@@ -13,12 +13,19 @@ import json
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 
 from modules.utilities import *
-from main_ui import window
+from main_ui import MainWindow
 
 
 def main(): 
     print("Running Application")
-    window()
+    app = QApplication(sys.argv)
+    MainWindow = MainWindow()
+    #win = Mywindow()
+    #win.show()
+   
+
+   
+    sys.exit(app.exec_())
     
     
     #scanDir(fileName)

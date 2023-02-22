@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1062</width>
-    <height>657</height>
+    <width>1000</width>
+    <height>752</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -158,21 +158,21 @@ QPushButton {
              <item>
               <widget class="QPushButton" name="UploadBtn">
                <property name="text">
-                <string>ICP </string>
+                <string>ICP Related</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_2">
                <property name="text">
-                <string>PushButton</string>
+                <string>GSMS Related</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton">
                <property name="text">
-                <string>Dashboard</string>
+                <string>Database</string>
                </property>
                <property name="icon">
                 <iconset>
@@ -585,7 +585,7 @@ margin: 0;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1062</width>
+     <width>1000</width>
      <height>22</height>
     </rect>
    </property>

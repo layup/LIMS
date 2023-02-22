@@ -9,13 +9,16 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from ui.GSMS_entry_page import Ui_GS_Entry
 
-from tester import Ui_ICP
+from modules.utilities import *
+
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1062, 657)
+        MainWindow.resize(1000, 752)
         MainWindow.setMinimumSize(QtCore.QSize(1000, 600))
         MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -124,16 +127,22 @@ class Ui_MainWindow(object):
 "margin: 0; \n"
 "}")
         self.stackedWidget.setObjectName("stackedWidget")
-        
         self.CreateReportPage = QtWidgets.QWidget()
         self.CreateReportPage.setObjectName("CreateReportPage")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.CreateReportPage)
-        
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setVerticalSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        
         self.Header = QtWidgets.QWidget(self.CreateReportPage)
+        
+        
+        self.page_3 = QtWidgets.QWidget()
+        self.page_3.ui = Ui_GS_Entry()
+        self.page_3.ui.setupUi(self.page_3)
+        self.page_3.setObjectName("page_3")
+        self.stackedWidget.addWidget(self.page_3)
+        
+        
         
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
@@ -243,39 +252,25 @@ class Ui_MainWindow(object):
         self.NextSection.setObjectName("NextSection")
         self.formLayout.setWidget(8, QtWidgets.QFormLayout.FieldRole, self.NextSection)
         self.gridLayout_2.addWidget(self.Body, 1, 0, 1, 1)
-        
         self.stackedWidget.addWidget(self.CreateReportPage)
-
+        
         self.page_2 = QtWidgets.QWidget()
         self.page_2.setObjectName("page_2")
         self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.page_2)
-        
-
-        #adding in custom widget thing    
-        self.page_3 =  QtWidgets.QWidget()
-        self.page_3.ui = Ui_ICP()
-        self.page_3.ui.setupUi(self.page_3)
-        
-        self.page_3.setObjectName("page_3")
-        self.stackedWidget.addWidget(self.page_3)
-        
-        
-
-        
-         
         self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_9.setObjectName("verticalLayout_9")
-        
         self.widget_3 = QtWidgets.QWidget(self.page_2)
         
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.widget_3.sizePolicy().hasHeightForWidth())
+        
         self.widget_3.setSizePolicy(sizePolicy)
         self.widget_3.setMaximumSize(QtCore.QSize(16777215, 80))
         self.widget_3.setStyleSheet("background-color: rgb(255, 215, 0);")
         self.widget_3.setObjectName("widget_3")
+        
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.widget_3)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
         self.label_11 = QtWidgets.QLabel(self.widget_3)
@@ -283,6 +278,7 @@ class Ui_MainWindow(object):
         font.setPointSize(20)
         font.setBold(True)
         font.setWeight(75)
+        
         self.label_11.setFont(font)
         self.label_11.setObjectName("label_11")
         self.verticalLayout_8.addWidget(self.label_11)
@@ -290,14 +286,12 @@ class Ui_MainWindow(object):
         self.label_12.setObjectName("label_12")
         self.verticalLayout_8.addWidget(self.label_12)
         self.verticalLayout_9.addWidget(self.widget_3)
-        
         self.stackedWidget.addWidget(self.page_2)
-        
         self.verticalLayout_5.addWidget(self.stackedWidget)
         self.horizontalLayout.addWidget(self.MainBodyContainer)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1062, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 22))
         self.menubar.setObjectName("menubar")
         self.menuLIMS = QtWidgets.QMenu(self.menubar)
         self.menuLIMS.setObjectName("menuLIMS")
@@ -315,10 +309,8 @@ class Ui_MainWindow(object):
         self.actionQuit.setObjectName("actionQuit")
         self.actionTest = QtWidgets.QAction(MainWindow)
         self.actionTest.setObjectName("actionTest")
-        
         self.actionCreate_Report = QtWidgets.QAction(MainWindow)
         self.actionCreate_Report.setObjectName("actionCreate_Report")
-        
         self.actionRecent_Reports = QtWidgets.QAction(MainWindow)
         self.actionRecent_Reports.setObjectName("actionRecent_Reports")
         self.menuLIMS.addAction(self.actionAbout)
@@ -344,9 +336,9 @@ class Ui_MainWindow(object):
         self.CreateReportBtn.setText(_translate("MainWindow", "Create Report"))
         self.ViewReportBtn.setText(_translate("MainWindow", "View Reports"))
         self.EditReportBtn.setText(_translate("MainWindow", "Edit Reports"))
-        self.UploadBtn.setText(_translate("MainWindow", "ICP "))
-        self.pushButton_2.setText(_translate("MainWindow", "PushButton"))
-        self.pushButton.setText(_translate("MainWindow", "Dashboard"))
+        self.UploadBtn.setText(_translate("MainWindow", "ICP Related"))
+        self.pushButton_2.setText(_translate("MainWindow", "GSMS Related"))
+        self.pushButton.setText(_translate("MainWindow", "Database"))
         self.SettingBtn.setText(_translate("MainWindow", "Settings"))
         self.HelpBtn.setText(_translate("MainWindow", "Help "))
         self.headerText.setText(_translate("MainWindow", "Create Report"))
