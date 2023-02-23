@@ -40,9 +40,9 @@ class Ui_GS_Entry(object):
         self.label_11.setFont(font)
         self.label_11.setObjectName("label_11")
         self.gridLayout_2.addWidget(self.label_11, 0, 0, 1, 1, QtCore.Qt.AlignTop)
-        self.label_12 = QtWidgets.QLabel(self.Header)
-        self.label_12.setObjectName("label_12")
-        self.gridLayout_2.addWidget(self.label_12, 2, 0, 1, 1)
+        self.labelJobNumHeader = QtWidgets.QLabel(self.Header)
+        self.labelJobNumHeader.setObjectName("labelJobNumHeader")
+        self.gridLayout_2.addWidget(self.labelJobNumHeader, 2, 0, 1, 1)
         self.verticalLayout.addWidget(self.Header)
         self.TabSelection = QtWidgets.QWidget(GS_Entry)
         self.TabSelection.setMinimumSize(QtCore.QSize(0, 50))
@@ -343,8 +343,8 @@ class Ui_GS_Entry(object):
     def retranslateUi(self, GS_Entry):
         _translate = QtCore.QCoreApplication.translate
         GS_Entry.setWindowTitle(_translate("GS_Entry", "Form"))
-        self.label_11.setText(_translate("GS_Entry", "GSMS Creation"))
-        self.label_12.setText(_translate("GS_Entry", "Job Number: "))
+        self.label_11.setText(_translate("GS_Entry", "GSMS Creation 2 "))
+        self.labelJobNumHeader.setText(_translate("GS_Entry", "Job Number: "))
         self.clientInfoBtn.setText(_translate("GS_Entry", "Client Information"))
         self.dataEntryBtn.setText(_translate("GS_Entry", "Data Entry"))
         self.GenerateReportBtn.setText(_translate("GS_Entry", "Generate Report "))
@@ -370,7 +370,7 @@ class Ui_GS_Entry(object):
         total_items = len(GSMS_values) 
         
         for x in range(total_items): 
-                print(x)
+                #print(x)
                 item = self.tableWidget.verticalHeaderItem(x)
                 item.setText(_translate("GS_Entry", str(x)))
                  
@@ -434,7 +434,7 @@ class Ui_GS_Entry(object):
         
         counter = 0; 
         for key, value in GSMS_values.items(): 
-                print(key, value )
+                #print(key, value )
                 item = self.tableWidget.item(counter, 0)
                 item.setText(_translate('GS_entry', value[0]))
                 item = self.tableWidget.item(counter, 1)

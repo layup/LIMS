@@ -1,76 +1,85 @@
-import sys 
+import sys, os
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *   
 
-from PyQt5.QtWidgets import (
-    QApplication, 
-    QHBoxLayout, 
-    QPushButton, 
-    QWidget, 
-    QMainWindow, 
-    QFileDialog
-    
-)
-
-
-
-
-from interface import Ui_MainWindow
-from modules.ICPConverter import * 
-
-
-class Window(QWidget): 
-    def __init__(self): 
-        super().__init__()
-        self.setWindowTitle("QHBox Layout Example")
-        
-        layout = QHBoxLayout()
-        
-        layout.addWidget(QPushButton('Left-Most'),1)
-        layout.addWidget(QPushButton('Center'),2)
-        layout.addWidget(QPushButton('Right-Most'),1)
-        
-        self.setLayout(layout)
-
-
-def openFile(): 
-    fileName, _ = QFileDialog.getOpenFileName(None, 'Single File', '', '*.xlsx')
-    print(fileName)
-
-class MainWindow(QMainWindow):
-    
-
+class MainPage(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
-      
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self) #self defined function that setups
-        
-        self.setWindowTitle("Tommy Lay") 
-        
+        super().__init__()
+        self.mdi = QMdiArea()
+        self.mdi.setFixedSize(1000, 400)
+        self.mdi.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.mdi.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.setWindowTitle("Sample Programme")
+        self.setGeometry(100, 100, 1600, 600)
+        self.Ui()
 
-        #Connect the pages   
-        self.ui.CreateReportBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.page_2))
-        self.ui.EditReportBtn.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.CreateReportPage))
-        self.ui.ViewReportBtn.clicked.connect(lambda:self.ui.stackedWidget.setCurrentWidget(self.ui.page_3))
-        #self.ui.ViewReportBtn.clicked.connect(openFile)
-        
-        #connect the menu bar options 
-        
-        self.show()
-        
-        
+    def Ui(self):
+        self.btn1 = QPushButton("Country")
+        self.btn1.setFixedSize(100, 30)
+        self.btn1.clicked.connect(self.countrypage)
+        self.left_layout = QVBoxLayout()
+        self.right_layout = QHBoxLayout()
+        self.main_layout = QHBoxLayout()
+        self.left_layout.setContentsMargins(3, 5, 5, 3)
+        self.left_layout.addWidget(self.btn1)
+        self.left_layout.addStretch()
+        self.right_layout.addWidget(self.mdi)
+        self.main_layout.setSpacing(5)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.addLayout(self.left_layout)
+        self.main_layout.addLayout(self.right_layout)
+        self.main_layout.addStretch()
+        widget = QWidget()
+        widget.setLayout(self.main_layout)
+        self.setCentralWidget(widget)
 
-    
-if __name__ == "__main__": 
-    ''' 
+    def countrypage(self):
+        page = Countrypage()
+        subwindow = self.mdi.addSubWindow(page)
+        subwindow.setWindowTitle("Create Country")
+        subwindow.setFixedWidth(300)
+        page.btn_close.clicked.connect(self.subwindowclose)
+        page.btn_new.clicked.connect(self.countrypage)
+        subwindow.show()
+        self.mdi.cascadeSubWindows()
+
+    def subwindowclose(self):
+        print("close activated from mdi programme")
+        current = self.mdi.activeSubWindow()
+        if current is not None:
+            self.mdi.activatePreviousSubWindow()
+            previous = self.mdi.activeSubWindow()
+            if previous is not None:
+                previous.widget().update_fields(current.widget())
+            current.close()
+
+
+class Countrypage(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.btn_close = QPushButton("Close")
+        self.btn_new = QPushButton("New")
+        self.tb_country = QLineEdit()
+        self.tb_continent = QLineEdit()
+        self.form_layout = QFormLayout()
+        self.form_layout.addRow("Country", self.tb_country)
+        self.form_layout.addRow("Continent", self.tb_continent)
+        self.form_layout.addRow("", self.btn_close)
+        self.form_layout.addRow("", self.btn_new)
+        self.setLayout(self.form_layout)
+
+    def update_fields(self, other):
+        if isinstance(other, Countrypage):
+            self.tb_country.setText(other.tb_country.text())
+            self.tb_continent.setText(other.tb_continent.text())
+        else:
+            raise TypeError('invalid page type')
+
+
+if __name__ == "__main__":
+
     app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec_())
-    '''
-    
-    app = QApplication(sys.argv)
-    MainWindow = MainWindow()
-
-    #MainWindow.show()
-
+    mainwindow = MainPage()
+    app.setStyle("Windows")
+    mainwindow.show()
     sys.exit(app.exec_())

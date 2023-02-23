@@ -135,12 +135,12 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.Header = QtWidgets.QWidget(self.CreateReportPage)
         
+        #added this page  
+
+        #self.page_3_setup()
+
         
-        self.page_3 = QtWidgets.QWidget()
-        self.page_3.ui = Ui_GS_Entry()
-        self.page_3.ui.setupUi(self.page_3)
-        self.page_3.setObjectName("page_3")
-        self.stackedWidget.addWidget(self.page_3)
+        
         
         
         
@@ -324,8 +324,14 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
+        
+        #trying to pass a signal from one page to another 
+        
+        
+        
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -359,6 +365,15 @@ class Ui_MainWindow(object):
         self.actionTest.setText(_translate("MainWindow", "Test"))
         self.actionCreate_Report.setText(_translate("MainWindow", "Create Reports"))
         self.actionRecent_Reports.setText(_translate("MainWindow", "Recent Reports"))
+        
+    def page_3_setup_2(self): 
+        
+        self.page_3 = QtWidgets.QWidget()
+        self.page_3.ui = Ui_GS_Entry() 
+        self.page_3.ui.setupUi(self.page_3)
+        self.page_3.setObjectName("page_3")
+        self.stackedWidget.addWidget(self.page_3)
+         
 
 
 if __name__ == "__main__":
