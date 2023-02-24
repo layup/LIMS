@@ -181,22 +181,21 @@ class Ui_GS_Entry(object):
         self.formLayout.setWidget(16, QtWidgets.QFormLayout.LabelRole, self.widget_2)
         self.horizontalLayout_2.addWidget(self.widget)
         self.widget_4 = QtWidgets.QWidget(self.ClientInfoPage)
-        self.widget_4.setMinimumSize(QtCore.QSize(200, 0))
+        self.widget_4.setMinimumSize(QtCore.QSize(100, 0))
         self.widget_4.setStyleSheet("QLineEdit {\n"
-                                "    min-width: 300px; \n"
-
-                                "}")
+"    min-width: 400px; \n"
+"}")
         self.widget_4.setObjectName("widget_4")
         self.formLayout_2 = QtWidgets.QFormLayout(self.widget_4)
         self.formLayout_2.setLabelAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.formLayout_2.setFormAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.formLayout_2.setObjectName("formLayout_2")
-        #self.sample1Value = QtWidgets.QLineEdit(self.widget_4)
-        #self.sample1Value.setObjectName("sample1Value")
-        #self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.sample1Value)
-        #self.sample1Name = QtWidgets.QLabel(self.widget_4)
-        #self.sample1Name.setObjectName("sample1Name")
-        #self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.sample1Name)
+        self.sample1Value = QtWidgets.QLineEdit(self.widget_4)
+        self.sample1Value.setObjectName("sample1Value")
+        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.sample1Value)
+        self.sample1Name = QtWidgets.QLabel(self.widget_4)
+        self.sample1Name.setObjectName("sample1Name")
+        self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.sample1Name)
         self.horizontalLayout_2.addWidget(self.widget_4)
         self.stackedWidget.addWidget(self.ClientInfoPage)
         self.ClientData = QtWidgets.QWidget()
@@ -341,7 +340,6 @@ class Ui_GS_Entry(object):
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(GS_Entry)
 
-    
     def retranslateUi(self, GS_Entry):
         _translate = QtCore.QCoreApplication.translate
         GS_Entry.setWindowTitle(_translate("GS_Entry", "Form"))
@@ -365,7 +363,7 @@ class Ui_GS_Entry(object):
         self.label_15.setText(_translate("GS_Entry", "Email"))
         self.label_16.setText(_translate("GS_Entry", "Fax"))
         self.label_17.setText(_translate("GS_Entry", "Payment Information"))
-        #self.sample1Name.setText(_translate("GS_Entry", "Sample 1 Name:"))
+        self.sample1Name.setText(_translate("GS_Entry", "Sample 1 Name:"))
        
        
         #does this onetime 
@@ -480,12 +478,8 @@ class Ui_GS_Entry(object):
         self.clientInfoBtn.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.ClientInfoPage))
         self.dataEntryBtn.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.ClientData))
                 
-
+                
         
-        
-            
-            
-            
 
 if __name__ == "__main__":
     import sys

@@ -175,8 +175,8 @@ def processClientInfo(jobNum, fileLocation):
         'sampleType1': '', 
         'sampleType2': '', 
         'totalSamples': '', 
-        'recieveTemp': '', 
-        'tele': '', 
+        'recvTemp': '', 
+        'tel': '', 
         'email': '', 
         'fax': '', 
         'payment': ''
@@ -187,32 +187,97 @@ def processClientInfo(jobNum, fileLocation):
     
     #have the information about the file, what kind of reports and etc 
     reportInformation = {}
+
+    sampleCounter = 0; 
     
     with open(fileLocation) as file: 
     
-        lines = [line for line in file.readlines() if line.strip()]
+        #lines = [line for line in file.readlines() if line.strip()]
         
-        for lineLocation, line in enumerate(lines,1):
-            print(lineLocation, line)
-            
+        #for lineLocation, line in enumerate(lines,0):
+        for lineLocation, line in enumerate(file, 0):
+            #print(lineLocation, line)
             
             if(lineLocation == 1): 
-                print(lineLocation, line)
+                #print(lineLocation, line)
                 clientInfoDict['clientName'] = line[0:54].strip()
                 clientInfoDict['date'] = line[50:(54+7)].strip()
                 clientInfoDict['time'] = line[66:71].strip()
                 
             if(lineLocation == 2): 
-                return; 
-            
-            
+                clientInfoDict['sampleType1'] = line[54:].strip()
                 
+                if "*" in line: 
+                    clientInfoDict['attn'] = line[:54].strip()
+                else: 
+                    clientInfoDict['addy1'] = line[:54].strip()
+                
+            if(lineLocation == 3): 
+                clientInfoDict['sampleType2'] = line[54:].strip()
+                
+                if(clientInfoDict['attn'] != ''):
+                    clientInfoDict['addy1'] = line[:60].strip()
+                else: 
+                    clientInfoDict['addy2'] = line[:60].strip()
+            
+            if(lineLocation == 4): 
+                clientInfoDict['totalSamples'] = line[60:].strip()
+                
+                if(clientInfoDict['attn'] != ''):
+                    clientInfoDict['addy2'] = line[:60].strip()
+                else: 
+                    clientInfoDict['addy3'] = line[:60].strip() 
+                    
+            if(lineLocation == 5): 
+                if(clientInfoDict['attn'] and clientInfoDict['addy2']): 
+                    clientInfoDict['addy3'] = line[:60].strip()
+                else: 
+                    clientInfoDict['tel'] = line[26:50].strip()
+
+                    try: 
+                        clientInfoDict['recvTemp'] = line[71:].strip()
+                    except:
+                        print('No recv temp avaliable')
+                        
+            if(lineLocation == 6): 
+                clientInfoDict['tel'] = line[26:50].strip() 
+                clientInfoDict['recvTemp'] = line[71:].strip()
+            
+            if(lineLocation == 7): 
+                clientInfoDict['fax'] = line[26:].strip()
+                
+            if(lineLocation == 8): 
+                
+                try: 
+                    foundEmail = re.search('([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', line).group()
+                    if(foundEmail): 
+                        clientInfoDict['email'] = foundEmail; 
+                except:
+                    print("email error")
+                
+                if("pd" in line.lower()): 
+                    clientInfoDict['payment'] = line[51:].strip()
                      
-        
+            
+            if(lineLocation > 35 and len(line) > 0): 
+                if(sampleCounter != int(clientInfoDict['totalSamples']) ):
+
+                    try: 
+                        sampleMatch = re.search('(?<=\s[0-9]).*', line).group()
+                        if(sampleMatch): 
+                            sampleName = str(jobNum) + '-' + str(sampleCounter+1)
+                            sampleNames[sampleName] = sampleMatch.strip()
+                            sampleCounter+=1; 
+                           
+                        #TODO: add something to get the - afterwords 
+                    except: 
+                        continue
+                    
         
     file.close()
     
-    print(clientInfoDict)
-    return clientInfoDict; 
+    #print(clientInfoDict)
+    #print(sampleNames)
+    return clientInfoDict, sampleNames; 
     
     

@@ -13,24 +13,18 @@ import json
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 
 from modules.utilities import *
-from main_ui import MainWindow
+from main_ui import window
 
 
 def main(): 
     print("Running Application")
-    app = QApplication(sys.argv)
-    MainWindow = MainWindow()
-    #win = Mywindow()
-    #win.show()
-   
-
-   
-    sys.exit(app.exec_())
+    window()
     
     
     #scanDir(fileName)
 
 if __name__ == "__main__":
+    #always have the database connected 
     main()
     
     
