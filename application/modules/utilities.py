@@ -8,6 +8,7 @@ import inquirer
 import json 
 import sqlite3 
 import pickle 
+from copy import copy
 
 
 
@@ -186,20 +187,32 @@ def processClientInfo(jobNum, fileLocation):
     sampleNames = {}
     
     #have the information about the file, what kind of reports and etc 
-    reportInformation = {}
+    sampleTests = {}
 
     sampleCounter = 0; 
+    prevLine = [0, ""]
+    prevLineHelper = [0, ""]
     
     with open(fileLocation) as file: 
     
-        #lines = [line for line in file.readlines() if line.strip()]
-        
-        #for lineLocation, line in enumerate(lines,0):
         for lineLocation, line in enumerate(file, 0):
-            #print(lineLocation, line)
+
+            if(prevLine[0]+1 == prevLineHelper[0]):
+                prevLine[0] = copy(prevLineHelper[0])
+                prevLine[1] = copy(prevLineHelper[1])
+                prevLineHelper[0] = copy(int(lineLocation))
+                prevLineHelper[1] = copy(line)
+            else: 
+                prevLineHelper[0] = copy(int(lineLocation))
+                prevLineHelper[1] = copy(line)
             
+
+            #print('PrevLine: ', prevLine[0], prevLine[1])
+            #print('PrevLineHelper: ', prevLineHelper[0], prevLineHelper[1])
+            #print('currentLine: ', lineLocation, line)
+        
+                    
             if(lineLocation == 1): 
-                #print(lineLocation, line)
                 clientInfoDict['clientName'] = line[0:54].strip()
                 clientInfoDict['date'] = line[50:(54+7)].strip()
                 clientInfoDict['time'] = line[66:71].strip()
@@ -260,6 +273,7 @@ def processClientInfo(jobNum, fileLocation):
                      
             
             if(lineLocation > 35 and len(line) > 0): 
+               
                 if(sampleCounter != int(clientInfoDict['totalSamples']) ):
 
                     try: 
@@ -271,13 +285,51 @@ def processClientInfo(jobNum, fileLocation):
                            
                         #TODO: add something to get the - afterwords 
                     except: 
-                        continue
+                        pass
+                #find the report information that does with corrisponding thing                
+                if(re.search('(?<=\s-\s).*', line)):
+                    prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
+                    print(prevSampleName)
+                    currentTestsCheck = re.search('(?<=\s-\s).*', line)
+                    prevSampleMatchCheck = re.search('(?<=\s[0-9]).*', prevLine[1])
+                    prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
+                    #sampleTests[prevSampleName] = currentTestsCheck.group()
+                    #not could be apart of the string name longer 
+                    
+                    #add to most recent sample
+                    if(currentTestsCheck):
+                        #print('current is a test: ', currentTestsCheck.group())
+                        sampleTests[prevSampleName] = currentTestsCheck.group()
+
+
+                    if(prevSampleMatchCheck):
+                        #print('prev was a sampleName')
+                        #print(sampleName[prevSampleName]) #doesnt work 
+                        pass; 
+                       
+                    #append onto them 
+                    if(prevSampleTestsCheck):
+                        sampleTests[prevSampleName] = sampleTests[prevSampleName]  + ", " + currentTestsCheck.group()
+                        
+                    #TODO: solve this later, add previous name onto current name sample 
+                    if((not bool(prevSampleMatchCheck)) and not( bool(prevSampleTestsCheck))): 
+                        print('prev was apart of the name yo')
+                        
+                        
+            
+            #print('---------------------------') 
+                
+                    
+                     
+            
+            
                     
         
     file.close()
     
     #print(clientInfoDict)
     #print(sampleNames)
+    #print(sampleTests)
     return clientInfoDict, sampleNames; 
     
     
