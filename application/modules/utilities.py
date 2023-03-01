@@ -17,6 +17,24 @@ from PyQt5.QtWidgets import (
     QFileDialog
 )
 
+REPORTS_TYPE = {
+    "ISP": "ISP", 
+    "GSMS": "GSMS"
+}
+
+MATRIX_TYPE = {
+    
+}
+
+PARAMETERS_TYPE = {
+    
+}
+
+
+METHODS_TYPE = {
+    
+}
+
 GSMS_values = {
     "001": ["ALkalinity", "mg/L"], 
     "002": ["NH3-N", "ug/L "], 

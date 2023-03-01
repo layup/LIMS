@@ -105,14 +105,17 @@ QPushButton::checked {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../assets/icon/Icons.qrc">
-           <normaloff>:/newPrefix/file.png</normaloff>:/newPrefix/file.png</iconset>
+          <iconset resource="assets/resourse.qrc">
+           <normaloff>:/icons/icons/file.png</normaloff>:/icons/icons/file.png</iconset>
          </property>
          <property name="iconSize">
           <size>
            <width>20</width>
            <height>20</height>
           </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -122,14 +125,17 @@ QPushButton::checked {
           <string/>
          </property>
          <property name="icon">
-          <iconset>
-           <normaloff>../assets/icon/plus.png</normaloff>../assets/icon/plus.png</iconset>
+          <iconset resource="assets/resourse.qrc">
+           <normaloff>:/icons/icons/file-earmark-plus.svg</normaloff>:/icons/icons/file-earmark-plus.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
            <width>20</width>
            <height>20</height>
           </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -139,14 +145,17 @@ QPushButton::checked {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../assets/icon/Icons.qrc">
-           <normaloff>:/newPrefix/flask.png</normaloff>:/newPrefix/flask.png</iconset>
+          <iconset resource="assets/resourse.qrc">
+           <normaloff>:/icons/icons/flask.png</normaloff>:/icons/icons/flask.png</iconset>
          </property>
          <property name="iconSize">
           <size>
            <width>20</width>
            <height>20</height>
           </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -156,8 +165,8 @@ QPushButton::checked {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../assets/icon/Icons.qrc">
-           <normaloff>:/newPrefix/microscope.png</normaloff>:/newPrefix/microscope.png</iconset>
+          <iconset resource="assets/resourse.qrc">
+           <normaloff>:/icons/icons/microscope.png</normaloff>:/icons/icons/microscope.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -189,8 +198,8 @@ QPushButton::checked {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../assets/icon/Icons.qrc">
-           <normaloff>:/newPrefix/settings-sliders.png</normaloff>:/newPrefix/settings-sliders.png</iconset>
+          <iconset resource="assets/resourse.qrc">
+           <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -255,6 +264,7 @@ QPushButton::checked {
 	height:30px;
 	color: #788596;
 	text-align:left;
+	font: 14px;
 
 }
 
@@ -301,8 +311,14 @@ color: rgb(255, 255, 255);</string>
              <string>Reports </string>
             </property>
             <property name="icon">
-             <iconset resource="../assets/icon/Icons.qrc">
-              <normaloff>:/newPrefix/file.png</normaloff>:/newPrefix/file.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/file.png</normaloff>:/icons/icons/file.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -324,13 +340,13 @@ color: rgb(255, 255, 255);</string>
              <string>Create Report</string>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../assets/icon/plus.png</normaloff>../assets/icon/plus.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/file-earmark-plus.svg</normaloff>:/icons/icons/file-earmark-plus.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="checkable">
@@ -344,11 +360,17 @@ color: rgb(255, 255, 255);</string>
           <item>
            <widget class="QPushButton" name="icpBtn1">
             <property name="text">
-             <string>ICP Related</string>
+             <string>ICP Database</string>
             </property>
             <property name="icon">
-             <iconset resource="../assets/icon/Icons.qrc">
-              <normaloff>:/newPrefix/flask.png</normaloff>:/newPrefix/flask.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/flask.png</normaloff>:/icons/icons/flask.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -358,11 +380,17 @@ color: rgb(255, 255, 255);</string>
           <item>
            <widget class="QPushButton" name="gsmsBtn1">
             <property name="text">
-             <string>GSMS Related</string>
+             <string>GSMS Database</string>
             </property>
             <property name="icon">
-             <iconset resource="../assets/icon/Icons.qrc">
-              <normaloff>:/newPrefix/microscope.png</normaloff>:/newPrefix/microscope.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/microscope.png</normaloff>:/icons/icons/microscope.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -388,8 +416,14 @@ color: rgb(255, 255, 255);</string>
              <string>Settings</string>
             </property>
             <property name="icon">
-             <iconset resource="../assets/icon/Icons.qrc">
-              <normaloff>:/newPrefix/settings-sliders.png</normaloff>:/newPrefix/settings-sliders.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -459,8 +493,8 @@ QPushButton {
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../assets/icon/menu-burger.png</normaloff>../assets/icon/menu-burger.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/menu-burger.png</normaloff>:/icons/icons/menu-burger.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -538,7 +572,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -1387,6 +1421,13 @@ QPushButton::hover {
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
+                  <widget class="QPushButton" name="pushButton">
+                   <property name="text">
+                    <string>Report Details</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QPushButton" name="clientInfoBtn">
                    <property name="text">
                     <string>Client Information</string>
@@ -1950,7 +1991,7 @@ QTableView::indicator:checked {
   </action>
  </widget>
  <resources>
-  <include location="../assets/icon/Icons.qrc"/>
+  <include location="assets/resourse.qrc"/>
  </resources>
  <connections>
   <connection>

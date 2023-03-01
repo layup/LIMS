@@ -1,0 +1,6 @@
+#ignore mac system files 
+.DS_store
+
+#ignore build folders 
+build/
+dist/

@@ -13,9 +13,7 @@ import asyncio
 
 from modules.utilities import * 
 from interface import *
-from ui.GSMS_entry_page import Ui_GS_Entry
 
-#from ..assets.icon.icons 
     
 class MainWindow(QMainWindow):
     
@@ -28,7 +26,7 @@ class MainWindow(QMainWindow):
         
         #define other widget setups 
     
-        self.setWindowTitle("Tommy Lay") 
+        self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
         self.ui.stackedWidget.setCurrentIndex(5)
         self.ui.reportsBtn1.setChecked(True)
@@ -172,7 +170,8 @@ class MainWindow(QMainWindow):
             self.loadData()
             
             
-        else: 
+        else:
+             
             print("Hello World")
             msg = QMessageBox() 
             msg.setWindowTitle("Error to procceed")
@@ -183,36 +182,6 @@ class MainWindow(QMainWindow):
     def loadData(self): 
         print(self.clientInfo)
         print(self.sampleNames)
-         
-
+        
         
     
-        
-        
-        
-         
-
-def window(): 
-    #global app, MainWindow 
-    app = QApplication(sys.argv)
-    app.setStyle('Windows')
-    MainWindow = MainWindow()
-    #win = Mywindow()
-    #win.show()
-   
-    sys.exit(app.exec_())
- 
-if __name__ == "__main__":
-    #window()
-    import sys 
-    app = QApplication(sys.argv)
-    MainWindow = MainWindow()
-    #win = Mywindow()
-    #win.show()
-
-    #for key, value in GSMS_values.items(): 
-    #    print(key, value )
-
-    #print(len(GSMS_values))
-    
-    sys.exit(app.exec_())

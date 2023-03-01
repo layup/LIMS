@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+#from assets import resourse_rc
 
 
 class Ui_MainWindow(object):
@@ -59,31 +60,34 @@ class Ui_MainWindow(object):
         self.reportsBtn2 = QtWidgets.QPushButton(self.LeftMenuContainerMini)
         self.reportsBtn2.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/newPrefix/file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/icons/icons/file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.reportsBtn2.setIcon(icon)
         self.reportsBtn2.setIconSize(QtCore.QSize(20, 20))
+        self.reportsBtn2.setCheckable(True)
         self.reportsBtn2.setObjectName("reportsBtn2")
         self.verticalLayout_6.addWidget(self.reportsBtn2)
         self.createReportBtn2 = QtWidgets.QPushButton(self.LeftMenuContainerMini)
         self.createReportBtn2.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("../assets/icon/plus.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/icons/icons/file-earmark-plus.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.createReportBtn2.setIcon(icon1)
         self.createReportBtn2.setIconSize(QtCore.QSize(20, 20))
+        self.createReportBtn2.setCheckable(True)
         self.createReportBtn2.setObjectName("createReportBtn2")
         self.verticalLayout_6.addWidget(self.createReportBtn2)
         self.icpBtn2 = QtWidgets.QPushButton(self.LeftMenuContainerMini)
         self.icpBtn2.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/newPrefix/flask.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/icons/icons/flask.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.icpBtn2.setIcon(icon2)
         self.icpBtn2.setIconSize(QtCore.QSize(20, 20))
+        self.icpBtn2.setCheckable(True)
         self.icpBtn2.setObjectName("icpBtn2")
         self.verticalLayout_6.addWidget(self.icpBtn2)
         self.gsmsBtn2 = QtWidgets.QPushButton(self.LeftMenuContainerMini)
         self.gsmsBtn2.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/newPrefix/microscope.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/icons/icons/microscope.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.gsmsBtn2.setIcon(icon3)
         self.gsmsBtn2.setIconSize(QtCore.QSize(20, 20))
         self.gsmsBtn2.setCheckable(True)
@@ -94,7 +98,7 @@ class Ui_MainWindow(object):
         self.settingsBtn2 = QtWidgets.QPushButton(self.LeftMenuContainerMini)
         self.settingsBtn2.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/newPrefix/settings-sliders.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(":/icons/icons/settings-sliders.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.settingsBtn2.setIcon(icon4)
         self.settingsBtn2.setIconSize(QtCore.QSize(20, 20))
         self.settingsBtn2.setCheckable(True)
@@ -123,6 +127,7 @@ class Ui_MainWindow(object):
 "    height:30px;\n"
 "    color: #788596;\n"
 "    text-align:left;\n"
+"    font: 14px;\n"
 "\n"
 "}\n"
 "\n"
@@ -153,6 +158,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.TopNav)
         self.reportsBtn1 = QtWidgets.QPushButton(self.LeftMenuSubContainer)
         self.reportsBtn1.setIcon(icon)
+        self.reportsBtn1.setIconSize(QtCore.QSize(20, 20))
         self.reportsBtn1.setCheckable(True)
         self.reportsBtn1.setObjectName("reportsBtn1")
         self.verticalLayout.addWidget(self.reportsBtn1)
@@ -161,18 +167,20 @@ class Ui_MainWindow(object):
         self.createReportBtn1.setAutoFillBackground(False)
         self.createReportBtn1.setStyleSheet("")
         self.createReportBtn1.setIcon(icon1)
-        self.createReportBtn1.setIconSize(QtCore.QSize(16, 16))
+        self.createReportBtn1.setIconSize(QtCore.QSize(20, 20))
         self.createReportBtn1.setCheckable(True)
         self.createReportBtn1.setFlat(False)
         self.createReportBtn1.setObjectName("createReportBtn1")
         self.verticalLayout.addWidget(self.createReportBtn1)
         self.icpBtn1 = QtWidgets.QPushButton(self.LeftMenuSubContainer)
         self.icpBtn1.setIcon(icon2)
+        self.icpBtn1.setIconSize(QtCore.QSize(20, 20))
         self.icpBtn1.setCheckable(True)
         self.icpBtn1.setObjectName("icpBtn1")
         self.verticalLayout.addWidget(self.icpBtn1)
         self.gsmsBtn1 = QtWidgets.QPushButton(self.LeftMenuSubContainer)
         self.gsmsBtn1.setIcon(icon3)
+        self.gsmsBtn1.setIconSize(QtCore.QSize(20, 20))
         self.gsmsBtn1.setCheckable(True)
         self.gsmsBtn1.setObjectName("gsmsBtn1")
         self.verticalLayout.addWidget(self.gsmsBtn1)
@@ -180,6 +188,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addItem(spacerItem1)
         self.settingBtn1 = QtWidgets.QPushButton(self.LeftMenuSubContainer)
         self.settingBtn1.setIcon(icon4)
+        self.settingBtn1.setIconSize(QtCore.QSize(20, 20))
         self.settingBtn1.setCheckable(True)
         self.settingBtn1.setObjectName("settingBtn1")
         self.verticalLayout.addWidget(self.settingBtn1)
@@ -219,7 +228,7 @@ class Ui_MainWindow(object):
         self.toggleMenu = QtWidgets.QPushButton(self.searchBar)
         self.toggleMenu.setText("")
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap("../assets/icon/menu-burger.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap(":/icons/icons/menu-burger.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toggleMenu.setIcon(icon5)
         self.toggleMenu.setIconSize(QtCore.QSize(20, 20))
         self.toggleMenu.setCheckable(True)
@@ -640,6 +649,9 @@ class Ui_MainWindow(object):
         self.tabSectionContainer.setObjectName("tabSectionContainer")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.tabSectionContainer)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.pushButton = QtWidgets.QPushButton(self.tabSectionContainer)
+        self.pushButton.setObjectName("pushButton")
+        self.horizontalLayout_4.addWidget(self.pushButton)
         self.clientInfoBtn = QtWidgets.QPushButton(self.tabSectionContainer)
         self.clientInfoBtn.setCheckable(True)
         self.clientInfoBtn.setObjectName("clientInfoBtn")
@@ -925,7 +937,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(2)
         self.stackedWidget_2.setCurrentIndex(0)
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainer.setHidden) # type: ignore
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
@@ -947,8 +959,8 @@ class Ui_MainWindow(object):
         self.logo.setText(_translate("MainWindow", "MB Labs Ltd."))
         self.reportsBtn1.setText(_translate("MainWindow", "Reports "))
         self.createReportBtn1.setText(_translate("MainWindow", "Create Report"))
-        self.icpBtn1.setText(_translate("MainWindow", "ICP Related"))
-        self.gsmsBtn1.setText(_translate("MainWindow", "GSMS Related"))
+        self.icpBtn1.setText(_translate("MainWindow", "ICP Database"))
+        self.gsmsBtn1.setText(_translate("MainWindow", "GSMS Database"))
         self.settingBtn1.setText(_translate("MainWindow", "Settings"))
         self.searchLine.setText(_translate("MainWindow", "Search Job Number"))
         self.label_21.setText(_translate("MainWindow", "Reports"))
@@ -990,6 +1002,7 @@ class Ui_MainWindow(object):
         self.label_25.setText(_translate("MainWindow", "Report Type:"))
         self.label_24.setText(_translate("MainWindow", "Matrix:"))
         self.label_14.setText(_translate("MainWindow", "TextLabel"))
+        self.pushButton.setText(_translate("MainWindow", "Report Details"))
         self.clientInfoBtn.setText(_translate("MainWindow", "Client Information"))
         self.dataEntryBtn.setText(_translate("MainWindow", "Data Entry"))
         self.GenerateReportBtn.setText(_translate("MainWindow", "Generate Report "))
@@ -1031,14 +1044,7 @@ class Ui_MainWindow(object):
         self.actionCreate_Report.setText(_translate("MainWindow", "Create Reports"))
         self.actionClear_Recent.setText(_translate("MainWindow", "Clear Recent "))
         self.actionUpload_ISP_Files.setText(_translate("MainWindow", "Upload ISP Files"))
-#import Icons_rc
+        #import resource as resourse_rc 
+        #import assets as resourse_rc
 
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+from assets import resource_rc
