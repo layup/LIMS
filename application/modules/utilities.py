@@ -11,6 +11,7 @@ import pickle
 from copy import copy
 
 
+
 from PyQt5.QtWidgets import (
     QFileDialog
 )
@@ -54,12 +55,38 @@ GSMS_values = {
     
 }
 
-ELEMENT_CONVERT = {
-    'al': 'aluminium', 
-    
-    
-
+periodic_table = {
+    'Ag': 'Silver',
+    'Al': 'Aluminum',
+    'Au': 'Gold',
+    'B': 'Boron',
+    'Ba': 'Barium',
+    'Be': 'Beryllium',
+    'Ca': 'Calcium',
+    'Co': 'Cobalt',
+    'Cr': 'Chromium',
+    'Cu': 'Copper',
+    'Fe': 'Iron',
+    'K': 'Potassium',
+    'La': 'Lanthanum',
+    'Mg': 'Magnesium',
+    'Mn': 'Manganese',
+    'Mo': 'Molybdenum',
+    'Na': 'Sodium',
+    'Ni': 'Nickel',
+    'P': 'Phosphorus',
+    'S': 'Sulfur',
+    'Sc': 'Scandium',
+    'Si': 'Silicon',
+    'Sn': 'Tin',
+    'Sr': 'Strontium',
+    'Ti': 'Titanium',
+    'V': 'Vanadium',
+    'W': 'Tungsten',
+    'Zn': 'Zinc'
 }
+
+
 
 GSMS_So_values = {
     "001": 0.100, 
@@ -99,13 +126,9 @@ def load_pickle(filename):
 
 def openFile(): 
     fileName, _ = QFileDialog.getOpenFileName(None, 'Open File', '',)
-    #print(fileName)
-    #print('Open FIle')
     return fileName
 
 def getFileLocation():
-
-    
     dlg = QFileDialog().getExistingDirectory()
     print(dlg)
     return dlg
@@ -421,8 +444,7 @@ def icpMethod1(filePath, db):
     loadPath = load_pickle('data.pickle') 
     print(loadPath)
     newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
-    
- 
+     
     
     print('Writing CSV File: {}'.format(newPath))
     f = open(newPath, 'w')

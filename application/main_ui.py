@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLin
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QObject, pyqtSlot
 
-
 #general Imports 
 import sys 
 import pandas as pd
@@ -17,27 +16,25 @@ from modules.utilities import *
 from modules.dbManager import *
 from interface import *
 
-
     
 class MainWindow(QMainWindow):
     
-
     def __init__(self):
         super(MainWindow, self).__init__()
       
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self) #self defined function that setups
+        self.ui.setupUi(self) 
         
         paths = load_pickle('data.pickle')
         self.db = Database(paths['databasePath'])
-        
+
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
         self.ui.stackedWidget.setCurrentIndex(1)
         self.ui.reportsBtn1.setChecked(True)
 
-        self.ui.jobNumInput.setText('171544')
+        self.ui.jobNumInput.setText('171981')
 
         #print(self.ui.page_3.ui.__dir__())
         #first page options 
@@ -53,7 +50,7 @@ class MainWindow(QMainWindow):
 
         #set first page paramenters         
         self.ui.reportType.addItems(REPORTS_TYPE)
-        self.ui.matrixType.addItems(sorted(MATRIX_TYPE))
+        self.ui.paramType.addItems(sorted(MATRIX_TYPE))
 
         #connect buttons 
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
@@ -187,14 +184,23 @@ class MainWindow(QMainWindow):
             msg.setText("Please enter a valid job number!")
             x = msg.exec_()  # this will show our messagebox
             
-
+    #only define for the CHM file 
     def gsmsLoader(self): 
         
         self.loadClientInfo()
         #check if the samples are ISP or not 
         
+        #load sample names 
+        for i, (key,value) in enumerate(self.sampleNames.items()):
+            item = SampleNameWidget(key, value)
+            self.ui.formLayout_5.addRow(item)
+            item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
+        
+        self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
+        
         GSMS_TESTS_LISTS = []
         ICP_TESTS_LISTS = []
+        tests = []
         
         for (currentJob ,testList) in self.sampleTests.items(): 
             for item in testList: 
@@ -202,30 +208,45 @@ class MainWindow(QMainWindow):
                     GSMS_TESTS_LISTS.append(item)
                 if(item not in ICP_TESTS_LISTS and 'ICP' in item):
                     ICP_TESTS_LISTS.append(item)
-            
-            
-        print(GSMS_TESTS_LISTS) 
-        print(ICP_TESTS_LISTS)       
+                if(item not in tests): 
+                    tests.append(item)
         
         GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
         
-        total_tests = len(GSMS_TESTS_LISTS)
+        tests = sorted(tests)
+        total_tests = len(tests)
         #newColumnCount = 5 + int(self.clientInfo['totalSamples'])    
         #TODO: fix the error checking 
+        #define the CHM information 
+    
+        #inital setup 
+        columnNames = [
+            'Tests', 
+            'Tests Name',
+            'Unit Value', 
+            'REF Value'
+        ]
+        initalColumns = len(columnNames)
         self.ui.dataTable.setRowCount(total_tests)
+        self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
         
-
-        self.ui.dataTable.setColumnCount(5 + int(self.clientInfo['totalSamples']))
+        #inital columns 
+        for i in range(initalColumns): 
+            item = QtWidgets.QTableWidgetItem()
+            self.ui.dataTable.setHorizontalHeaderItem(i, item)
+            item2 = self.ui.dataTable.horizontalHeaderItem(i)
+            item2.setText(columnNames[i])
+    
         
-        for i , (key,value ) in enumerate(self.sampleNames.items(), start=5):
+        #populate with sample names 
+        for i , (key,value ) in enumerate(self.sampleNames.items(), start=initalColumns):
             item = QtWidgets.QTableWidgetItem()
             self.ui.dataTable.setHorizontalHeaderItem(i, item)
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(key)
             
-    
-        
-        for i, value in enumerate(GSMS_TESTS_LISTS): 
+        #list the tests 
+        for i, value in enumerate(tests): 
             item = QtWidgets.QTableWidgetItem()
             item.setText(value)
             self.ui.dataTable.setItem(i, 0, item)
@@ -235,16 +256,16 @@ class MainWindow(QMainWindow):
             self.ui.dataTable.setItem(i, 1, item2)
             #self.ui.dataTable.item(i, 0).setText(GSMS_TESTS_LISTS[i])
         
+        
         #item = self.dataTable.horizontalHeaderItem(4)
         #item.setText(_translate("MainWindow", "STD += 2"))
         
     def loadClientInfo(self): 
+        #clear the first page 
         self.ui.jobNumInput.setText('')
         self.ui.reportType.setCurrentText('')
         
-        #print(self.clientInfo)
-        #sprint(self.sampleNames)
-
+        #set the header parameter 
         self.ui.jobNum.setText(self.jobNum)
         
         self.ui.clientName_1.setText(self.clientInfo['clientName'])
@@ -264,29 +285,125 @@ class MainWindow(QMainWindow):
         self.ui.payment_1.setText(self.clientInfo['payment'])
 
         #load sample names 
+        ''' 
         for i, (key,value) in enumerate(self.sampleNames.items()):
             item = SampleNameWidget(key, value)
             self.ui.formLayout_5.addRow(item)
             item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
         
         self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
-         
+        '''
         
     def ispLoader(self): 
         
         self.loadClientInfo()
         
         #check if haas data to load into the file location 
-        sql = 'SELECT sampleName, jobNumber, sampleData FROM machineData '
+        sql = 'SELECT sampleName, jobNumber, sampleData FROM machineData where jobNumber = ?'
         
-        temp = self.db.query(sql)
-        print(temp)
-        #print(temp)
+        #need to get sample data from both machines 
+        sampleData = list(self.db.query(sql, (self.jobNum,)))
+        
+        totalSamples = len(sampleData)
+        selectedSampleNames = []
+        
+        for item in sampleData:
+            selectedSampleNames.append(item[0])
+            
+        print(self.sampleNames)   
+        print('currentNames: ', selectedSampleNames)
+        print('current2: ', selectedSampleNames[0])
+       
+        #create the sample names based on that         
+        
+        for i, (key, value) in enumerate(self.sampleNames.items()):
+            
+            if(key in selectedSampleNames):
+                print('active:', key)
+                item = SampleNameWidget(key, value)
+                self.ui.formLayout_5.addRow(item)
+                item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
+                   
+        elements = []
+    
+        #for sample in sampleData[0][2]: 
+            
+        #    for key,value in json.loads(sample).items():
+        #        elements.append(key);
+                
+        for (key, value) in json.loads(sampleData[0][2]).items():
+            elements.append(key)
+        
+        totalElements = len(elements)
+        print(elements)
+        print(totalElements)
+        #load the given data information and column 
 
+        columnNames = [
+            'Element Name', 
+            'Element symbol',
+            'Unit Value', 
+            'REF Value', 
+            'distal factor'
+            
+        ]
+        initalColumns = len(columnNames)
+        self.ui.dataTable.setRowCount(totalElements)
+        self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
+        
+        #inital columns 
+        for i in range(initalColumns): 
+            item = QtWidgets.QTableWidgetItem()
+            self.ui.dataTable.setHorizontalHeaderItem(i, item)
+            item2 = self.ui.dataTable.horizontalHeaderItem(i)
+            item2.setText(columnNames[i])
+        
+        
+        for i , (key) in enumerate(selectedSampleNames, start=initalColumns):
+            item = QtWidgets.QTableWidgetItem()
+            self.ui.dataTable.setHorizontalHeaderItem(i, item)
+            item2 = self.ui.dataTable.horizontalHeaderItem(i)
+            item2.setText(key)
+        
+        #reduce this 
+        for i, value in enumerate(elements): 
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(periodic_table[value])
+            self.ui.dataTable.setItem(i, 0, item)
+
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setText(value)
+            self.ui.dataTable.setItem(i, 1, item2)
+        
+            item3 = QtWidgets.QTableWidgetItem()
+            item3.setText('mg/L')
+            self.ui.dataTable.setItem(i, 2, item3)
+            
+            item4 = QtWidgets.QTableWidgetItem()
+            item4.setText(1)
+            self.ui.dataTable.setItem(i, 3, item4)
+        
+        #set the values for each sample 
+        for col, currentSample in enumerate(sampleData, start=5): 
+            
+            #don't need to match column, did previous math to find out 
+            tempName = currentSample[0]
+            print(i,currentSample)
+            
+            for row, (key, value ) in enumerate(json.loads(currentSample[2]).items()): 
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(value)
+                self.ui.dataTable.setItem(row, col, item)
+                
+            #assume data is arranged in order? 
+            
+        
+            
+                
+
+    
         
         pass 
-    
-
 
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 

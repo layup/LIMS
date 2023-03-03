@@ -536,8 +536,8 @@ QPushButton {
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>../assets/icon/search.png</normaloff>../assets/icon/search.png</iconset>
+             <iconset resource="assets/resourse.qrc">
+              <normaloff>:/icons/icons/search.png</normaloff>:/icons/icons/search.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -572,7 +572,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -847,6 +847,19 @@ QComboBox {
               <property name="horizontalSpacing">
                <number>30</number>
               </property>
+              <item row="3" column="0">
+               <widget class="QLabel" name="jobNumLabel">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Job Number</string>
+                </property>
+               </widget>
+              </item>
               <item row="3" column="1">
                <widget class="QLineEdit" name="jobNumInput">
                 <property name="sizePolicy">
@@ -902,45 +915,6 @@ QComboBox {
                </widget>
               </item>
               <item row="5" column="0">
-               <widget class="QLabel" name="MatrixLabel">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Matrix </string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QComboBox" name="matrixType">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>test</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>test2</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="6" column="0">
                <widget class="QLabel" name="ParamLabel">
                 <property name="font">
                  <font>
@@ -953,7 +927,7 @@ QComboBox {
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="5" column="1">
                <widget class="QComboBox" name="paramType">
                 <property name="minimumSize">
                  <size>
@@ -969,36 +943,7 @@ QComboBox {
                 </property>
                </widget>
               </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="MethodLabel">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Method</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="1">
-               <widget class="QComboBox" name="methodType">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="8" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="label">
                 <property name="font">
                  <font>
@@ -1011,7 +956,7 @@ QComboBox {
                 </property>
                </widget>
               </item>
-              <item row="8" column="1">
+              <item row="6" column="1">
                <widget class="QComboBox" name="stdType">
                 <property name="minimumSize">
                  <size>
@@ -1021,7 +966,7 @@ QComboBox {
                 </property>
                </widget>
               </item>
-              <item row="10" column="1">
+              <item row="8" column="1">
                <widget class="QPushButton" name="NextSection">
                 <property name="minimumSize">
                  <size>
@@ -1040,19 +985,6 @@ QComboBox {
                 </property>
                 <property name="text">
                  <string>Next Section</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="jobNumLabel">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Job Number</string>
                 </property>
                </widget>
               </item>
@@ -1792,6 +1724,11 @@ QLabel {
                   </property>
                   <item>
                    <widget class="QWidget" name="dataEntryBody" native="true">
+                    <property name="styleSheet">
+                     <string notr="true">#dataTable {
+	padding-bottom: 20px;
+}</string>
+                    </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
                      <property name="spacing">
                       <number>-1</number>
@@ -1907,31 +1844,6 @@ QTableView::indicator:checked {
                        <row/>
                        <row/>
                        <row/>
-                       <column>
-                        <property name="text">
-                         <string>Property Name </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>UnitType </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>So</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Ref Values </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>STD += 2</string>
-                        </property>
-                       </column>
                       </widget>
                      </item>
                     </layout>
