@@ -4,7 +4,7 @@ test:
 	echo "Hello World"
 
 create_resourse: 
-	cd assets/ && pyrcc5 resourse.qrc -o resource_rc.py
+	cd assets/ && pyrcc5 resourse.qrc -o resourse_rc.py
 
 create_ui:
 	echo 'Generating interface UI .py file'
@@ -12,6 +12,9 @@ create_ui:
 
 run: 
 	python3 app.py
+
+create: 
+	pyinstaller app.spec 
 
 clean: 
 	echo "Clearing Cache"

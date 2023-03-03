@@ -826,7 +826,13 @@ margin: 0;
            <item row="1" column="0">
             <widget class="QWidget" name="Body" native="true">
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(253, 250, 255)</string>
+              <string notr="true">QWidget {
+	background-color: rgb(253, 250, 255)
+}
+
+QComboBox {
+	color:black;
+} </string>
              </property>
              <layout class="QFormLayout" name="formLayout">
               <property name="rowWrapPolicy">
@@ -880,7 +886,7 @@ margin: 0;
                </widget>
               </item>
               <item row="4" column="1">
-               <widget class="QComboBox" name="reportTypeSelection">
+               <widget class="QComboBox" name="reportType">
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
@@ -909,7 +915,7 @@ margin: 0;
                </widget>
               </item>
               <item row="5" column="1">
-               <widget class="QComboBox" name="MatrixSelection">
+               <widget class="QComboBox" name="matrixType">
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
@@ -922,6 +928,16 @@ margin: 0;
                   <height>16777215</height>
                  </size>
                 </property>
+                <item>
+                 <property name="text">
+                  <string>test</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>test2</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item row="6" column="0">
@@ -938,7 +954,7 @@ margin: 0;
                </widget>
               </item>
               <item row="6" column="1">
-               <widget class="QComboBox" name="ParamSelection">
+               <widget class="QComboBox" name="paramType">
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
@@ -967,7 +983,7 @@ margin: 0;
                </widget>
               </item>
               <item row="7" column="1">
-               <widget class="QComboBox" name="MethodSelection">
+               <widget class="QComboBox" name="methodType">
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
@@ -996,7 +1012,7 @@ margin: 0;
                </widget>
               </item>
               <item row="8" column="1">
-               <widget class="QComboBox" name="comboBox">
+               <widget class="QComboBox" name="stdType">
                 <property name="minimumSize">
                  <size>
                   <width>200</width>
@@ -1051,16 +1067,16 @@ margin: 0;
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <item>
             <widget class="QWidget" name="widget_4" native="true">
@@ -1098,9 +1114,16 @@ margin: 0;
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="widget" native="true">
-             <property name="styleSheet">
-              <string notr="true">QWidget {
+            <widget class="QStackedWidget" name="icpStack">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="icpMenu">
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QWidget" name="widget" native="true">
+                 <property name="styleSheet">
+                  <string notr="true">QWidget {
 	background-color: rgb(255, 255, 255)
 }
 
@@ -1110,69 +1133,104 @@ QPushButton {
 }
 
 </string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
-              <item>
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item alignment="Qt::AlignVCenter">
-               <widget class="QWidget" name="widget_10" native="true">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton {
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <item>
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item alignment="Qt::AlignVCenter">
+                   <widget class="QWidget" name="widget_10" native="true">
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton {
 	border:none; 
 	background-color: rgb(182, 186, 185)
 
 }</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_3">
-                 <item>
-                  <widget class="QPushButton" name="pushButton_3">
-                   <property name="text">
-                    <string>Upload ICP Datta</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_4">
-                   <property name="text">
-                    <string>Define ICP Elements</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_5">
-                   <property name="text">
-                    <string>Reports</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_3">
+                     <item>
+                      <widget class="QPushButton" name="icpUploadBtn">
+                       <property name="text">
+                        <string>Upload ICP Datta</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_2">
+                       <property name="text">
+                        <string>ICP Database</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_4">
+                       <property name="text">
+                        <string>Define ICP Elements</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_5">
+                       <property name="text">
+                        <string>Reports</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="icpDatabase">
+              <widget class="QTableView" name="tableView">
+               <property name="geometry">
+                <rect>
+                 <x>170</x>
+                 <y>110</y>
+                 <width>256</width>
+                 <height>192</height>
+                </rect>
+               </property>
+              </widget>
+             </widget>
             </widget>
            </item>
           </layout>
@@ -1481,7 +1539,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -1537,7 +1595,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="1" column="1">
-                      <widget class="QLineEdit" name="clientName">
+                      <widget class="QLineEdit" name="clientName_1">
                        <property name="minimumSize">
                         <size>
                          <width>402</width>
@@ -1554,7 +1612,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="2" column="1">
-                      <widget class="QLineEdit" name="date_2"/>
+                      <widget class="QLineEdit" name="date_1"/>
                      </item>
                      <item row="3" column="0">
                       <widget class="QLabel" name="label_4">
@@ -1564,7 +1622,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="3" column="1">
-                      <widget class="QLineEdit" name="time_2"/>
+                      <widget class="QLineEdit" name="time_1"/>
                      </item>
                      <item row="4" column="0">
                       <widget class="QLabel" name="label_5">
@@ -1574,7 +1632,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="4" column="1">
-                      <widget class="QLineEdit" name="attention"/>
+                      <widget class="QLineEdit" name="attention_1"/>
                      </item>
                      <item row="5" column="0">
                       <widget class="QLabel" name="label_6">
@@ -1584,7 +1642,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="5" column="1">
-                      <widget class="QLineEdit" name="addy1"/>
+                      <widget class="QLineEdit" name="addy1_1"/>
                      </item>
                      <item row="6" column="0">
                       <widget class="QLabel" name="label_7">
@@ -1594,7 +1652,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="6" column="1">
-                      <widget class="QLineEdit" name="addy2"/>
+                      <widget class="QLineEdit" name="addy2_1"/>
                      </item>
                      <item row="7" column="0">
                       <widget class="QLabel" name="label_8">
@@ -1604,7 +1662,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="7" column="1">
-                      <widget class="QLineEdit" name="addy3"/>
+                      <widget class="QLineEdit" name="addy3_1"/>
                      </item>
                      <item row="8" column="0">
                       <widget class="QLabel" name="label_9">
@@ -1614,7 +1672,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="8" column="1">
-                      <widget class="QLineEdit" name="sampleType1"/>
+                      <widget class="QLineEdit" name="sampleType1_1"/>
                      </item>
                      <item row="9" column="0">
                       <widget class="QLabel" name="label_10">
@@ -1624,7 +1682,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="9" column="1">
-                      <widget class="QLineEdit" name="sampleType2"/>
+                      <widget class="QLineEdit" name="sampleType2_1"/>
                      </item>
                      <item row="10" column="0">
                       <widget class="QLabel" name="label_15">
@@ -1634,7 +1692,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="10" column="1">
-                      <widget class="QLineEdit" name="totalSamples"/>
+                      <widget class="QLineEdit" name="totalSamples_1"/>
                      </item>
                      <item row="11" column="0">
                       <widget class="QLabel" name="label_16">
@@ -1644,7 +1702,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="11" column="1">
-                      <widget class="QLineEdit" name="recvTemp"/>
+                      <widget class="QLineEdit" name="recvTemp_1"/>
                      </item>
                      <item row="12" column="0">
                       <widget class="QLabel" name="label_17">
@@ -1654,7 +1712,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="12" column="1">
-                      <widget class="QLineEdit" name="tel"/>
+                      <widget class="QLineEdit" name="tel_1"/>
                      </item>
                      <item row="13" column="0">
                       <widget class="QLabel" name="label_18">
@@ -1664,7 +1722,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="13" column="1">
-                      <widget class="QLineEdit" name="email"/>
+                      <widget class="QLineEdit" name="email_1"/>
                      </item>
                      <item row="14" column="0">
                       <widget class="QLabel" name="label_19">
@@ -1674,7 +1732,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="14" column="1">
-                      <widget class="QLineEdit" name="fax"/>
+                      <widget class="QLineEdit" name="fax_1"/>
                      </item>
                      <item row="15" column="0">
                       <widget class="QLabel" name="label_20">
@@ -1684,7 +1742,7 @@ QPushButton::hover {
                       </widget>
                      </item>
                      <item row="15" column="1">
-                      <widget class="QLineEdit" name="payment"/>
+                      <widget class="QLineEdit" name="payment_1"/>
                      </item>
                      <item row="16" column="0">
                       <widget class="QWidget" name="widget_6" native="true"/>
@@ -1713,26 +1771,6 @@ QLabel {
                      <property name="verticalSpacing">
                       <number>5</number>
                      </property>
-                     <item row="4" column="0">
-                      <widget class="QLabel" name="label_23">
-                       <property name="text">
-                        <string>TextLabel</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_12">
-                       <property name="text">
-                        <string>TextLabel</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLineEdit" name="sample1Value"/>
-                     </item>
-                     <item row="4" column="1">
-                      <widget class="QLineEdit" name="lineEdit_3"/>
-                     </item>
                     </layout>
                    </widget>
                   </item>

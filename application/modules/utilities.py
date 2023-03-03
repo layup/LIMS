@@ -11,20 +11,15 @@ import pickle
 from copy import copy
 
 
-
-
 from PyQt5.QtWidgets import (
     QFileDialog
 )
 
-REPORTS_TYPE = {
-    "ISP": "ISP", 
-    "GSMS": "GSMS"
-}
 
-MATRIX_TYPE = {
-    
-}
+
+REPORTS_TYPE = ['','ISP-1','ISP-2','GSMS']
+
+MATRIX_TYPE = ['','food', 'water', 'apples']
 
 PARAMETERS_TYPE = {
     
@@ -59,6 +54,13 @@ GSMS_values = {
     
 }
 
+ELEMENT_CONVERT = {
+    'al': 'aluminium', 
+    
+    
+
+}
+
 GSMS_So_values = {
     "001": 0.100, 
     '002': 0.254, 
@@ -72,11 +74,13 @@ GSMS_ref_values = {
         
 }
 
+
 GSMS_std_values ={
     
 }
 
 
+        
 
 def save_pickle(dictonaryName):
     try:
@@ -106,13 +110,12 @@ def getFileLocation():
     print(dlg)
     return dlg
 
-def convertTXTFile(fileLocation): 
-
-    return 
-
-def convertCSVFile(fileLocation): 
+def saveNewLocation():
+    location = getFileLocation()
     
-    return 
+    text = input('Save File Name')
+    
+    save_pickle({text:location})
 
 
 def scanDir(path): 
@@ -135,7 +138,7 @@ def scanDir(path):
     
 
 def scanForTXTFolders(jobNum): 
-    print('jobnumber: ', jobNum)
+    #print('jobnumber: ', jobNum)
 
     fileLocationsDictonary = load_pickle('data.pickle')
     TXTLocation = fileLocationsDictonary['TXTDirLocation']
@@ -204,12 +207,16 @@ def processClientInfo(jobNum, fileLocation):
     #grab the file names 
     sampleNames = {}
     
+
     #have the information about the file, what kind of reports and etc 
     sampleTests = {}
 
     sampleCounter = 0; 
     prevLine = [0, ""]
     prevLineHelper = [0, ""]
+    
+    if(fileLocation == None): 
+        return clientInfoDict, sampleNames, sampleTests; 
     
     with open(fileLocation) as file: 
     
@@ -307,7 +314,7 @@ def processClientInfo(jobNum, fileLocation):
                 #find the report information that does with corrisponding thing                
                 if(re.search('(?<=\s-\s).*', line)):
                     prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
-                    print(prevSampleName)
+                    #print(prevSampleName)
                     currentTestsCheck = re.search('(?<=\s-\s).*', line)
                     prevSampleMatchCheck = re.search('(?<=\s[0-9]).*', prevLine[1])
                     prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
@@ -338,16 +345,176 @@ def processClientInfo(jobNum, fileLocation):
             #print('---------------------------') 
                 
                     
-                     
-            
-            
-                    
-        
     file.close()
+    
+    #print(sampleTests)
+    #process tyhe sampleTests 
+    for key,value in sampleTests.items():
+        testLists = [x.strip() for x in value.split(',')]
+        sampleTests[key] = testLists
+           
+    
+    
     
     #print(clientInfoDict)
     #print(sampleNames)
     #print(sampleTests)
-    return clientInfoDict, sampleNames; 
+    return clientInfoDict, sampleNames, sampleTests; 
     
     
+def icp_upload(filePath, db): 
+    print('Scanning the file')
+
+    
+    if(filePath.endswith('.txt')):
+        icpMethod1(filePath, db)
+        
+    elif(filePath.endswith('.xlsx')):
+        print('Method 2')
+        
+    else: 
+        print("Not valid file type")
+    
+    return; 
+    
+    
+def icpMethod1(filePath, db): 
+
+    file1 = open(filePath, 'r')
+    fname = os.path.basename(filePath)
+    #TODO: insert try catch block 
+    fname = fname.split('.txt')[0]
+    #remove extenion 
+    
+    print('Method 1')
+    print('FileName: ', fname)
+    
+    Lines = file1.readlines()
+    
+    startingLine = 'Date Time Label Element Label (nm) Conc %RSD Unadjusted Conc Intensity %RSD' 
+    headers = ['Sample', 'Analyte', 'Element', 'HT', ' ', 'units', 'rep', ' ', ' '] 
+    
+    startingPostion = []
+    endPostion = []
+    count = 0
+    
+    # Strips the newline character
+    for line in Lines:
+        
+        #print("Line{}: {}".format(count, line.strip()))
+        if(line.strip() == startingLine):
+            startingPostion.append(count)
+            
+        if(re.search('([1-9]|[1-9][0-9]) of ([1-9]|[1-9][0-9])$', line)): 
+            endPostion.append(count)
+
+        count += 1
+
+            
+    #update headers 
+    headerUpdate = Lines[startingPostion[0] + 1]; 
+    headerUpdate = headerUpdate.split()
+    headers[7] = headerUpdate[0]
+    headers[8] = headerUpdate[1]
+
+    newName = fname + '.csv'
+    loadPath = load_pickle('data.pickle') 
+    print(loadPath)
+    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
+    
+ 
+    
+    print('Writing CSV File: {}'.format(newPath))
+    f = open(newPath, 'w')
+    writer = csv.writer(f)
+    writer.writerow(headers)
+    
+    spiltLengths = []
+    
+    jobNumbers = []
+    jobData = {
+        
+    }
+    
+    elementData = {}
+    currentJob = ''
+    
+
+    for start in startingPostion: 
+        running = True; 
+        counter = 1; 
+
+        while(running): 
+
+            currentLine = Lines[start + counter]
+            
+            if(re.search('([1-9]|[1-9][0-9]) of ([1-9]|[1-9][0-9])$', currentLine)): 
+                break; 
+            
+            counter += 1; 
+
+            splitLine = currentLine.split()
+            spiltLengths.append(len(splitLine))
+
+            if(re.search('\d{6}-\d{1,2}', splitLine[2])):
+                #create a temp format 
+                temp = []
+                temp.append(splitLine[2])
+                temp.append(1)
+                temp.append(splitLine[3])
+                temp.append(1)
+                temp.append(splitLine[6])
+                temp.append('mg/L')
+                temp.append(1)
+                temp.append(splitLine[0])
+                temp.append(splitLine[1])
+
+                if(currentJob =='' ):
+                    currentJob = splitLine[2]
+  
+                elif(currentJob != splitLine[2]):
+                    jobData[currentJob] = elementData   
+                    elementData = {}
+                    currentJob = splitLine[2]
+
+                elementData[splitLine[3]] = splitLine[6]
+    
+                jobNumber = splitLine[2].split('-')[0]
+                if(jobNumber not in jobNumbers):
+                    #print(jobNumber)
+                    jobNumbers.append(jobNumber)
+                    
+                if(temp): 
+                    writer.writerow(temp)
+            
+            #print(len(splitLine))
+
+    
+    spiltLengths = numpy.array(spiltLengths)
+    unique, counts = numpy.unique(spiltLengths, return_counts=True)
+    #print(dict(zip(unique, counts)))
+
+    f.close()
+    file1.close()
+    
+    #print(jobNumbers)
+    
+    
+    #save to database
+    for (key, value) in jobData.items(): 
+        #print(key)
+        sql = 'INSERT INTO machineData values(?,?,?,1,?)'
+        jobNum = key.split('-')[0]
+        tempData = json.dumps(value)
+        db.execute(sql, (key,jobNum,newPath, tempData))
+        db.commit()
+    
+    #save to database 
+    
+    
+    return jobNumbers, jobData; 
+
+#scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
+def testScanner(): 
+    
+    return; 
