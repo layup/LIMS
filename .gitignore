@@ -1,5 +1,5 @@
 #ignore mac system files 
-.DS_store
+.DS_Store
 
 #ignore build folders 
 build/
