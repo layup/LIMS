@@ -1,6 +1,6 @@
 #PYQT Imports 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QObject, pyqtSlot
 
@@ -27,13 +27,16 @@ class MainWindow(QMainWindow):
         
         paths = load_pickle('data.pickle')
         self.db = Database(paths['databasePath'])
+       
 
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
+
+        self.activeCreation = False; 
         self.ui.stackedWidget.setCurrentIndex(1)
         self.ui.reportsBtn1.setChecked(True)
-
+        
         self.ui.jobNumInput.setText('171981')
 
         #print(self.ui.page_3.ui.__dir__())
@@ -74,6 +77,7 @@ class MainWindow(QMainWindow):
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
         #print(btn_list)
+        #FIXME: issue that arises when the active creation setting is thing 
         for btn in btn_list:
             #if index in [5, 6]:
             #    btn.setAutoExclusive(False)
@@ -81,12 +85,40 @@ class MainWindow(QMainWindow):
             #else:
             btn.setAutoExclusive(True)
 
+
+
+    def messageBox(self):
+        msgBox = QMessageBox()  
+        msgBox.setText("The document has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
+        msgBox.setDefaultButton(QMessageBox.Save);
+        #msgBox.buttonClicked.connect(self.msgbtn)
+        x = msgBox.exec_()  # this will show our messagebox
+        
+        if(x == QMessageBox.Save): 
+            self.ui.stackedWidget.setCurrentIndex(0)  
+            self.activeCreation = False; 
+        if(x == QMessageBox.Discard):
+            self.ui.stackedWidget.setCurrentIndex(0) 
+            self.activeCreation = False; 
+        if(x == QMessageBox.Cancel):
+            pass 
+        #print(x);
+            
+        
     #Define button presses
     def on_reportsBtn1_toggled(self):
-        self.ui.stackedWidget.setCurrentIndex(0)
         
+        if(self.activeCreation == False):
+            self.ui.stackedWidget.setCurrentIndex(0)
+        else: 
+            self.messageBox(); 
+            #self.ui.reportsBtn1.setChecked(False)
+    
     def on_reportsBtn2_toggled(self):
-        self.ui.stackedWidget.setCurrentIndex(0)
+        if(self.activeCreation == False):
+            self.ui.stackedWidget.setCurrentIndex(0)
 
     def on_createReportBtn1_toggled(self):
         self.ui.stackedWidget.setCurrentIndex(1)
@@ -112,7 +144,17 @@ class MainWindow(QMainWindow):
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
          
-         
+    
+    def on_stackedWidget_currentChanged(self):
+        print("Changed: ", self.ui.stackedWidget.currentIndex())
+        print('Creation Active: ', self.activeCreation)
+        
+        if(self.ui.stackedWidget.currentIndex() == 5):
+             self.activeCreation = True
+             print('active is 5')
+        
+
+    
     #button activations  
     @pyqtSlot()
     def on_icpUploadBtn_clicked(self): 
@@ -171,10 +213,12 @@ class MainWindow(QMainWindow):
   
             if(reportType == 'ISP-1'):
                 print('isp loader')
+                
                 self.ispLoader()
             
             if(reportType == 'GSMS'):
                 print('gsms loader')
+            
                 self.gsmsLoader()
             
         else:
@@ -257,6 +301,11 @@ class MainWindow(QMainWindow):
             #self.ui.dataTable.item(i, 0).setText(GSMS_TESTS_LISTS[i])
         
         
+        #TODO: remove the data when loading the information 
+        #TODO: create the csv file we created 
+        #TODO: add the side panel where user can add in more tests or remove the test 
+        #TODO: have a popup when the user is trying to leave the page (save or not save)
+        
         #item = self.dataTable.horizontalHeaderItem(4)
         #item.setText(_translate("MainWindow", "STD += 2"))
         
@@ -323,7 +372,9 @@ class MainWindow(QMainWindow):
                 item = SampleNameWidget(key, value)
                 self.ui.formLayout_5.addRow(item)
                 item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
-                   
+        
+        self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets()) 
+        
         elements = []
     
         #for sample in sampleData[0][2]: 
@@ -349,8 +400,8 @@ class MainWindow(QMainWindow):
         ]
         initalColumns = len(columnNames)
         self.ui.dataTable.setRowCount(totalElements)
-        self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
-        
+        self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
+
         #inital columns 
         for i in range(initalColumns): 
             item = QtWidgets.QTableWidgetItem()
@@ -379,9 +430,11 @@ class MainWindow(QMainWindow):
             item3.setText('mg/L')
             self.ui.dataTable.setItem(i, 2, item3)
             
+            #TODO: add ref values here 
+            
             item4 = QtWidgets.QTableWidgetItem()
-            item4.setText(1)
-            self.ui.dataTable.setItem(i, 3, item4)
+            item4.setText('1')
+            self.ui.dataTable.setItem(i, 4, item4)
         
         #set the values for each sample 
         for col, currentSample in enumerate(sampleData, start=5): 
@@ -396,12 +449,19 @@ class MainWindow(QMainWindow):
                 self.ui.dataTable.setItem(row, col, item)
                 
             #assume data is arranged in order? 
-            
         
-            
-                
+        # Calculate the required height of the table
+        #row_height =  self.ui.dataTable.verticalHeader().defaultSectionSize()
+        #total_height = row_height *  self.ui.dataTable.rowCount()
+        #total_height = row_height +
 
-    
+        # Set the fixed size of the table to accommodate all the rows
+        #self.ui.dataTable.setFixedSize( self.ui.dataTable.width(), total_height)
+            
+        column_width = self.ui.dataTable.columnWidth(2)
+        padding = 10
+        total_width = column_width + padding
+        self.ui.dataTable.setColumnWidth(2, total_width)    
         
         pass 
 
@@ -487,4 +547,27 @@ class SampleNameWidget(QWidget):
         layout.addWidget(self.button)
         
         self.setLayout(layout)
+
+class SaveMessageBoxWidget(QWidget): 
     
+    def __init__(self):
+        super().__init__()
+        
+        self.error_popup()
+
+    def removeDuplicate(self):
+        print('def removeDuplicate(self): ...')
+#        curItem = self.listWidget_2.currentItem()
+#        self.listWidget_2.takeItem(curItem)
+
+    def error_popup(self):
+        msg = QMessageBox.critical(
+            self, 
+            'Title', 
+            "You can't select more than one wicket-keeper", 
+            QMessageBox.Yes | QMessageBox.Cancel
+        )
+        if msg == QMessageBox.Yes:
+#            msg.buttonClicked.connect(self.removeDuplicate)
+            print('Ok')
+            self.removeDuplicate()

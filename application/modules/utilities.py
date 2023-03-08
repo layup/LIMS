@@ -6,30 +6,20 @@ import csv
 import numpy
 import inquirer
 import json 
-import sqlite3 
 import pickle 
 from copy import copy
-
-
+import pandas as pd 
+import openpyxl
 
 from PyQt5.QtWidgets import (
     QFileDialog
 )
 
-
-
 REPORTS_TYPE = ['','ISP-1','ISP-2','GSMS']
-
 MATRIX_TYPE = ['','food', 'water', 'apples']
 
-PARAMETERS_TYPE = {
-    
-}
-
-
-METHODS_TYPE = {
-    
-}
+PARAMETERS_TYPE = {}
+METHODS_TYPE = {}
 
 GSMS_values = {
     "001": ["ALkalinity", "mg/L"], 
@@ -254,11 +244,9 @@ def processClientInfo(jobNum, fileLocation):
                 prevLineHelper[0] = copy(int(lineLocation))
                 prevLineHelper[1] = copy(line)
             
-
             #print('PrevLine: ', prevLine[0], prevLine[1])
             #print('PrevLineHelper: ', prevLineHelper[0], prevLineHelper[1])
             #print('currentLine: ', lineLocation, line)
-        
                     
             if(lineLocation == 1): 
                 clientInfoDict['clientName'] = line[0:54].strip()
@@ -377,8 +365,6 @@ def processClientInfo(jobNum, fileLocation):
         sampleTests[key] = testLists
            
     
-    
-    
     #print(clientInfoDict)
     #print(sampleNames)
     #print(sampleTests)
@@ -393,14 +379,14 @@ def icp_upload(filePath, db):
         icpMethod1(filePath, db)
         
     elif(filePath.endswith('.xlsx')):
-        print('Method 2')
+        icpMethod2(filePath, db)
         
     else: 
         print("Not valid file type")
     
     return; 
     
-    
+#TODO: sort by name  
 def icpMethod1(filePath, db): 
 
     file1 = open(filePath, 'r')
@@ -537,6 +523,98 @@ def icpMethod1(filePath, db):
     return jobNumbers, jobData; 
 
 #scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
-def testScanner(): 
+def icpMethod2(filePath, db): 
+    
+    wb = openpyxl.load_workbook(filePath)
+    sheets = wb.sheetnames 
+    
+    fname = os.path.basename(filePath)
+    #TODO: insert try catch block 
+    fname = fname.split('.xlsx')[0]
+    
+    print('Method 2')
+    print('FileName: ', fname)
+
+
+    newName = fname + '.csv'
+    loadPath = load_pickle('data.pickle') 
+    
+    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
+    
+    worksheet = wb[sheets[0]]
+
+    sampleTypeColumn = worksheet['E']
+    sampleNameColumn = worksheet['G']
+    
+    elementConversion = ['He', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
+    elementColumns = ['I', 'J', 'M', 'O', "Q", 'U', 'AA', 'AC']
+    selectedRows = []
+    
+    
+    for cell in sampleTypeColumn:     
+        if(cell.value == 'Sample'):
+            pass 
+            #print(cell.value)
+            currentSampleName = worksheet.cell(row=cell.row, column=7).value
+           
+            if any([x in currentSampleName for x in ['blk', 'curve']]):
+                
+                continue; 
+            else: 
+                print(currentSampleName)
+                selectedRows.append(cell.row)
+            #    print(f'Row: {cell.row} Value: {currentSampleName}')
+             
+    #    print(f'Row: {cell.row} value: {cell.value}')    
+    
+    #print(selectedRows)
+    
+    for row in selectedRows: 
+        row_values = []
+        for col in elementColumns:
+            col_index = openpyxl.utils.column_index_from_string(col)
+            cell_value = worksheet.cell(row=row, column=col_index).value
+            row_values.append(cell_value)
+        #print(row_values)
+    
+    #write excel 
+    
+    newWB = openpyxl.Workbook()
+    worksheet2 = newWB.active 
+    
+    worksheet2.cell(row=1, column=1).value = 'Sample'
+    tableNames = ['', 'Rjct', 'Data File', 'Acq. Date-Time', 'Type', 'Level', 'Sample Name', 'Total Dil.']
+    
+    worksheet2.merge_cells('A1:H1')
+    
+    column_num = 1;
+    for item in tableNames: 
+        worksheet2.cell(row=2, column=column_num).value = item; 
+        column_num += 1; 
+    
+   
+    row_num = 3; 
+    for row_value in selectedRows:
+
+        for currentPos in range(1,8): 
+            worksheet2.cell(row=row_num, column=currentPos).value = worksheet.cell(row=row_value, column=currentPos).value
+        
+        tempCol = 9
+        for col in elementColumns: 
+            col_index = openpyxl.utils.column_index_from_string(col)
+            worksheet2.cell(row=row_num, column=tempCol).value = worksheet.cell(row=row_value, column=col_index).value
+            tempCol+=1; 
+            
+
+        row_num+=1;      
+        
+ 
+     
+    
+    newWB.save('text.xlsx')
+
+        
+        
     
     return; 
+

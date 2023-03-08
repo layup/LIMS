@@ -1725,9 +1725,7 @@ QLabel {
                   <item>
                    <widget class="QWidget" name="dataEntryBody" native="true">
                     <property name="styleSheet">
-                     <string notr="true">#dataTable {
-	padding-bottom: 20px;
-}</string>
+                     <string notr="true"/>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
                      <property name="spacing">
@@ -1844,6 +1842,11 @@ QTableView::indicator:checked {
                        <row/>
                        <row/>
                        <row/>
+                       <column>
+                        <property name="text">
+                         <string>test</string>
+                        </property>
+                       </column>
                       </widget>
                      </item>
                     </layout>
