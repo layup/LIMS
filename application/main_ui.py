@@ -1,8 +1,8 @@
 #PYQT Imports 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate, QAbstractItemView
 from PyQt5.Qt import Qt
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, QDateTime
 
 #general Imports 
 import sys 
@@ -14,8 +14,8 @@ import asyncio
 
 from modules.utilities import * 
 from modules.dbManager import *
+from modules.excelCreation import *
 from interface import *
-
     
 class MainWindow(QMainWindow):
     
@@ -28,7 +28,6 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         self.db = Database(paths['databasePath'])
        
-
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
@@ -38,10 +37,15 @@ class MainWindow(QMainWindow):
         self.ui.reportsBtn1.setChecked(True)
         
         self.ui.jobNumInput.setText('171981')
-
-        #print(self.ui.page_3.ui.__dir__())
-        #first page options 
         
+        size = self.size()
+        width = size.width() 
+        
+        columnWidth = width / 7
+        
+        for column in range(7): 
+            self.ui.reportsTable.setColumnWidth(column, columnWidth)
+
         #self.ui.jobNumInput.textChanged.connect(lambda: print(self.ui.jobNumInput.text()))
         #load initial database 
         
@@ -59,34 +63,14 @@ class MainWindow(QMainWindow):
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
-               
-        #can have other keyboard modifiers as well 
-        #self.ui.stackedWidget.currentChanged.connect(lambda: print("Stacked Widget Changed "))
         
-        #connect the menu bar options 
-        #self.ui.subHeaderText.setText("Hello World")
+        #self.ui.stackedWidget.currentChanged.connect(lambda: print("Stacked Widget Changed "))
         
         self.showMaximized()
         #self.show()
 
-
     
     ## Change QPushButton Checkable status when stackedWidget index changed
-    def on_stackedWidget_currentChanged(self, index):
-        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
-                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
-        
-        #print(btn_list)
-        #FIXME: issue that arises when the active creation setting is thing 
-        for btn in btn_list:
-            #if index in [5, 6]:
-            #    btn.setAutoExclusive(False)
-            #    btn.setChecked(False)
-            #else:
-            btn.setAutoExclusive(True)
-
-
-
     def messageBox(self):
         msgBox = QMessageBox()  
         msgBox.setText("The document has been modified.");
@@ -105,20 +89,28 @@ class MainWindow(QMainWindow):
         if(x == QMessageBox.Cancel):
             pass 
         #print(x);
-            
         
-    #Define button presses
+    def on_stackedWidget_currentChanged(self, index):
+        #print('Running')
+        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
+                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
+        
+        #print(btn_list)
+        #FIXME: issue that arises when the active creation setting is thing 
+        for btn in btn_list:
+            #if index in [1,2,3,4]:
+            #    btn.setAutoExclusive(False)
+            #    btn.setChecked(False)
+            #else:s
+            btn.setAutoExclusive(True)
+                   
+        
+    #Define Menu Button presses 
     def on_reportsBtn1_toggled(self):
-        
-        if(self.activeCreation == False):
-            self.ui.stackedWidget.setCurrentIndex(0)
-        else: 
-            self.messageBox(); 
-            #self.ui.reportsBtn1.setChecked(False)
+        self.ui.stackedWidget.setCurrentIndex(0) 
     
     def on_reportsBtn2_toggled(self):
-        if(self.activeCreation == False):
-            self.ui.stackedWidget.setCurrentIndex(0)
+        self.ui.stackedWidget.setCurrentIndex(0)
 
     def on_createReportBtn1_toggled(self):
         self.ui.stackedWidget.setCurrentIndex(1)
@@ -144,33 +136,87 @@ class MainWindow(QMainWindow):
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
          
+    #Define ICP Page Menu Buttons 
+    def on_icpBtn1_clicked(self): 
+        self.ui.icpStack.setCurrentIndex(0)
     
-    def on_stackedWidget_currentChanged(self):
-        print("Changed: ", self.ui.stackedWidget.currentIndex())
-        print('Creation Active: ', self.activeCreation)
+    def on_icpBtn2_clicked(self): 
+        self.ui.icpStack.setCurrentIndex(0)
+    
+    def on_icpDatabaseBtn_clicked(self): 
+        self.ui.icpStack.setCurrentIndex(1)
         
-        if(self.ui.stackedWidget.currentIndex() == 5):
-             self.activeCreation = True
-             print('active is 5')
+        columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
         
+        #load both databases 
+        #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
+        icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
+        icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
+        
+        machine1Data = list(self.db.query(icpMachine1sql))
+        #machine2Data = list(self.db.query(icpMachine2sql))
+        
+        self.updateIcpTable(machine1Data)
 
-    
+    def updateIcpTable(self, result): 
+
+        textLabelUpdate = 'Total Search Results: ' + str(len(result))
+
+        self.ui.icpLabel.setText(textLabelUpdate)
+        self.ui.icpTable.setRowCount(len(result)) 
+        self.ui.icpTable.setColumnWidth(3, 600)
+        
+        
+        for i, data in enumerate(result):
+            #loops throught items in the order sql requested 
+            for j in range(len(data)): 
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(str(data[j]))
+                item.setTextAlignment(Qt.AlignHCenter)
+                self.ui.icpTable.setItem(i,j,item) 
+        
+        self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
+    @pyqtSlot()
+    def on_icpSearchBtn_clicked(self): 
+        jobNum = self.ui.icpSearchInput.text() 
+        inquery = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 WHERE sampleName LIKE ?'
+        
+        if(jobNum == ''):
+            pass; 
+        else: 
+            machine1Data = list(self.db.query(inquery, ('%' + jobNum + '%',)))
+            
+            #TODO: create a message button, streamline the process 
+            if not machine1Data: 
+                msgBox = QMessageBox()  
+                msgBox.setText("No Search Results");
+                msgBox.setInformativeText("No search results for given job number");
+                msgBox.setStandardButtons(QMessageBox.Ok);
+                x = msgBox.exec_()  # this will show our messagebox
+                
+            else: 
+                self.updateIcpTable(machine1Data)
+
     #button activations  
     @pyqtSlot()
     def on_icpUploadBtn_clicked(self): 
         fileLocation = openFile()
         print(fileLocation)
-        
         icp_upload(fileLocation, self.db) 
         
         #check if the file is .xlsx or txt document 
         
                 
     def keyPressEvent(self, event):
+        #print(event)
+
         if event.key() == Qt.Key_Enter:
-            self.test_method()
+            #self.test_method()
+            pass 
         if event.key() == Qt.Key_Space: 
-            self.test_method()
+            #elf.test_method()
+            pass
         
     def savePickle(self): 
         jsonLocation = getFileLocation()
@@ -182,27 +228,32 @@ class MainWindow(QMainWindow):
         
         save_pickle(tempDictonary)
         
-    
+    #PROCESS PAGE 
+     
     def proceedPage(self):
         #remove whitespaces 
         jobNum = self.ui.jobNumInput.text().strip()
         reportType = self.ui.reportType.currentText()
-        
-        #print(self.ui.jobNumInput.text())
-        #print(reportType)
-        
+        parameter = self.ui.paramType.currentText()
+        recovery = self.ui.stdType.currentText()
         #make sure they entered all the valid information
         
         errorCheck = {
             'jobNum': '', 
             'reportType': '', 
+            'parameter': '',
+            'recovery': ''
         }
         
+        
+        
+        #TODO: check if a report already exists, if so load that information instead 
         
         if(re.match('^([0-9]{6})$', jobNum)): 
             self.jobNum = jobNum; 
             self.ui.stackedWidget.setCurrentIndex(5)
             self.ui.stackedWidget_2.setCurrentIndex(0)
+            self.activeCreation = True; 
 
             tempLocation = scanForTXTFolders(self.jobNum)
             clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, tempLocation)
@@ -210,15 +261,17 @@ class MainWindow(QMainWindow):
             self.clientInfo = clientInfo 
             self.sampleNames = sampleNames
             self.sampleTests = sampleTests
+    
+            createReport(self.db, jobNum, reportType)
   
-            if(reportType == 'ISP-1'):
+            if('ISP' in reportType):
                 print('isp loader')
-                
-                self.ispLoader()
+                self.ui.icpDataField.show()
+                self.icpLoader()
             
             if(reportType == 'GSMS'):
                 print('gsms loader')
-            
+                self.ui.icpDataField.hide() 
                 self.gsmsLoader()
             
         else:
@@ -228,10 +281,19 @@ class MainWindow(QMainWindow):
             msg.setText("Please enter a valid job number!")
             x = msg.exec_()  # this will show our messagebox
             
-    #only define for the CHM file 
+     
+    def loadExistingInfo(self): 
+        
+        pass; 
+    
+    def overWriteExisting(self): 
+        pass; 
+    
+    
     def gsmsLoader(self): 
         
         self.loadClientInfo()
+    
         #check if the samples are ISP or not 
         
         #load sample names 
@@ -268,10 +330,11 @@ class MainWindow(QMainWindow):
             'Tests', 
             'Tests Name',
             'Unit Value', 
-            'REF Value'
+            'REF Value', 
+            'Distal factor'
         ]
         initalColumns = len(columnNames)
-        self.ui.dataTable.setRowCount(total_tests)
+        self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
         self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
         
         #inital columns 
@@ -290,15 +353,19 @@ class MainWindow(QMainWindow):
             item2.setText(key)
             
         #list the tests 
-        for i, value in enumerate(tests): 
+        for i, value in enumerate(GSMS_TESTS_LISTS): 
             item = QtWidgets.QTableWidgetItem()
             item.setText(value)
             self.ui.dataTable.setItem(i, 0, item)
 
             item2 = QtWidgets.QTableWidgetItem()
             item2.setText('mg/L')
-            self.ui.dataTable.setItem(i, 1, item2)
+            self.ui.dataTable.setItem(i, 2, item2)
             #self.ui.dataTable.item(i, 0).setText(GSMS_TESTS_LISTS[i])
+            
+            item2 = QtWidgets.QTableWidgetItem() 
+            item2.setText(str(1))
+            self.ui.dataTable.setItem(i, 4, item2) 
         
         
         #TODO: remove the data when loading the information 
@@ -343,17 +410,21 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
         '''
         
-    def ispLoader(self): 
+    #TODO: sidebar have a s
+    def icpLoader(self): 
         
         self.loadClientInfo()
         
         #check if haas data to load into the file location 
-        sql = 'SELECT sampleName, jobNumber, sampleData FROM machineData where jobNumber = ?'
+        sql = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ?'
         
         #need to get sample data from both machines 
+        #FIXME: add a try catch and get second sample amount 
         sampleData = list(self.db.query(sql, (self.jobNum,)))
         
+        
         totalSamples = len(sampleData)
+        #FIXME: have check if sample names is empty 
         selectedSampleNames = []
         
         for item in sampleData:
@@ -364,7 +435,6 @@ class MainWindow(QMainWindow):
         print('current2: ', selectedSampleNames[0])
        
         #create the sample names based on that         
-        
         for i, (key, value) in enumerate(self.sampleNames.items()):
             
             if(key in selectedSampleNames):
@@ -375,31 +445,28 @@ class MainWindow(QMainWindow):
         
         self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets()) 
         
-        elements = []
-    
-        #for sample in sampleData[0][2]: 
-            
-        #    for key,value in json.loads(sample).items():
-        #        elements.append(key);
-                
-        for (key, value) in json.loads(sampleData[0][2]).items():
-            elements.append(key)
-        
-        totalElements = len(elements)
-        print(elements)
-        print(totalElements)
         #load the given data information and column 
-
         columnNames = [
             'Element Name', 
             'Element symbol',
             'Unit Value', 
             'REF Value', 
             'distal factor'
-            
         ]
+        
+        addtionalRows = [
+            'pH', 
+            'Hardness', 
+        ]
+        
+        excludedElements = [
+            'U', 'S'
+        ]
+        
+        totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
+        
         initalColumns = len(columnNames)
-        self.ui.dataTable.setRowCount(totalElements)
+        self.ui.dataTable.setRowCount(totalRows)
         self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
 
         #inital columns 
@@ -409,61 +476,122 @@ class MainWindow(QMainWindow):
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(columnNames[i])
         
-        
+        #set the sampleNames 
         for i , (key) in enumerate(selectedSampleNames, start=initalColumns):
             item = QtWidgets.QTableWidgetItem()
             self.ui.dataTable.setHorizontalHeaderItem(i, item)
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(key)
         
-        #reduce this 
-        for i, value in enumerate(elements): 
-            item = QtWidgets.QTableWidgetItem()
-            item.setText(periodic_table[value])
+       
+        #Get all the names of the elments then sort them
+        
+        elementNames = []
+         
+        for (key,value) in periodic_table.items(): 
+            if(key not in excludedElements): 
+                elementNames.append(value)
+            
+        elementNames.sort()
+        
+        print(elementNames)
+        print(len(elementNames))
+        
+        hardnessLocation = {}
+        
+        for i, value in enumerate(elementNames): 
+            
+            currentSymbol = elementSymbols[value]
+            
+            if(currentSymbol in ['Mg', 'Ca']): 
+                hardnessLocation[currentSymbol] = int(i); 
+            
+            item = QtWidgets.QTableWidgetItem() 
+            item.setText(value) 
             self.ui.dataTable.setItem(i, 0, item)
 
             item2 = QtWidgets.QTableWidgetItem()
-            item2.setText(value)
+            item2.setText(currentSymbol)
             self.ui.dataTable.setItem(i, 1, item2)
-        
+            
             item3 = QtWidgets.QTableWidgetItem()
-            item3.setText('mg/L')
+            if(currentSymbol in icpMachine2Symbols): 
+                item3.setText('ug/L')
+            else: 
+                item3.setText('mg/L')
             self.ui.dataTable.setItem(i, 2, item3)
             
-            #TODO: add ref values here 
-            
+            #set distal factor to default of 1 
             item4 = QtWidgets.QTableWidgetItem()
             item4.setText('1')
             self.ui.dataTable.setItem(i, 4, item4)
+
+        for i, value in enumerate(addtionalRows): 
+            postion = totalRows - i - 1; 
+            item = QtWidgets.QTableWidgetItem()  
+            item.setText(value)
+            self.ui.dataTable.setItem(postion ,0 , item)
+            
+            if(value == 'Hardness'): 
+                item2 = QtWidgets.QTableWidgetItem()
+                item2.setText("CaC0<sub>3</sub>")
+                self.ui.dataTable.setItem(postion, 1, item2) 
+                
+                item3 = QtWidgets.QTableWidgetItem()
+                item3.setText('ug/L')
+                self.ui.dataTable.setItem(postion, 2, item3) 
         
-        #set the values for each sample 
+
+        #print(hardnessLocation)
+        
+        #TODO: combine the two tables so can easily iterate through them lol 
         for col, currentSample in enumerate(sampleData, start=5): 
+            #tempName = currentSample[0]
+            #print(i,currentSample) 
             
-            #don't need to match column, did previous math to find out 
-            tempName = currentSample[0]
-            print(i,currentSample)
-            
-            for row, (key, value ) in enumerate(json.loads(currentSample[2]).items()): 
-                item = QtWidgets.QTableWidgetItem()
-                item.setText(value)
+            currentSampleVal = json.loads(currentSample[2])
+            for row in range(len(elementNames)): 
+                item = QtWidgets.QTableWidgetItem(); 
+                
+                cellValue = self.ui.dataTable.item(row, 1).text()
+
+                #determine if both things have been loaded yet
+                #TODO: add a side reload button 
+                if(cellValue in currentSampleVal): 
+                    item.setText(currentSampleVal[cellValue])
+                else: 
+                    item.setText('ND')
+                    
                 self.ui.dataTable.setItem(row, col, item)
                 
-            #assume data is arranged in order? 
-        
-        # Calculate the required height of the table
-        #row_height =  self.ui.dataTable.verticalHeader().defaultSectionSize()
-        #total_height = row_height *  self.ui.dataTable.rowCount()
-        #total_height = row_height +
-
-        # Set the fixed size of the table to accommodate all the rows
-        #self.ui.dataTable.setFixedSize( self.ui.dataTable.width(), total_height)
+            #determine the hardness postion 
+            hardnessVals = {}
+            item = QtWidgets.QTableWidgetItem() 
             
+            for (key, value) in hardnessLocation.items(): 
+                #get the row location
+                cellValue2 = self.ui.dataTable.item(value, col).text()
+                print(cellValue2)
+                hardnessVals[key] = cellValue2
+
+            if not (['ND', 'uncal'] in hardnessVals.items()): 
+                result = hardnessCalc(hardnessVals['Ca'], hardnessVals['Mg'])
+                item.setText(str(result))
+                print(result)
+                
+            else: 
+                item.setText('ND')
+            
+            self.ui.dataTable.setItem(len(elementNames), col, item) 
+            
+            #TODO: add text change items for when the values are changed
+                
+        
         column_width = self.ui.dataTable.columnWidth(2)
         padding = 10
         total_width = column_width + padding
         self.ui.dataTable.setColumnWidth(2, total_width)    
         
-        pass 
 
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
@@ -527,7 +655,8 @@ class MainWindow(QMainWindow):
         self.clientInfo['payment'] = self.ui.payment_1.text()
         #print(self.clientInfo)
         
-    
+
+
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 
         super(SampleNameWidget ,self).__init__(parent)

@@ -10,6 +10,7 @@ import pickle
 from copy import copy
 import pandas as pd 
 import openpyxl
+from datetime import date
 
 from PyQt5.QtWidgets import (
     QFileDialog
@@ -45,7 +46,7 @@ GSMS_values = {
     
 }
 
-periodic_table = {
+periodic_table1 = {
     'Ag': 'Silver',
     'Al': 'Aluminum',
     'Au': 'Gold',
@@ -76,6 +77,60 @@ periodic_table = {
     'Zn': 'Zinc'
 }
 
+periodic_table_2 = {
+    'As': 'Arsenic',
+    'Se': 'Selenium',
+    'Cd': 'Cadmium',
+    'Sb': 'Antimony',
+    'Hg': 'Mercury',
+    'Pb': 'Lead',
+    'U': 'Uranium'
+}
+
+#34 
+periodic_table = {
+    'Ag': 'Silver',
+    'Al': 'Aluminum',
+    'Au': 'Gold',
+    'B': 'Boron',
+    'Ba': 'Barium',
+    'Be': 'Beryllium',
+    'Ca': 'Calcium',
+    'Cd': 'Cadmium',
+    'Co': 'Cobalt',
+    'Cr': 'Chromium',
+    'Cu': 'Copper',
+    'Fe': 'Iron',
+    'Hg': 'Mercury',
+    'K': 'Potassium',
+    'La': 'Lanthanum',
+    'Mg': 'Magnesium',
+    'Mn': 'Manganese',
+    'Mo': 'Molybdenum',
+    'Na': 'Sodium',
+    'Ni': 'Nickel',
+    'P': 'Phosphorus',
+    'Pb': 'Lead',
+    'S': 'Sulfur',
+    'Sb': 'Antimony',
+    'Sc': 'Scandium',
+    'Se': 'Selenium',
+    'Si': 'Silicon',
+    'Sn': 'Tin',
+    'Sr': 'Strontium',
+    'Ti': 'Titanium',
+    'U': 'Uranium',
+    'V': 'Vanadium',
+    'W': 'Tungsten',
+    'Zn': 'Zinc'
+}
+
+elementSymbols = {v: k for k, v in periodic_table.items()}
+icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
+
+
+
+icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
 
 
 GSMS_So_values = {
@@ -97,7 +152,11 @@ GSMS_std_values ={
 }
 
 
-        
+
+def hardnessCalc(calcium, magnesium): 
+    
+    return round(float(calcium) * 2.497 + float(magnesium) * 4.11, 1)
+
 
 def save_pickle(dictonaryName):
     try:
@@ -325,7 +384,8 @@ def processClientInfo(jobNum, fileLocation):
                 #find the report information that does with corrisponding thing                
                 if(re.search('(?<=\s-\s).*', line)):
                     prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
-                    #print(prevSampleName)
+                    #print('CURRENT: ', line)
+                    #print('PREV: ', prevLine[1])
                     currentTestsCheck = re.search('(?<=\s-\s).*', line)
                     prevSampleMatchCheck = re.search('(?<=\s[0-9]).*', prevLine[1])
                     prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
@@ -335,17 +395,19 @@ def processClientInfo(jobNum, fileLocation):
                     #add to most recent sample
                     if(currentTestsCheck):
                         #print('current is a test: ', currentTestsCheck.group())
-                        sampleTests[prevSampleName] = currentTestsCheck.group()
-
-
+                        if(prevSampleTestsCheck):
+                            sampleTests[prevSampleName] = sampleTests[prevSampleName]  + ", " + currentTestsCheck.group()
+                        else: 
+                            sampleTests[prevSampleName] = currentTestsCheck.group()
+                        
+                    #Prev sample name 
                     if(prevSampleMatchCheck):
                         #print('prev was a sampleName')
                         #print(sampleName[prevSampleName]) #doesnt work 
                         pass; 
                        
                     #append onto them 
-                    if(prevSampleTestsCheck):
-                        sampleTests[prevSampleName] = sampleTests[prevSampleName]  + ", " + currentTestsCheck.group()
+
                         
                     #TODO: solve this later, add previous name onto current name sample 
                     if((not bool(prevSampleMatchCheck)) and not( bool(prevSampleTestsCheck))): 
@@ -358,16 +420,17 @@ def processClientInfo(jobNum, fileLocation):
                     
     file.close()
     
-    #print(sampleTests)
+    print(sampleTests)
     #process tyhe sampleTests 
     for key,value in sampleTests.items():
+        
         testLists = [x.strip() for x in value.split(',')]
         sampleTests[key] = testLists
            
     
     #print(clientInfoDict)
     #print(sampleNames)
-    #print(sampleTests)
+    print(sampleTests)
     return clientInfoDict, sampleNames, sampleTests; 
     
     
@@ -387,6 +450,8 @@ def icp_upload(filePath, db):
     return; 
     
 #TODO: sort by name  
+#FIXME: issue sometimes cuts off the ending, so we can just have a cut off section.
+#read line by line and just add the line instead 
 def icpMethod1(filePath, db): 
 
     file1 = open(filePath, 'r')
@@ -507,17 +572,19 @@ def icpMethod1(filePath, db):
     
     #print(jobNumbers)
     
+    #FIXME: uploading same data
+    #we can have a check in place in the file where it is saved 
     
     #save to database
+    todayDate = date.today()
+    #save to database 
     for (key, value) in jobData.items(): 
         #print(key)
-        sql = 'INSERT INTO machineData values(?,?,?,1,?)'
+        sql = 'INSERT INTO icpMachineData1 values(?,?,?,?,?, 1)'
         jobNum = key.split('-')[0]
         tempData = json.dumps(value)
-        db.execute(sql, (key,jobNum,newPath, tempData))
+        db.execute(sql, (key,jobNum,newPath, tempData, todayDate))
         db.commit()
-    
-    #save to database 
     
     
     return jobNumbers, jobData; 
@@ -618,3 +685,29 @@ def icpMethod2(filePath, db):
     
     return; 
 
+
+
+#FIXME: if another thing comes along 
+def createReport(db, jobNum, reportType, parameter=False, recovery=False): 
+    
+    if('ISP' in reportType):
+        sql  = 'INSERT INTO icpReports (jobNumber, reportType, status, createdDate) values (?,?,1,?)'
+        
+    if(reportType == 'GSMS'):
+        sql  = 'INSERT INTO gsmsReports (jobNumber, reportType, status, createdDate) values (?,?,1,?)'
+
+    todayDate = date.today()
+    print('COMMAND: ', sql) 
+
+    db.execute(sql, (jobNum, reportType, todayDate))
+    db.commit()
+    
+    
+def saveClientInformation(db): 
+    
+    pass; 
+
+def saveGSMSData(): 
+    
+    
+    pass; 
