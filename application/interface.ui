@@ -380,7 +380,7 @@ color: rgb(255, 255, 255);</string>
           <item>
            <widget class="QPushButton" name="gsmsBtn1">
             <property name="text">
-             <string>GSMS Database</string>
+             <string>GCMS Database</string>
             </property>
             <property name="icon">
              <iconset resource="assets/resourse.qrc">
@@ -1070,7 +1070,7 @@ QLineEdit {
            <item>
             <widget class="QStackedWidget" name="icpStack">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1954,14 +1954,14 @@ QPushButton::hover {
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QPushButton" name="pushButton_10">
+                     <widget class="QPushButton" name="createReportBtn">
                       <property name="text">
                        <string>Generate Report </string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_9">
+                     <widget class="QPushButton" name="MarkerBtn">
                       <property name="text">
                        <string>Mark Complete</string>
                       </property>
@@ -2000,7 +2000,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">

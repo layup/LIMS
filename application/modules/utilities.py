@@ -165,6 +165,7 @@ def save_pickle(dictonaryName):
     except Exception as ex:
         print("Error during pickling object (Possibly unsupported):", ex)
 
+
 def load_pickle(filename):
     try:
         with open(filename, "rb") as f:
@@ -420,7 +421,7 @@ def processClientInfo(jobNum, fileLocation):
                     
     file.close()
     
-    print(sampleTests)
+    #print(sampleTests)
     #process tyhe sampleTests 
     for key,value in sampleTests.items():
         
@@ -430,7 +431,7 @@ def processClientInfo(jobNum, fileLocation):
     
     #print(clientInfoDict)
     #print(sampleNames)
-    print(sampleTests)
+    #print(sampleTests)
     return clientInfoDict, sampleNames, sampleTests; 
     
     

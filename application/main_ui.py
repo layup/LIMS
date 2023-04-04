@@ -12,6 +12,7 @@ import sys
 import re 
 import asyncio
 
+from modules.createExcel import * 
 from modules.utilities import * 
 from modules.dbManager import *
 from modules.excelCreation import *
@@ -89,6 +90,22 @@ class MainWindow(QMainWindow):
         if(x == QMessageBox.Cancel):
             pass 
         #print(x);
+    def loadReport(self): 
+        msgBox = QMessageBox()  
+        msgBox.setText("Report Already Exists");
+        msgBox.setInformativeText("Would you like to load existing report or overwrite report?");
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
+        msgBox.setDefaultButton(QMessageBox.Yes);
+        
+        x = msgBox.exec_()
+
+        if(x == QMessageBox.Yes): 
+            pass 
+        if(x == QMessageBox.No):
+            pass 
+        if(x == QMessageBox.Cancel):
+            pass 
+       
         
     def on_stackedWidget_currentChanged(self, index):
         #print('Running')
@@ -104,7 +121,53 @@ class MainWindow(QMainWindow):
             #else:s
             btn.setAutoExclusive(True)
                    
+        if(index == 0): 
+            self.loadReportsPage(); 
+    
+    def loadReportsPage(self): 
+    
+        print('Loading Report Page')
+       
+        #FIXME include the other table and also some how to open up this table again  
+        query = 'SELECT * FROM gsmsReports'
+       
+        results = list(self.db.query(query)) 
+        print(results)
+        self.ui.reportsTable.setRowCount(len(results))
+    
+        #inital columns 
+        for row, current in enumerate(results): 
+            item = QtWidgets.QTableWidgetItem() 
+            item.setTextAlignment(Qt.AlignCenter)
+            item.setText(str(current[0])) 
+            self.ui.reportsTable.setItem(row, 0, item)  
+
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[6]))
+            self.ui.reportsTable.setItem(row, 1, item2)  
+            
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[4]))
+            self.ui.reportsTable.setItem(row, 5, item2)  
+           
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            
+            if(current[3] == 1): 
+                item2.setText('COMPLETE')
+            else: 
+                item2.setText("INCOMPLETE")
+            
+            self.ui.reportsTable.setItem(row,6, item2)   
+    
+    
+       
+        #TODO: if sleected open this thing 
+
         
+    
     #Define Menu Button presses 
     def on_reportsBtn1_toggled(self):
         self.ui.stackedWidget.setCurrentIndex(0) 
@@ -159,13 +222,12 @@ class MainWindow(QMainWindow):
         self.updateIcpTable(machine1Data)
 
     def updateIcpTable(self, result): 
-
+        
         textLabelUpdate = 'Total Search Results: ' + str(len(result))
 
         self.ui.icpLabel.setText(textLabelUpdate)
         self.ui.icpTable.setRowCount(len(result)) 
         self.ui.icpTable.setColumnWidth(3, 600)
-        
         
         for i, data in enumerate(result):
             #loops throught items in the order sql requested 
@@ -228,8 +290,8 @@ class MainWindow(QMainWindow):
         
         save_pickle(tempDictonary)
         
+    
     #PROCESS PAGE 
-     
     def proceedPage(self):
         #remove whitespaces 
         jobNum = self.ui.jobNumInput.text().strip()
@@ -258,11 +320,33 @@ class MainWindow(QMainWindow):
             tempLocation = scanForTXTFolders(self.jobNum)
             clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, tempLocation)
             
+
             self.clientInfo = clientInfo 
             self.sampleNames = sampleNames
             self.sampleTests = sampleTests
-    
-            createReport(self.db, jobNum, reportType)
+
+            #TODO: find based on the report type    
+            
+            reportExistSQL = 'SELECT * FROM gsmsReports WHERE jobNumber = ?' 
+            reportResults = self.db.query(reportExistSQL, [jobNum])
+                
+            #Saving into SQL database, so can load later 
+            if reportResults is None:  
+                print('No Exists')
+                #TODO: remanme this sql beter 
+                if('ISP' in reportType): 
+                    pass; 
+                if('GSMS' in reportType): 
+                    pass; 
+                
+                createReport(self.db, jobNum, reportType)
+                pass; 
+            else: 
+                print('Report Exists')
+                print(reportResults)
+                self.loadReport()
+
+
   
             if('ISP' in reportType):
                 print('isp loader')
@@ -272,7 +356,7 @@ class MainWindow(QMainWindow):
             if(reportType == 'GSMS'):
                 print('gsms loader')
                 self.ui.icpDataField.hide() 
-                self.gsmsLoader()
+                self.gcmsLoader()
             
         else:
             errorCheck['jobNum'] = 'Invalid Job Number'
@@ -290,7 +374,7 @@ class MainWindow(QMainWindow):
         pass; 
     
     
-    def gsmsLoader(self): 
+    def gcmsLoader(self): 
         
         self.loadClientInfo()
     
@@ -367,14 +451,59 @@ class MainWindow(QMainWindow):
             item2.setText(str(1))
             self.ui.dataTable.setItem(i, 4, item2) 
         
+        self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
+        
         
         #TODO: remove the data when loading the information 
         #TODO: create the csv file we created 
         #TODO: add the side panel where user can add in more tests or remove the test 
         #TODO: have a popup when the user is trying to leave the page (save or not save)
+        #TODO: save the data as we switch pages 
         
         #item = self.dataTable.horizontalHeaderItem(4)
         #item.setText(_translate("MainWindow", "STD += 2"))
+        
+
+        self.ui.createReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
+        
+    def GcmsReportHandler(self, tests):
+        #FIXME: adjust based on the sample information 
+        initalColumns = 5; 
+        totalSamples = len(self.sampleNames)
+        totalTests = len(tests)
+        sampleData = {}
+        
+        #FIXME: have something determine the lower values of the things 
+        for col in range(initalColumns, totalSamples + initalColumns ): 
+            currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
+            jobValues = []
+            for row in range(totalTests): 
+                try: 
+                    currentItem = self.ui.dataTable.item(row, col).text()
+                    jobValues.append(currentItem)
+                except: 
+                    jobValues.append('ND')
+                    
+            sampleData[currentJob] = jobValues
+            #print(currentJob, sampleData[currentJob])
+        
+        createGcmsReport(self.clientInfo, self.sampleNames, sampleData, tests)
+
+    def handle_item_changed(self, item, test): 
+        row = item.row()
+        column = item.column()
+        value = item.text()
+        
+        print(test)
+        
+        print(f"Row {row}, Column {column} changed to {value}")
+        
+        if(column >= 5):
+            print(self.ui.dataTable.item(row,column).text())
+        
+        
+        
+
         
     def loadClientInfo(self): 
         #clear the first page 
@@ -485,7 +614,6 @@ class MainWindow(QMainWindow):
         
        
         #Get all the names of the elments then sort them
-        
         elementNames = []
          
         for (key,value) in periodic_table.items(): 
@@ -534,12 +662,13 @@ class MainWindow(QMainWindow):
             
             if(value == 'Hardness'): 
                 item2 = QtWidgets.QTableWidgetItem()
-                item2.setText("CaC0<sub>3</sub>")
+                item2.setText("CaC0₃")
                 self.ui.dataTable.setItem(postion, 1, item2) 
                 
                 item3 = QtWidgets.QTableWidgetItem()
                 item3.setText('ug/L')
                 self.ui.dataTable.setItem(postion, 2, item3) 
+       
         
 
         #print(hardnessLocation)
@@ -591,7 +720,38 @@ class MainWindow(QMainWindow):
         padding = 10
         total_width = column_width + padding
         self.ui.dataTable.setColumnWidth(2, total_width)    
+
+        self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
+
+        self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
+    
+    def icpReportHander(self, tests, totalSamples): 
+        #FIXME: adjust based on the sample information 
+        initalColumns = 5; 
+        #totalSamples = len(self.sampleNames)
+        totalTests = len(tests)
+        sampleData = {}
         
+        print(totalSamples)
+        
+        
+        #FIXME: have something determine the lower values of the things 
+        for col in range(initalColumns, totalSamples + initalColumns ): 
+            currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
+            jobValues = []
+            for row in range(totalTests + 2): 
+                try: 
+                    currentItem = self.ui.dataTable.item(row, col).text()
+                    jobValues.append(currentItem)
+                except: 
+                    jobValues.append('ND')
+                    
+            sampleData[currentJob] = jobValues
+            #print(currentJob, sampleData[currentJob])
+                    
+        createIcpReport(self.clientInfo, self.sampleNames, sampleData, tests)
+        
+        pass 
 
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
@@ -643,7 +803,7 @@ class MainWindow(QMainWindow):
         self.clientInfo['recvTemp'] = self.ui.recvTemp_1.text()
         
     def on_tel_1_textChanged(self):
-        self.clientInfo['tel'] = self.ui.clientName_1.text()
+        self.clientInfo['tel'] = self.ui.tel_1.text()
     
     def on_email_1_textChanged(self):
         self.clientInfo['email'] = self.ui.email_1.text()
