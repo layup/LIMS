@@ -572,7 +572,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -1070,7 +1070,7 @@ QLineEdit {
            <item>
             <widget class="QStackedWidget" name="icpStack">
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1159,6 +1159,13 @@ QPushButton:hover{
                       </widget>
                      </item>
                      <item>
+                      <widget class="QPushButton" name="icpStandardsBtn">
+                       <property name="text">
+                        <string>Standards/Blank Calc</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
                       <widget class="QPushButton" name="icpElementsBtn">
                        <property name="text">
                         <string>Define ICP Elements</string>
@@ -1171,7 +1178,7 @@ QPushButton:hover{
                      <item>
                       <widget class="QPushButton" name="icpParamBtn">
                        <property name="text">
-                        <string>Define ICP Parameters</string>
+                        <string> Limits and Comments</string>
                        </property>
                        <property name="checkable">
                         <bool>true</bool>
@@ -1179,9 +1186,9 @@ QPushButton:hover{
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="icpRecoveryBtn">
+                      <widget class="QPushButton" name="icpReportBtn">
                        <property name="text">
-                        <string>Define ICP Recovery</string>
+                        <string>Report Types</string>
                        </property>
                        <property name="checkable">
                         <bool>true</bool>
@@ -1314,7 +1321,7 @@ QPushButton:hover{
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="page">
+             <widget class="QWidget" name="icpElements">
               <layout class="QHBoxLayout" name="horizontalLayout_12">
                <item>
                 <widget class="QWidget" name="widget_15" native="true">
@@ -1329,17 +1336,17 @@ QPushButton:hover{
                  </property>
                  <layout class="QGridLayout" name="gridLayout_3">
                   <item row="0" column="0">
-                   <widget class="QLineEdit" name="lineEdit_3"/>
+                   <widget class="QLineEdit" name="elementInput"/>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QPushButton" name="pushButton_2">
+                   <widget class="QPushButton" name="addElementBtn">
                     <property name="text">
                      <string>Add Compound</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0" colspan="2">
-                   <widget class="QListWidget" name="listWidget">
+                   <widget class="QListWidget" name="definedElements">
                     <item>
                      <property name="text">
                       <string>Aluminium</string>
@@ -1364,7 +1371,7 @@ QPushButton:hover{
                       <height>50</height>
                      </size>
                     </property>
-                    <widget class="QPushButton" name="pushButton_3">
+                    <widget class="QPushButton" name="deleteCompBtn">
                      <property name="geometry">
                       <rect>
                        <x>140</x>
@@ -1377,7 +1384,7 @@ QPushButton:hover{
                       <string>Delete Compound</string>
                      </property>
                     </widget>
-                    <widget class="QPushButton" name="pushButton_5">
+                    <widget class="QPushButton" name="saveCompBtn">
                      <property name="geometry">
                       <rect>
                        <x>20</x>
@@ -1392,59 +1399,6 @@ QPushButton:hover{
                     </widget>
                    </widget>
                   </item>
-                  <item row="3" column="0">
-                   <widget class="QWidget" name="widget_18" native="true">
-                    <layout class="QFormLayout" name="formLayout_7">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_37">
-                       <property name="text">
-                        <string>Report Type</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_38">
-                       <property name="text">
-                        <string>Lower Value </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QLineEdit" name="lineEdit_6"/>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_39">
-                       <property name="text">
-                        <string>Upper Value </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLineEdit" name="lineEdit_7"/>
-                     </item>
-                     <item row="3" column="1">
-                      <widget class="QLineEdit" name="lineEdit_8"/>
-                     </item>
-                     <item row="4" column="0">
-                      <widget class="QLabel" name="label_41">
-                       <property name="text">
-                        <string>Comments</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="4" column="1">
-                      <widget class="QPlainTextEdit" name="plainTextEdit"/>
-                     </item>
-                     <item row="3" column="0">
-                      <widget class="QLabel" name="label_40">
-                       <property name="text">
-                        <string>Units</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
                   <item row="1" column="0">
                    <widget class="QWidget" name="widget_17" native="true">
                     <layout class="QFormLayout" name="formLayout_8">
@@ -1456,53 +1410,179 @@ QPushButton:hover{
                       </widget>
                      </item>
                      <item row="3" column="1">
-                      <widget class="QLineEdit" name="lineEdit_4"/>
+                      <widget class="QLineEdit" name="symbolInput"/>
                      </item>
-                     <item row="5" column="0">
+                     <item row="4" column="0">
                       <widget class="QLabel" name="label_36">
                        <property name="text">
                         <string>Element Name </string>
                        </property>
                       </widget>
                      </item>
-                     <item row="5" column="1">
-                      <widget class="QLineEdit" name="lineEdit_5"/>
+                     <item row="4" column="1">
+                      <widget class="QLineEdit" name="elementNameinput"/>
                      </item>
-                     <item row="12" column="0">
-                      <widget class="QLabel" name="label_35">
+                     <item row="6" column="1">
+                      <widget class="QLabel" name="label_48">
                        <property name="text">
-                        <string>Standard Value</string>
+                        <string>Range For Standards</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="13" column="0">
-                      <widget class="QLabel" name="label_34">
-                       <property name="text">
-                        <string>High Value</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="11" column="0">
+                     <item row="7" column="0">
                       <widget class="QLabel" name="label_33">
                        <property name="text">
                         <string>Low Value </string>
                        </property>
                       </widget>
                      </item>
-                     <item row="11" column="1">
-                      <widget class="QLineEdit" name="lineEdit_9"/>
+                     <item row="7" column="1">
+                      <widget class="QLineEdit" name="lowValueInput"/>
                      </item>
-                     <item row="12" column="1">
-                      <widget class="QLineEdit" name="lineEdit_10"/>
+                     <item row="8" column="0">
+                      <widget class="QLabel" name="label_35">
+                       <property name="text">
+                        <string>Standard Value</string>
+                       </property>
+                      </widget>
                      </item>
-                     <item row="13" column="1">
-                      <widget class="QLineEdit" name="lineEdit_11"/>
+                     <item row="8" column="1">
+                      <widget class="QLineEdit" name="standardValueInput"/>
+                     </item>
+                     <item row="9" column="0">
+                      <widget class="QLabel" name="label_34">
+                       <property name="text">
+                        <string>High Value</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="9" column="1">
+                      <widget class="QLineEdit" name="HighValueInput"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QWidget" name="widget_18" native="true">
+                    <layout class="QFormLayout" name="formLayout_7">
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="reportTypeDropdown">
+                       <property name="minimumSize">
+                        <size>
+                         <width>150</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_38">
+                       <property name="text">
+                        <string>Lower Limit</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lowerLimit"/>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_39">
+                       <property name="text">
+                        <string>upper Limit </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_40">
+                       <property name="text">
+                        <string>Unit Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="unitType"/>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QLabel" name="label_41">
+                       <property name="text">
+                        <string>Comments</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QPlainTextEdit" name="RightSideComment"/>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_37">
+                       <property name="text">
+                        <string>Report Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="upperLimit"/>
                      </item>
                     </layout>
                    </widget>
                   </item>
                  </layout>
                 </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="icpReportType">
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QWidget" name="widget_29" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>300</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>300</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(194, 220, 255);</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_12">
+                  <item>
+                   <widget class="QWidget" name="widget_31" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_15">
+                     <property name="spacing">
+                      <number>-1</number>
+                     </property>
+                     <item>
+                      <widget class="QLineEdit" name="reportNameInput"/>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="addReportBtn">
+                       <property name="text">
+                        <string>Add Report</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QListWidget" name="reportsList"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_30" native="true"/>
                </item>
               </layout>
              </widget>
@@ -2000,7 +2080,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">

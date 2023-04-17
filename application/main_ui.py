@@ -58,13 +58,17 @@ class MainWindow(QMainWindow):
 
         #set first page paramenters         
         self.ui.reportType.addItems(REPORTS_TYPE)
-        self.ui.paramType.addItems(sorted(MATRIX_TYPE))
 
+        paramResults = sorted(self.getReportTypeList())
+        paramResults.insert(0, "")
+       
+        self.ui.paramType.addItems(paramResults)
+        
         #connect buttons 
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
-        
+
         #self.ui.stackedWidget.currentChanged.connect(lambda: print("Stacked Widget Changed "))
         
         self.showMaximized()
@@ -221,6 +225,185 @@ class MainWindow(QMainWindow):
         
         self.updateIcpTable(machine1Data)
 
+    def on_icpElementsBtn_clicked(self): 
+        self.ui.icpStack.setCurrentIndex(2)
+        
+        #self.ui.addElementBtn.clicked.connect(lambda: self.add_element())
+    
+    @pyqtSlot()
+    def on_icpReportBtn_clicked(self): 
+        self.ui.icpStack.setCurrentIndex(3)
+        self.loadReportList()
+        
+        
+    #ICP Buttons 
+    @pyqtSlot()
+    def on_addElementBtn_clicked(self): 
+        currentText = self.ui.elementInput.text()
+        
+        if(currentText != ''): 
+            print(currentText)
+            self.ui.definedElements.addItem(currentText)
+            self.ui.elementInput.clear()
+            
+        else: 
+            print("Please enter not blank")
+         
+         
+         
+    @pyqtSlot()
+    def on_saveCompBtn_clicked(self): 
+        #TODO: remove white spaces just in case 
+        symbolName = self.ui.symbolInput.text().lower()
+        elementName = self.ui.elementNameinput.text().lower()
+        
+        lowVal = self.ui.lowValueInput.text()
+        standVal = self.ui.standardValueInput.text()
+        highVal = self.ui.HighValueInput.text()
+        
+        reportType = self.ui.reportTypeDropdown.currentText()
+        lowerLimit = self.ui.lowerLimit.text()
+        upperLimit = self.ui.upperLimit.text()
+        unitType = self.ui.unitType.text()
+        
+        comment = self.ui.RightSideComment.toPlainText() 
+        
+        print(symbolName, elementName)
+        
+        if(symbolName != "" and elementName != ""):
+            
+            defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol, lowValue, standValue, highValue) VALUES (?,?,?,?,?)'
+            #definedLimitsQuery = 'INSERT OR REPLACE INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)'
+            
+
+            loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'  
+            self.db.execute(loadLimits, (elementName, reportType))
+            limitResults = self.db.fetchone()
+            
+            insertLimit = 'INSERT INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)' 
+            updateLimit = 'UPDATE icpLimits SET lowerLimit = ?, maxLimit = ?, comments =?, units =? WHERE reportType=? AND element=?' 
+
+            try:
+                self.db.execute(defineElementQuery, (elementName, symbolName, lowVal, standVal, highVal) )
+                
+                if(limitResults): 
+                    self.db.execute(updateLimit, (lowerLimit, upperLimit, comment, unitType, reportType, elementName))
+                else: 
+                    self.db.execute(insertLimit, (reportType, elementName, lowerLimit, upperLimit, comment, unitType))
+                
+                self.db.commit()
+
+            except sqlite3.IntegrityError as e:
+                print(e)
+                
+    @pyqtSlot()
+    def on_addReportBtn_clicked(self): 
+        reportText = self.ui.reportNameInput.text()
+        
+        
+        if(reportText != ''): 
+           
+            createReportquerry = 'INSERT INTO icpReportType values (?)'
+            
+            try:
+                self.db.execute(createReportquerry, (reportText,) )
+                self.db.commit()
+                self.ui.reportsList.addItem(reportText)
+            except sqlite3.IntegrityError as e:
+                print(e)
+
+        else: 
+            print("Error No Report Name")
+
+    def loadReportList(self): 
+        
+        loadquerry = 'SELECT * FROM icpReportType' 
+        results = self.db.query(loadquerry)
+        
+        self.ui.reportsList.clear()
+        
+        for item in results: 
+            #print(item)
+            self.ui.reportsList.addItem(item[0])    
+         
+         
+    def on_definedElements_doubleClicked(self):
+
+        selected_item = self.ui.definedElements.currentItem()
+        
+        if selected_item is not None:
+            selected_item_text = selected_item.text()
+            
+            loadElement = 'SELECT * FROM icpElements WHERE element = ?'
+            loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'
+            
+            self.db.execute(loadElement, (selected_item_text,))
+            elementResult = self.db.fetchone()
+           
+            reportType = self.ui.reportTypeDropdown.currentText()
+            
+            self.db.execute(loadLimits, (selected_item_text, reportType))
+            limitResults = self.db.fetchone()
+            
+            if elementResult: 
+                
+                self.ui.elementNameinput.setText(elementResult[0])
+                self.ui.symbolInput.setText(elementResult[1])
+                self.ui.lowValueInput.setText(elementResult[2])
+                self.ui.HighValueInput.setText(elementResult[3])
+                self.ui.standardValueInput.setText(elementResult[4])
+                
+                self.ui.lowerLimit.setText(str(limitResults[2]))
+                self.ui.upperLimit.setText(str(limitResults[3]))
+                self.ui.unitType.setText(limitResults[5])
+                self.ui.RightSideComment.setPlainText(limitResults[4])
+                
+            else: 
+                self.clearElementInfo()
+                self.ui.elementNameinput.setText(selected_item_text)
+                
+                
+        else:
+            print("No item selected.")
+        
+        
+    def on_icpStack_currentChanged(self, index):
+        
+        if(index == 2): 
+            self.loadDefinedElements()        
+            
+    
+    def loadDefinedElements(self): 
+        print("Loading Defined Elements Friends")
+            
+        self.ui.reportTypeDropdown.clear()
+        self.ui.definedElements.clear()
+    
+        getElementsQuery = 'SELECT * FROM icpElements ORDER BY element ASC'
+        definedElements = self.db.query(getElementsQuery)        
+     
+        reportType = self.getReportTypeList()
+        self.ui.reportTypeDropdown.addItems(reportType)     
+        
+         
+        for element in definedElements: 
+            self.ui.definedElements.addItem(element[0])
+
+        self.clearElementInfo()
+            
+    def clearElementInfo(self): 
+        self.ui.symbolInput.clear()
+        self.ui.elementNameinput.clear()
+        self.ui.lowValueInput.clear()
+        self.ui.HighValueInput.clear()
+        self.ui.standardValueInput.clear()
+        
+        self.ui.lowerLimit.clear()
+        self.ui.upperLimit.clear()
+        self.ui.unitType.clear()
+        self.ui.RightSideComment.clear()
+        
+    
     def updateIcpTable(self, result): 
         
         textLabelUpdate = 'Total Search Results: ' + str(len(result))
@@ -462,16 +645,20 @@ class MainWindow(QMainWindow):
         
         #item = self.dataTable.horizontalHeaderItem(4)
         #item.setText(_translate("MainWindow", "STD += 2"))
-        
+       
+
 
         self.ui.createReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
         
     def GcmsReportHandler(self, tests):
         #FIXME: adjust based on the sample information 
+        #FIXME: crashes when doing gcms to icp without closing program 
         initalColumns = 5; 
         totalSamples = len(self.sampleNames)
         totalTests = len(tests)
         sampleData = {}
+        unitType = []
+        
         
         #FIXME: have something determine the lower values of the things 
         for col in range(initalColumns, totalSamples + initalColumns ): 
@@ -486,8 +673,17 @@ class MainWindow(QMainWindow):
                     
             sampleData[currentJob] = jobValues
             #print(currentJob, sampleData[currentJob])
+            
+        for row in range(totalTests): 
+            try: 
+                currentVal = self.ui.dataTable.item(row, 2).text()
+                unitType.append(currentVal)
+            except: 
+                unitType.append('')
+            
+        print("UNITS TESTING: ", unitType)
         
-        createGcmsReport(self.clientInfo, self.sampleNames, sampleData, tests)
+        createGcmsReport(self.clientInfo, self.sampleNames, sampleData, tests, unitType)
 
     def handle_item_changed(self, item, test): 
         row = item.row()
@@ -500,10 +696,6 @@ class MainWindow(QMainWindow):
         
         if(column >= 5):
             print(self.ui.dataTable.item(row,column).text())
-        
-        
-        
-
         
     def loadClientInfo(self): 
         #clear the first page 
@@ -541,7 +733,7 @@ class MainWindow(QMainWindow):
         
     #TODO: sidebar have a s
     def icpLoader(self): 
-        
+        #FIXME: error 
         self.loadClientInfo()
         
         #check if haas data to load into the file location 
@@ -731,6 +923,7 @@ class MainWindow(QMainWindow):
         #totalSamples = len(self.sampleNames)
         totalTests = len(tests)
         sampleData = {}
+        unitType = []
         
         print(totalSamples)
         
@@ -748,10 +941,28 @@ class MainWindow(QMainWindow):
                     
             sampleData[currentJob] = jobValues
             #print(currentJob, sampleData[currentJob])
-                    
-        createIcpReport(self.clientInfo, self.sampleNames, sampleData, tests)
+            
+        for i in range(totalTests): 
+            try: 
+                currentItem = self.ui.dataTable.item(i, 2).text()
+                unitType.append(currentItem)
+            except: 
+                unitType.append('')
         
-        pass 
+        elementsWithLimits = self.getElementLimits(); 
+        print(elementsWithLimits)    
+
+        limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
+        limits = self.db.query(limitQuery, ('Water',))
+
+        print(limits)
+        
+                         
+        createIcpReport(self.clientInfo, self.sampleNames, sampleData, tests, unitType, elementsWithLimits, limits)
+        
+        
+        
+        
 
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
@@ -814,7 +1025,34 @@ class MainWindow(QMainWindow):
     def on_payment_1_textChanged(self): 
         self.clientInfo['payment'] = self.ui.payment_1.text()
         #print(self.clientInfo)
+    
+    
+    def getReportTypeList(self): 
+        getReportsQuery = 'SELECT * FROM icpReportType' 
+        reportTypes = self.db.query(getReportsQuery)
         
+        temp = []
+
+        for item in reportTypes: 
+            #print(item)
+            temp.append(item[0])
+            
+        return temp; 
+
+    def getElementLimits(self): 
+        elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
+        elementWithLimits = self.db.query(elementsQuery, ('Water',))    
+        
+        temp = []
+
+        for item in elementWithLimits: 
+            #print(item)
+            temp.append(item[0]) 
+        
+        return temp; 
+
+    
+
 
 
 class SampleNameWidget(QWidget): 

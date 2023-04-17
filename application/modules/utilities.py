@@ -11,6 +11,8 @@ from copy import copy
 import pandas as pd 
 import openpyxl
 from datetime import date
+from string import printable
+
 
 from PyQt5.QtWidgets import (
     QFileDialog
@@ -48,7 +50,7 @@ GSMS_values = {
 
 periodic_table1 = {
     'Ag': 'Silver',
-    'Al': 'Aluminum',
+    'Al': 'Aluminium',
     'Au': 'Gold',
     'B': 'Boron',
     'Ba': 'Barium',
@@ -90,8 +92,9 @@ periodic_table_2 = {
 #34 
 periodic_table = {
     'Ag': 'Silver',
-    'Al': 'Aluminum',
+    'Al': 'Aluminium',
     'Au': 'Gold',
+    'As': 'Arsenic', 
     'B': 'Boron',
     'Ba': 'Barium',
     'Be': 'Beryllium',
@@ -703,6 +706,7 @@ def createReport(db, jobNum, reportType, parameter=False, recovery=False):
     db.execute(sql, (jobNum, reportType, todayDate))
     db.commit()
     
+
     
 def saveClientInformation(db): 
     

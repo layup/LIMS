@@ -5,6 +5,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, borders, Border, Side
 from openpyxl.cell.rich_text import TextBlock, CellRichText
+from openpyxl.worksheet.page import PageMargins
 
 from openpyxl.worksheet.header_footer import HeaderFooter
 
@@ -28,12 +29,13 @@ def createIcpReport():
     pass 
 
 
-def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo):
+def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
     
     print(clientInfo)
     print(sampleNames)
     print(sampleData)
     print(testInfo)
+    print(unitType)
    
     
     #FIXME: picke saving and loading without being fucked up 
@@ -109,7 +111,7 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo):
     pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0)
 
     #INSERT TEST INFORMATION 
-    pageLocation = insertTestInfo(ws, pageLocation, testInfo, samplePlacement[0], sampleData, totalTests)
+    pageLocation = insertTestInfo(ws, pageLocation, testInfo, samplePlacement[0], sampleData, totalTests, unitType)
     
     
     #INSERT THE REMAINING PAGES 
@@ -146,16 +148,13 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo):
                         pageLocation+=2;
                         pageLocation+=1; 
                         pageLocation = insertTestTitles(ws,pageLocation, totalTests, i * 4)
-                        pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[i], sampleData, totalTests)
+                        pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[i], sampleData, totalTests, unitType)
                         pageLocation = insertComments(ws,pageLocation)
-                        
-
                         
                     else: 
                         #next page 
                         currentPage+=1; 
                         
-                    
                     pass; 
                     
     
@@ -168,34 +167,259 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo):
 
 
     cell = ws['A50']
+    ''' 
     cell.value = CellRichText([
         TextBlock(text='normal text', font=Font(bold=False)),
         TextBlock(text='bold text', font=Font(bold=True)),
     ])
-
+    '''
     
     wb.save('example.xlsx')
     
- 
-     
-    
-    pass; 
 
-def createIcpReport(clientInfo, sampleNames, sampleData, testInfo): 
+def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, limitElements, limits): 
     print(clientInfo)
     print(sampleNames)
     print(sampleData)
     print(testInfo)
+    print(unitType)
+    print(limitElements)
+    print(limits)
+
+    newList = [item.lower() for item in testInfo]
+    
+    print(newList)
+    limitRef = {}
+    
+    for i, item in enumerate(limitElements): 
+        try: 
+            index = newList.index(item)
+            limitRef[index] = limits[i]
+        except:
+            print("could not find") 
+            
+        
+    print(limitRef)
+
     
     
-    pass; 
+
+    wb = Workbook()
+    ws = wb.active
+    
+   # set the default view to page layout
+    ws.sheet_view.view = "pageLayout" 
+
+    # Set the page width to auto
+    page_setup = ws.page_setup
+    
+    #setup page size 
+    page_setup.fitToPage = True
+    page_setup.fitToHeight = False 
+    page_setup.fitToWidth = True
+    #page margins 
+    
+    page_margins = PageMargins()
+    page_margins.left = 0.7
+    page_margins.right = 0.7
+    page_margins.top = 0.75
+    page_margins.bottom = 0.75
+    page_margins.header = 0.3
+    page_margins.footer = 0.3
+    
+    ws.page_margins = page_margins
+    
+  
+    font = Font(name='Times New Roman')
+    ws.sheet_format.font = font; 
+
+    createFooters(ws); 
+
+    #SETTING UP MAIN INFORMATION 
+    #TODO: determine how far out the longest thing is 
+    #FIXME: check out for none issue when they appear
+    #TODO: add the job number to the end of this thing mf 
+        
+    ws = createHeader(ws, clientInfo, 'D')
+    ws.column_dimensions['A'].width = 20 #120px 
+    ws.print_title_rows = '1:8' # the first two rows
+    
+    #determine how many rows the sample name will take 
+    sampleSections = []
+    samplePlacement = []    
+    selectedNames = []
+    
+    currentWord = ''
+    temp = []
+    
+    #determine how many sample sections we will need 
+    for key in sampleData: 
+        selectedNames.append(key)
+        
+
+    #can only display 4 at a time 
+    print('!------ GENERATING SAMPLE NAME ------!')
+    for i, sampleNum in enumerate(selectedNames, start=1): 
+        sampleName = sampleNames[sampleNum]
+        condencedName = " ".join(sampleName.split())
+        currentWord += " " + str(i) + ") " + condencedName + " "
+        temp.append(sampleNum)
+
+        if(i % 4 == 0): 
+            sampleSections.append(currentWord)
+            samplePlacement.append(temp)
+            currentWord = ""
+            temp = []
+        
+    if(len(temp) != 0): 
+        sampleSections.append(currentWord)
+        samplePlacement.append(temp)
+        currentWord = ""
+        temp = [] 
+            
+
+    #insert sample names section
+    insertSampleName(ws, 9, sampleSections[0])
+    
+    #TODO: Determine how much of spacing and what not we need 
+    pageLocation = 12; 
+    
+    totalSamples = len(sampleData)
+    totalTests = len(testInfo)
+    totalRows = 8 
+   
+    pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0) 
+    #for row in range(len(testInfo)): 
+    
+    #46 * 15 = 690  
+        
+    unitCol = 7
+        
+    counter = pageLocation; 
+    for item in range(len(testInfo)): 
+        elementRow = ws.cell(row=counter, column=1); 
+        symbolRow = ws.cell(row=counter, column=2); 
+        unitRow = ws.cell(row=counter, column=unitCol)
+        
+        
+        elementRow.value = "{0}) {1}".format(item+1, testInfo[item])
+
+        temp = testInfo[item]
+        symbolRow.value = elementSymbols[temp]
+        #print(item)
+        try: 
+            unitRow.value = unitType[item]
+        except: 
+            print("error")
+        
+        elementRow.border = Border(right=thinBorder) 
+        symbolRow.border  = Border(right=thinBorder) 
+        unitRow.border    = Border(right=thinBorder) 
+        
+        symbolRow.alignment = Alignment(horizontal='center', vertical='center')
+        unitRow.alignment   = Alignment(horizontal='center', vertical='center')
+        
+        ws.row_dimensions[counter].height = 13
+        
+        
+        
+        
+        counter+=1; 
+   
+    counter = pageLocation 
+    sampleLocation = 0 
+
+    for i, sample in enumerate(samplePlacement[0], start=3): 
+        
+        print(i, sample)
+        
+        for j in range(0, len(testInfo)): 
+            currentSample = ws.cell(row=counter+j, column=i)        
+            currentSample.alignment = Alignment(horizontal='center', vertical='center')  
+            currentSample.border = Border(right=thinBorder)
+            
+            currentVal = sampleData[sample][j]
+            #print(currentVal)
+            #print(j)
+            
+            #FIXME: this is wrong atm uncal means something else 
+            try: 
+                temp = float(currentVal)
+                
+                if j in limitRef: 
+                    print(j)
+                    lower = limitRef[j][1]
+                    higher = limitRef[j][2]
+                    
+                    currentSample.value = temp 
+                    
+                    if(lower != ''): 
+                        if(temp < lower): 
+                            print('lower')
+                            currentSample.value = '< ' + str(lower)
+
+                            
+                    if(higher != ''): 
+                        if(temp > higher): 
+                            print('higher')
+                            currentSample.value = '> ' + str(higher)
+
+                    
+                else: 
+                    currentSample.value = temp 
+                    
+                
+            except:
+                if(currentVal == 'Uncal'):
+                    currentSample.value = 'n/a'
+                else: 
+                    currentSample.value = currentVal
+                    
+            #print(currentSample.value)
+            
+        
+
+
+    sampleLocation += 1 
+    pageLocation += totalTests;  
+    
+    print(pageLocation)
+    
+    maxWidth = ws.max_column 
+    print(f'The width of the worksheet is {maxWidth} columns')
+
+
+        
+    font = Font(name="Times New Roman", size=9)
+
+    # Apply the font to all cells in the worksheet
+    for row in ws.iter_rows():
+        
+        for cell in row:
+            cell.font = font 
+            
+            if(cell.row < 10): 
+                ws.row_dimensions[cell.row].height = 13
+
+          
+            
+
+    
+    wb.save('example2.xlsx')
 
 
 def createFooters(ws): 
     
     #Setting up the headers and footers 
+    ws.oddHeader.fontName = 'Times New Roman'
+    ws.oddHeader.fontSize = 14
+
+    ws.evenHeader.left.font_name = 'Times New Roman'
+    ws.evenHeader.left.font_size = 14
+    
     ws.oddHeader.left.text  = 'GCMS - Report Form: &D'
     ws.evenHeader.left.text = 'GCMS - Report Form: &D' 
+    
     
     ws.oddHeader.right.text  = "Page &P of &N"
     ws.evenFooter.right.text = "Page &P of &N"
@@ -208,6 +432,7 @@ def createFooters(ws):
     
     ws.oddFooter.right.text = '&BMail:&B PO BOX 2103 Stn Main \n Sidney, B.C, V8L 356'
     ws.evenFooter.right.text ='&BMail:&B PO BOX 2103 Stn Main \n Sidney, B.C, V8L 356'
+    
 
 def createHeader(ws, clientInfo, column2): 
     
@@ -320,15 +545,33 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal ):
 
     return pageLocation 
 
-def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests): 
+def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType): 
 
     counter = pageLocation
+    ''' 
     for test in testInfo: 
         test = re.sub('[^A-Za-z0-9]+', '', test)
         testPlacement = ws.cell(row=counter, column=1)
         testPlacement.value = test 
         testPlacement.border = Border(right=thinBorder)
         counter+=1
+    '''
+    
+
+    for item in range(len(testInfo)): 
+        currentTest = re.sub('[^A-Za-z0-9]+', '', testInfo[item])
+        testPlacement = ws.cell(row=counter, column=1)
+        unitPlacement = ws.cell(row=counter, column=2)
+        
+        testPlacement.value = currentTest
+        unitPlacement.value = unitType[item]
+        
+        testPlacement.border = Border(right=thinBorder) 
+        unitPlacement.alignment = Alignment(horizontal='center', vertical='center')
+        
+        counter+=1; 
+    
+    
     
     counter = pageLocation 
     sampleLocation = 0 
@@ -348,6 +591,7 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
             
             currentSample.value = currentResults[j]
             currentSample.border = Border(right=thinBorder, left=thinBorder)
+            
             
     sampleLocation += 1 
     pageLocation += totalTests-1; 
@@ -381,8 +625,22 @@ def insertComments(ws, pageLocation):
     return pageLocation; 
 
 
+
+    
+    
+    
+
+
+
 def insertSignature(ws, pageLocation): 
     
     name1 = 'R. Bilodeau'
     title1 = 'Analytical Chemist'
     name2 = 'H. Hartmann'
+    
+
+def insertTestTitlesIcp():
+    pass;  
+
+def insertTestInfoIcp(): 
+    pass; 
