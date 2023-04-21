@@ -11,6 +11,7 @@ import json
 import sys 
 import re 
 import asyncio
+import pickle
 
 from modules.createExcel import * 
 from modules.utilities import * 
@@ -68,6 +69,9 @@ class MainWindow(QMainWindow):
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
+        
+        
+        self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())
 
         #self.ui.stackedWidget.currentChanged.connect(lambda: print("Stacked Widget Changed "))
         
@@ -109,7 +113,20 @@ class MainWindow(QMainWindow):
             pass 
         if(x == QMessageBox.Cancel):
             pass 
-       
+        
+    def deleteBox(self, title, message, action):
+        msgBox = QMessageBox()  
+        msgBox.setText(title);
+        msgBox.setInformativeText(message);
+        msgBox.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        x = msgBox.exec_() 
+        
+        if(x == QMessageBox.Yes): 
+            pass
+        if(x == QMessageBox.No):
+            pass 
+        
+
         
     def on_stackedWidget_currentChanged(self, index):
         #print('Running')
@@ -137,7 +154,10 @@ class MainWindow(QMainWindow):
        
         results = list(self.db.query(query)) 
         print(results)
+
+         
         self.ui.reportsTable.setRowCount(len(results))
+    
     
         #inital columns 
         for row, current in enumerate(results): 
@@ -165,12 +185,18 @@ class MainWindow(QMainWindow):
                 item2.setText("INCOMPLETE")
             
             self.ui.reportsTable.setItem(row,6, item2)   
-    
-    
+        
+        self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
+
+        
        
         #TODO: if sleected open this thing 
 
-        
+    def on_table_double_clicked(self, index):
+    # Open the row data
+        row = index.row()
+        print(f"Double clicked on row {row}")
     
     #Define Menu Button presses 
     def on_reportsBtn1_toggled(self):
@@ -227,6 +253,9 @@ class MainWindow(QMainWindow):
 
     def on_icpElementsBtn_clicked(self): 
         self.ui.icpStack.setCurrentIndex(2)
+        #TODO: load in the total elements 
+        #TODO: add something when activated 
+        self.ui.icpLabel.setText("Total Elements: 10")
         
         #self.ui.addElementBtn.clicked.connect(lambda: self.add_element())
     
@@ -239,6 +268,7 @@ class MainWindow(QMainWindow):
     #ICP Buttons 
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
+        #TODO: add a message box about adding blanks 
         currentText = self.ui.elementInput.text()
         
         if(currentText != ''): 
@@ -250,12 +280,12 @@ class MainWindow(QMainWindow):
             print("Please enter not blank")
          
          
-         
     @pyqtSlot()
     def on_saveCompBtn_clicked(self): 
         #TODO: remove white spaces just in case 
-        symbolName = self.ui.symbolInput.text().lower()
-        elementName = self.ui.elementNameinput.text().lower()
+        #TODO: check if they are valid limits
+        symbolName = self.ui.symbolInput.text().lower().strip()
+        elementName = self.ui.elementNameinput.text().lower().strip()
         
         lowVal = self.ui.lowValueInput.text()
         standVal = self.ui.standardValueInput.text()
@@ -264,7 +294,7 @@ class MainWindow(QMainWindow):
         reportType = self.ui.reportTypeDropdown.currentText()
         lowerLimit = self.ui.lowerLimit.text()
         upperLimit = self.ui.upperLimit.text()
-        unitType = self.ui.unitType.text()
+        unitType = self.ui.unitType.text().strip()
         
         comment = self.ui.RightSideComment.toPlainText() 
         
@@ -275,7 +305,6 @@ class MainWindow(QMainWindow):
             defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol, lowValue, standValue, highValue) VALUES (?,?,?,?,?)'
             #definedLimitsQuery = 'INSERT OR REPLACE INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)'
             
-
             loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'  
             self.db.execute(loadLimits, (elementName, reportType))
             limitResults = self.db.fetchone()
@@ -295,11 +324,60 @@ class MainWindow(QMainWindow):
 
             except sqlite3.IntegrityError as e:
                 print(e)
+
+    @pyqtSlot()
+    def on_deleteCompBtn_clicked(self):
+        print("Deleting the componenet")
+
+        elementName = self.ui.elementNameinput.text().lower()
+        print(elementName)
+        #TODO: are you sure you wanted to delete this time popup
+        #TODO: error when deleting nothing
+        
+        deleteQuery = 'DELETE FROM icpElements WHERE element = ?'
+        
+        try: 
+            self.deleteBox("DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
+            
+            self.db.execute(deleteQuery, (elementName,))
+            self.db.commit()
+
+            currentItem = self.ui.definedElements.currentRow()
+            self.ui.definedElements.takeItem(currentItem)
+            self.ui.definedElements.setCurrentItem(None)
+            self.clearElementInfo()
+        
+        except: 
+            print('Error: could not delete item')
+            
+    
+    def loadElementLimits(self): 
+        print('CHANGE')
+        reportType = self.ui.reportTypeDropdown.currentText()
+        elementName = self.ui.elementNameinput.text().lower()
+
+        limitsQuery = 'SELECT * from icpLimits WHERE reportType = ? and element = ?'
+        
+        try: 
+            self.db.execute(limitsQuery, (reportType, elementName))
+            limitResults = self.db.fetchone()
+            print('results: ', limitResults)
+            if(limitResults is None): 
+                self.clearElementLimits()
+            else: 
+                self.ui.lowerLimit.setText(str(limitResults[2]))
+                self.ui.upperLimit.setText(str(limitResults[3]))
+                self.ui.unitType.setText(limitResults[5])
+                self.ui.RightSideComment.setPlainText(limitResults[4]) 
+            
+        except: 
+            print('Error: Could not load in limits ')
+       
+        
                 
     @pyqtSlot()
     def on_addReportBtn_clicked(self): 
         reportText = self.ui.reportNameInput.text()
-        
         
         if(reportText != ''): 
            
@@ -325,9 +403,12 @@ class MainWindow(QMainWindow):
         for item in results: 
             #print(item)
             self.ui.reportsList.addItem(item[0])    
-         
-         
-    def on_definedElements_doubleClicked(self):
+        
+   
+    def on_definedElements_clicked(self):
+        print('Defined Elements')
+        
+     
 
         selected_item = self.ui.definedElements.currentItem()
         
@@ -353,18 +434,59 @@ class MainWindow(QMainWindow):
                 self.ui.HighValueInput.setText(elementResult[3])
                 self.ui.standardValueInput.setText(elementResult[4])
                 
-                self.ui.lowerLimit.setText(str(limitResults[2]))
-                self.ui.upperLimit.setText(str(limitResults[3]))
-                self.ui.unitType.setText(limitResults[5])
-                self.ui.RightSideComment.setPlainText(limitResults[4])
+                if(limitResults is None): 
+                    self.clearElementLimits()
+                else: 
+                    self.ui.lowerLimit.setText(str(limitResults[2]))
+                    self.ui.upperLimit.setText(str(limitResults[3]))
+                    self.ui.unitType.setText(limitResults[5])
+                    self.ui.RightSideComment.setPlainText(limitResults[4])
                 
             else: 
                 self.clearElementInfo()
                 self.ui.elementNameinput.setText(selected_item_text)
-                
-                
+            
         else:
             print("No item selected.")
+
+    def on_reportsList_clicked(self): 
+        reportType = self.ui.reportsList.currentItem().text()
+        self.ui.footerComments.setText(None)
+        
+        try:
+            loadFooterComment = 'SELECT footerComment from icpReportType WHERE reportType = ?'
+            self.db.execute(loadFooterComment, (reportType,))
+            result = self.db.fetchone()
+            list_binary = result[0]
+            
+            if(list_binary): 
+                commentList = pickle.loads(list_binary)
+                text = '\n'.join(commentList)
+                self.ui.footerComments.insertPlainText(text)
+                
+            
+        except:
+            print("Error: Couldn't load comment") 
+        
+
+    @pyqtSlot() 
+    def on_saveFooter_clicked(self):        
+        saveComment = self.ui.footerComments.toPlainText()
+        reportType = self.ui.reportsList.currentItem()
+                
+        if(saveComment != ''):            
+            commentLists = saveComment.split('\n')
+            list_binary = pickle.dumps(commentLists)
+                        
+            try: 
+                updateFooterCommentQuery = 'UPDATE icpReportType SET footerComment = ? WHERE reportType = ?'
+                self.db.execute(updateFooterCommentQuery, (list_binary, reportType.text()))
+                self.db.commit()
+        
+            except: 
+                print("Error: updating footer not working")            
+        else: 
+            print('Nothing is the same')
         
         
     def on_icpStack_currentChanged(self, index):
@@ -403,6 +525,11 @@ class MainWindow(QMainWindow):
         self.ui.unitType.clear()
         self.ui.RightSideComment.clear()
         
+    def clearElementLimits(self): 
+        self.ui.lowerLimit.clear()
+        self.ui.upperLimit.clear()
+        self.ui.unitType.clear()
+        self.ui.RightSideComment.clear()
     
     def updateIcpTable(self, result): 
         
@@ -451,7 +578,12 @@ class MainWindow(QMainWindow):
         icp_upload(fileLocation, self.db) 
         
         #check if the file is .xlsx or txt document 
+    
+    def on_reportlist_doubleClicked(self): 
+        print('Something is being selected')
         
+        selected_item = self.ui.reportsList.currentItem()
+    
                 
     def keyPressEvent(self, event):
         #print(event)
@@ -528,8 +660,6 @@ class MainWindow(QMainWindow):
                 print('Report Exists')
                 print(reportResults)
                 self.loadReport()
-
-
   
             if('ISP' in reportType):
                 print('isp loader')
@@ -696,6 +826,8 @@ class MainWindow(QMainWindow):
         
         if(column >= 5):
             print(self.ui.dataTable.item(row,column).text())
+            
+        
         
     def loadClientInfo(self): 
         #clear the first page 
@@ -957,9 +1089,10 @@ class MainWindow(QMainWindow):
 
         print(limits)
         
-                         
-        createIcpReport(self.clientInfo, self.sampleNames, sampleData, tests, unitType, elementsWithLimits, limits)
+        #load the footer comment 
         
+                         
+        createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits)
         
         
         

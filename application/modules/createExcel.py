@@ -108,7 +108,7 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
     totalRows = 8 
     
     #TODO:  add new column for comments 
-    pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0)
+    pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0, 0)
 
     #INSERT TEST INFORMATION 
     pageLocation = insertTestInfo(ws, pageLocation, testInfo, samplePlacement[0], sampleData, totalTests, unitType)
@@ -147,7 +147,7 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
                         insertSampleName(ws, pageLocation, currentSample)
                         pageLocation+=2;
                         pageLocation+=1; 
-                        pageLocation = insertTestTitles(ws,pageLocation, totalTests, i * 4)
+                        pageLocation = insertTestTitles(ws,pageLocation, totalTests, i * 4, 0 )
                         pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[i], sampleData, totalTests, unitType)
                         pageLocation = insertComments(ws,pageLocation)
                         
@@ -177,7 +177,7 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
     wb.save('example.xlsx')
     
 
-def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, limitElements, limits): 
+def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits): 
     print(clientInfo)
     print(sampleNames)
     print(sampleData)
@@ -185,6 +185,7 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
     print(unitType)
     print(limitElements)
     print(limits)
+    #TODO: missing the report type that will get called into this thing 
 
     newList = [item.lower() for item in testInfo]
     
@@ -200,9 +201,6 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
             
         
     print(limitRef)
-
-    
-    
 
     wb = Workbook()
     ws = wb.active
@@ -242,6 +240,8 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
         
     ws = createHeader(ws, clientInfo, 'D')
     ws.column_dimensions['A'].width = 20 #120px 
+    ws.column_dimensions['H'].width = 19 
+    cell = ws['A']
     ws.print_title_rows = '1:8' # the first two rows
     
     #determine how many rows the sample name will take 
@@ -288,7 +288,7 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
     totalTests = len(testInfo)
     totalRows = 8 
    
-    pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0) 
+    pageLocation = insertTestTitles(ws, pageLocation, totalSamples, 0, 1 ) 
     #for row in range(len(testInfo)): 
     
     #46 * 15 = 690  
@@ -296,7 +296,7 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
     unitCol = 7
         
     counter = pageLocation; 
-    for item in range(len(testInfo)): 
+    for item in range(totalTests): 
         elementRow = ws.cell(row=counter, column=1); 
         symbolRow = ws.cell(row=counter, column=2); 
         unitRow = ws.cell(row=counter, column=unitCol)
@@ -320,10 +320,7 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
         unitRow.alignment   = Alignment(horizontal='center', vertical='center')
         
         ws.row_dimensions[counter].height = 13
-        
-        
-        
-        
+         
         counter+=1; 
    
     counter = pageLocation 
@@ -333,57 +330,103 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
         
         print(i, sample)
         
-        for j in range(0, len(testInfo)): 
+        for j in range(0, totalTests+2): 
             currentSample = ws.cell(row=counter+j, column=i)        
             currentSample.alignment = Alignment(horizontal='center', vertical='center')  
             currentSample.border = Border(right=thinBorder)
             
+            comment = ws.cell(row=counter+j, column=8)
+            comment.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
+            
+            
             currentVal = sampleData[sample][j]
-            #print(currentVal)
+            #print(j, currentVal)
             #print(j)
             
             #FIXME: this is wrong atm uncal means something else 
             try: 
-                temp = float(currentVal)
                 
+                temp = float(currentVal)
+        
+                #print('current J: ', j)
                 if j in limitRef: 
-                    print(j)
+                
                     lower = limitRef[j][1]
                     higher = limitRef[j][2]
                     
                     currentSample.value = temp 
+                    #print('{} Lower: {} | Higher: {}'.format(j, lower,higher))
                     
                     if(lower != ''): 
                         if(temp < lower): 
                             print('lower')
                             currentSample.value = '< ' + str(lower)
 
-                            
                     if(higher != ''): 
                         if(temp > higher): 
                             print('higher')
                             currentSample.value = '> ' + str(higher)
-
-                    
+                        
+                    if(temp == 0): 
+                       currentSample.value = 'ND2' 
+                
+                #no limit exists for the given thing
                 else: 
                     currentSample.value = temp 
                     
+                    if(temp == 0): 
+                        currentSample.value = 'ND2'  
+
                 
             except:
+                #print(j, 'EXCEPT: ', currentVal)
                 if(currentVal == 'Uncal'):
                     currentSample.value = 'n/a'
+                    
                 else: 
                     currentSample.value = currentVal
                     
-            #print(currentSample.value)
-            
         
+            if j in limitRef: 
+                higher = limitRef[j][2]
+                limitComment = limitRef[j][3]
 
+                if(limitComment != ''): 
+                    comment.value = limitComment
+                elif(higher != ''): 
+                    comment.value = str(higher) + "mg/L"  
+                else: 
+                    comment.value = 'no limit listed'
+            else: 
+                comment.value = 'no limit listed' 
+                
+            #print(currentSample.value) 
+    
+    #calculate the remaining pixel count, if not enough then contiune onto the next page based on how many pixels 
+    
 
     sampleLocation += 1 
     pageLocation += totalTests;  
+
     
-    print(pageLocation)
+    hardness = ws.cell(row=pageLocation, column=1)   
+    hardness.value = 'Hardness' 
+    hardness.border = Border(right=thinBorder)
+    
+    hardness = ws.cell(row=pageLocation, column=2)   
+    hardness.border = Border(right=thinBorder)
+    
+    pageLocation+=1; 
+    
+    phRow = ws.cell(row=pageLocation, column=1)
+    phRow.value = 'Ph'
+    hardness.border = Border(right=thinBorder) 
+    
+    pageLocation +=1; 
+    
+    
+    #insert hardness and ph levels 
+    print('Current Page: ', pageLocation)
     
     maxWidth = ws.max_column 
     print(f'The width of the worksheet is {maxWidth} columns')
@@ -398,12 +441,16 @@ def createIcpReport(clientInfo, sampleNames, sampleData, testInfo, unitType, lim
         for cell in row:
             cell.font = font 
             
-            if(cell.row < 10): 
-                ws.row_dimensions[cell.row].height = 13
-
-          
-            
-
+            #if(cell.row < 10): 
+            ws.row_dimensions[cell.row].height = 13
+ 
+    jobNumLocation = ws.cell(row=1, column=8)
+    jobNumLocation.value = "W" + str(jobNum)
+    jobNumLocation.alignment = Alignment(horizontal='center', vertical='center')
+    
+    #insert footer tests 
+    
+    
     
     wb.save('example2.xlsx')
 
@@ -494,12 +541,19 @@ def insertSampleName(ws, row, sampleSection):
     ws.merge_cells(start_row=row, start_column=1, end_row=row+1, end_column=8)
     temp.alignment = Alignment(wrap_text=True) 
     
-def insertTestTitles(ws, pageLocation, totalSamples, startVal ): 
+def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType): 
     tests = ws.cell(row=pageLocation, column=1)
-    tests.value = 'Tests'
+    if(reportType == 0):
+        tests.value = 'Tests'
+    else: 
+        tests.value = 'Elements'        
 
     units = ws.cell(row=pageLocation, column=2)
-    units.value = 'Units'
+    if(reportType == 0): 
+        units.value = 'Units'
+    else: 
+        units.value = "Symbols"
+
     units.border = Border(right=thinBorder, left=thinBorder)
     units.alignment = Alignment(horizontal='center', vertical='center')
 
@@ -519,13 +573,20 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal ):
             sample.border = Border(right=thinBorder, left=thinBorder) 
             
     so = ws.cell(row=pageLocation, column=7) 
-    so.value = 'So'
+    if(reportType == 0): 
+        so.value = 'So'
+    else: 
+        so.value = 'Units'
     so.border = Border(right=thinBorder, left=thinBorder)
     so.alignment = Alignment(horizontal='center', vertical='center') 
     
     ref = ws.cell(row=pageLocation, column=8)
-    ref.value = 'Ref Value'  
-    ref.alignment = Alignment(horizontal='center', vertical='center')  
+    if(reportType == 0 ): 
+        ref.value = 'Ref Value'
+        ref.alignment = Alignment(horizontal='center', vertical='center')  
+    else: 
+        ref.value = 'Maximum Limits'  
+        ref.alignment = Alignment(horizontal='left', vertical='center', indent=1)  
     
     pageLocation+=1; 
     
@@ -544,6 +605,8 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal ):
     pageLocation+=1; 
 
     return pageLocation 
+
+
 
 def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType): 
 
@@ -624,11 +687,6 @@ def insertComments(ws, pageLocation):
     pageLocation+=6; 
     return pageLocation; 
 
-
-
-    
-    
-    
 
 
 
