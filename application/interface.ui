@@ -572,7 +572,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -1070,7 +1070,7 @@ QLineEdit {
            <item>
             <widget class="QStackedWidget" name="icpStack">
              <property name="currentIndex">
-              <number>3</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1159,26 +1159,9 @@ QPushButton:hover{
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="icpStandardsBtn">
-                       <property name="text">
-                        <string>Standards/Blank Calc</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <widget class="QPushButton" name="icpElementsBtn">
                        <property name="text">
                         <string>Define ICP Elements</string>
-                       </property>
-                       <property name="checkable">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="icpParamBtn">
-                       <property name="text">
-                        <string> Limits and Comments</string>
                        </property>
                        <property name="checkable">
                         <bool>true</bool>
@@ -1402,62 +1385,72 @@ QPushButton:hover{
                   <item row="1" column="0">
                    <widget class="QWidget" name="widget_17" native="true">
                     <layout class="QFormLayout" name="formLayout_8">
-                     <item row="3" column="0">
+                     <item row="6" column="0">
                       <widget class="QLabel" name="label_32">
                        <property name="text">
                         <string>Element Symbol</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="3" column="1">
+                     <item row="6" column="1">
                       <widget class="QLineEdit" name="symbolInput"/>
                      </item>
-                     <item row="4" column="0">
+                     <item row="7" column="0">
                       <widget class="QLabel" name="label_36">
                        <property name="text">
                         <string>Element Name </string>
                        </property>
                       </widget>
                      </item>
-                     <item row="4" column="1">
+                     <item row="7" column="1">
                       <widget class="QLineEdit" name="elementNameinput"/>
                      </item>
-                     <item row="6" column="1">
+                     <item row="9" column="1">
                       <widget class="QLabel" name="label_48">
                        <property name="text">
                         <string>Range For Standards</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="7" column="0">
+                     <item row="10" column="0">
                       <widget class="QLabel" name="label_33">
                        <property name="text">
                         <string>Low Value </string>
                        </property>
                       </widget>
                      </item>
-                     <item row="7" column="1">
+                     <item row="10" column="1">
                       <widget class="QLineEdit" name="lowValueInput"/>
                      </item>
-                     <item row="8" column="0">
+                     <item row="11" column="0">
                       <widget class="QLabel" name="label_35">
                        <property name="text">
                         <string>Standard Value</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="8" column="1">
+                     <item row="11" column="1">
                       <widget class="QLineEdit" name="standardValueInput"/>
                      </item>
-                     <item row="9" column="0">
+                     <item row="12" column="0">
                       <widget class="QLabel" name="label_34">
                        <property name="text">
                         <string>High Value</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="9" column="1">
+                     <item row="12" column="1">
                       <widget class="QLineEdit" name="HighValueInput"/>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="label_58">
+                       <property name="text">
+                        <string>Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QComboBox" name="comboBox"/>
                      </item>
                     </layout>
                    </widget>
@@ -1607,7 +1600,7 @@ QPushButton:hover{
                       <rect>
                        <x>20</x>
                        <y>70</y>
-                       <width>711</width>
+                       <width>721</width>
                        <height>221</height>
                       </rect>
                      </property>
@@ -1670,19 +1663,291 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
          <widget class="QWidget" name="gsmsPage">
-          <widget class="QLabel" name="label_57">
-           <property name="geometry">
-            <rect>
-             <x>300</x>
-             <y>130</y>
-             <width>131</width>
-             <height>16</height>
-            </rect>
+          <layout class="QVBoxLayout" name="verticalLayout_19">
+           <property name="spacing">
+            <number>0</number>
            </property>
-           <property name="text">
-            <string>GC/MS Reports </string>
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-          </widget>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="gcmsHeader" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>80</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(255, 215, 0);</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_13">
+              <property name="leftMargin">
+               <number>12</number>
+              </property>
+              <property name="topMargin">
+               <number>12</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_59">
+                <property name="font">
+                 <font>
+                  <pointsize>20</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>GC/MS Page</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="icpLabel_2">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QStackedWidget" name="gcmsStack">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <widget class="QWidget" name="gcmsMenu">
+              <layout class="QVBoxLayout" name="verticalLayout_20">
+               <property name="spacing">
+                <number>-1</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QWidget" name="widget_33" native="true">
+                 <property name="styleSheet">
+                  <string notr="true">QWidget {
+	background-color: rgb(255, 255, 255)
+}
+
+QPushButton {
+	padding: 10px;
+	width:200px;
+	border:none; 
+	background-color: rgb(182, 186, 185)
+}
+
+QPushButton:hover{
+	background-color: rgb(180, 180, 180)
+}
+</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_17">
+                  <item>
+                   <spacer name="horizontalSpacer_6">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item alignment="Qt::AlignVCenter">
+                   <widget class="QWidget" name="widget_7" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0">
+                     <property name="spacing">
+                      <number>-1</number>
+                     </property>
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SetDefaultConstraint</enum>
+                     </property>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_3">
+                       <property name="text">
+                        <string>PushButton</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_2">
+                       <property name="text">
+                        <string>Define Test Values</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_5">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_2">
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QWidget" name="widget_34" native="true">
+                 <property name="maximumSize">
+                  <size>
+                   <width>300</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: rgb(253, 131, 83);</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_7">
+                  <item row="0" column="0">
+                   <widget class="QLineEdit" name="elementInput_2"/>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QPushButton" name="addElementBtn_2">
+                    <property name="text">
+                     <string>Add Tests</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="2">
+                   <widget class="QListWidget" name="definedElements_2">
+                    <item>
+                     <property name="text">
+                      <string>Aluminium</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_35" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_22">
+                  <item>
+                   <widget class="QWidget" name="widget_36" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <widget class="QPushButton" name="pushButton_4">
+                     <property name="geometry">
+                      <rect>
+                       <x>20</x>
+                       <y>10</y>
+                       <width>113</width>
+                       <height>32</height>
+                      </rect>
+                     </property>
+                     <property name="text">
+                      <string>Save</string>
+                     </property>
+                    </widget>
+                    <widget class="QPushButton" name="pushButton_5">
+                     <property name="geometry">
+                      <rect>
+                       <x>130</x>
+                       <y>10</y>
+                       <width>113</width>
+                       <height>32</height>
+                      </rect>
+                     </property>
+                     <property name="text">
+                      <string>Delete</string>
+                     </property>
+                    </widget>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_37" native="true">
+                    <layout class="QFormLayout" name="formLayout_18">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_57">
+                       <property name="text">
+                        <string>test Name </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_60">
+                       <property name="text">
+                        <string>Unit Type </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_61">
+                       <property name="text">
+                        <string>Ref Value</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QTextEdit" name="textEdit"/>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLineEdit" name="lineEdit_4"/>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineEdit_5"/>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineEdit_6"/>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="settingsPage">
           <layout class="QVBoxLayout" name="verticalLayout_9">

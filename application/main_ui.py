@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         size = self.size()
         width = size.width() 
         
+        #TODO: move this into a different function 
         columnWidth = width / 7
         
         for column in range(7): 
@@ -71,10 +72,7 @@ class MainWindow(QMainWindow):
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
         
         
-        self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())
-
-        #self.ui.stackedWidget.currentChanged.connect(lambda: print("Stacked Widget Changed "))
-        
+        self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
         self.showMaximized()
         #self.show()
 
@@ -144,6 +142,8 @@ class MainWindow(QMainWindow):
                    
         if(index == 0): 
             self.loadReportsPage(); 
+            
+        
     
     def loadReportsPage(self): 
     
@@ -189,8 +189,6 @@ class MainWindow(QMainWindow):
         self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
 
-        
-       
         #TODO: if sleected open this thing 
 
     def on_table_double_clicked(self, index):
@@ -255,7 +253,11 @@ class MainWindow(QMainWindow):
         self.ui.icpStack.setCurrentIndex(2)
         #TODO: load in the total elements 
         #TODO: add something when activated 
-        self.ui.icpLabel.setText("Total Elements: 10")
+        
+        total = self.getTotalElements()
+        self.ui.icpLabel.setText("Total Elements: {}".format(total))
+        
+        
         
         #self.ui.addElementBtn.clicked.connect(lambda: self.add_element())
     
@@ -407,13 +409,12 @@ class MainWindow(QMainWindow):
    
     def on_definedElements_clicked(self):
         print('Defined Elements')
-        
-     
-
+         
         selected_item = self.ui.definedElements.currentItem()
         
         if selected_item is not None:
             selected_item_text = selected_item.text()
+            print(selected_item_text); 
             
             loadElement = 'SELECT * FROM icpElements WHERE element = ?'
             loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'
@@ -426,6 +427,7 @@ class MainWindow(QMainWindow):
             self.db.execute(loadLimits, (selected_item_text, reportType))
             limitResults = self.db.fetchone()
             
+            print(elementResult); 
             if elementResult: 
                 
                 self.ui.elementNameinput.setText(elementResult[0])
@@ -464,7 +466,6 @@ class MainWindow(QMainWindow):
                 text = '\n'.join(commentList)
                 self.ui.footerComments.insertPlainText(text)
                 
-            
         except:
             print("Error: Couldn't load comment") 
         
@@ -530,6 +531,11 @@ class MainWindow(QMainWindow):
         self.ui.upperLimit.clear()
         self.ui.unitType.clear()
         self.ui.RightSideComment.clear()
+        
+        
+    def clearDataTable(self): 
+        self.ui.dataTable.clearContents()
+        self.ui.dataTable.setRowCount(0)
     
     def updateIcpTable(self, result): 
         
@@ -661,6 +667,8 @@ class MainWindow(QMainWindow):
                 print(reportResults)
                 self.loadReport()
   
+            self.clearDataTable()
+  
             if('ISP' in reportType):
                 print('isp loader')
                 self.ui.icpDataField.show()
@@ -791,6 +799,7 @@ class MainWindow(QMainWindow):
         
         
         #FIXME: have something determine the lower values of the things 
+        #FIXME: 804 error occurs when Nonetype, can't get .text()
         for col in range(initalColumns, totalSamples + initalColumns ): 
             currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
             jobValues = []
@@ -869,13 +878,13 @@ class MainWindow(QMainWindow):
         self.loadClientInfo()
         
         #check if haas data to load into the file location 
-        sql = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ?'
+        sql = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
         
         #need to get sample data from both machines 
         #FIXME: add a try catch and get second sample amount 
         sampleData = list(self.db.query(sql, (self.jobNum,)))
         
-        
+     
         totalSamples = len(sampleData)
         #FIXME: have check if sample names is empty 
         selectedSampleNames = []
@@ -950,7 +959,7 @@ class MainWindow(QMainWindow):
         print(len(elementNames))
         
         hardnessLocation = {}
-        
+        #TODO: load in the right Elements and the unit values 
         for i, value in enumerate(elementNames): 
             
             currentSymbol = elementSymbols[value]
@@ -1172,6 +1181,8 @@ class MainWindow(QMainWindow):
             
         return temp; 
 
+
+    #SQL Query Functions 
     def getElementLimits(self): 
         elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
         elementWithLimits = self.db.query(elementsQuery, ('Water',))    
@@ -1183,9 +1194,15 @@ class MainWindow(QMainWindow):
             temp.append(item[0]) 
         
         return temp; 
-
     
-
+    def getTotalElements(self): 
+        amountQuery = 'SELECT count(*) FROM icpElements'
+        
+        self.db.execute(amountQuery)
+        total = self.db.fetchone()[0]
+        
+        return total; 
+    
 
 
 class SampleNameWidget(QWidget): 
