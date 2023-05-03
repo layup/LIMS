@@ -6,6 +6,8 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, borders, Border, Side
 from openpyxl.cell.rich_text import TextBlock, CellRichText 
 from openpyxl.worksheet.page import PageMargins
+from openpyxl.drawing.image import Image
+
 
 from openpyxl.worksheet.header_footer import HeaderFooter
 
@@ -188,7 +190,9 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
                 pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType)
                 
                 if(i+1 == remainingSamples): 
-                    pageLocation = insertComments(ws, pageLocation)    
+                    pageLocation = insertComments(ws, pageLocation)  
+                    img = Image('signature.png') 
+                    ws.add_image(img, 'B2') 
                     
                 counter+=1; 
                 usedSamples += 4;
@@ -321,6 +325,9 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     pageLocation = 9; 
     usedSamples = 0; 
     
+
+
+    
     totalSamples = len(sampleData.keys())
     print('Total Samples: ', totalSamples);
     formatRows(ws, totalSamples)
@@ -344,6 +351,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
                 comment.font = Font(bold=True, size=9, name="Times New Roman")
             else: 
                print('Insert comment and signature') 
+
+
             
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 

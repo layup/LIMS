@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(1)
         self.ui.reportsBtn1.setChecked(True)
         
-        self.ui.jobNumInput.setText('171981')
+
         
         size = self.size()
         width = size.width() 
@@ -58,13 +58,7 @@ class MainWindow(QMainWindow):
         #temp['TXTDirLocation'] = getFileLocation()
         #save_pickle(temp)
 
-        #set first page paramenters         
-        self.ui.reportType.addItems(REPORTS_TYPE)
-
-        paramResults = sorted(self.getReportTypeList())
-        paramResults.insert(0, "")
-       
-        self.ui.paramType.addItems(paramResults)
+        self.loadCreatePage()
         
         #connect buttons 
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
@@ -95,7 +89,8 @@ class MainWindow(QMainWindow):
             self.activeCreation = False; 
         if(x == QMessageBox.Cancel):
             pass 
-        #print(x);
+        
+        
     def loadReport(self): 
         msgBox = QMessageBox()  
         msgBox.setText("Report Already Exists");
@@ -106,7 +101,8 @@ class MainWindow(QMainWindow):
         x = msgBox.exec_()
 
         if(x == QMessageBox.Yes): 
-            pass 
+            pass
+            #FIXME: load in the values as well 
         if(x == QMessageBox.No):
             pass 
         if(x == QMessageBox.Cancel):
@@ -125,7 +121,7 @@ class MainWindow(QMainWindow):
             pass 
         
 
-        
+   
     def on_stackedWidget_currentChanged(self, index):
         #print('Running')
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
@@ -143,48 +139,77 @@ class MainWindow(QMainWindow):
         if(index == 0): 
             self.loadReportsPage(); 
             
+        if(index == 1): 
+            self.ui.jobNumInput.setText('171981')
+            self.ui.reportType.setCurrentIndex(0)
+            self.ui.paramType.setCurrentIndex(0)
+            
+
+            
+
+    def loadCreatePage(self): 
+        print('Loading user information')
+        
+        #load the report Types
+        
+        
+        self.ui.reportType.addItems(REPORTS_TYPE)
+
+        paramResults = sorted(self.getReportTypeList())
+        paramResults.insert(0, "")
+       
+        self.ui.paramType.addItems(paramResults)
+        
+        #based on what the reportType is should load the appropriate parameters Type 
         
     
     def loadReportsPage(self): 
     
         print('Loading Report Page')
        
-        #FIXME include the other table and also some how to open up this table again  
-        query = 'SELECT * FROM gsmsReports'
-       
+        #FIXME: include the other table and also some how to open up this table again  
+        #TODO: sort by date or something
+        query = 'SELECT * FROM jobs' 
         results = list(self.db.query(query)) 
         print(results)
 
-         
         self.ui.reportsTable.setRowCount(len(results))
-    
     
         #inital columns 
         for row, current in enumerate(results): 
             item = QtWidgets.QTableWidgetItem() 
             item.setTextAlignment(Qt.AlignCenter)
-            item.setText(str(current[0])) 
+            item.setText(str(current[1])) 
             self.ui.reportsTable.setItem(row, 0, item)  
 
             item2 = QtWidgets.QTableWidgetItem()
             item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[6]))
+            item2.setText(str(current[2]))
             self.ui.reportsTable.setItem(row, 1, item2)  
             
             item2 = QtWidgets.QTableWidgetItem()
             item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[4]))
-            self.ui.reportsTable.setItem(row, 5, item2)  
+            item2.setText(str(current[3]))
+            self.ui.reportsTable.setItem(row, 2, item2)
+            
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[5]))
+            self.ui.reportsTable.setItem(row, 3, item2)  
+             
            
             item2 = QtWidgets.QTableWidgetItem()
             item2.setTextAlignment(Qt.AlignCenter)
             
-            if(current[3] == 1): 
+            if(current[4] == 1): 
                 item2.setText('COMPLETE')
             else: 
                 item2.setText("INCOMPLETE")
             
-            self.ui.reportsTable.setItem(row,6, item2)   
+            self.ui.reportsTable.setItem(row,4, item2)   
+            
+        button = QPushButton("Click me!")
+        self.ui.reportsTable.setCellWidget(1,1, button)
         
         self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
@@ -226,7 +251,10 @@ class MainWindow(QMainWindow):
     
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
-         
+        
+    def on_gsmsBtn1_clicked(self): 
+        self.ui.gcmsStack.setCurrentIndex(0)
+     
     #Define ICP Page Menu Buttons 
     def on_icpBtn1_clicked(self): 
         self.ui.icpStack.setCurrentIndex(0)
@@ -614,77 +642,100 @@ class MainWindow(QMainWindow):
     
     #PROCESS PAGE 
     def proceedPage(self):
-        #remove whitespaces 
+        
         jobNum = self.ui.jobNumInput.text().strip()
         reportType = self.ui.reportType.currentText()
         parameter = self.ui.paramType.currentText()
-        recovery = self.ui.stdType.currentText()
-        #make sure they entered all the valid information
         
-        errorCheck = {
-            'jobNum': '', 
-            'reportType': '', 
-            'parameter': '',
-            'recovery': ''
-        }
-        
-        
-        
-        #TODO: check if a report already exists, if so load that information instead 
-        
+    
+        #0 = name 
+        #1 = reportType 
+        #2 = parameter 
+        errorCheck = [0, 0, 0]       
+     
         if(re.match('^([0-9]{6})$', jobNum)): 
+            errorCheck[0] = 0; 
+        else: 
+            errorCheck[0] = 1; 
+            #self.ui.jobNumInput.setStyleSheet('border:1px solid red;')
+         
+        if(reportType != ''):
+            errorCheck[1] = 0;
+            
+        else: 
+            errorCheck[1] = 1; 
+        
+        if(parameter != ''): 
+            errorCheck[2] = 0
+        else: 
+            errorCheck[2] = 1
+            
+        print("ErrorCheck: ", errorCheck)
+        
+        
+        if(sum(errorCheck) == 0): 
             self.jobNum = jobNum; 
-            self.ui.stackedWidget.setCurrentIndex(5)
-            self.ui.stackedWidget_2.setCurrentIndex(0)
+            self.parameter = parameter 
+            self.reportType = reportType
             self.activeCreation = True; 
 
             tempLocation = scanForTXTFolders(self.jobNum)
             clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, tempLocation)
-            
 
             self.clientInfo = clientInfo 
             self.sampleNames = sampleNames
             self.sampleTests = sampleTests
 
-            #TODO: find based on the report type    
+            checkReports = 'SELECT * FROM jobs WHERE jobNum = ? and reportType = ?'
+            self.db.execute(checkReports, (jobNum, reportType)) 
+            reportResult = self.db.fetchone()
             
-            reportExistSQL = 'SELECT * FROM gsmsReports WHERE jobNumber = ?' 
-            reportResults = self.db.query(reportExistSQL, [jobNum])
-                
-            #Saving into SQL database, so can load later 
-            if reportResults is None:  
-                print('No Exists')
-                #TODO: remanme this sql beter 
-                if('ISP' in reportType): 
-                    pass; 
-                if('GSMS' in reportType): 
-                    pass; 
-                
-                createReport(self.db, jobNum, reportType)
-                pass; 
+            if reportResult is None:  
+                print('No Exists, adding to the file')
+                createReport(self.db, jobNum, reportType, parameter)
             else: 
                 print('Report Exists')
-                print(reportResults)
-                self.loadReport()
+                print(reportResult)
+                #TODO: load the report if exists
+                self.loadReport()            
   
+            self.ui.stackedWidget.setCurrentIndex(5)
+            self.ui.stackedWidget_2.setCurrentIndex(0) 
             self.clearDataTable()
-  
+            
+            self.ui.jobNum.setText(jobNum)
+            
+
             if('ISP' in reportType):
-                print('isp loader')
+                print('ISP Loader')
                 self.ui.icpDataField.show()
                 self.icpLoader()
             
-            if(reportType == 'GSMS'):
-                print('gsms loader')
+            if(reportType == 'GCMS'):
+                print('GCMS Loader')
                 self.ui.icpDataField.hide() 
                 self.gcmsLoader()
             
-        else:
-            errorCheck['jobNum'] = 'Invalid Job Number'
+        else: 
+            outputMessage = ''
+            
+            if(errorCheck[0] == 1): 
+                print('Error: Please Enter a valid job number')
+                outputMessage += 'Please Enter a Valid Job Number\n'
+
+            if(errorCheck[1] == 1): 
+                print("Error: Please Select a reportType")
+                outputMessage += 'Please Select a Report Type\n'
+                
+            if(errorCheck[2] == 1): 
+                print('Error: Please Select a parameter')
+                outputMessage += 'Please Select a Parmeter\n'
+                
             msg = QMessageBox() 
-            msg.setWindowTitle("Error to procceed")
-            msg.setText("Please enter a valid job number!")
+            msg.setWindowTitle("Error")
+            msg.setText(outputMessage)
             x = msg.exec_()  # this will show our messagebox
+
             
      
     def loadExistingInfo(self): 
@@ -841,10 +892,13 @@ class MainWindow(QMainWindow):
     def loadClientInfo(self): 
         #clear the first page 
         self.ui.jobNumInput.setText('')
-        self.ui.reportType.setCurrentText('')
+        
         
         #set the header parameter 
-        self.ui.jobNum.setText(self.jobNum)
+        self.ui.jobNum.setText("W" + self.jobNum)
+        self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
+        self.ui.parameterHeader.setText(self.parameter); 
+        self.ui.reportTypeHeader.setText(self.reportType)
         
         self.ui.clientName_1.setText(self.clientInfo['clientName'])
         self.ui.date_1.setText(self.clientInfo['date'])

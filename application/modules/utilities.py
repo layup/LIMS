@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (
     QFileDialog
 )
 
-REPORTS_TYPE = ['','ISP-1','ISP-2','GSMS']
+REPORTS_TYPE = ['','ISP','GCMS']
 MATRIX_TYPE = ['','food', 'water', 'apples']
 
 PARAMETERS_TYPE = {}
@@ -692,19 +692,27 @@ def icpMethod2(filePath, db):
 
 
 #FIXME: if another thing comes along 
-def createReport(db, jobNum, reportType, parameter=False, recovery=False): 
-    
+def createReport(db, jobNum, reportType, parameter, recovery=False): 
+
+    '''     
     if('ISP' in reportType):
-        sql  = 'INSERT INTO icpReports (jobNumber, reportType, status, createdDate) values (?,?,1,?)'
+        sql  = 'INSERT INTO icpReports (jobNumber, reportType, parameter, status, createdDate) values (?, ?,?,1,?)'
         
     if(reportType == 'GSMS'):
-        sql  = 'INSERT INTO gsmsReports (jobNumber, reportType, status, createdDate) values (?,?,1,?)'
+        sql  = 'INSERT INTO gsmsReports (jobNumber, reportType, parameter, status, createdDate) values (?,?,?,1,?)'
 
     todayDate = date.today()
     print('COMMAND: ', sql) 
 
-    db.execute(sql, (jobNum, reportType, todayDate))
+    db.execute(sql, (jobNum, reportType, parameter, todayDate))
     db.commit()
+    '''
+    
+    sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, status) values (?,?,?,?,0)'
+    currentDate = date.today()
+    db.execute(sql, (jobNum, reportType, parameter, currentDate))
+    db.commit()
+    
     
 
     
