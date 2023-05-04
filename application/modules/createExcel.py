@@ -13,7 +13,7 @@ from openpyxl.worksheet.header_footer import HeaderFooter
 
 import math 
 import re 
-
+import os 
 
 from modules.utilities import * 
 
@@ -25,8 +25,11 @@ defaultFont = Font(name="Times New Roman", size=9)
 thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
+fileLocationsDictonary = load_pickle('data.pickle')
+exportPath = fileLocationsDictonary['reportsPath']
 
-def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
+
+def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType):
     print('CREATING GCMS REPORT')
     print(clientInfo)
     print(sampleNames)
@@ -212,11 +215,13 @@ def createGcmsReport(clientInfo, sampleNames, sampleData, testInfo, unitType):
                     
                 counter+=1; 
                 usedSamples += 4; 
-            
-
-
+        
     
-    wb.save('example.xlsx')
+    fileName = 'W' + str(jobNum) + "_gcms.xlsx" 
+    filePath = os.path.join(exportPath, fileName)
+    print('Export Path: ', filePath)
+    
+    wb.save(filePath)
     
 
 def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits): 
@@ -373,8 +378,13 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     maxWidth = ws.max_column 
     print(f'The width of the worksheet is {maxWidth} columns')
     print('Current Page location: ', pageLocation); 
+    
+     
+    fileName = 'W' + str(jobNum) + "_isp.xlsx" 
+    filePath = os.path.join(exportPath, fileName)
+    print('Export Path: ', filePath)
  
-    wb.save('example2.xlsx')
+    wb.save(filePath)
 
 def pageSetup(ws): 
    

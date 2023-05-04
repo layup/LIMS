@@ -58,6 +58,17 @@ class MainWindow(QMainWindow):
         #temp['TXTDirLocation'] = getFileLocation()
         #save_pickle(temp)
 
+        
+        
+        fileLocationsDictonary = load_pickle('data.pickle')
+       
+        #ileLocationsDictonary['reportsPath'] = getFileLocation()
+        
+        #save_pickle(fileLocationsDictonary)
+        
+        print(fileLocationsDictonary)
+       
+        
         self.loadCreatePage()
         
         #connect buttons 
@@ -873,7 +884,7 @@ class MainWindow(QMainWindow):
             
         print("UNITS TESTING: ", unitType)
         
-        createGcmsReport(self.clientInfo, self.sampleNames, sampleData, tests, unitType)
+        createGcmsReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, tests, unitType)
 
     def handle_item_changed(self, item, test): 
         row = item.row()

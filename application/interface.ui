@@ -486,7 +486,7 @@ color: rgb(255, 255, 255);</string>
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="searchBar" native="true">
+        <widget class="QWidget" name="topHeader" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -522,6 +522,9 @@ QLabel {
 }</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QPushButton" name="toggleMenu">
             <property name="text">
@@ -556,33 +559,6 @@ QLabel {
            </spacer>
           </item>
           <item>
-           <widget class="QLineEdit" name="searchLine">
-            <property name="text">
-             <string>Search Job Number</string>
-            </property>
-            <property name="maxLength">
-             <number>20</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="searchbtn">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="assets/resourse.qrc">
-              <normaloff>:/icons/icons/search.png</normaloff>:/icons/icons/search.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -594,6 +570,92 @@ QLabel {
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QWidget" name="searchBar" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QWidget {
+	border: none; 
+}
+
+QPushButton {
+	background-color:white; 
+	padding: 2px; 
+	margin: 0;
+	height: 25px; 
+}
+
+QLineEdit {
+	margin: 0px; 
+	border: none;
+	height:25px; 
+}
+
+QLineEdit:focus {
+	background-color: none; 
+	outline: none; 
+	border: none; 
+}
+
+</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>1</number>
+             </property>
+             <item>
+              <widget class="QLineEdit" name="searchLine">
+               <property name="text">
+                <string>Search Job Number</string>
+               </property>
+               <property name="maxLength">
+                <number>20</number>
+               </property>
+               <property name="dragEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="cursorMoveStyle">
+                <enum>Qt::LogicalMoveStyle</enum>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="searchbtn">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="assets/resourse.qrc">
+                 <normaloff>:/icons/icons/search.png</normaloff>:/icons/icons/search.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -610,18 +672,21 @@ margin: 0;
           <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(66, 78, 101);</string>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_17">
            <property name="leftMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>12</number>
            </property>
            <item>
             <widget class="QWidget" name="widget_8" native="true">
@@ -638,7 +703,7 @@ margin: 0;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(255, 255, 255);</string>
+              <string notr="true">color:white; </string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_16">
               <item>
@@ -680,15 +745,32 @@ margin: 0;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true"/>
+              <string notr="true">QWidget#widget_9 {
+	background-color: #323a47;
+	border-radius: 5px; 
+}
+QLineEdit {
+	background-color: white; 
+	padding-left: 5px; 
+} 
+QPushButton {
+	color:white; 
+
+}</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>-1</number>
+              </property>
+              <property name="leftMargin">
+               <number>12</number>
+              </property>
               <item>
                <widget class="QPushButton" name="pushButton_6">
                 <property name="minimumSize">
                  <size>
                   <width>100</width>
-                  <height>40</height>
+                  <height>35</height>
                  </size>
                 </property>
                 <property name="text">
@@ -715,7 +797,57 @@ margin: 0;
            <item>
             <widget class="QWidget" name="widget_2" native="true">
              <property name="styleSheet">
-              <string notr="true"/>
+              <string notr="true">QHeaderView::section {
+	background-color: #555555;
+	color: #FFFFFF;
+	font-weight: bold;	
+	padding: 4px;
+	 border: none;
+}
+QHeaderView {
+	border: none;
+} 
+
+QTableWidget {
+	gridline-color: #grey;
+	border: none;
+	color:white; 
+	background-color: #323a47
+}
+
+QTableWidget::item {
+	padding: 5px;
+	border: none;
+}
+QTableWidget::item:selected{
+	background-color: none; 
+	color:white; 
+} 
+
+QTableWidget::item:selected {
+	background-color: #D0D0D0;
+	color: white;
+}
+QTableWidget::item:focus {
+	color: white; 
+}
+
+QTableCornerButton::section {
+	background-color: #555555;
+}
+
+QWidget {
+	background-color: #323a47; 
+	color:white; 
+}
+
+QWidget#widget_2{
+	background-color: #323a47;
+	margin: 2px;
+	border-radius: 5px;  
+}
+   
+</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_18">
               <property name="spacing">
@@ -725,7 +857,7 @@ margin: 0;
                <number>12</number>
               </property>
               <property name="topMargin">
-               <number>0</number>
+               <number>12</number>
               </property>
               <property name="rightMargin">
                <number>12</number>
@@ -739,22 +871,7 @@ margin: 0;
                  <enum>Qt::LeftToRight</enum>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QTableWidget.table-striped {
-    border-collapse: collapse;
-    border-spacing: 0;
-    width: 100%;
-    border: 1px solid #ddd;
-}
-
-QTableWidget.table-striped th,
-table.table-striped td {
-    text-align: left;
-    padding: 8px;
-}
-
-table.table-striped tr:nth-child(even) {
-    background-color: #f2f2f2;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="alternatingRowColors">
                  <bool>false</bool>
@@ -798,6 +915,16 @@ table.table-striped tr:nth-child(even) {
                 <row>
                  <property name="text">
                   <string>1</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>3</string>
                  </property>
                 </row>
                 <column>
@@ -878,6 +1005,9 @@ table.table-striped tr:nth-child(even) {
               <string notr="true">color: white; </string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <property name="topMargin">
                <number>0</number>
               </property>
@@ -904,7 +1034,7 @@ table.table-striped tr:nth-child(even) {
               <item>
                <widget class="QLabel" name="label_22">
                 <property name="text">
-                 <string>HELLO </string>
+                 <string>ISP and GCMS Reports </string>
                 </property>
                </widget>
               </item>
@@ -914,21 +1044,22 @@ table.table-striped tr:nth-child(even) {
            <item row="1" column="0">
             <widget class="QWidget" name="Body" native="true">
              <property name="styleSheet">
-              <string notr="true">
-
-QComboBox {
-	color:black;
-	padding:2px;
-	padding-left: 5px; 
-} 
-
-QLineEdit {
-	padding: 2px; 
-	padding-left: 5px; 
-	border: 1px solid grey; 
-}</string>
+              <string notr="true"/>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <widget class="QWidget" name="widget_44" native="true">
                 <property name="minimumSize">
@@ -940,7 +1071,7 @@ QLineEdit {
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>150</height>
+                  <height>160</height>
                  </size>
                 </property>
                 <property name="styleSheet">
@@ -952,18 +1083,30 @@ QWidget{
 	color:white; 
 }
 
-QLineEdit {
-	background-color:white; 
-	
-}
-
 QComboBox {
-	background-color: white; 
+	padding:2px;
+	padding-left: 5px; 
+	color:white; 
+	border: 1px solid gray; 
+} 
+
+QLineEdit {
+	padding: 2px; 
+	padding-left: 5px; 
+	border: 1px solid gray; 
+	color:white; 
 }
 
 QPushButton {
-
-}</string>
+	border:none; 
+	border: 1px solid gray; 
+	border-radius: 2px;
+	color:white; 
+}
+QPushButton:hover {
+	background-color: rgb(55, 65, 84)
+} 
+</string>
                 </property>
                 <layout class="QFormLayout" name="formLayout">
                  <item row="0" column="0">
@@ -1018,6 +1161,21 @@ QPushButton {
                      <height>16777215</height>
                     </size>
                    </property>
+                   <item>
+                    <property name="text">
+                     <string>test</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>test</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>test</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                  <item row="1" column="0">
@@ -1088,14 +1246,17 @@ QPushButton {
                </widget>
               </item>
               <item>
-               <widget class="QWidget" name="widget_45" native="true">
-                <property name="minimumSize">
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
                  <size>
-                  <width>200</width>
-                  <height>0</height>
+                  <width>40</width>
+                  <height>20</height>
                  </size>
                 </property>
-               </widget>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -1144,6 +1305,9 @@ QWidget {
 }</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_10">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <property name="topMargin">
                <number>0</number>
               </property>
@@ -1180,7 +1344,7 @@ QWidget {
               <string notr="true">background-color: rgb(66, 78, 101);</string>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1521,11 +1685,6 @@ QListWidget {
                       <string>Aluminium</string>
                      </property>
                     </item>
-                    <item>
-                     <property name="text">
-                      <string>test</string>
-                     </property>
-                    </item>
                    </widget>
                   </item>
                  </layout>
@@ -1539,12 +1698,13 @@ QListWidget {
 }
 QWidget#widget_11 {
 	background-color: #323a47;
-	border-radius: 10px;
+	border-radius: 10px;	
 }
 
 QWidget#widget_17 {
 	background-color: #323a47;
 	border-radius: 10px;
+
 }
 QWidget#widget_18 {
 	background-color: #323a47;
@@ -1563,19 +1723,31 @@ QPushButton:hover{
 	background-color: rgb(180, 180, 180)
 }
 QLineEdit {
-	 border: 1px solid gray;
+	border: 1px solid gray;
 	min-width: 140px; 
+	background-color: rgb(55, 65, 84);
 }
+
+QLabel {
+	background-color: #323a47;
+}
+
 QComboBox {
     border: 1px solid gray;
     border-radius: 3px;
     padding: 1px 18px 1px 3px;
     min-width: 6em;
+	background-color: rgb(55, 65, 84);
 }
 
 QComboBox:editable {
     background: white;
 }
+
+QPlainTextEdit {
+	border: 1px solid gray;
+	background-color: rgb(55, 65, 84);
+} 
 
 
 </string>
@@ -1592,6 +1764,9 @@ QComboBox:editable {
                   </property>
                   <item row="1" column="0">
                    <widget class="QWidget" name="widget_17" native="true">
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
                     <layout class="QFormLayout" name="formLayout_8">
                      <item row="0" column="1">
                       <widget class="QComboBox" name="comboBox">
@@ -1926,6 +2101,13 @@ QListWidget {
 	background-color:  #323a47;
 	color:white; 
 }
+
+
+QTextEdit {
+	border: 1px solid gray;
+	background-color: rgb(55, 65, 84);
+	color: white; 
+} 
 </string>
                     </property>
                     <widget class="QLabel" name="label_49">
@@ -2076,7 +2258,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QStackedWidget" name="gcmsStack">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <layout class="QVBoxLayout" name="verticalLayout_20">
@@ -2430,80 +2612,85 @@ QWidget#widget_43:hover {
            </item>
            <item>
             <widget class="QWidget" name="settingBody" native="true">
-             <widget class="QPushButton" name="pushButton_7">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>181</width>
-                <height>41</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Set Path</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="lineEdit_2">
-              <property name="geometry">
-               <rect>
-                <x>190</x>
-                <y>10</y>
-                <width>371</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
              <widget class="QWidget" name="widget_14" native="true">
               <property name="geometry">
                <rect>
-                <x>160</x>
-                <y>170</y>
-                <width>391</width>
-                <height>171</height>
+                <x>30</x>
+                <y>20</y>
+                <width>871</width>
+                <height>311</height>
                </rect>
               </property>
-              <layout class="QFormLayout" name="formLayout_11">
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+	min-width: 200px; 
+}</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_3">
                <item row="0" column="0">
-                <widget class="QWidget" name="widget_19" native="true">
-                 <layout class="QFormLayout" name="formLayout_9">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_12">
-                    <property name="text">
-                     <string>test:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_42">
-                    <property name="text">
-                     <string>what is going on to this </string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <widget class="QPushButton" name="pushButton_7">
+                 <property name="text">
+                  <string>Set Database</string>
+                 </property>
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QWidget" name="widget_20" native="true">
-                 <layout class="QFormLayout" name="formLayout_10">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_43">
-                    <property name="text">
-                     <string>test2:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_44">
-                    <property name="text">
-                     <string>test3</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <widget class="QLineEdit" name="lineEdit_2">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Set the database path .db </string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QPushButton" name="pushButton_9">
+                 <property name="text">
+                  <string>Set TXT </string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="lineEdit_7">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="label_23">
+                 <property name="text">
+                  <string>Set the TXT folder, folder that contains all of information  </string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QPushButton" name="pushButton_10">
+                 <property name="text">
+                  <string>PushButton</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="lineEdit_8">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLabel" name="label_24">
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="text">
+                  <string>Set the output reports Folder </string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -2721,7 +2908,7 @@ QWidget#widget_43:hover {
                   <height>16777215</height>
                  </size>
                 </property>
-                <layout class="QFormLayout" name="formLayout_3">
+                <layout class="QVBoxLayout" name="verticalLayout_25">
                  <property name="leftMargin">
                   <number>0</number>
                  </property>
@@ -2734,36 +2921,23 @@ QWidget#widget_43:hover {
                  <property name="bottomMargin">
                   <number>0</number>
                  </property>
-                 <item row="0" column="1">
+                 <item>
                   <widget class="QRadioButton" name="radioButton">
                    <property name="text">
-                    <string>Machine 1 Data</string>
+                    <string>CHM Data </string>
                    </property>
                    <property name="checkable">
                     <bool>false</bool>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
+                 <item>
                   <widget class="QRadioButton" name="radioButton_2">
                    <property name="text">
-                    <string>Machine 2 Data</string>
+                    <string>TXT Data </string>
                    </property>
                    <property name="checkable">
                     <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="label_31">
-                   <property name="font">
-                    <font>
-                     <weight>50</weight>
-                     <bold>false</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Machine Data</string>
                    </property>
                   </widget>
                  </item>
@@ -2783,10 +2957,13 @@ QWidget#widget_43:hover {
              </property>
              <property name="styleSheet">
               <string notr="true">QWidget#tabSectionWidget {
-	background-color:#323a47; 
+	
 	border-bottom: 1px solid; 
 	border-bottom-color: rgba(0, 0, 0, 76);
 	border-radius: 10px;
+}
+QWidget { 
+	background-color: #323a47
 }
 
 QPushButton { 
@@ -2853,7 +3030,7 @@ QPushButton::hover {
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_8">
+                  <widget class="QPushButton" name="saveJobBtn">
                    <property name="text">
                     <string>Save</string>
                    </property>
@@ -2945,7 +3122,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -2981,6 +3158,7 @@ QPushButton::hover {
 	background-color: rgb(255, 255, 255);
 }
 
+
 QWidget#widget_5 {
 	background-color: #323a47; 
 	color:white; 
@@ -2989,6 +3167,7 @@ QWidget#widget_5 {
 
 QLabel {
 	color: white; 
+	background-color: #323a47; 
 } </string>
                     </property>
                     <layout class="QFormLayout" name="formLayout_2">
@@ -3191,6 +3370,9 @@ QLabel {
                  </layout>
                 </widget>
                 <widget class="QWidget" name="ClientData">
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_3">
                   <property name="leftMargin">
                    <number>0</number>
@@ -3207,10 +3389,50 @@ QLabel {
                   <item>
                    <widget class="QWidget" name="dataEntryBody" native="true">
                     <property name="styleSheet">
-                     <string notr="true">
-border-color:red; 
+                     <string notr="true">QHeaderView::section {
+	background-color: #555555;
+	color: #FFFFFF;
+	font-weight: bold;	
+	padding: 4px;
+	 border: none;
+}
+QHeaderView {
+	border: none;
+} 
 
-</string>
+QTableWidget {
+	gridline-color: #grey;
+	border: none;
+	color:white; 
+	background-color: #323a47
+}
+
+QTableWidget::item {
+	padding: 5px;
+	border: none;
+}
+QTableWidget::item:selected{
+	background-color: none; 
+	color:white; 
+} 
+
+QTableWidget::item:selected {
+	background-color: #D0D0D0;
+	color: white;
+}
+QTableWidget::item:focus {
+	color: white; 
+}
+
+QTableCornerButton::section {
+	background-color: #555555;
+}
+
+QWidget {
+	background-color: #323a47; 
+	color:white; 
+	border-radius: 10px; 
+} </string>
                     </property>
                     <layout class="QHBoxLayout" name="horizontalLayout_10">
                      <property name="spacing">
@@ -3220,7 +3442,7 @@ border-color:red;
                       <number>12</number>
                      </property>
                      <property name="topMargin">
-                      <number>0</number>
+                      <number>12</number>
                      </property>
                      <property name="rightMargin">
                       <number>12</number>
@@ -3277,7 +3499,7 @@ QTableView::indicator:checked {
                         <bool>true</bool>
                        </property>
                        <property name="alternatingRowColors">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <property name="textElideMode">
                         <enum>Qt::ElideRight</enum>
@@ -3310,7 +3532,7 @@ QTableView::indicator:checked {
                         <bool>false</bool>
                        </attribute>
                        <attribute name="verticalHeaderVisible">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </attribute>
                        <attribute name="verticalHeaderDefaultSectionSize">
                         <number>22</number>
