@@ -194,9 +194,13 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
                 
                 if(i+1 == remainingSamples): 
                     pageLocation = insertComments(ws, pageLocation)  
-                    img = Image('signature.png') 
-                    ws.add_image(img, 'B2') 
-                    
+                    pageLocation+=1; 
+             
+                    img = Image('signature.png')
+                    cell = ws.cell(row=pageLocation, column=3)
+                    coordinate = cell.coordinate
+                    ws.add_image(img, coordinate)
+                        
                 counter+=1; 
                 usedSamples += 4;
         
@@ -224,7 +228,7 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
     wb.save(filePath)
     
 
-def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits): 
+def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, foooterComment): 
     print('ICP general Information')
     print(clientInfo)
     print(sampleNames)
@@ -330,9 +334,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     pageLocation = 9; 
     usedSamples = 0; 
     
-
-
-    
+    #FIXME: include the length of the comments 
     totalSamples = len(sampleData.keys())
     print('Total Samples: ', totalSamples);
     formatRows(ws, totalSamples)
@@ -352,10 +354,22 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             #TODO: insert the comment 
             if(totalPages > 1): 
                 comment = ws.cell(row=pageLocation, column=1)
-                comment.value = 'continued on next page....'
+                comment.value = 'Continued on next page ....'
                 comment.font = Font(bold=True, size=9, name="Times New Roman")
             else: 
-               print('Insert comment and signature') 
+                print('Insert comment and signature') 
+                
+                for (i, value) in enumerate(foooterComment):
+                    comment = ws.cell(row=pageLocation, column=1)
+                    comment.value = value
+                    comment.font = Font(size=9, name="Times New Roman") 
+                    pageLocation+=1; 
+                    
+                pageLocation+=1; 
+                img = Image('signature.png')
+                cell = ws.cell(row=pageLocation, column=3)
+                coordinate = cell.coordinate
+                ws.add_image(img, coordinate)
 
 
             
@@ -367,10 +381,21 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             if((currentPage+1) == totalPages): 
-                print('inserting Comment and Signature')
+                for (i, value) in enumerate(foooterComment):
+                    comment = ws.cell(row=pageLocation, column=1)
+                    comment.value = value
+                    comment.font = Font(size=9, name="Times New Roman") 
+                    pageLocation+=1; 
+
+
+                pageLocation+=1; 
+                img = Image('signature.png')
+                cell = ws.cell(row=pageLocation, column=3)
+                coordinate = cell.coordinate
+                ws.add_image(img, coordinate)
             else: 
                 comment = ws.cell(row=pageLocation, column=1)
-                comment.value = 'continued on next page....'
+                comment.value = 'Continued on next page ....'
                 comment.font = Font(bold=True, size=9, name="Times New Roman")
         
         usedSamples += sampleAmount; 
@@ -804,6 +829,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
             
         if(current == 2): 
             temp.value = 'CaCO₃'
+            temp.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
             
         if(current == 7):
             temp.value = 'mg/L'

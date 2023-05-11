@@ -49,29 +49,15 @@ class MainWindow(QMainWindow):
         for column in range(7): 
             self.ui.reportsTable.setColumnWidth(column, columnWidth)
 
-        #self.ui.jobNumInput.textChanged.connect(lambda: print(self.ui.jobNumInput.text()))
-        #load initial database 
-        
-        #temp = {'ispDataUploadPath': '/Users/layup/Documents/Programming/work /MB Labs/LIMS2.0/data/uploadData', 
-        #        'databasePath':'/Users/layup/Documents/Programming/work /MB Labs/LIMS2.0/database/ISP.db',
-        #        'TXTDirLocation':'/Users/layup/Downloads/MB_LABS/TXT files/'}
-        #temp['TXTDirLocation'] = getFileLocation()
-        #save_pickle(temp)
-
-        
-        
+    
+  
         fileLocationsDictonary = load_pickle('data.pickle')
-       
-        #ileLocationsDictonary['reportsPath'] = getFileLocation()
-        
-        #save_pickle(fileLocationsDictonary)
-        
         print(fileLocationsDictonary)
        
         
         self.loadCreatePage()
         
-        #connect buttons 
+
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
@@ -79,7 +65,7 @@ class MainWindow(QMainWindow):
         
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
         self.showMaximized()
-        #self.show()
+
 
     
     ## Change QPushButton Checkable status when stackedWidget index changed
@@ -101,6 +87,12 @@ class MainWindow(QMainWindow):
         if(x == QMessageBox.Cancel):
             pass 
         
+        
+    #how to load in the data 
+    # save into database 
+    #
+    #
+    
         
     def loadReport(self): 
         msgBox = QMessageBox()  
@@ -154,16 +146,26 @@ class MainWindow(QMainWindow):
             self.ui.jobNumInput.setText('171981')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
-            
+        
+        
+        self.prev_index = (index - 1) % self.ui.stackedWidget.count()
+        print('prev index: ', self.prev_index)
+        prev_widget = self.ui.stackedWidget.widget(self.prev_index)
+        current_widget = self.ui.stackedWidget.currentWidget()
+        
+        if(self.prev_index == 5): 
+            print('Do you want to save?')
+        # Access the previous and current widgets
 
+        # Do something with the widgets
+        #print(f"Previous widget: {prev_widget}")
+        #print(f"Current widget: {current_widget}")
             
 
     def loadCreatePage(self): 
         print('Loading user information')
         
         #load the report Types
-        
-        
         self.ui.reportType.addItems(REPORTS_TYPE)
 
         paramResults = sorted(self.getReportTypeList())
@@ -183,6 +185,7 @@ class MainWindow(QMainWindow):
         query = 'SELECT * FROM jobs' 
         results = list(self.db.query(query)) 
         print(results)
+       
 
         self.ui.reportsTable.setRowCount(len(results))
     
@@ -211,16 +214,22 @@ class MainWindow(QMainWindow):
            
             item2 = QtWidgets.QTableWidgetItem()
             item2.setTextAlignment(Qt.AlignCenter)
-            
+
+    
             if(current[4] == 1): 
                 item2.setText('COMPLETE')
             else: 
                 item2.setText("INCOMPLETE")
-            
+                
             self.ui.reportsTable.setItem(row,4, item2)   
+              
+            button = QPushButton("Open")
+            self.ui.reportsTable.setCellWidget(row,5, button)
+            button.clicked.connect(lambda _, row=row: print(row));
             
-        button = QPushButton("Click me!")
-        self.ui.reportsTable.setCellWidget(1,1, button)
+         
+        #button = QPushButton("Click me!")
+        #self.ui.reportsTable.setCellWidget(1,1, button)
         
         self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
@@ -233,7 +242,7 @@ class MainWindow(QMainWindow):
         print(f"Double clicked on row {row}")
     
     #Define Menu Button presses 
-    def on_reportsBtn1_toggled(self):
+    def on_reportsBtn1_toggled(self): 
         self.ui.stackedWidget.setCurrentIndex(0) 
     
     def on_reportsBtn2_toggled(self):
@@ -262,11 +271,16 @@ class MainWindow(QMainWindow):
     
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
-        
+             
     def on_gsmsBtn1_clicked(self): 
         self.ui.gcmsStack.setCurrentIndex(0)
+
+    def on_gcmsDefineTestBtn_clicked(self): 
+        self.ui.gcmsStack.setCurrentIndex(1)
      
-    #Define ICP Page Menu Buttons 
+    def on_gcmsReportTypeBtn_clicked(self): 
+        self.ui.gcmsStack.setCurrentIndex(2)
+
     def on_icpBtn1_clicked(self): 
         self.ui.icpStack.setCurrentIndex(0)
     
@@ -276,36 +290,56 @@ class MainWindow(QMainWindow):
     def on_icpDatabaseBtn_clicked(self): 
         self.ui.icpStack.setCurrentIndex(1)
         
-        columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
-        
-        #load both databases 
-        #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
-        icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
-        icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
-        
-        machine1Data = list(self.db.query(icpMachine1sql))
-        #machine2Data = list(self.db.query(icpMachine2sql))
-        
-        self.updateIcpTable(machine1Data)
-
     def on_icpElementsBtn_clicked(self): 
         self.ui.icpStack.setCurrentIndex(2)
-        #TODO: load in the total elements 
-        #TODO: add something when activated 
-        
-        total = self.getTotalElements()
-        self.ui.icpLabel.setText("Total Elements: {}".format(total))
-        
-        
-        
-        #self.ui.addElementBtn.clicked.connect(lambda: self.add_element())
-    
-    @pyqtSlot()
+       
     def on_icpReportBtn_clicked(self): 
         self.ui.icpStack.setCurrentIndex(3)
-        self.loadReportList()
         
+    def on_icpStack_currentChanged(self, index):
         
+        if(index == 0): 
+            self.ui.icpPageTitle.setText("ICP Page")
+            self.ui.icpLabel.setText("")
+        
+        if(index == 1): 
+            columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
+        
+            #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
+            icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
+            icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
+            
+            machine1Data = list(self.db.query(icpMachine1sql))
+            #machine2Data = list(self.db.query(icpMachine2sql))
+            
+            self.updateIcpTable(machine1Data) 
+        
+        if(index == 2): 
+            total = self.getTotalElements()
+            self.ui.icpPageTitle.setText("ICP Defined Elements")
+            self.ui.icpLabel.setText("Total Elements: {}".format(total))
+            self.loadDefinedElements()
+
+        if(index == 3): 
+            self.ui.icpPageTitle.setText("ICP Reports")
+            self.ui.icpLabel.setText("Total Reports:") 
+            self.loadReportList()
+
+    def on_gcmsStack_currentChanged(self, index):
+        
+        if(index == 0): 
+            self.ui.gcmsTitleLabel.setText('GCMS Page')
+            self.ui.gcmsSubTitleLabel.setText('')
+        
+        if(index == 1): 
+            self.ui.gcmsTitleLabel.setText('GCMS Defined Tests')
+            self.ui.gcmsSubTitleLabel.setText('Total Tests: ')
+
+        if(index == 2): 
+            self.ui.gcmsTitleLabel.setText('GCMS Defined Reports')
+            self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
+    
+
     #ICP Buttons 
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
@@ -529,11 +563,6 @@ class MainWindow(QMainWindow):
             print('Nothing is the same')
         
         
-    def on_icpStack_currentChanged(self, index):
-        
-        if(index == 2): 
-            self.loadDefinedElements()        
-            
     
     def loadDefinedElements(self): 
         print("Loading Defined Elements Friends")
@@ -547,7 +576,6 @@ class MainWindow(QMainWindow):
         reportType = self.getReportTypeList()
         self.ui.reportTypeDropdown.addItems(reportType)     
         
-         
         for element in definedElements: 
             self.ui.definedElements.addItem(element[0])
 
@@ -626,7 +654,6 @@ class MainWindow(QMainWindow):
     
     def on_reportlist_doubleClicked(self): 
         print('Something is being selected')
-        
         selected_item = self.ui.reportsList.currentItem()
     
                 
@@ -640,25 +667,19 @@ class MainWindow(QMainWindow):
             #elf.test_method()
             pass
         
-    def savePickle(self): 
-        jsonLocation = getFileLocation()
-        
-        tempDictonary = {
-            "JSONFileLocation":'/Users/layup/Documents/Programming/work /MB Labs/LIMS2.0/database/fileLocation.json', 
-            "TXTDirLocation": jsonLocation 
-        }
-        
-        save_pickle(tempDictonary)
-        
     
     #PROCESS PAGE 
+    @pyqtSlot()
     def proceedPage(self):
         
         jobNum = self.ui.jobNumInput.text().strip()
         reportType = self.ui.reportType.currentText()
         parameter = self.ui.paramType.currentText()
         
-    
+        print('JobNumber: ', jobNum)
+        print('ReportType: ', reportType)
+        print('Parameter: ', parameter)
+        
         #0 = name 
         #1 = reportType 
         #2 = parameter 
@@ -670,7 +691,7 @@ class MainWindow(QMainWindow):
             errorCheck[0] = 1; 
             #self.ui.jobNumInput.setStyleSheet('border:1px solid red;')
          
-        if(reportType != ''):
+        if(reportType == 'ISP' or reportType == 'GCMS'):
             errorCheck[1] = 0;
             
         else: 
@@ -758,6 +779,7 @@ class MainWindow(QMainWindow):
     
     
     def gcmsLoader(self): 
+        print('GCMS LOADER')
         
         self.loadClientInfo()
     
@@ -785,6 +807,7 @@ class MainWindow(QMainWindow):
                     tests.append(item)
         
         GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
+       
         
         tests = sorted(tests)
         total_tests = len(tests)
@@ -834,8 +857,9 @@ class MainWindow(QMainWindow):
             item2.setText(str(1))
             self.ui.dataTable.setItem(i, 4, item2) 
         
-        self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
-        
+        #TODO: add the item changed thing 
+        #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
+    
         
         #TODO: remove the data when loading the information 
         #TODO: create the csv file we created 
@@ -847,10 +871,13 @@ class MainWindow(QMainWindow):
         #item.setText(_translate("MainWindow", "STD += 2"))
        
 
-
         self.ui.createReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
         
+        
+    
     def GcmsReportHandler(self, tests):
+        
+        
         #FIXME: adjust based on the sample information 
         #FIXME: crashes when doing gcms to icp without closing program 
         initalColumns = 5; 
@@ -861,9 +888,10 @@ class MainWindow(QMainWindow):
         
         
         #FIXME: have something determine the lower values of the things 
-        #FIXME: 804 error occurs when Nonetype, can't get .text()
         for col in range(initalColumns, totalSamples + initalColumns ): 
+            #FIXME: AttributeError: 'NoneType' object has no attribute 'text' (isp > gsmc > isp) error appears  
             currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
+            print('currentJob Test: ', currentJob)
             jobValues = []
             for row in range(totalTests): 
                 try: 
@@ -891,9 +919,8 @@ class MainWindow(QMainWindow):
         column = item.column()
         value = item.text()
         
-        print(test)
-        
-        print(f"Row {row}, Column {column} changed to {value}")
+        #print(test)
+        #print(f"Row {row}, Column {column} changed to {value}")
         
         if(column >= 5):
             print(self.ui.dataTable.item(row,column).text())
@@ -939,6 +966,7 @@ class MainWindow(QMainWindow):
         
     #TODO: sidebar have a s
     def icpLoader(self): 
+        print('LOADING ICP STUFF')
         #FIXME: error 
         self.loadClientInfo()
         
@@ -957,9 +985,9 @@ class MainWindow(QMainWindow):
         for item in sampleData:
             selectedSampleNames.append(item[0])
             
-        print(self.sampleNames)   
-        print('currentNames: ', selectedSampleNames)
-        print('current2: ', selectedSampleNames[0])
+        #print(self.sampleNames)   
+        #print('currentNames: ', selectedSampleNames)
+        #print('current2: ', selectedSampleNames[0])
        
         #create the sample names based on that         
         for i, (key, value) in enumerate(self.sampleNames.items()):
@@ -1020,8 +1048,10 @@ class MainWindow(QMainWindow):
             
         elementNames.sort()
         
-        print(elementNames)
-        print(len(elementNames))
+        #print(elementNames)
+        #print(len(elementNames))
+        
+        #self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
         
         hardnessLocation = {}
         #TODO: load in the right Elements and the unit values 
@@ -1098,13 +1128,13 @@ class MainWindow(QMainWindow):
             for (key, value) in hardnessLocation.items(): 
                 #get the row location
                 cellValue2 = self.ui.dataTable.item(value, col).text()
-                print(cellValue2)
+                #print(cellValue2)
                 hardnessVals[key] = cellValue2
 
             if not (['ND', 'uncal'] in hardnessVals.items()): 
                 result = hardnessCalc(hardnessVals['Ca'], hardnessVals['Mg'])
                 item.setText(str(result))
-                print(result)
+                #print(result)
                 
             else: 
                 item.setText('ND')
@@ -1120,19 +1150,21 @@ class MainWindow(QMainWindow):
         self.ui.dataTable.setColumnWidth(2, total_width)    
 
         self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-
+        
+ 
         self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
     
     def icpReportHander(self, tests, totalSamples): 
-        #FIXME: adjust based on the sample information 
+        #FIXME: adjust based on the sample information
+        #FIXME: adjust the limits 
+        #FIXME: adjust the unit amount  
         initalColumns = 5; 
         #totalSamples = len(self.sampleNames)
         totalTests = len(tests)
         sampleData = {}
         unitType = []
         
-        print(totalSamples)
-        
+        #print(totalSamples)
         
         #FIXME: have something determine the lower values of the things 
         for col in range(initalColumns, totalSamples + initalColumns ): 
@@ -1156,17 +1188,31 @@ class MainWindow(QMainWindow):
                 unitType.append('')
         
         elementsWithLimits = self.getElementLimits(); 
-        print(elementsWithLimits)    
+        #print(elementsWithLimits)    
 
         limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
-        limits = self.db.query(limitQuery, ('Water',))
+        commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
+        limits = self.db.query(limitQuery, (self.parameter,))
+        
+        self.db.execute(commentQuery, (self.parameter,))
+        commentResults = self.db.fetchone()
+ 
+        footerComments = ''
+        
+        if(commentResults[0]):
+            footerComments = pickle.loads(commentResults[0])
+            footerList = '\n'.join(footerComments)
+            footerComments = footerList.split('\n')
 
+
+        print('ICP HANDLER')
         print(limits)
-        
+        #print(self.reportType)
+        #print(footerComment)
+        print('--------')
+   
         #load the footer comment 
-        
-                         
-        createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits)
+        #createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
         
         
         
@@ -1273,6 +1319,8 @@ class MainWindow(QMainWindow):
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 
         super(SampleNameWidget ,self).__init__(parent)
+    
+        newName = str(valueName).strip()
     
         self.label = QLabel(labelName)
         self.edit = QLineEdit(valueName)

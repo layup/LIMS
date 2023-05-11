@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
 )
 
 REPORTS_TYPE = ['','ISP','GCMS']
-MATRIX_TYPE = ['','food', 'water', 'apples']
+#MATRIX_TYPE = ['','food', 'water', 'apples']
 
 PARAMETERS_TYPE = {}
 METHODS_TYPE = {}
@@ -132,32 +132,10 @@ elementSymbols = {v: k for k, v in periodic_table.items()}
 icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
 
 
-
 icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
 
 
-GSMS_So_values = {
-    "001": 0.100, 
-    '002': 0.254, 
-    '003': ''
-}
-
-GSMS_ref_values = {
-    "001": 100, 
-    "002": 10, 
-    "003": 10, 
-        
-}
-
-
-GSMS_std_values ={
-    
-}
-
-
-
 def hardnessCalc(calcium, magnesium): 
-    
     return round(float(calcium) * 2.497 + float(magnesium) * 4.11, 1)
 
 
@@ -212,7 +190,6 @@ def scanDir(path):
     obj.close()
 
     
-
 def scanForTXTFolders(jobNum): 
     #print('jobnumber: ', jobNum)
 
@@ -691,23 +668,9 @@ def icpMethod2(filePath, db):
 
 
 
-#FIXME: if another thing comes along 
-def createReport(db, jobNum, reportType, parameter, recovery=False): 
 
-    '''     
-    if('ISP' in reportType):
-        sql  = 'INSERT INTO icpReports (jobNumber, reportType, parameter, status, createdDate) values (?, ?,?,1,?)'
-        
-    if(reportType == 'GSMS'):
-        sql  = 'INSERT INTO gsmsReports (jobNumber, reportType, parameter, status, createdDate) values (?,?,?,1,?)'
+def createReport(db, jobNum, reportType, parameter): 
 
-    todayDate = date.today()
-    print('COMMAND: ', sql) 
-
-    db.execute(sql, (jobNum, reportType, parameter, todayDate))
-    db.commit()
-    '''
-    
     sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, status) values (?,?,?,?,0)'
     currentDate = date.today()
     db.execute(sql, (jobNum, reportType, parameter, currentDate))
@@ -720,7 +683,7 @@ def saveClientInformation(db):
     
     pass; 
 
-def saveGSMSData(): 
+def saveGcmsData(): 
     
     
     pass; 
