@@ -671,7 +671,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1523,56 +1523,6 @@ QPushButton::hover {
                <property name="bottomMargin">
                 <number>12</number>
                </property>
-               <item row="2" column="0">
-                <widget class="QTableWidget" name="icpTable">
-                 <attribute name="horizontalHeaderCascadingSectionResizes">
-                  <bool>true</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderDefaultSectionSize">
-                  <number>200</number>
-                 </attribute>
-                 <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderCascadingSectionResizes">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderStretchLastSection">
-                  <bool>false</bool>
-                 </attribute>
-                 <column>
-                  <property name="text">
-                   <string>Sample Name </string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Job Number</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Machine Type</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>File Location </string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Upload Date </string>
-                  </property>
-                 </column>
-                </widget>
-               </item>
                <item row="0" column="0">
                 <widget class="QWidget" name="icpSearchBar" native="true">
                  <property name="minimumSize">
@@ -1628,7 +1578,84 @@ QLineEdit {
                 </widget>
                </item>
                <item row="1" column="0">
-                <widget class="QListView" name="listView"/>
+                <widget class="QWidget" name="widget_23" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>100</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QWidget {
+	background-color: #323a47;
+	border-radius: 5px; 
+}
+
+#icpTable {
+	color:white; 
+} 
+QHeaderView::section { 
+	background-color: red; 
+	color:white; 
+}
+QHeaderView::vertical::section { background-color: blue; }</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_28">
+                  <item>
+                   <widget class="QTableWidget" name="icpTable">
+                    <attribute name="horizontalHeaderCascadingSectionResizes">
+                     <bool>true</bool>
+                    </attribute>
+                    <attribute name="horizontalHeaderDefaultSectionSize">
+                     <number>200</number>
+                    </attribute>
+                    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="horizontalHeaderStretchLastSection">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderVisible">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderCascadingSectionResizes">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+                     <bool>false</bool>
+                    </attribute>
+                    <attribute name="verticalHeaderStretchLastSection">
+                     <bool>false</bool>
+                    </attribute>
+                    <column>
+                     <property name="text">
+                      <string>Sample Name </string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Job Number</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Machine Type</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>File Location </string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Upload Date </string>
+                     </property>
+                    </column>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -2409,7 +2436,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QStackedWidget" name="gcmsStack">
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <property name="styleSheet">
@@ -2484,13 +2511,20 @@ QPushButton::hover {
 	background-color: rgb(107, 108, 108);
 }</string>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0">
+                    <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0,0">
                      <property name="spacing">
                       <number>-1</number>
                      </property>
                      <property name="sizeConstraint">
                       <enum>QLayout::SetDefaultConstraint</enum>
                      </property>
+                     <item>
+                      <widget class="QPushButton" name="pushButton">
+                       <property name="text">
+                        <string>Enter Tests Data</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
                       <widget class="QPushButton" name="gcmsDefineTestBtn">
                        <property name="text">
@@ -2586,7 +2620,7 @@ QListWidget {
                    <number>0</number>
                   </property>
                   <item row="2" column="0" colspan="2">
-                   <widget class="QListWidget" name="definedElements_2">
+                   <widget class="QListWidget" name="gcmsDefinedtests">
                     <item>
                      <property name="text">
                       <string>test</string>
@@ -2616,7 +2650,7 @@ QListWidget {
                       <number>12</number>
                      </property>
                      <item>
-                      <widget class="QLineEdit" name="elementInput_2">
+                      <widget class="QLineEdit" name="testsInputLabel">
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
@@ -2626,7 +2660,7 @@ QListWidget {
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="addElementBtn_2">
+                      <widget class="QPushButton" name="gcmsAddTestsBtn">
                        <property name="text">
                         <string>Add Tests</string>
                        </property>
@@ -2735,14 +2769,14 @@ QWidget#widget_37 QTextEdit {
                       </spacer>
                      </item>
                      <item row="0" column="0">
-                      <widget class="QPushButton" name="pushButton_4">
+                      <widget class="QPushButton" name="gcmsSaveTestBtn">
                        <property name="text">
                         <string>Save</string>
                        </property>
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QPushButton" name="pushButton_5">
+                      <widget class="QPushButton" name="gcmsDeleteTestBtn">
                        <property name="text">
                         <string>Delete</string>
                        </property>
@@ -2757,21 +2791,21 @@ QWidget#widget_37 QTextEdit {
                      <string notr="true"/>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_13">
-                     <item row="1" column="0">
+                     <item row="2" column="0">
                       <widget class="QLabel" name="label_60">
                        <property name="text">
                         <string>Unit Type </string>
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="1">
-                      <widget class="QLineEdit" name="lineEdit_5"/>
-                     </item>
                      <item row="2" column="1">
-                      <widget class="QLineEdit" name="lineEdit_6"/>
+                      <widget class="QLineEdit" name="gcmsUnitType"/>
                      </item>
                      <item row="3" column="1">
-                      <widget class="QTextEdit" name="textEdit"/>
+                      <widget class="QLineEdit" name="gcmsRefValue"/>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QTextEdit" name="gcmsComment"/>
                      </item>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_57">
@@ -2780,7 +2814,7 @@ QWidget#widget_37 QTextEdit {
                        </property>
                       </widget>
                      </item>
-                     <item row="4" column="1">
+                     <item row="5" column="1">
                       <spacer name="verticalSpacer_6">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
@@ -2794,9 +2828,9 @@ QWidget#widget_37 QTextEdit {
                       </spacer>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QLineEdit" name="lineEdit_4"/>
+                      <widget class="QLineEdit" name="gcmsTestName"/>
                      </item>
-                     <item row="2" column="0">
+                     <item row="3" column="0">
                       <widget class="QLabel" name="label_61">
                        <property name="text">
                         <string>Ref Value</string>
@@ -2815,6 +2849,16 @@ QWidget#widget_37 QTextEdit {
                         </size>
                        </property>
                       </spacer>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_13">
+                       <property name="text">
+                        <string>TXT Name</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="gcmsTxtName"/>
                      </item>
                     </layout>
                    </widget>
@@ -4034,46 +4078,9 @@ QWidget {
                   <item>
                    <widget class="QWidget" name="dataEntryBody" native="true">
                     <property name="styleSheet">
-                     <string notr="true">QHeaderView::section {
-	background-color: #555555;
-	color: #FFFFFF;
-	font-weight: bold;	
-	padding: 4px;
-	border: none;
-}
+                     <string notr="true">
 
-QTableWidget {
-	gridline-color: grey;
-	border: none;
-	color:white; 
-	background-color: #323a47;
-	
-}
-
-QTableWidget::item {
-	padding: 5px;
-	border:None; 
-	color:white
-
-}
-QTableWidget::item:selected{
-	background-color: none; 
-	color:white; 
-} 
-
-QTableWidget::item:selected {
-	background-color: #D0D0D0;
-	color: white;
-}
-QTableWidget::item:focus {
-	color: white; 
-}
-
-QTableCornerButton::section {
-	background-color: #555555;
-}
-
-QWidget {
+QWidget#dataEntryBody {
 	background-color: #323a47; 
 	color:white; 
 	border-radius: 10px; 
@@ -4093,7 +4100,7 @@ QWidget {
                       <number>12</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>0</number>
+                      <number>12</number>
                      </property>
                      <item>
                       <widget class="QTableWidget" name="dataTable">
@@ -4132,7 +4139,7 @@ QWidget {
                         <number>16</number>
                        </property>
                        <attribute name="horizontalHeaderVisible">
-                        <bool>false</bool>
+                        <bool>true</bool>
                        </attribute>
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>false</bool>
@@ -4153,7 +4160,7 @@ QWidget {
                         <bool>false</bool>
                        </attribute>
                        <attribute name="verticalHeaderVisible">
-                        <bool>false</bool>
+                        <bool>true</bool>
                        </attribute>
                        <attribute name="verticalHeaderDefaultSectionSize">
                         <number>22</number>

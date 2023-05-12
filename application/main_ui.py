@@ -39,25 +39,12 @@ class MainWindow(QMainWindow):
         self.ui.reportsBtn1.setChecked(True)
         
 
-        
-        size = self.size()
-        width = size.width() 
-        
-        #TODO: move this into a different function 
-        columnWidth = width / 7
-        
-        for column in range(7): 
-            self.ui.reportsTable.setColumnWidth(column, columnWidth)
-
-    
-  
-        fileLocationsDictonary = load_pickle('data.pickle')
-        print(fileLocationsDictonary)
+        #fileLocationsDictonary = load_pickle('data.pickle')
+        #print(fileLocationsDictonary)
        
-        
+        #load the setup 
         self.loadCreatePage()
         
-
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
@@ -67,7 +54,7 @@ class MainWindow(QMainWindow):
         self.showMaximized()
 
 
-    
+
     ## Change QPushButton Checkable status when stackedWidget index changed
     def messageBox(self):
         msgBox = QMessageBox()  
@@ -87,13 +74,7 @@ class MainWindow(QMainWindow):
         if(x == QMessageBox.Cancel):
             pass 
         
-        
-    #how to load in the data 
-    # save into database 
-    #
-    #
     
-        
     def loadReport(self): 
         msgBox = QMessageBox()  
         msgBox.setText("Report Already Exists");
@@ -123,43 +104,6 @@ class MainWindow(QMainWindow):
         if(x == QMessageBox.No):
             pass 
         
-
-   
-    def on_stackedWidget_currentChanged(self, index):
-        #print('Running')
-        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
-                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
-        
-        #print(btn_list)
-        #FIXME: issue that arises when the active creation setting is thing 
-        for btn in btn_list:
-            #if index in [1,2,3,4]:
-            #    btn.setAutoExclusive(False)
-            #    btn.setChecked(False)
-            #else:s
-            btn.setAutoExclusive(True)
-                   
-        if(index == 0): 
-            self.loadReportsPage(); 
-            
-        if(index == 1): 
-            self.ui.jobNumInput.setText('171981')
-            self.ui.reportType.setCurrentIndex(0)
-            self.ui.paramType.setCurrentIndex(0)
-        
-        
-        self.prev_index = (index - 1) % self.ui.stackedWidget.count()
-        print('prev index: ', self.prev_index)
-        prev_widget = self.ui.stackedWidget.widget(self.prev_index)
-        current_widget = self.ui.stackedWidget.currentWidget()
-        
-        if(self.prev_index == 5): 
-            print('Do you want to save?')
-        # Access the previous and current widgets
-
-        # Do something with the widgets
-        #print(f"Previous widget: {prev_widget}")
-        #print(f"Current widget: {current_widget}")
             
 
     def loadCreatePage(self): 
@@ -271,6 +215,9 @@ class MainWindow(QMainWindow):
     
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
+
+         
+    #---------------- Stack Management -----------------------
              
     def on_gsmsBtn1_clicked(self): 
         self.ui.gcmsStack.setCurrentIndex(0)
@@ -333,17 +280,69 @@ class MainWindow(QMainWindow):
         
         if(index == 1): 
             self.ui.gcmsTitleLabel.setText('GCMS Defined Tests')
-            self.ui.gcmsSubTitleLabel.setText('Total Tests: ')
+            
+            totalTests = len(self.gcmsGetTotalTests())
+            
+            self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
+
+            self.gcmsLoadTestsNames()
 
         if(index == 2): 
             self.ui.gcmsTitleLabel.setText('GCMS Defined Reports')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
-    
 
-    #ICP Buttons 
+
+    def on_stackedWidget_currentChanged(self, index):
+        #print('Running')
+        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
+                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
+        
+        #print(btn_list)
+        #FIXME: issue that arises when the active creation setting is thing 
+        for btn in btn_list:
+            #if index in [1,2,3,4]:
+            #    btn.setAutoExclusive(False)
+            #    btn.setChecked(False)
+            #else:s
+            btn.setAutoExclusive(True)
+                   
+        if(index == 0): 
+            self.loadReportsPage(); 
+            
+        if(index == 1): 
+            self.ui.jobNumInput.setText('171981')
+            self.ui.reportType.setCurrentIndex(0)
+            self.ui.paramType.setCurrentIndex(0)
+        
+        
+        self.prev_index = (index - 1) % self.ui.stackedWidget.count()
+        print('prev index: ', self.prev_index)
+        prev_widget = self.ui.stackedWidget.widget(self.prev_index)
+        current_widget = self.ui.stackedWidget.currentWidget()
+        
+        if(self.prev_index == 5): 
+            print('Do you want to save?')
+        # Access the previous and current widgets
+
+        # Do something with the widgets
+        #print(f"Previous widget: {prev_widget}")
+        #print(f"Current widget: {current_widget}")
+
+    #--------------------------------------------------------- 
+        
+
+    #---------------- Defined Elements -----------------------
+    
+    
+    
+    
+    
+    
+    #---------------------------------------------------------
+    
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
-        #TODO: add a message box about adding blanks 
+
         currentText = self.ui.elementInput.text()
         
         if(currentText != ''): 
@@ -565,8 +564,7 @@ class MainWindow(QMainWindow):
         
     
     def loadDefinedElements(self): 
-        print("Loading Defined Elements Friends")
-            
+
         self.ui.reportTypeDropdown.clear()
         self.ui.definedElements.clear()
     
@@ -633,6 +631,7 @@ class MainWindow(QMainWindow):
             machine1Data = list(self.db.query(inquery, ('%' + jobNum + '%',)))
             
             #TODO: create a message button, streamline the process 
+            #TODO: check to make sure not duplicate as well 
             if not machine1Data: 
                 msgBox = QMessageBox()  
                 msgBox.setText("No Search Results");
@@ -657,16 +656,156 @@ class MainWindow(QMainWindow):
         selected_item = self.ui.reportsList.currentItem()
     
                 
-    def keyPressEvent(self, event):
-        #print(event)
-
-        if event.key() == Qt.Key_Enter:
-            #self.test_method()
-            pass 
-        if event.key() == Qt.Key_Space: 
-            #elf.test_method()
-            pass
+  
+   # ----------------------- GCMS TEST PAGE -----------------------
+    
+    def gcmsLoadTestsData(self): 
         
+        selectedTests = self.ui.gcmsDefinedtests.currentItem()
+        
+        if selectedTests is not None:
+            try: 
+                getTestsData = 'SELECT * FROM gcmsTests WHERE testName = ?'
+                self.db.execute(getTestsData, (selectedTests.text(),))
+                results = self.db.fetchone() 
+            
+                self.ui.gcmsTestName.setText(results[0])
+                self.ui.gcmsUnitType.setText(results[1])
+                self.ui.gcmsRefValue.setText(results[2])
+            except: 
+                #item is not in the database yet 
+                self.gcmsClearDefinedTestsValues()
+                self.ui.gcmsTestName.setText(selectedTests.text())
+                
+                
+    def gcmsLoadTestsNames(self): 
+        
+        self.ui.gcmsDefinedtests.clear()
+        self.ui.testsInputLabel.clear()
+    
+        getTestNamesQuery = 'SELECT testName FROM gcmsTests ORDER BY testName ASC'
+        testNames = self.db.query(getTestNamesQuery)           
+
+        print(testNames)
+        
+        for test in testNames: 
+            self.ui.gcmsDefinedtests.addItem(test[0])
+
+        self.gcmsClearDefinedTestsValues(); 
+    
+    def gcmsGetListValues(self): 
+        
+        values = []
+        
+        for index in range(self.ui.gcmsDefinedtests.count()):
+            item = self.ui.gcmsDefinedtests.item(index)
+            values.append(item.text())
+            
+        return values; 
+    
+    def gcmsGetTotalTests(self): 
+        
+        test = 'SELECT * FROM gcmsTests'
+        
+        return self.db.query(test)
+        
+    
+    def gcmsClearDefinedTestsValues(self): 
+        self.ui.gcmsTestName.clear()
+        self.ui.gcmsUnitType.clear()
+        self.ui.gcmsRefValue.clear()
+        self.ui.gcmsComment.clear()
+    
+    
+    @pyqtSlot() 
+    def on_gcmsAddTestsBtn_clicked(self): 
+        
+        existingTests = self.gcmsGetListValues()
+        print(existingTests)
+        
+        currentText = self.ui.testsInputLabel.text()
+
+        
+        if(currentText != '' and currentText not in existingTests): 
+            #clear values 
+            self.gcmsClearDefinedTestsValues()
+            self.ui.testsInputLabel.clear()
+            #add to testse 
+            self.ui.gcmsDefinedtests.addItem(currentText)
+            
+            totalItems = len(self.gcmsGetListValues())
+            
+            self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
+            self.ui.gcmsTestName.setText(currentText)
+            
+        else: 
+            print('Please enter a valid tests')
+
+    
+    
+    @pyqtSlot()
+    def on_gcmsSaveTestBtn_clicked(self):
+
+        testName = self.ui.gcmsTestName.text().strip()
+        unitType = self.ui.gcmsUnitType.text().strip()
+        refValue = self.ui.gcmsRefValue.text()        
+        comment = self.ui.gcmsComment.toPlainText() 
+        
+        print(testName, unitType,refValue)
+        
+        if(testName != ""):
+            
+            definedTestsValues = 'INSERT OR REPLACE INTO gcmsTests (testName, unitType, refValue) VALUES (?,?,?)' 
+            
+            try:
+                self.db.execute(definedTestsValues, (testName, unitType, refValue) )
+                self.db.commit()
+
+            except sqlite3.IntegrityError as e:
+                print(e)
+    
+    @pyqtSlot()    
+    def on_gcmsDeleteTestBtn_clicked(self): 
+        
+        testName = self.ui.gcmsTestName.text().lower().strip()
+        selected_item = self.ui.gcmsDefinedtests.currentItem()
+
+        print(testName)
+        print(selected_item)
+
+        deleteQuery = 'DELETE FROM gcmstests WHERE testName = ?'
+        
+        try: 
+            self.deleteBox("DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
+            
+            self.db.execute(deleteQuery, (testName,))
+            self.db.commit()
+
+            currentItem = self.ui.gcmsDefinedtests.currentRow()
+            self.ui.gcmsDefinedtests.takeItem(currentItem)
+            self.ui.gcmsDefinedtests.setCurrentItem(None)
+            
+            self.gcmsClearDefinedTestsValues()
+        
+        except: 
+            print('Error: could not delete item')
+        
+    
+    def on_gcmsDefinedtests_clicked(self): 
+        self.gcmsLoadTestsData()
+            
+
+    def on_gcmsDefinedtests_currentRowChanged(self):
+
+        try:
+            self.gcmsLoadTestsData()
+        
+        except: 
+            print('error')
+            
+        
+        
+    #-------------------------------------------------------------
     
     #PROCESS PAGE 
     @pyqtSlot()
@@ -683,7 +822,12 @@ class MainWindow(QMainWindow):
         #0 = name 
         #1 = reportType 
         #2 = parameter 
-        errorCheck = [0, 0, 0]       
+        #3 = TXT file exists
+        errorCheck = [0, 0, 0, 0]     
+
+        fileExist = scanForTXTFolders(jobNum)
+        print(fileExist)
+     
      
         if(re.match('^([0-9]{6})$', jobNum)): 
             errorCheck[0] = 0; 
@@ -702,7 +846,15 @@ class MainWindow(QMainWindow):
         else: 
             errorCheck[2] = 1
             
+        if(fileExist != None): 
+            errorCheck[3] = 0;
+        else: 
+            errorCheck[3] = 1; 
+        
+            
         print("ErrorCheck: ", errorCheck)
+        
+        
         
         
         if(sum(errorCheck) == 0): 
@@ -762,6 +914,10 @@ class MainWindow(QMainWindow):
             if(errorCheck[2] == 1): 
                 print('Error: Please Select a parameter')
                 outputMessage += 'Please Select a Parmeter\n'
+            
+            if(errorCheck[3] == 1): 
+                print("Error: TXT File doesn't exist")
+                outputMessage += 'TXT File could not be located\n'
                 
             msg = QMessageBox() 
             msg.setWindowTitle("Error")
@@ -769,14 +925,7 @@ class MainWindow(QMainWindow):
             x = msg.exec_()  # this will show our messagebox
 
             
-     
-    def loadExistingInfo(self): 
-        
-        pass; 
-    
-    def overWriteExisting(self): 
-        pass; 
-    
+
     
     def gcmsLoader(self): 
         print('GCMS LOADER')
@@ -820,7 +969,7 @@ class MainWindow(QMainWindow):
             'Tests', 
             'Tests Name',
             'Unit Value', 
-            'REF Value', 
+            'Standard Recovery', 
             'Distal factor'
         ]
         initalColumns = len(columnNames)

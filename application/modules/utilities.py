@@ -189,7 +189,8 @@ def scanDir(path):
 
     obj.close()
 
-    
+
+ 
 def scanForTXTFolders(jobNum): 
     #print('jobnumber: ', jobNum)
 
@@ -234,7 +235,8 @@ def processTXTFolders(jobNum, locations):
         tempLocationObject.close()
     #TODO: return a blank user information 
     #can just clone the clientInfoDict somewhere and send it back 
-    print("No Job Number Matches")
+    #print("No Job Number Matches")
+    return None; 
 
         
 def processClientInfo(jobNum, fileLocation):

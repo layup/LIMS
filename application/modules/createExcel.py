@@ -54,11 +54,13 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
     
     ws = createHeader(ws, clientInfo, 'D')
     ws.column_dimensions['A'].width = 20 #120px 
+    #ws.column_dimensions['G'].width = 14 
+    ws.column_dimensions['H'].width = 19
     ws.print_title_rows = '1:8' # the first two rows
     
     #FIXME: add the proper job number instead of placeholder 
     jobNumLocation = ws.cell(row=1, column=8)
-    jobNumLocation.value = "W" + "8888888"
+    jobNumLocation.value = "W" + str(jobNum)
     jobNumLocation.alignment = Alignment(horizontal='right', vertical='center')
 
     sampleSections = []
@@ -577,7 +579,7 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType):
 
     so = ws.cell(row=pageLocation, column=7) 
     if(reportType == 0): 
-        so.value = 'So'
+        so.value = 'STD Recv'
     else: 
         so.value = 'Units'
     so.border = Border(right=thinBorder, left=thinBorder)
@@ -585,7 +587,7 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType):
     
     ref = ws.cell(row=pageLocation, column=8)
     if(reportType == 0 ): 
-        ref.value = 'Ref Value'
+        ref.value = 'Comments'
         ref.alignment = Alignment(horizontal='center', vertical='center')  
     else: 
         ref.value = 'Maximum Limits'  
@@ -673,10 +675,8 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
 def insertComments(ws, pageLocation): 
 
     comments = { 
-        "SD":  'SD    = standard devition;       REF VALUE = primary or secondary reference material', 
+        "SD":  'SD    = standard devition;       Standard Recovery = primary or secondary reference material', 
         'STD': 'STD  = secondary standard calibrated to primary standard reference material', 
-        'So':  'So     = standard deviation at zero analyte concentration; method detection limit is generally', 
-        'So2': '       considered to be 3x So value', 
         'ND':  'ND   = none is detcted;          n/a = not applicable'
     }
     
