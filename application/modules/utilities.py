@@ -135,6 +135,22 @@ icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
 icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
 
 
+
+def is_real_number(string): 
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
+def remove_escape_characters(string):
+    # Define a regular expression pattern to match escape sequences
+    pattern = r'\\.'
+    # Replace escape sequences with an empty string
+    result = re.sub(pattern, '', string)
+    return result
+
 def hardnessCalc(calcium, magnesium): 
     return round(float(calcium) * 2.497 + float(magnesium) * 4.11, 1)
 

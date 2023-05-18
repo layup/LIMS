@@ -185,7 +185,8 @@ class MainWindow(QMainWindow):
         row = index.row()
         print(f"Double clicked on row {row}")
     
-    #Define Menu Button presses 
+    #------------- Define Menu Button presses --------------
+    
     def on_reportsBtn1_toggled(self): 
         self.ui.stackedWidget.setCurrentIndex(0) 
     
@@ -215,7 +216,6 @@ class MainWindow(QMainWindow):
     
     def on_settingBtn2_toggled(self):
          self.ui.stackedWidget.setCurrentIndex(4)
-
          
     #---------------- Stack Management -----------------------
              
@@ -227,6 +227,12 @@ class MainWindow(QMainWindow):
      
     def on_gcmsReportTypeBtn_clicked(self): 
         self.ui.gcmsStack.setCurrentIndex(2)
+        
+    def on_gcmsEnterTestsBtn_clicked(self): 
+        self.ui.gcmsStack.setCurrentIndex(3);     
+    
+    def on_gcmsViewDatabase_clicked(self): 
+        self.ui.gcmsStack.setCurrentIndex(4)
 
     def on_icpBtn1_clicked(self): 
         self.ui.icpStack.setCurrentIndex(0)
@@ -290,6 +296,16 @@ class MainWindow(QMainWindow):
         if(index == 2): 
             self.ui.gcmsTitleLabel.setText('GCMS Defined Reports')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
+            
+            
+        if(index == 3): 
+            self.ui.gcmsTitleLabel.setText('GCMS Tests Entry')
+            self.ui.gcmsSubTitleLabel.setText('')
+             
+            self.gcmsClearEnteredTestsData()
+            
+            self.getTestsAndUnits()
+            
 
 
     def on_stackedWidget_currentChanged(self, index):
@@ -677,7 +693,7 @@ class MainWindow(QMainWindow):
                 self.gcmsClearDefinedTestsValues()
                 self.ui.gcmsTestName.setText(selectedTests.text())
                 
-                
+        
     def gcmsLoadTestsNames(self): 
         
         self.ui.gcmsDefinedtests.clear()
@@ -791,6 +807,7 @@ class MainWindow(QMainWindow):
             print('Error: could not delete item')
         
     
+    @pyqtSlot()
     def on_gcmsDefinedtests_clicked(self): 
         self.gcmsLoadTestsData()
             
@@ -807,7 +824,233 @@ class MainWindow(QMainWindow):
         
     #-------------------------------------------------------------
     
-    #PROCESS PAGE 
+    def getTestsAndUnits(self): 
+        
+        inquery = 'SELECT testName, unitType FROM gcmsTests'
+        results = self.db.query(inquery)
+        
+        print(results)
+        
+        pass; 
+    
+    
+
+
+    # -------------------- GCMS Data Entering --------------------
+    
+    #TODO: have error handling for duplicates 
+    #TODO: takes in the values from the 
+    #TODO: connect from the defined values in gcms Defined Tests Page
+
+    @pyqtSlot()    
+    def on_gcmsProceedBtn_clicked(self):
+        #check if the there is standard and entered unit
+        
+    
+        errorCheck = [0,0,0]
+        
+        standards = self.ui.gcmsStandardVal.text().strip()
+        units = self.ui.gcmsUnitVal.text().strip()
+        tests = self.ui.gcmsTests.text().strip() 
+        
+        if(standards != '' and is_real_number(standards)): 
+            errorCheck[0] = 0 
+        else: 
+            errorCheck[0] = 1; 
+            
+        if(units != ''): 
+            errorCheck[1] = 0
+        else: 
+            errorCheck[1] = 1; 
+            
+        if(tests != ''): 
+            errorCheck[2] = 0 
+        else: 
+            errorCheck[2] = 1; 
+        
+        
+        if(sum(errorCheck) == 0):
+            self.ui.gcmsTestsValueWidget.setEnabled(True)
+            self.ui.widget_28.setEnabled(False)
+            
+            self.ui.gcmsStandardVal_2.setText(standards)
+            self.ui.gcmsUnitVal_2.setText(units)
+            self.ui.gcmsTests_2.setText(tests)  
+            
+        else: 
+            outputMessage = ''
+            
+            if(errorCheck[0] == 1): 
+               
+                outputMessage += 'Please Enter a Valid Standard Number\n'
+
+            if(errorCheck[1] == 1): 
+              
+                outputMessage += 'Please Select a Unit\n'
+                
+            if(errorCheck[2] == 1): 
+               
+                outputMessage += 'Please Select a Tests\n'
+            
+                
+            msg = QMessageBox() 
+            msg.setWindowTitle("Error")
+            msg.setText(outputMessage)
+            x = msg.exec_()  # this will show our messagebox 
+    
+        pass; 
+           
+
+    @pyqtSlot()   
+    def on_gcmsAddTestsBtn_2_clicked(self): 
+        
+        errorCheck = [0,0,0]
+        
+        standards = self.ui.gcmsStandardVal_2.text().strip()
+        units = self.ui.gcmsUnitVal_2.text().strip()
+        testName = self.ui.gcmsTests_2.text().strip()  
+        
+        
+        errorCheck = [0,0,0]
+        
+        testNum = self.ui.gcmsTestsJobNum.text().strip()
+        sampleNum = self.ui.gcmsTestsSample.text().strip()
+        sampleVal = self.ui.gcmsTestsVal.text().strip()
+        
+        
+        if(testNum != '' and is_real_number(testNum)): 
+           errorCheck[0] = 0 
+        else: 
+            errorCheck[0] = 1; 
+        
+        if(sampleNum != '' and is_real_number(sampleNum)): 
+           errorCheck[1] = 0 
+        else: 
+            errorCheck[1] = 1; 
+
+        if(sampleVal != ''): 
+            errorCheck[2] = 0
+        else: 
+            errorCheck[2] = 1; 
+        
+        
+        if(sum(errorCheck) == 0): 
+            
+            jobNum = testNum + '-' + sampleNum; 
+            
+            checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE jobNumber = ? and testsName = ?)'
+            self.db.execute(checkInquery, (jobNum, testName))
+            result = self.db.fetchone()[0]
+            
+            
+            if(result == 1): 
+                
+                msgBox = QMessageBox()  
+                msgBox.setText("Duplicate Sample");
+                msgBox.setInformativeText("Would you like to overwrite existing sample?" );
+                msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
+                msgBox.setDefaultButton(QMessageBox.Yes);
+                
+                x = msgBox.exec_()
+
+                if(x == QMessageBox.Yes): 
+                    self.addToGcmsTestsData(jobNum, testName, sampleVal, standards, units)
+                    self.ui.gcmsTestsLists.addItem(jobNum)
+                    self.gcmsClearSampleJob() 
+                    
+                if(x == QMessageBox.No):
+                    self.gcmsClearSampleJob() 
+                    
+                if(x == QMessageBox.Cancel):
+                    pass 
+                
+            
+            else: 
+                self.addToGcmsTestsData(jobNum, testName, sampleVal, standards, units)
+                self.ui.gcmsTestsLists.addItem(jobNum)
+                self.gcmsClearSampleJob() 
+                
+
+        else: 
+            outputMessage = ''
+            
+            if(errorCheck[0] == 1): 
+                outputMessage += 'Please Enter a Valid Job Number\n'
+
+            if(errorCheck[1] == 1): 
+
+                outputMessage += 'Please Enter a Valid Sample Number\n'
+                
+            if(errorCheck[2] == 1): 
+            
+                outputMessage += 'Please Enter a Valid Sample Value \n'
+            
+                
+            msg = QMessageBox() 
+            msg.setWindowTitle("Error")
+            msg.setText(outputMessage)
+            x = msg.exec_()  # this will show our messagebox 
+    
+             
+
+            
+    def gcmsClearSampleJob(self): 
+        self.ui.gcmsTestsSample.clear()
+        self.ui.gcmsTestsVal.clear() 
+             
+    def gcmsClearSideData(self): 
+        self.ui.gcmsStandardVal.clear()
+        self.ui.gcmsUnitVal.clear()
+        self.ui.gcmsTests.clear() 
+           
+
+    def gcmsClearEnteredTestsData(self): 
+        
+        self.ui.gcmsTestsValueWidget.setEnabled(False)
+        self.ui.widget_28.setEnabled(True)
+            
+        self.ui.gcmsStandardVal.clear()
+        self.ui.gcmsUnitVal.clear()
+        self.ui.gcmsTests.clear()
+        
+        self.ui.gcmsStandardVal_2.clear()
+        self.ui.gcmsUnitVal_2.clear()
+        self.ui.gcmsTests_2.clear()
+            
+        self.ui.gcmsTestsJobNum.clear()
+        self.ui.gcmsTestsSample.clear()
+        self.ui.gcmsTestsVal.clear()
+        
+        self.ui.gcmsTestsLists.clear()
+
+
+    #SQL 
+
+    
+    def addToGcmsTestsData(self, jobNum, testName, sampleVal, standards, units): 
+        addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (jobNumber, testsName, testsValue, StandardValue, unitValue) VALUES (?,?,?,?,?)'
+        
+        try:
+            self.db.execute(addInquery, (jobNum, testName, sampleVal, standards, units) )
+            self.db.commit()
+
+        except sqlite3.IntegrityError as e:
+            print(e) 
+ 
+ 
+    def loadExistingData(self): 
+        
+        query = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
+        pass; 
+        
+        
+        
+
+    #-------------------------------------------------------------
+    
+    
+    # ----------------------- PROCESS PAGE ------------------------
+  
     @pyqtSlot()
     def proceedPage(self):
         
@@ -855,8 +1098,6 @@ class MainWindow(QMainWindow):
         print("ErrorCheck: ", errorCheck)
         
         
-        
-        
         if(sum(errorCheck) == 0): 
             self.jobNum = jobNum; 
             self.parameter = parameter 
@@ -901,6 +1142,8 @@ class MainWindow(QMainWindow):
                 self.gcmsLoader()
             
         else: 
+            #TODO: can combine into one function that print errors to the screen 
+            # param(total errors, [error messages], add style) 
             outputMessage = ''
             
             if(errorCheck[0] == 1): 
@@ -925,7 +1168,7 @@ class MainWindow(QMainWindow):
             x = msg.exec_()  # this will show our messagebox
 
             
-
+    # -------------------------------------------------------------
     
     def gcmsLoader(self): 
         print('GCMS LOADER')
@@ -1019,7 +1262,8 @@ class MainWindow(QMainWindow):
         #item = self.dataTable.horizontalHeaderItem(4)
         #item.setText(_translate("MainWindow", "STD += 2"))
        
-
+        #FIXME: this have a rpeort handle (if report = 1 or 2 do this instead, )
+        #but how do you pass the tests 
         self.ui.createReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
         
         
