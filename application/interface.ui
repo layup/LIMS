@@ -2534,7 +2534,7 @@ QListWidget {
 }</string>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <property name="styleSheet">
@@ -2707,7 +2707,8 @@ QPushButton::hover {
 	border-radius: 10px;
 }
 QWidget {
-	background-color:  #323a47
+	background-color:  #323a47; 
+	color:white; 
 }
 
 QWidget QPushButton { 
@@ -2739,15 +2740,6 @@ QListWidget {
                   <property name="horizontalSpacing">
                    <number>0</number>
                   </property>
-                  <item row="2" column="0" colspan="2">
-                   <widget class="QListWidget" name="gcmsDefinedtests">
-                    <item>
-                     <property name="text">
-                      <string>test</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
                   <item row="1" column="0">
                    <widget class="QWidget" name="widget_18" native="true">
                     <property name="minimumSize">
@@ -2787,6 +2779,22 @@ QListWidget {
                       </widget>
                      </item>
                     </layout>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QListWidget" name="gcmsDefinedtests">
+                    <item>
+                     <property name="text">
+                      <string>test</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_54">
+                    <property name="text">
+                     <string>TXT Test Names</string>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -2914,7 +2922,7 @@ QWidget#widget_37 QTextEdit {
                      <item row="3" column="0">
                       <widget class="QLabel" name="label_61">
                        <property name="text">
-                        <string>Ref Value</string>
+                        <string>So Value</string>
                        </property>
                       </widget>
                      </item>
@@ -2937,7 +2945,7 @@ QWidget#widget_37 QTextEdit {
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_57">
                        <property name="text">
-                        <string>Test Name</string>
+                        <string>Display Name</string>
                        </property>
                       </widget>
                      </item>
@@ -2955,7 +2963,7 @@ QWidget#widget_37 QTextEdit {
                       </spacer>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QLineEdit" name="gcmsTestName"/>
+                      <widget class="QLineEdit" name="gcmsDisplayName"/>
                      </item>
                      <item row="0" column="2">
                       <spacer name="horizontalSpacer_16">
@@ -3336,7 +3344,7 @@ p, li { white-space: pre-wrap; }
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>160</height>
+                      <height>2000</height>
                      </size>
                     </property>
                     <property name="styleSheet">
@@ -3353,15 +3361,25 @@ p, li { white-space: pre-wrap; }
                      <item row="2" column="1">
                       <widget class="QLineEdit" name="gcmsStandardVal"/>
                      </item>
+                     <item row="7" column="1">
+                      <widget class="QPushButton" name="gcmsProceedBtn">
+                       <property name="text">
+                        <string>Proceed</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QComboBox" name="gcmsUnitVal"/>
+                     </item>
                      <item row="3" column="0">
                       <widget class="QLabel" name="label_30">
                        <property name="text">
                         <string>Enter Unit</string>
                        </property>
                       </widget>
-                     </item>
-                     <item row="3" column="1">
-                      <widget class="QLineEdit" name="gcmsUnitVal"/>
                      </item>
                      <item row="4" column="0">
                       <widget class="QLabel" name="label_51">
@@ -3371,17 +3389,7 @@ p, li { white-space: pre-wrap; }
                       </widget>
                      </item>
                      <item row="4" column="1">
-                      <widget class="QLineEdit" name="gcmsTests"/>
-                     </item>
-                     <item row="6" column="1">
-                      <widget class="QPushButton" name="gcmsProceedBtn">
-                       <property name="text">
-                        <string>Proceed</string>
-                       </property>
-                       <property name="checkable">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
+                      <widget class="QComboBox" name="gcmsTests"/>
                      </item>
                     </layout>
                    </widget>
@@ -4191,6 +4199,13 @@ QPushButton::hover {
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_13">
                  <item>
+                  <widget class="QPushButton" name="createIcpReportBtn">
+                   <property name="text">
+                    <string>Generate Report 1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QWidget" name="widget_25" native="true">
                    <layout class="QHBoxLayout" name="horizontalLayout_11">
                     <property name="leftMargin">
@@ -4206,9 +4221,9 @@ QPushButton::hover {
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QPushButton" name="createReportBtn">
+                     <widget class="QPushButton" name="createGcmsReportBtn">
                       <property name="text">
-                       <string>Generate Report </string>
+                       <string>Generate Report 2</string>
                       </property>
                      </widget>
                     </item>
@@ -4254,7 +4269,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <property name="styleSheet">
@@ -4566,6 +4581,9 @@ QWidget#dataEntryBody {
                          <bold>false</bold>
                         </font>
                        </property>
+                       <property name="layoutDirection">
+                        <enum>Qt::LeftToRight</enum>
+                       </property>
                        <property name="styleSheet">
                         <string notr="true"/>
                        </property>
@@ -4594,7 +4612,7 @@ QWidget#dataEntryBody {
                         <number>16</number>
                        </property>
                        <attribute name="horizontalHeaderVisible">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </attribute>
                        <attribute name="horizontalHeaderCascadingSectionResizes">
                         <bool>false</bool>
@@ -4615,7 +4633,7 @@ QWidget#dataEntryBody {
                         <bool>false</bool>
                        </attribute>
                        <attribute name="verticalHeaderVisible">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </attribute>
                        <attribute name="verticalHeaderDefaultSectionSize">
                         <number>22</number>

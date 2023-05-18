@@ -6,6 +6,7 @@ import csv
 import numpy
 import inquirer
 import json 
+import string
 import pickle 
 from copy import copy
 import pandas as pd 
@@ -135,6 +136,13 @@ icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
 icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
 
 
+def search_list_of_lists(lists, targets):
+    for sublist in lists:
+        
+        if all(target in sublist for target in targets):
+            
+            return sublist 
+    return None
 
 def is_real_number(string): 
     try:
@@ -143,13 +151,24 @@ def is_real_number(string):
     except ValueError:
         return False
 
+def remove_unicode_characters(text):
+    # Create a translation table with all Unicode characters set to None
+    translation_table = dict.fromkeys(range(0x10000), None)
+    translation_table.update(str.maketrans("", "", string.printable))
 
-def remove_escape_characters(string):
-    # Define a regular expression pattern to match escape sequences
-    pattern = r'\\.'
-    # Replace escape sequences with an empty string
-    result = re.sub(pattern, '', string)
-    return result
+    # Remove Unicode characters using the translation table
+    cleaned_text = text.translate(translation_table)
+
+    return cleaned_text
+
+def remove_escape_characters(text):
+    # Define the regex pattern to match escape characters including \x sequences
+    escape_pattern = r'\\[xX][0-9a-fA-F]{2}|\\x1a|\.'
+
+    # Use regex substitution to remove escape characters
+    cleaned_text = re.sub(escape_pattern, '', text)
+
+    return cleaned_text
 
 def hardnessCalc(calcium, magnesium): 
     return round(float(calcium) * 2.497 + float(magnesium) * 4.11, 1)
@@ -204,6 +223,8 @@ def scanDir(path):
 
 
     obj.close()
+
+
 
 
  

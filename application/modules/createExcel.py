@@ -332,6 +332,11 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #if 1 = (61 * i) - (8 * (i-1)) + 1 =  62
     #if 2 = (61 * 2) - (8 * 1) + 1 = 115 
     #if 2 = (61 * 3) - (8 * 2) + 1 = 
+    
+    
+    #TODO: tests how many of the tests need footer comments 
+    #TODO: determine how long the extra tests comments are 
+    #TODO: factor that into the size insertion 
 
     pageLocation = 9; 
     usedSamples = 0; 

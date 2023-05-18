@@ -12,6 +12,8 @@ import sys
 import re 
 import asyncio
 import pickle
+import string
+
 
 from modules.createExcel import * 
 from modules.utilities import * 
@@ -286,6 +288,7 @@ class MainWindow(QMainWindow):
         
         if(index == 1): 
             self.ui.gcmsTitleLabel.setText('GCMS Defined Tests')
+          
             
             totalTests = len(self.gcmsGetTotalTests())
             
@@ -304,7 +307,10 @@ class MainWindow(QMainWindow):
              
             self.gcmsClearEnteredTestsData()
             
-            self.getTestsAndUnits()
+            temp = self.getTestsAndUnits()
+            
+            self.ui.gcmsTests.addItems(temp[0])
+            self.ui.gcmsUnitVal.addItems(temp[1])
             
 
 
@@ -582,6 +588,7 @@ class MainWindow(QMainWindow):
     def loadDefinedElements(self): 
 
         self.ui.reportTypeDropdown.clear()
+        self.ui.gcmsDefinedtests.clear()
         self.ui.definedElements.clear()
     
         getElementsQuery = 'SELECT * FROM icpElements ORDER BY element ASC'
@@ -674,40 +681,50 @@ class MainWindow(QMainWindow):
                 
   
    # ----------------------- GCMS TEST PAGE -----------------------
+   #TODO: if the txt name changes update the listName 
+   #keep track of the currentIndex when first getting it 
+   
     
     def gcmsLoadTestsData(self): 
         
         selectedTests = self.ui.gcmsDefinedtests.currentItem()
+        
+        print('selected Tests: ', selectedTests)
         
         if selectedTests is not None:
             try: 
                 getTestsData = 'SELECT * FROM gcmsTests WHERE testName = ?'
                 self.db.execute(getTestsData, (selectedTests.text(),))
                 results = self.db.fetchone() 
+                
+                print(results)
             
-                self.ui.gcmsTestName.setText(results[0])
-                self.ui.gcmsUnitType.setText(results[1])
-                self.ui.gcmsRefValue.setText(results[2])
+                self.ui.gcmsTxtName.setText(str(results[0]))
+                self.ui.gcmsUnitType.setText(str(results[1]))
+                self.ui.gcmsRefValue.setText(str(results[2]))
+                self.ui.gcmsDisplayName.setText(str(results[3]))
             except: 
                 #item is not in the database yet 
+                print('Error: selected Text was None') 
                 self.gcmsClearDefinedTestsValues()
-                self.ui.gcmsTestName.setText(selectedTests.text())
+                self.ui.gcmsTxtName.setText(selectedTests.text())
                 
         
     def gcmsLoadTestsNames(self): 
         
+        self.gcmsClearDefinedTestsValues(); 
         self.ui.gcmsDefinedtests.clear()
         self.ui.testsInputLabel.clear()
     
-        getTestNamesQuery = 'SELECT testName FROM gcmsTests ORDER BY testName ASC'
+        getTestNamesQuery = 'SELECT testName FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
         testNames = self.db.query(getTestNamesQuery)           
-
+        
         print(testNames)
         
         for test in testNames: 
             self.ui.gcmsDefinedtests.addItem(test[0])
 
-        self.gcmsClearDefinedTestsValues(); 
+        
     
     def gcmsGetListValues(self): 
         
@@ -727,10 +744,13 @@ class MainWindow(QMainWindow):
         
     
     def gcmsClearDefinedTestsValues(self): 
-        self.ui.gcmsTestName.clear()
+        self.ui.gcmsDisplayName.clear()
+        self.ui.gcmsTxtName.clear()
         self.ui.gcmsUnitType.clear()
         self.ui.gcmsRefValue.clear()
         self.ui.gcmsComment.clear()
+     
+
     
     
     @pyqtSlot() 
@@ -752,7 +772,7 @@ class MainWindow(QMainWindow):
             totalItems = len(self.gcmsGetListValues())
             
             self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
-            self.ui.gcmsTestName.setText(currentText)
+            self.ui.gcmsTxtName.setText(currentText)
             
         else: 
             print('Please enter a valid tests')
@@ -762,19 +782,21 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_gcmsSaveTestBtn_clicked(self):
 
-        testName = self.ui.gcmsTestName.text().strip()
+        
+        displayName = self.ui.gcmsDisplayName.text().strip()
+        txtName = self.ui.gcmsTxtName.text().strip()
         unitType = self.ui.gcmsUnitType.text().strip()
-        refValue = self.ui.gcmsRefValue.text()        
+        recoveryVal = self.ui.gcmsRefValue.text()        
         comment = self.ui.gcmsComment.toPlainText() 
         
-        print(testName, unitType,refValue)
+        print(txtName, unitType, recoveryVal, displayName)
         
-        if(testName != ""):
+        if(txtName != ""):
             
-            definedTestsValues = 'INSERT OR REPLACE INTO gcmsTests (testName, unitType, refValue) VALUES (?,?,?)' 
+            definedTestsValues = 'INSERT OR REPLACE INTO gcmsTests (testName, unitType, recoveryVal, displayName) VALUES (?,?,?, ?)' 
             
             try:
-                self.db.execute(definedTestsValues, (testName, unitType, refValue) )
+                self.db.execute(definedTestsValues, (txtName, unitType, recoveryVal, displayName) )
                 self.db.commit()
 
             except sqlite3.IntegrityError as e:
@@ -783,10 +805,10 @@ class MainWindow(QMainWindow):
     @pyqtSlot()    
     def on_gcmsDeleteTestBtn_clicked(self): 
         
-        testName = self.ui.gcmsTestName.text().lower().strip()
+        txtName = self.ui.gcmsTxtName.text().strip()
         selected_item = self.ui.gcmsDefinedtests.currentItem()
 
-        print(testName)
+        print(txtName)
         print(selected_item)
 
         deleteQuery = 'DELETE FROM gcmstests WHERE testName = ?'
@@ -794,7 +816,7 @@ class MainWindow(QMainWindow):
         try: 
             self.deleteBox("DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
             
-            self.db.execute(deleteQuery, (testName,))
+            self.db.execute(deleteQuery, (txtName,))
             self.db.commit()
 
             currentItem = self.ui.gcmsDefinedtests.currentRow()
@@ -819,21 +841,27 @@ class MainWindow(QMainWindow):
         
         except: 
             print('error')
-            
         
         
     #-------------------------------------------------------------
     
     def getTestsAndUnits(self): 
         
-        inquery = 'SELECT testName, unitType FROM gcmsTests'
+        inquery = 'SELECT testName, unitType FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
         results = self.db.query(inquery)
         
-        print(results)
+        tests = ['']
+        units = ['']
         
-        pass; 
-    
-    
+        for testName, unitType in results: 
+            if(testName != '' ): 
+                tests.append(testName)
+            
+            if(unitType != '' and unitType not in units):
+                units.append(unitType)
+        
+        return (tests,units)
+        
 
 
     # -------------------- GCMS Data Entering --------------------
@@ -850,8 +878,8 @@ class MainWindow(QMainWindow):
         errorCheck = [0,0,0]
         
         standards = self.ui.gcmsStandardVal.text().strip()
-        units = self.ui.gcmsUnitVal.text().strip()
-        tests = self.ui.gcmsTests.text().strip() 
+        units = self.ui.gcmsUnitVal.currentText()
+        tests = self.ui.gcmsTests.currentText()
         
         if(standards != '' and is_real_number(standards)): 
             errorCheck[0] = 0 
@@ -936,10 +964,10 @@ class MainWindow(QMainWindow):
         
         if(sum(errorCheck) == 0): 
             
-            jobNum = testNum + '-' + sampleNum; 
+            sampleNum = testNum + '-' + sampleNum; 
             
-            checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE jobNumber = ? and testsName = ?)'
-            self.db.execute(checkInquery, (jobNum, testName))
+            checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?)'
+            self.db.execute(checkInquery, (sampleNum, testName))
             result = self.db.fetchone()[0]
             
             
@@ -954,8 +982,8 @@ class MainWindow(QMainWindow):
                 x = msgBox.exec_()
 
                 if(x == QMessageBox.Yes): 
-                    self.addToGcmsTestsData(jobNum, testName, sampleVal, standards, units)
-                    self.ui.gcmsTestsLists.addItem(jobNum)
+                    self.addToGcmsTestsData(sampleNum, testName, sampleVal, standards, units, testNum)
+                    self.ui.gcmsTestsLists.addItem(sampleNum)
                     self.gcmsClearSampleJob() 
                     
                 if(x == QMessageBox.No):
@@ -964,10 +992,9 @@ class MainWindow(QMainWindow):
                 if(x == QMessageBox.Cancel):
                     pass 
                 
-            
             else: 
-                self.addToGcmsTestsData(jobNum, testName, sampleVal, standards, units)
-                self.ui.gcmsTestsLists.addItem(jobNum)
+                self.addToGcmsTestsData(sampleNum, testName, sampleVal, standards, units, testNum)
+                self.ui.gcmsTestsLists.addItem(sampleNum)
                 self.gcmsClearSampleJob() 
                 
 
@@ -985,14 +1012,12 @@ class MainWindow(QMainWindow):
             
                 outputMessage += 'Please Enter a Valid Sample Value \n'
             
-                
             msg = QMessageBox() 
             msg.setWindowTitle("Error")
             msg.setText(outputMessage)
             x = msg.exec_()  # this will show our messagebox 
     
-             
-
+            
             
     def gcmsClearSampleJob(self): 
         self.ui.gcmsTestsSample.clear()
@@ -1024,14 +1049,11 @@ class MainWindow(QMainWindow):
         self.ui.gcmsTestsLists.clear()
 
 
-    #SQL 
-
-    
-    def addToGcmsTestsData(self, jobNum, testName, sampleVal, standards, units): 
-        addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (jobNumber, testsName, testsValue, StandardValue, unitValue) VALUES (?,?,?,?,?)'
+    def addToGcmsTestsData(self, sampleNum, testName, sampleVal, standards, units, jobNum ): 
+        addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
         
         try:
-            self.db.execute(addInquery, (jobNum, testName, sampleVal, standards, units) )
+            self.db.execute(addInquery, (sampleNum, testName, sampleVal, standards, units, jobNum,) )
             self.db.commit()
 
         except sqlite3.IntegrityError as e:
@@ -1044,8 +1066,7 @@ class MainWindow(QMainWindow):
         pass; 
         
         
-        
-
+    
     #-------------------------------------------------------------
     
     
@@ -1133,11 +1154,19 @@ class MainWindow(QMainWindow):
 
             if('ISP' in reportType):
                 print('ISP Loader')
+                
+                self.ui.createIcpReportBtn.setVisible(True)
+                self.ui.createGcmsReportBtn.setVisible(False)
+                
                 self.ui.icpDataField.show()
                 self.icpLoader()
             
             if(reportType == 'GCMS'):
                 print('GCMS Loader')
+                
+                self.ui.createIcpReportBtn.setVisible(False)
+                self.ui.createGcmsReportBtn.setVisible(True)
+                
                 self.ui.icpDataField.hide() 
                 self.gcmsLoader()
             
@@ -1175,7 +1204,8 @@ class MainWindow(QMainWindow):
         
         self.loadClientInfo()
     
-        #check if the samples are ISP or not 
+        #TODO: scan in the TXT Tests, scan in from Defined Tests too 
+        #TODO: fix the error checking 
         
         #load sample names 
         for i, (key,value) in enumerate(self.sampleNames.items()):
@@ -1186,35 +1216,49 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
         
         GSMS_TESTS_LISTS = []
-        ICP_TESTS_LISTS = []
-        tests = []
+        #ICP_TESTS_LISTS = []
+        #tests = []
         
         for (currentJob ,testList) in self.sampleTests.items(): 
             for item in testList: 
-                if(item not in GSMS_TESTS_LISTS and 'ICP' not in item):
-                    GSMS_TESTS_LISTS.append(item)
-                if(item not in ICP_TESTS_LISTS and 'ICP' in item):
-                    ICP_TESTS_LISTS.append(item)
-                if(item not in tests): 
-                    tests.append(item)
+                
+                temp = remove_escape_characters(str(item)) 
+                
+                if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):
+                    GSMS_TESTS_LISTS.append(temp)
+                #if(temp not in ICP_TESTS_LISTS and 'ICP' in temp):
+                #    ICP_TESTS_LISTS.append(temp)
+                    
+                #if(temp not in tests): 
+                #    tests.append(temp)
+     
+        
+        
+        testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
+        testsResults = self.db.query(testsQuery, (self.jobNum,))
+        
+        #TODO: can create a list and combine unique values
+        if(testsResults != None): 
+            for item in testsResults: 
+                if(item[1] not in GSMS_TESTS_LISTS):
+                    GSMS_TESTS_LISTS.append(item[1])
+                    
+                    
         
         GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
-       
-        
-        tests = sorted(tests)
-        total_tests = len(tests)
-        #newColumnCount = 5 + int(self.clientInfo['totalSamples'])    
-        #TODO: fix the error checking 
-        #define the CHM information 
+        print(GSMS_TESTS_LISTS) 
+
     
         #inital setup 
         columnNames = [
             'Tests', 
-            'Tests Name',
+            'Display Name',
             'Unit Value', 
+            'So', 
             'Standard Recovery', 
             'Distal factor'
         ]
+        
         initalColumns = len(columnNames)
         self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
         self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
@@ -1225,47 +1269,78 @@ class MainWindow(QMainWindow):
             self.ui.dataTable.setHorizontalHeaderItem(i, item)
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(columnNames[i])
-    
+            
+        #set the names of the columns 
+        #self.ui.dataTable.setHorizontalHeaderLabels(columnNames)
+     
         
         #populate with sample names 
         for i , (key,value ) in enumerate(self.sampleNames.items(), start=initalColumns):
+
             item = QtWidgets.QTableWidgetItem()
             self.ui.dataTable.setHorizontalHeaderItem(i, item)
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(key)
             
+        displayNamesQuery = 'SELECT * gcmsTests'
+        displayResults = self.db.query(displayNamesQuery) 
+        print(displayResults)
+            
+            
         #list the tests 
+        print('I move faster than your trust issues')
         for i, value in enumerate(GSMS_TESTS_LISTS): 
             item = QtWidgets.QTableWidgetItem()
             item.setText(value)
             self.ui.dataTable.setItem(i, 0, item)
+            
+            #TODO: search for the display name 
 
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setText('mg/L')
-            self.ui.dataTable.setItem(i, 2, item2)
-            #self.ui.dataTable.item(i, 0).setText(GSMS_TESTS_LISTS[i])
             
             item2 = QtWidgets.QTableWidgetItem() 
             item2.setText(str(1))
             self.ui.dataTable.setItem(i, 4, item2) 
         
+            #go down each column and determine if there is a match
+           # print(i, value)
+            for column in range(initalColumns, self.ui.dataTable.columnCount()):
+                header_item = self.ui.dataTable.horizontalHeaderItem(column)
+                if header_item is not None:
+                    column_name = header_item.text()
+
+                  
+                    result = search_list_of_lists(testsResults,[column_name, value] )
+                    
+                    if result is not None: 
+                        #print(result)
+                        
+                        #value
+                        item = QtWidgets.QTableWidgetItem()
+                        item.setText(str(result[2]))
+                        self.ui.dataTable.setItem(i, column, item) 
+                        
+                        #So 
+                        item = QtWidgets.QTableWidgetItem()
+                        item.setText(str(result[3]))
+                        self.ui.dataTable.setItem(i, 3, item)
+                        
+                        #unit 
+                        item = QtWidgets.QTableWidgetItem()
+                        item.setText(result[4])
+                        self.ui.dataTable.setItem(i, 2, item) 
+                        
+        
+            
+                
+                    
+
+        
         #TODO: add the item changed thing 
         #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
     
-        
-        #TODO: remove the data when loading the information 
-        #TODO: create the csv file we created 
-        #TODO: add the side panel where user can add in more tests or remove the test 
-        #TODO: have a popup when the user is trying to leave the page (save or not save)
-        #TODO: save the data as we switch pages 
-        
-        #item = self.dataTable.horizontalHeaderItem(4)
-        #item.setText(_translate("MainWindow", "STD += 2"))
-       
-        #FIXME: this have a rpeort handle (if report = 1 or 2 do this instead, )
-        #but how do you pass the tests 
-        self.ui.createReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
-        
+    
+    
+        self.ui.createGcmsReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
         
     
     def GcmsReportHandler(self, tests):
@@ -1273,16 +1348,14 @@ class MainWindow(QMainWindow):
         
         #FIXME: adjust based on the sample information 
         #FIXME: crashes when doing gcms to icp without closing program 
-        initalColumns = 5; 
+        initalColumns = 6; 
         totalSamples = len(self.sampleNames)
         totalTests = len(tests)
         sampleData = {}
         unitType = []
         
-        
-        #FIXME: have something determine the lower values of the things 
         for col in range(initalColumns, totalSamples + initalColumns ): 
-            #FIXME: AttributeError: 'NoneType' object has no attribute 'text' (isp > gsmc > isp) error appears  
+           
             currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
             print('currentJob Test: ', currentJob)
             jobValues = []
@@ -1545,7 +1618,7 @@ class MainWindow(QMainWindow):
         self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
         
  
-        self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
+        self.ui.createIcpReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
     
     def icpReportHander(self, tests, totalSamples): 
         #FIXME: adjust based on the sample information
