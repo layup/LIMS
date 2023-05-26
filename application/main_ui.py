@@ -18,7 +18,6 @@ import string
 from modules.createExcel import * 
 from modules.utilities import * 
 from modules.dbManager import *
-from modules.excelCreation import *
 from interface import *
     
 class MainWindow(QMainWindow):
@@ -311,6 +310,11 @@ class MainWindow(QMainWindow):
             
             self.ui.gcmsTests.addItems(temp[0])
             self.ui.gcmsUnitVal.addItems(temp[1])
+        
+        if(index == 4): 
+            self.ui.gcmsTitleLabel.setText('GCMS Tests Database') 
+            self.ui.gcmsSubTitleLabel.setText('')
+            self.loadInputData(); 
             
 
 
@@ -869,6 +873,8 @@ class MainWindow(QMainWindow):
     #TODO: have error handling for duplicates 
     #TODO: takes in the values from the 
     #TODO: connect from the defined values in gcms Defined Tests Page
+    #TODO: make sure to add a date for the table so we can sort it by the most recent date
+    #TODO: duplication error
 
     @pyqtSlot()    
     def on_gcmsProceedBtn_clicked(self):
@@ -1060,11 +1066,43 @@ class MainWindow(QMainWindow):
             print(e) 
  
  
-    def loadExistingData(self): 
+    def loadInputData(self): 
+        print('Loading Existing Data'); 
         
-        query = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
-        pass; 
+        TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value']
+        self.ui.gcmsInputTable.setColumnCount(len(TableHeader))
+        self.ui.gcmsInputTable.setHorizontalHeaderLabels(TableHeader)
         
+        
+        query = 'SELECT * FROM gcmsTestsData ORDER BY jobNum ASC'
+        results = self.db.query(query, [])
+        print(results)
+        self.ui.gcmsInputTable.setRowCount(len(results))
+        
+        for i, result in enumerate(results):
+            for j in range(len(TableHeader)): 
+                 self.ui.gcmsInputTable.setItem(i, j, QtWidgets.QTableWidgetItem(str(result[j])))
+
+
+    def replaceError(self):
+        msgBox = QMessageBox()  
+        msgBox.setText("The document has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
+        msgBox.setDefaultButton(QMessageBox.Save);
+        #msgBox.buttonClicked.connect(self.msgbtn)
+        x = msgBox.exec_()  # this will show our messagebox
+        
+        if(x == QMessageBox.Save): 
+            self.ui.stackedWidget.setCurrentIndex(0)  
+            self.activeCreation = False; 
+        if(x == QMessageBox.Discard):
+            self.ui.stackedWidget.setCurrentIndex(0) 
+            self.activeCreation = False; 
+        if(x == QMessageBox.Cancel):
+            pass 
+        
+
         
     
     #-------------------------------------------------------------
@@ -1262,6 +1300,9 @@ class MainWindow(QMainWindow):
         initalColumns = len(columnNames)
         self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
         self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
+        self.ui.dataTable.horizontalHeader().setVisible(True)
+        self.ui.dataTable.verticalHeader().setVisible(True)
+
         
         #inital columns 
         for i in range(initalColumns): 
@@ -1282,9 +1323,9 @@ class MainWindow(QMainWindow):
             item2 = self.ui.dataTable.horizontalHeaderItem(i)
             item2.setText(key)
             
-        displayNamesQuery = 'SELECT * gcmsTests'
-        displayResults = self.db.query(displayNamesQuery) 
-        print(displayResults)
+        #displayNamesQuery = 'SELECT * gcmsTests'
+        #displayResults = self.db.query(displayNamesQuery) 
+        #print(displayResults)
             
             
         #list the tests 
