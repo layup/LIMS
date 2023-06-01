@@ -31,15 +31,6 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         print(paths)
         
-  
-        
-        if os.name == "nt":  # Check if the OS is Windows
-            dbLocation = os.path.normpath(str(paths['databasePath'])) 
-            
-            print(dbLocation) 
-            
-            if(isValidDatabase[dbLocation]):
-                print("winning")
 
         
         
@@ -1191,7 +1182,8 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         newLocation = openFile()
         if(newLocation != ''): 
-            paths['TXTDirLocation'] = newLocation; 
+            paths['databasePath'] = newLocation; 
+            print(paths)
             save_pickle(paths)  
         
     
