@@ -31,6 +31,17 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         print(paths)
         
+  
+        
+        if os.name == "nt":  # Check if the OS is Windows
+            windowsPath = paths.replace("/", "\\")
+            print(windowsPath)
+            
+            if(isValidDatabase[windowsPath['databasePath']]):
+                print("winning")
+
+        
+        
         if(isValidDatabase(paths['databasePath'])): 
             self.db = Database(paths['databasePath'])
         else: 
