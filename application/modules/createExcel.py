@@ -25,11 +25,6 @@ defaultFont = Font(name="Times New Roman", size=9)
 thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
-fileLocationsDictonary = load_pickle('data.pickle')
-exportPath = '/'
-
-if(fileLocationsDictonary['reportsPath'] != None ):
-    exportPath = fileLocationsDictonary['reportsPath']
 
 
 def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType, recovery):
@@ -43,8 +38,8 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
     print("--------------------")
    
     #FIXME: picke saving and loading without being fucked up, get path of where things should be saved
-    temp = load_pickle('data.pickle')
-    writePath = temp['ispDataUploadPath']
+    temp = load_pickle('data.pickle') 
+    exportPath = temp['reportsPath']
     
     wb = Workbook()
     ws = wb.active
@@ -202,6 +197,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     print(limits)
     print('-------------------------')
     #TODO: missing the report type that will get called into this thing 
+    temp = load_pickle('data.pickle') 
+    exportPath = temp['reportsPath']
 
     newList = [item.lower() for item in testInfo]
     
