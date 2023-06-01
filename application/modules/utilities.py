@@ -223,6 +223,7 @@ def isValidDatabase(database_path):
         conn.close()
         return True
     except sqlite3.DatabaseError:
+        print
         return False
 
 
@@ -263,6 +264,7 @@ def scanForTXTFolders(jobNum):
     TXTLocation = fileLocationsDictonary['TXTDirLocation']
     
     locationsObject = os.scandir(TXTLocation)
+    print(locationsObject)
     
     txtFolderLocations = [] 
     
