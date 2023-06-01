@@ -26,7 +26,10 @@ thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
 fileLocationsDictonary = load_pickle('data.pickle')
-exportPath = fileLocationsDictonary['reportsPath']
+exportPath = '/'
+
+if(fileLocationsDictonary['reportsPath'] != None ):
+    exportPath = fileLocationsDictonary['reportsPath']
 
 
 def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType, recovery):
