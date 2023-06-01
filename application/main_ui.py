@@ -34,10 +34,12 @@ class MainWindow(QMainWindow):
   
         
         if os.name == "nt":  # Check if the OS is Windows
+            dbLocation = os.path.normpath(paths['databasePath'])
+            
             windowsPath = os.path.normpath(paths)
             print(windowsPath) 
             
-            if(isValidDatabase[windowsPath['databasePath']]):
+            if(isValidDatabase[dbLocation]):
                 print("winning")
 
         
