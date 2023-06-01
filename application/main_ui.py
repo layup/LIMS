@@ -32,15 +32,12 @@ class MainWindow(QMainWindow):
         print(paths)
         
         
-        test = getFileLocation()
-        paths['databasePath'] = test; 
-        save_pickle(paths)
         
         try: 
             self.db = Database(paths['databasePath'])
         except: 
             
-            databasePathTemp = getFileLocation()
+            databasePathTemp = openFile()
             
             #paths['databasePath'] = setDatabase; 
             #save_pickle(paths)
@@ -1148,21 +1145,27 @@ class MainWindow(QMainWindow):
     
     # ----------------------- PROCESS PAGE ------------------------
 
+    
+    @pyqtSlot()
     def on_reportsPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = getFileLocation()
         paths['reportsPath'] = newLocation; 
         save_pickle(paths)
         
+    
+    @pyqtSlot()
     def on_txtPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = getFileLocation()
         paths['TXTDirLocation'] = newLocation; 
         save_pickle(paths)
-        
+    
+    
+    @pyqtSlot() 
     def on_convertPathBtn(self): 
         paths = load_pickle('data.pickle')
-        newLocation = getFileLocation()
+        newLocation = openFile()
         paths['ispDataUploadPath'] = newLocation; 
         save_pickle(paths) 
         
