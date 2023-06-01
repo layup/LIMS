@@ -5,6 +5,7 @@ import re
 import csv
 import numpy
 import inquirer
+import sqlite3 
 import json 
 import string
 import pickle 
@@ -215,6 +216,16 @@ def getFileLocation():
     dlg = QFileDialog().getExistingDirectory()
     print(dlg)
     return dlg
+
+def isValidDatabase(database_path):
+    try:
+        conn = sqlite3.connect(database_path)
+        conn.close()
+        return True
+    except sqlite3.DatabaseError:
+        return False
+
+
 
 def saveNewLocation():
     location = getFileLocation()

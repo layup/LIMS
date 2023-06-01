@@ -31,11 +31,9 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         print(paths)
         
-        
-        
-        try: 
+        if(isValidDatabase(paths)): 
             self.db = Database(paths['databasePath'])
-        except: 
+        else: 
             print('Database not valid')
             
             databasePathTemp = openFile()
