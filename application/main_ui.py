@@ -34,7 +34,15 @@ class MainWindow(QMainWindow):
         try: 
             self.db = Database(paths['databasePath'])
         except: 
-            self.db = Database('temp.db')
+            
+            setDatabase = getFileLocation()
+            
+            paths['databasePath'] = setDatabase; 
+            save_pickle(paths)
+            
+            self.db = Database(paths['databasePath'])
+
+            
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
@@ -343,6 +351,10 @@ class MainWindow(QMainWindow):
             self.ui.jobNumInput.setText('171981')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
+            
+        if(index == 4): 
+            print('Settings baby')
+            
         
         
         self.prev_index = (index - 1) % self.ui.stackedWidget.count()
@@ -1126,6 +1138,31 @@ class MainWindow(QMainWindow):
         
     
     #-------------------------------------------------------------
+    
+    # ----------------------- PROCESS PAGE ------------------------
+
+    def on_reportsPathBtn_clicked(self): 
+        paths = load_pickle('data.pickle')
+        newLocation = getFileLocation()
+        paths['reportsPath'] = newLocation; 
+        save_pickle(paths)
+        
+    def on_txtPathBtn_clicked(self): 
+        paths = load_pickle('data.pickle')
+        newLocation = getFileLocation()
+        paths['TXTDirLocation'] = newLocation; 
+        save_pickle(paths)
+        
+    def on_convertPathBtn(self): 
+        paths = load_pickle('data.pickle')
+        newLocation = getFileLocation()
+        paths['ispDataUploadPath'] = newLocation; 
+        save_pickle(paths) 
+        
+    
+        
+    
+    
     
     
     # ----------------------- PROCESS PAGE ------------------------
