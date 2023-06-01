@@ -35,12 +35,13 @@ class MainWindow(QMainWindow):
             self.db = Database(paths['databasePath'])
         except: 
             
-            setDatabase = getFileLocation()
+            databasePathTemp = getFileLocation()
             
-            paths['databasePath'] = setDatabase; 
-            save_pickle(paths)
+            #paths['databasePath'] = setDatabase; 
+            #save_pickle(paths)
             
-            self.db = Database(paths['databasePath'])
+            self.db = Database(databasePathTemp)
+            
 
             
         #define other widget setups 
