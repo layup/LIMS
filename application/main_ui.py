@@ -1,6 +1,6 @@
 #PYQT Imports 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QHeaderView, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate, QAbstractItemView
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QObject, pyqtSlot, QDateTime
 
@@ -40,8 +40,8 @@ class MainWindow(QMainWindow):
         self.ui.reportsBtn1.setChecked(True)
         
 
-        #fileLocationsDictonary = load_pickle('data.pickle')
-        #print(fileLocationsDictonary)
+        fileLocationsDictonary = load_pickle('data.pickle')
+        print(fileLocationsDictonary)
        
         #load the setup 
         self.loadCreatePage()
@@ -981,7 +981,8 @@ class MainWindow(QMainWindow):
                 
                 msgBox = QMessageBox()  
                 msgBox.setText("Duplicate Sample");
-                msgBox.setInformativeText("Would you like to overwrite existing sample?" );
+                duplicateMsg = "Would you like to overwrite existing sample " + str(sampleNum) + " ?"
+                msgBox.setInformativeText(duplicateMsg);
                 msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
                 msgBox.setDefaultButton(QMessageBox.Yes);
                 
@@ -989,7 +990,11 @@ class MainWindow(QMainWindow):
 
                 if(x == QMessageBox.Yes): 
                     self.addToGcmsTestsData(sampleNum, testName, sampleVal, standards, units, testNum)
-                    self.ui.gcmsTestsLists.addItem(sampleNum)
+                    
+                    matching_items = self.ui.gcmsTestsLists.findItems(sampleNum, Qt.MatchExactly) 
+                    if not matching_items: 
+                        self.ui.gcmsTestsLists.addItem(sampleNum)
+                    
                     self.gcmsClearSampleJob() 
                     
                 if(x == QMessageBox.No):
@@ -1056,6 +1061,7 @@ class MainWindow(QMainWindow):
 
 
     def addToGcmsTestsData(self, sampleNum, testName, sampleVal, standards, units, jobNum ): 
+
         addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
         
         try:
@@ -1069,7 +1075,7 @@ class MainWindow(QMainWindow):
     def loadInputData(self): 
         print('Loading Existing Data'); 
         
-        TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value']
+        TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value', 'Job Num', 'Delete']
         self.ui.gcmsInputTable.setColumnCount(len(TableHeader))
         self.ui.gcmsInputTable.setHorizontalHeaderLabels(TableHeader)
         
@@ -1080,25 +1086,35 @@ class MainWindow(QMainWindow):
         self.ui.gcmsInputTable.setRowCount(len(results))
         
         for i, result in enumerate(results):
-            for j in range(len(TableHeader)): 
-                 self.ui.gcmsInputTable.setItem(i, j, QtWidgets.QTableWidgetItem(str(result[j])))
+            for j in range(len(TableHeader)-1): 
+                 self.ui.gcmsInputTable.setItem(i, j, QtWidgets.QTableWidgetItem(str(result[j])))     
+            
+            
+            #button.setText("Delete")
+            #button.clicked.connect(self.handleDeleteButtonClick)
+
+            button = QPushButton("Delete")
+            self.ui.gcmsInputTable.setCellWidget(i ,6, button)
+            button.clicked.connect(lambda _, row=i: print('Delete Row: ', row));
+            
+            
 
 
-    def replaceError(self):
+    def replaceError(self,sampleName):
         msgBox = QMessageBox()  
-        msgBox.setText("The document has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
+        msgBox.setText("Duplicate Data?");
+        message = 'There is sample named ' + str(sampleName) 
+        
+        msgBox.setInformativeText(message);
+        msgBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Save);
         msgBox.setDefaultButton(QMessageBox.Save);
         #msgBox.buttonClicked.connect(self.msgbtn)
         x = msgBox.exec_()  # this will show our messagebox
         
         if(x == QMessageBox.Save): 
-            self.ui.stackedWidget.setCurrentIndex(0)  
-            self.activeCreation = False; 
-        if(x == QMessageBox.Discard):
-            self.ui.stackedWidget.setCurrentIndex(0) 
-            self.activeCreation = False; 
+            pass      
+
+
         if(x == QMessageBox.Cancel):
             pass 
         
@@ -1245,6 +1261,8 @@ class MainWindow(QMainWindow):
         #TODO: scan in the TXT Tests, scan in from Defined Tests too 
         #TODO: fix the error checking 
         
+        
+        
         #load sample names 
         for i, (key,value) in enumerate(self.sampleNames.items()):
             item = SampleNameWidget(key, value)
@@ -1263,7 +1281,11 @@ class MainWindow(QMainWindow):
                 temp = remove_escape_characters(str(item)) 
                 
                 if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):
+                                        
                     GSMS_TESTS_LISTS.append(temp)
+
+                    
+                    
                 #if(temp not in ICP_TESTS_LISTS and 'ICP' in temp):
                 #    ICP_TESTS_LISTS.append(temp)
                     
@@ -1291,8 +1313,7 @@ class MainWindow(QMainWindow):
         columnNames = [
             'Tests', 
             'Display Name',
-            'Unit Value', 
-            'So', 
+            'Unit', 
             'Standard Recovery', 
             'Distal factor'
         ]
@@ -1303,6 +1324,7 @@ class MainWindow(QMainWindow):
         self.ui.dataTable.horizontalHeader().setVisible(True)
         self.ui.dataTable.verticalHeader().setVisible(True)
 
+        self.ui.dataTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         
         #inital columns 
         for i in range(initalColumns): 
@@ -1326,17 +1348,23 @@ class MainWindow(QMainWindow):
         #displayNamesQuery = 'SELECT * gcmsTests'
         #displayResults = self.db.query(displayNamesQuery) 
         #print(displayResults)
-            
-            
-        #list the tests 
-        print('I move faster than your trust issues')
+        
+        #list tests 
         for i, value in enumerate(GSMS_TESTS_LISTS): 
             item = QtWidgets.QTableWidgetItem()
             item.setText(value)
             self.ui.dataTable.setItem(i, 0, item)
             
             #TODO: search for the display name 
-
+            displayQuery = 'SELECT displayName FROM gcmsTests WHERE testName = ?'
+            self.db.execute(displayQuery, [value,])
+            result = self.db.fetchone()
+            print(result)
+            
+            if(result): 
+                displayNameItem  = QtWidgets.QTableWidgetItem() 
+                displayNameItem.setText(result[0])
+                self.ui.dataTable.setItem(i, 1, displayNameItem) 
             
             item2 = QtWidgets.QTableWidgetItem() 
             item2.setText(str(1))
@@ -1349,18 +1377,23 @@ class MainWindow(QMainWindow):
                 if header_item is not None:
                     column_name = header_item.text()
 
-                  
                     result = search_list_of_lists(testsResults,[column_name, value] )
                     
                     if result is not None: 
                         #print(result)
                         
+                    
                         #value
                         item = QtWidgets.QTableWidgetItem()
                         item.setText(str(result[2]))
                         self.ui.dataTable.setItem(i, column, item) 
                         
                         #So 
+                        #item = QtWidgets.QTableWidgetItem()
+                        #item.setText(str(result[3]))
+                        #self.ui.dataTable.setItem(i, 3, item)
+                        
+                        #recovery  
                         item = QtWidgets.QTableWidgetItem()
                         item.setText(str(result[3]))
                         self.ui.dataTable.setItem(i, 3, item)
@@ -1371,14 +1404,8 @@ class MainWindow(QMainWindow):
                         self.ui.dataTable.setItem(i, 2, item) 
                         
         
-            
-                
-                    
-
-        
         #TODO: add the item changed thing 
         #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
-    
     
     
         self.ui.createGcmsReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
@@ -1389,11 +1416,13 @@ class MainWindow(QMainWindow):
         
         #FIXME: adjust based on the sample information 
         #FIXME: crashes when doing gcms to icp without closing program 
-        initalColumns = 6; 
+        initalColumns = 5; 
         totalSamples = len(self.sampleNames)
         totalTests = len(tests)
         sampleData = {}
         unitType = []
+        recovery = []
+        displayNames = []
         
         for col in range(initalColumns, totalSamples + initalColumns ): 
            
@@ -1412,14 +1441,37 @@ class MainWindow(QMainWindow):
             
         for row in range(totalTests): 
             try: 
+                testsName = self.ui.dataTable.item(row, 1).text()
+                print('TestName: ', testsName)
+                if(testsName): 
+                    displayNames.append(testsName)
+                    
+        
+            except: 
+                displayNames.append(tests[row])
+            
+            try: 
                 currentVal = self.ui.dataTable.item(row, 2).text()
                 unitType.append(currentVal)
             except: 
                 unitType.append('')
             
-        print("UNITS TESTING: ", unitType)
+            try: 
+                recoveryVal = self.ui.dataTable.item(row, 3).text()
+                
+                if(is_float(recoveryVal)): 
+                    recovery.append(float(recoveryVal))
+                else: 
+                    recovery.append(recoveryVal) 
+            except: 
+                recovery.append('')       
+                
         
-        createGcmsReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, tests, unitType)
+        
+            
+        #print("UNITS TESTING: ", unitType)
+        
+        createGcmsReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
 
     def handle_item_changed(self, item, test): 
         row = item.row()
@@ -1437,7 +1489,6 @@ class MainWindow(QMainWindow):
     def loadClientInfo(self): 
         #clear the first page 
         self.ui.jobNumInput.setText('')
-        
         
         #set the header parameter 
         self.ui.jobNum.setText("W" + self.jobNum)
@@ -1461,41 +1512,34 @@ class MainWindow(QMainWindow):
         self.ui.fax_1.setText(self.clientInfo['fax'])
         self.ui.payment_1.setText(self.clientInfo['payment'])
 
-        #load sample names 
-        ''' 
-        for i, (key,value) in enumerate(self.sampleNames.items()):
-            item = SampleNameWidget(key, value)
-            self.ui.formLayout_5.addRow(item)
-            item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
-        
-        self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
-        '''
-        
+
     #TODO: sidebar have a s
     def icpLoader(self): 
         print('LOADING ICP STUFF')
-        #FIXME: error 
+        
         self.loadClientInfo()
         
         #check if haas data to load into the file location 
-        sql = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
+        sql1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
+        sql2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
         
-        #need to get sample data from both machines 
-        #FIXME: add a try catch and get second sample amount 
-        sampleData = list(self.db.query(sql, (self.jobNum,)))
+        sampleData = list(self.db.query(sql1, (self.jobNum,)))
+        sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
         
-     
-        totalSamples = len(sampleData)
-        #FIXME: have check if sample names is empty 
+        
         selectedSampleNames = []
         
         for item in sampleData:
             selectedSampleNames.append(item[0])
-            
-        #print(self.sampleNames)   
-        #print('currentNames: ', selectedSampleNames)
-        #print('current2: ', selectedSampleNames[0])
-       
+        
+        #TODO: can remove if you really think about it needs to combine both machines 
+        for item in sampleData2: 
+            if(item[0] not in selectedSampleNames): 
+                selectedSampleNames.append(item[0]) 
+        
+        totalSamples = len(selectedSampleNames)     
+        print('SelectedSampleItems: ', selectedSampleNames)    
+        
         #create the sample names based on that         
         for i, (key, value) in enumerate(self.sampleNames.items()):
             
@@ -1512,7 +1556,7 @@ class MainWindow(QMainWindow):
             'Element Name', 
             'Element symbol',
             'Unit Value', 
-            'REF Value', 
+            'REF Value', #TODO: remove ref value
             'distal factor'
         ]
         
@@ -1525,11 +1569,15 @@ class MainWindow(QMainWindow):
             'U', 'S'
         ]
         
-        totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
         
+        #setting up the table
+        totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
         initalColumns = len(columnNames)
+        
         self.ui.dataTable.setRowCount(totalRows)
         self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
+        self.ui.dataTable.horizontalHeader().setVisible(True)
+        self.ui.dataTable.verticalHeader().setVisible(True)
 
         #inital columns 
         for i in range(initalColumns): 
@@ -1554,6 +1602,10 @@ class MainWindow(QMainWindow):
                 elementNames.append(value)
             
         elementNames.sort()
+        
+        queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
+        
+        
         
         #print(elementNames)
         #print(len(elementNames))
@@ -1589,6 +1641,7 @@ class MainWindow(QMainWindow):
             item4.setText('1')
             self.ui.dataTable.setItem(i, 4, item4)
 
+        #adding hardness and Ph 
         for i, value in enumerate(addtionalRows): 
             postion = totalRows - i - 1; 
             item = QtWidgets.QTableWidgetItem()  
@@ -1609,6 +1662,73 @@ class MainWindow(QMainWindow):
         #print(hardnessLocation)
         
         #TODO: combine the two tables so can easily iterate through them lol 
+        #TODO: check if the sampleData's aren't empty 
+        
+        
+        #TODO: combine both the datasets; 
+        
+        machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
+        machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
+        
+        print(machine1)
+        print(machine2)
+        
+        
+        for i in range(len(elementNames)): 
+            item = self.ui.dataTable.item(i, 1)
+            
+            if(item != None): 
+                symbol = item.text()
+                #print(symbol)
+                
+                for j, sample in enumerate(selectedSampleNames): 
+                    item = QtWidgets.QTableWidgetItem(); 
+                    #currentCell = self.ui.dataTable
+                    #machine1Val = machine1[sample][symbol]
+                    #machine2Val = machine2[sample][symbol]
+                    
+                    #currentCell.setText(i,j, item)
+                    
+                    if sample in machine1 and symbol in machine1[sample]: 
+                        machine1Val = machine1[sample][symbol]
+                        print(symbol, ' 1  ', machine1Val)      
+                        
+                        item.setText(machine1Val)
+                        #currentCell.setText(i,j, item)
+                        
+                    
+                    if sample in machine2 and symbol in machine2[sample]: 
+                        machine2Val = machine2[sample][symbol]
+                        machine2Val = round(machine2Val, 3 )
+                        
+                        print(symbol, ' 2  ', machine2Val) 
+                        
+                        item.setText(str(machine2Val))
+                        #currentCell.setText(i,j, item)
+                
+                    self.ui.dataTable.setItem(i,j+5, item)
+
+
+        for j, sample in enumerate(selectedSampleNames):   
+            item = QtWidgets.QTableWidgetItem();  
+            
+            if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
+                calcium = machine1[sample]['Ca']
+                magnesium = machine1[sample]['Mg']
+                
+                print('cal: ', calcium)
+                print('mag: ', magnesium)
+                
+                result = hardnessCalc(calcium, magnesium)
+                print('result: ', result)
+                item.setText(str(result))
+                self.ui.dataTable.setItem(33, j+5, item)
+                
+                #item.setText(str(result))
+                #self.ui.dataTable.setItem(34,j+5, item)
+                
+                    
+        ''' 
         for col, currentSample in enumerate(sampleData, start=5): 
             #tempName = currentSample[0]
             #print(i,currentSample) 
@@ -1638,7 +1758,7 @@ class MainWindow(QMainWindow):
                 #print(cellValue2)
                 hardnessVals[key] = cellValue2
 
-            if not (['ND', 'uncal'] in hardnessVals.items()): 
+            if not (['ND', 'uncal'] in hardnessValshardnessVals.items()): 
                 result = hardnessCalc(hardnessVals['Ca'], hardnessVals['Mg'])
                 item.setText(str(result))
                 #print(result)
@@ -1647,9 +1767,10 @@ class MainWindow(QMainWindow):
                 item.setText('ND')
             
             self.ui.dataTable.setItem(len(elementNames), col, item) 
-            
+        '''    
             #TODO: add text change items for when the values are changed
                 
+        
         
         column_width = self.ui.dataTable.columnWidth(2)
         padding = 10
@@ -1657,8 +1778,6 @@ class MainWindow(QMainWindow):
         self.ui.dataTable.setColumnWidth(2, total_width)    
 
         self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-        
- 
         self.ui.createIcpReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
     
     def icpReportHander(self, tests, totalSamples): 
@@ -1719,7 +1838,7 @@ class MainWindow(QMainWindow):
         print('--------')
    
         #load the footer comment 
-        #createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
+        createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
         
         
         

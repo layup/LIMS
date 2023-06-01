@@ -29,13 +29,14 @@ fileLocationsDictonary = load_pickle('data.pickle')
 exportPath = fileLocationsDictonary['reportsPath']
 
 
-def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType):
+def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType, recovery):
     print('CREATING GCMS REPORT')
     print(clientInfo)
     print(sampleNames)
     print(sampleData)
     print(testInfo)
     print(unitType)
+    print(recovery)
     print("--------------------")
    
     #FIXME: picke saving and loading without being fucked up, get path of where things should be saved
@@ -58,6 +59,12 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
     ws.column_dimensions['H'].width = 19
     ws.print_title_rows = '1:8' # the first two rows
     
+    
+    #INSERT NEW COLUMN FOR So
+    totalCols = 8 
+    pageSize = 61 
+    
+    
     #FIXME: add the proper job number instead of placeholder 
     jobNumLocation = ws.cell(row=1, column=8)
     jobNumLocation.value = "W" + str(jobNum)
@@ -71,9 +78,12 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
     totalSamples = len(sampleData.keys())
     print('Total Samples: ', totalSamples)
     #FIXME: so page amounts change based on column width, so takes in how many pages we want 
-    formatRows(ws, totalSamples);
+    formatRows(ws, totalSamples, totalCols, pageSize);
     
     #can only display 4 at a time 
+    currentWord = ""
+    temp = []
+    
     for i, (key,value) in enumerate(sampleNames.items(), start=1): 
         
         stripedWord = " ".join(value.split())
@@ -89,65 +99,13 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
             currentWord = ""
             temp = []
     
+    if(currentWord != ''):
+        sampleSections.append(currentWord)
+        samplePlacement.append(temp) 
+    
     print('Sample Placement: ', samplePlacement)
     print('Sample Sections: ', sampleSections)
     
-    ''' 
-    insertSampleName(ws, 9, sampleSections[0])
-    #TODO: Determine how much of spacing and what not we need 
-    pageLocation = 12; 
-    totalSamples = len(sampleData)
-    totalTests = len(testInfo)
-    
-    #TODO:  add new column for comments 
-    pageLocation = insertTestTitles(ws, pageLocation, len(samplePlacement[0]), 0, 0)
-
-    #INSERT TEST INFORMATION 
-    pageLocation = insertTestInfo(ws, pageLocation, testInfo, samplePlacement[0], sampleData, totalTests, unitType)
-    
-    #INSERT THE REMAINING PAGES 
-    currentPage = 0; 
-
-    if(len(sampleSections) > 1): 
-        for i, currentSample in enumerate(sampleSections): 
-            print(i, currentSample)
-            if(i != 0): 
-            
-                testRowAmount = 2 + 1 + totalTests + 1 
-                #not last one 
-                if(i + 1 != len(sampleSections)):
-                    
-                    #test total + current placement + add endspace 
-                    temp = testRowAmount + pageLocation + 2 
-                    if(nextPage(temp,currentPage)):
-                        
-                        insertSampleName(ws, pageLocation, currentSample)
-                        pageLocation+=2;
-                        
-                        pass; 
-                    else: 
-                        currentPage+=1; 
-                    
-                #last row 
-                else: 
-                    
-                    temp = testRowAmount + pageLocation + 2 
-                    if(nextPage(temp,currentPage)):
-                        
-                        insertSampleName(ws, pageLocation, currentSample)
-                        pageLocation+=2;
-                        pageLocation+=1; 
-                        pageLocation = insertTestTitles(ws,pageLocation, totalTests, i * 4, 0 )
-                        pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[i], sampleData, totalTests, unitType)
-                        pageLocation = insertComments(ws,pageLocation)
-                        
-                    else: 
-                        #next page 
-                        currentPage+=1; 
-                        
-                    pass; 
-                    
-    '''
     
     pageSize = 56; 
     allocatedSpace = 20; 
@@ -190,9 +148,9 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
             remainingSamples = totalSampleSections - counter; 
             
             for i in range(remainingSamples): 
-                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter])
-                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0)
-                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType)
+                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
+                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
+                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)
                 
                 if(i+1 == remainingSamples): 
                     pageLocation = insertComments(ws, pageLocation)  
@@ -210,9 +168,9 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
         else: 
             print('Not Last Page')
             for i in range(totalTablesWithComments): 
-                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter])
-                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0)
-                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType)   
+                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
+                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
+                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)   
                 
                 if(i+1 == totalTablesWithComments): 
                     comment = ws.cell(row=pageLocation, column=1)
@@ -337,14 +295,16 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #TODO: tests how many of the tests need footer comments 
     #TODO: determine how long the extra tests comments are 
     #TODO: factor that into the size insertion 
-
+    totalCols = 8 
+    pageSize = 61; 
     pageLocation = 9; 
     usedSamples = 0; 
     
     #FIXME: include the length of the comments 
     totalSamples = len(sampleData.keys())
+    
     print('Total Samples: ', totalSamples);
-    formatRows(ws, totalSamples)
+    formatRows(ws, totalSamples, totalCols, pageSize)
     #how do we know where to start each loop? 
     for currentPage in range(totalPages): 
         
@@ -354,8 +314,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         #first page infomation 
         if(currentPage == 0): 
             pageLocation = 9; 
-            pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage])
-            pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1 ) 
+            pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage], totalCols)
+            pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1, totalCols ) 
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             #TODO: insert the comment 
@@ -374,7 +334,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
                     
                 pageLocation+=1; 
                 img = Image('signature.png')
-                cell = ws.cell(row=pageLocation, column=3)
+                cell = ws.cell(row=pageLocation, column=4)
                 coordinate = cell.coordinate
                 ws.add_image(img, coordinate)
 
@@ -383,8 +343,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 
             print('Starting Location: ', pageLocation) 
-            pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage])
-            pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1 ) 
+            pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage], totalCols)
+            pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1, totalCols) 
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             if((currentPage+1) == totalPages): 
@@ -397,7 +357,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
 
                 pageLocation+=1; 
                 img = Image('signature.png')
-                cell = ws.cell(row=pageLocation, column=3)
+                cell = ws.cell(row=pageLocation, column=4)
                 coordinate = cell.coordinate
                 ws.add_image(img, coordinate)
             else: 
@@ -442,16 +402,16 @@ def pageSetup(ws):
     
     ws.page_margins = page_margins
     
-
-def formatRows(ws, totalSamples): 
+#FORMATS WAY MORE THEN NEEDED BUT W/
+def formatRows(ws, totalSamples, totalCols, pageSize): 
 
     totalPages = math.ceil(totalSamples/4) 
     print('Total Pages: ', totalPages)
 
-    totalRows = (61 * totalPages) - (8 * (totalPages-1))
+    totalRows = (pageSize * totalPages) - (8 * (totalPages-1))
     print('Total Rows: ', totalRows)
 
-    for row in ws.iter_rows(min_row=1, max_col=8, max_row=totalRows): 
+    for row in ws.iter_rows(min_row=1, max_col=totalCols, max_row=totalRows): 
         
         for cell in row:
             cell.font = defaultFont 
@@ -538,18 +498,18 @@ def nextPage(curVal, curPage):
         print("TRUE")
         return True; 
 
-def insertSampleName(ws, row, sampleSection): 
+def insertSampleName(ws, row, sampleSection, totalRows): 
     
     temp = ws.cell(row=row, column=1)
     temp.value = 'Samples: ' + sampleSection
     temp.border = Border(bottom=thinBorder)
    
-    ws.merge_cells(start_row=row, start_column=1, end_row=row+1, end_column=8)
+    ws.merge_cells(start_row=row, start_column=1, end_row=row+1, end_column=totalRows)
     temp.alignment = Alignment(wrap_text=True) 
     
     return row + 3; 
     
-def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType): 
+def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, totalCols): 
     
     tests = ws.cell(row=pageLocation, column=1)
     if(reportType == 0):
@@ -584,35 +544,38 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType):
 
     so = ws.cell(row=pageLocation, column=7) 
     if(reportType == 0): 
-        so.value = 'STD Recv'
+        so.value = 'Recovery'
     else: 
         so.value = 'Units'
     so.border = Border(right=thinBorder, left=thinBorder)
     so.alignment = Alignment(horizontal='center', vertical='center') 
     
-    ref = ws.cell(row=pageLocation, column=8)
+    
+    colH = ws.cell(row=pageLocation, column=8)
     if(reportType == 0 ): 
-        ref.value = 'Comments'
-        ref.alignment = Alignment(horizontal='center', vertical='center')  
-    else: 
-        ref.value = 'Maximum Limits'  
-        ref.alignment = Alignment(horizontal='left', vertical='center', indent=1)  
+        colH.value = 'Comment'
+        colH.alignment = Alignment(horizontal='center', vertical='center')  
+        
+    else:
+        colH.value = 'Maximum Limits'  
+        colH.alignment = Alignment(horizontal='left', vertical='center', indent=1)  
     
     pageLocation+=1; 
     
         
-    for i in range(1,9): 
+    for i in range(1,totalCols+1): 
         current = ws.cell(row=pageLocation, column=i) 
         
         if(i in allowedBorders): 
-            
+        
             if(i != 8): 
                 current.border = Border(right=thinBorder, bottom=doubleBorder)
             else: 
                 current.border = Border(bottom=doubleBorder) 
-                
+            
             if(i == 7): 
                 current.border = Border(right=thinBorder, left=thinBorder, bottom=doubleBorder)
+            
         else: 
             current.border = Border(bottom=doubleBorder)
             
@@ -623,26 +586,33 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType):
 
 
 #will change how we get the tests and unit type, will be saved somewhere 
-def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType): 
+def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType, recovery): 
 
     counter = pageLocation
 
     for i in range(len(testInfo)): 
         #is this removing the escape characters? 
-        currentTest = re.sub('[^A-Za-z0-9]+', '', testInfo[i])
+        #currentTest = re.sub('[^A-Za-z0-9]+', '', testInfo[i])
         testPlacement = ws.cell(row=counter, column=1)
         unitPlacement = ws.cell(row=counter, column=2)
-        soPlacement = ws.cell(row=counter, column=7)
-        
-        testPlacement.value = currentTest
+        recoveryPlacement = ws.cell(row=counter, column=7)
+
+        try:  
+            testPlacement.value = testInfo[i]
+        except: 
+            testPlacement.value = 'Error'
+            
         unitPlacement.value = unitType[i]
+        recoveryPlacement.value = recovery[i]
         
         #testPlacement.border = Border(right=thinBorder) 
         unitPlacement.border = Border(right=thinBorder, left=thinBorder)
         unitPlacement.alignment = Alignment(horizontal='center', vertical='center')
         
-        soPlacement.border = Border(left=thinBorder, right=thinBorder)
-        soPlacement.alignment = Alignment(horizontal='center', vertical='center')  
+        recoveryPlacement.border = Border(left=thinBorder, right=thinBorder)
+        recoveryPlacement.alignment = Alignment(horizontal='center', vertical='center')  
+        
+
         
         counter+=1; 
     
@@ -689,7 +659,7 @@ def insertComments(ws, pageLocation):
         temp = ws.cell(row = pageLocation+i, column=1)
         temp.value = value
         
-    pageLocation+=6; 
+    pageLocation+=5; 
     return pageLocation; 
 
 
@@ -761,7 +731,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
                     lower = limitRef[j][1]
                     higher = limitRef[j][2]
                     currentSample.value = temp 
-                    #print('{} Lower: {} | Higher: {}'.format(j, lower,higher))
+                    #print('{} Lower: {} | Highser: {}'.format(j, lower,higher))
                     
                     if(lower != ''): 
                         if(temp < lower): 
@@ -773,14 +743,14 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
                             currentSample.value = '> ' + f'{higher:.3f}'
                     
                     if(temp == 0): 
-                       currentSample.value = 'ND2-1' 
+                       currentSample.value = 'ND' 
                 
                 #no limit exists for the given thing
                 else: 
                     currentSample.value = temp 
                     
                     if(temp == 0): 
-                        currentSample.value = 'ND2-2'  
+                        currentSample.value = 'ND'  
 
             except:
                 if(currentVal == 'Uncal'):

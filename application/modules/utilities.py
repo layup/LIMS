@@ -136,6 +136,14 @@ icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
 icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
 
 
+def is_float(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
 def search_list_of_lists(lists, targets):
     for sublist in lists:
         
@@ -163,12 +171,21 @@ def remove_unicode_characters(text):
 
 def remove_escape_characters(text):
     # Define the regex pattern to match escape characters including \x sequences
-    escape_pattern = r'\\[xX][0-9a-fA-F]{2}|\\x1a|\.'
+    #escape_pattern = r'\\[xX][0-9a-fA-F]{2}|\\x1a|\.'
 
     # Use regex substitution to remove escape characters
-    cleaned_text = re.sub(escape_pattern, '', text)
+    #cleaned_text = re.sub(escape_pattern, '', text)
 
-    return cleaned_text
+    #return cleaned_text
+    
+    characters_to_remove = ['\x1a', '\n']
+
+    cleaned_string = text; 
+    
+    for char in characters_to_remove:
+        cleaned_string = cleaned_string.replace(char, '')
+        
+    return cleaned_string
 
 def hardnessCalc(calcium, magnesium): 
     return round(float(calcium) * 2.497 + float(magnesium) * 4.11, 1)
@@ -600,7 +617,7 @@ def icpMethod1(filePath, db):
     #save to database 
     for (key, value) in jobData.items(): 
         #print(key)
-        sql = 'INSERT INTO icpMachineData1 values(?,?,?,?,?, 1)'
+        sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
         jobNum = key.split('-')[0]
         tempData = json.dumps(value)
         db.execute(sql, (key,jobNum,newPath, tempData, todayDate))
@@ -622,61 +639,74 @@ def icpMethod2(filePath, db):
     print('Method 2')
     print('FileName: ', fname)
 
-
-    newName = fname + '.csv'
+    newName = fname + '_formated'  + '.xlsx'
     loadPath = load_pickle('data.pickle') 
+    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName)  
     
-    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
-    
-    worksheet = wb[sheets[0]]
+    ws = wb[sheets[0]]
 
-    sampleTypeColumn = worksheet['E']
-    sampleNameColumn = worksheet['G']
+    sampleTypeColumn = ws['E']
+    sampleNameColumn = ws['G']
     
-    elementConversion = ['He', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
-    elementColumns = ['I', 'J', 'M', 'O', "Q", 'U', 'AA', 'AC']
+    elementConversion = ['As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
+    elementColumns = ['I', 'J', 'M', "Q", 'U', 'AA', 'AC']
     selectedRows = []
-    
-    
+    #jobNumbers = []
+
+    sampleInfo = {}
+
     for cell in sampleTypeColumn:     
         if(cell.value == 'Sample'):
-            pass 
-            #print(cell.value)
-            currentSampleName = worksheet.cell(row=cell.row, column=7).value
-           
-            if any([x in currentSampleName for x in ['blk', 'curve']]):
-                
-                continue; 
-            else: 
-                print(currentSampleName)
-                selectedRows.append(cell.row)
-            #    print(f'Row: {cell.row} Value: {currentSampleName}')
              
-    #    print(f'Row: {cell.row} value: {cell.value}')    
+            currentSampleName = ws.cell(row=cell.row, column=7).value
+            pattern = r'^\d{6}-\d{3}'
+            
+            if(re.search(pattern, currentSampleName)): 
+                selectedRows.append(cell.row)
+                
+                sampleName = formatJobSampleString(currentSampleName)
+                jobNum = sampleName[:6]
+                #print('---------------')
+                #print(sampleName, '|' , jobNum)
+
+                sampleData = {}
+                
+                for i, element in enumerate(elementColumns): 
+        
+                    col_index = openpyxl.utils.column_index_from_string(element)
+                    elementVal = ws.cell(row=cell.row, column=col_index).value 
+
+                    if(elementVal == '<0.000'):
+                        sampleData[elementConversion[i]] = 0.00
+                    else: 
+                        sampleData[elementConversion[i]] = elementVal
+                    
+                sampleInfo[sampleName] = sampleData
+                
+                    
+    todayDate = date.today()
     
-    #print(selectedRows)
+    for key,value in sampleInfo.items(): 
+        query = 'INSERT OR REPLACE INTO icpMachineData2 values(?,?,?,?,?,2)'
+        jobNum = key[:6]
+        tempData = json.dumps(value)
+        db.execute(query, (key, jobNum, newPath, tempData, todayDate))
+        db.commit()
+
     
-    for row in selectedRows: 
-        row_values = []
-        for col in elementColumns:
-            col_index = openpyxl.utils.column_index_from_string(col)
-            cell_value = worksheet.cell(row=row, column=col_index).value
-            row_values.append(cell_value)
-        #print(row_values)
+    newWb = openpyxl.Workbook()
+    ws2 = newWb.active 
     
-    #write excel 
+    ws2.cell(row=1, column=1).value = 'Sample'
+    tableNames = ['', 'Rjct', 'Data File', 'Acq. Date-Time', 'Type', 'Level', 'Sample Name', 'Total Dil', 
+                  '75  As  [ He ] ', '78  Se  [ H2 ] ', '111  Cd  [ No Gas ] ', '123 Sb [He]', '202 Hg [He]', '208 Pb [He]', '238 U[He]'
+                  ]
     
-    newWB = openpyxl.Workbook()
-    worksheet2 = newWB.active 
-    
-    worksheet2.cell(row=1, column=1).value = 'Sample'
-    tableNames = ['', 'Rjct', 'Data File', 'Acq. Date-Time', 'Type', 'Level', 'Sample Name', 'Total Dil.']
-    
-    worksheet2.merge_cells('A1:H1')
+    ws2.merge_cells('A1:H1')
     
     column_num = 1;
     for item in tableNames: 
-        worksheet2.cell(row=2, column=column_num).value = item; 
+        ws2.cell(row=2, column=column_num).value = item; 
         column_num += 1; 
     
    
@@ -684,29 +714,62 @@ def icpMethod2(filePath, db):
     for row_value in selectedRows:
 
         for currentPos in range(1,8): 
-            worksheet2.cell(row=row_num, column=currentPos).value = worksheet.cell(row=row_value, column=currentPos).value
+            ws2.cell(row=row_num, column=currentPos).value = ws.cell(row=row_value, column=currentPos).value
         
         tempCol = 9
         for col in elementColumns: 
             col_index = openpyxl.utils.column_index_from_string(col)
-            worksheet2.cell(row=row_num, column=tempCol).value = worksheet.cell(row=row_value, column=col_index).value
+            ws2.cell(row=row_num, column=tempCol).value = ws.cell(row=row_value, column=col_index).value
             tempCol+=1; 
             
 
         row_num+=1;      
-        
- 
-     
-    
-    newWB.save('text.xlsx')
 
-        
-        
     
+    newWb.save(newPath)
+    
+
+
     return; 
 
+def formatJobSampleString(inputString): 
+
+    sample = inputString.strip()
+    
+    match = re.match(r'(\d+)-0+(\d+)', sample)
+    
+    if match: 
+        first_part = match.group(1)
+        second_part = match.group(2)
+
+        formatted_string = f"{first_part}-{second_part}"
+        
+        return formatted_string; 
 
 
+def formatStringArray(inputArray): 
+    
+    outputArray = []
+    
+    for sample in inputArray: 
+        sample = sample.strip()
+        
+        # Use regular expressions to extract the desired pattern
+        match = re.match(r'(\d+)-0+(\d+)', string)
+        
+        if match:
+            # Get the captured groups from the regex match
+            first_part = match.group(1)
+            second_part = match.group(2)
+
+            # Construct the desired format
+            formatted_string = f"{first_part}-{second_part}"
+
+            outputArray.append(formatted_string)
+
+    
+    return(outputArray)
+        
 
 def createReport(db, jobNum, reportType, parameter): 
 

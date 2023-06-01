@@ -671,7 +671,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>4</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -948,7 +948,12 @@ QWidget#widget_2{
                 </attribute>
                 <row>
                  <property name="text">
-                  <string>1</string>
+                  <string>171823-9</string>
+                 </property>
+                </row>
+                <row>
+                 <property name="text">
+                  <string>171823-2</string>
                  </property>
                 </row>
                 <column>
@@ -2534,7 +2539,7 @@ QListWidget {
 }</string>
              </property>
              <property name="currentIndex">
-              <number>4</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <property name="styleSheet">
@@ -3815,13 +3820,13 @@ QPushButton {
                <string>Set the database path .db </string>
               </property>
              </widget>
-             <widget class="QComboBox" name="comboBox_2">
+             <widget class="QWidget" name="widget_42" native="true">
               <property name="geometry">
                <rect>
-                <x>800</x>
-                <y>200</y>
-                <width>104</width>
-                <height>26</height>
+                <x>660</x>
+                <y>110</y>
+                <width>371</width>
+                <height>111</height>
                </rect>
               </property>
              </widget>
@@ -4269,7 +4274,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <property name="styleSheet">
