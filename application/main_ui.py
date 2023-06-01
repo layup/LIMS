@@ -29,8 +29,12 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self) 
         
         paths = load_pickle('data.pickle')
-        self.db = Database(paths['databasePath'])
-       
+        print(paths)
+        
+        try: 
+            self.db = Database(paths['databasePath'])
+        except: 
+            self.db = Database('temp.db')
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
