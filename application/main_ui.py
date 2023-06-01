@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         try: 
             self.db = Database(paths['databasePath'])
         except: 
+            print('Database not valid')
             
             databasePathTemp = openFile()
             
@@ -142,11 +143,14 @@ class MainWindow(QMainWindow):
         print('Loading Report Page')
        
         #FIXME: include the other table and also some how to open up this table again  
-        #TODO: sort by date or something
+        #TODO: sort by date or somethingsetDatabase
+        
         query = 'SELECT * FROM jobs' 
-        results = list(self.db.query(query)) 
-        print(results)
-       
+        try: 
+            results = list(self.db.query(query)) 
+            #print(results)
+        except: 
+            results = []
 
         self.ui.reportsTable.setRowCount(len(results))
     
@@ -1143,31 +1147,42 @@ class MainWindow(QMainWindow):
     
     #-------------------------------------------------------------
     
-    # ----------------------- PROCESS PAGE ------------------------
+    # ----------------------- Settings Page ------------------------
 
     
     @pyqtSlot()
     def on_reportsPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = getFileLocation()
-        paths['reportsPath'] = newLocation; 
-        save_pickle(paths)
+        if(newLocation != ''): 
+            paths['reportsPath'] = newLocation; 
+            save_pickle(paths)
         
     
     @pyqtSlot()
     def on_txtPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = getFileLocation()
-        paths['TXTDirLocation'] = newLocation; 
-        save_pickle(paths)
+        if(newLocation != ''): 
+            paths['TXTDirLocation'] = newLocation; 
+            save_pickle(paths)
     
     
     @pyqtSlot() 
-    def on_convertPathBtn(self): 
+    def on_convertPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = openFile()
-        paths['ispDataUploadPath'] = newLocation; 
-        save_pickle(paths) 
+        if(newLocation != ''): 
+            paths['ispDataUploadPath'] = newLocation; 
+            save_pickle(paths) 
+        
+    @pyqtSlot()  
+    def on_dbPathBtn_clicked(self):
+        paths = load_pickle('data.pickle')
+        newLocation = openFile()
+        if(newLocation != ''): 
+            paths['TXTDirLocation'] = newLocation; 
+            save_pickle(paths)  
         
     
         
