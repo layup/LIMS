@@ -31,6 +31,11 @@ class MainWindow(QMainWindow):
         paths = load_pickle('data.pickle')
         print(paths)
         
+        
+        test = getFileLocation()
+        paths['databasePath'] = test; 
+        save_pickle(paths)
+        
         try: 
             self.db = Database(paths['databasePath'])
         except: 
@@ -42,6 +47,7 @@ class MainWindow(QMainWindow):
             
             self.db = Database(databasePathTemp)
             
+
 
             
         #define other widget setups 
