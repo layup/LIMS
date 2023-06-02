@@ -38,7 +38,7 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name='dist')
+               name='MBLABS')
 
 # Define any additional configurations or options as needed
 

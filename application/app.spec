@@ -21,6 +21,7 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# Create the executable 
 exe = EXE(
     pyz,
     a.scripts,
@@ -38,6 +39,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+#create the distribution 
 coll = COLLECT(
     exe,
     a.binaries,

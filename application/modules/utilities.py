@@ -264,7 +264,7 @@ def scanForTXTFolders(jobNum):
     TXTLocation = fileLocationsDictonary['TXTDirLocation']
     
     locationsObject = os.scandir(TXTLocation)
-    print(locationsObject)
+    #print(locationsObject)
     
     txtFolderLocations = [] 
     

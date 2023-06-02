@@ -357,12 +357,13 @@ class MainWindow(QMainWindow):
             self.loadReportsPage(); 
             
         if(index == 1): 
-            self.ui.jobNumInput.setText('171981')
+            #self.ui.jobNumInput.setText('171981')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
             
         if(index == 4): 
             print('Settings baby')
+            self.loadSettings()
             
         
         
@@ -1120,10 +1121,27 @@ class MainWindow(QMainWindow):
 
             button = QPushButton("Delete")
             self.ui.gcmsInputTable.setCellWidget(i ,6, button)
-            button.clicked.connect(lambda _, row=i: print('Delete Row: ', row));
+            button.clicked.connect(lambda _, row=i: self.gcmsInputTableDeleteRow(row));
             
-            
+    def gcmsInputTableDeleteRow(self, row): 
+        print('Row to delete: ', row)
+        
+        try: 
+            #need jobNumber and sampleName 
+            sampleNum = self.ui.gcmsInputTable.item(row, 0).text()
+            testsName = self.ui.gcmsInputTable.item(row, 1).text()
+            #print(str(row) + " : " + str(sampleNum) + ' | ' + str(testsName))
+            self.ui.gcmsInputTable.removeRow(row)
+            query = 'DELETE FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?'
+            self.db.execute(query, [sampleNum, testsName])
+            self.db.commit()
+        except:
+            print('Could not delete item')
+        
 
+
+        
+    
 
     def replaceError(self,sampleName):
         msgBox = QMessageBox()  
@@ -1158,6 +1176,8 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['reportsPath'] = newLocation; 
             save_pickle(paths)
+
+            self.ui.reportPath.setText(paths['reportsPath'])
         
     
     @pyqtSlot()
@@ -1167,15 +1187,19 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['TXTDirLocation'] = newLocation; 
             save_pickle(paths)
+
+            self.ui.txtPath.setText(paths['TXTDirLocation'])
     
     
     @pyqtSlot() 
-    def on_convertPathBtn_clicked(self): 
+    def on_convertedPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
         newLocation = openFile()
         if(newLocation != ''): 
             paths['ispDataUploadPath'] = newLocation; 
             save_pickle(paths) 
+
+            self.ui.convertPath.setText(paths['ispDataUploadPath'])
         
     @pyqtSlot()  
     def on_dbPathBtn_clicked(self):
@@ -1183,11 +1207,18 @@ class MainWindow(QMainWindow):
         newLocation = openFile()
         if(newLocation != ''): 
             paths['databasePath'] = newLocation; 
-            print(paths)
             save_pickle(paths)  
+
+            self.ui.dbPath.setText(paths['databasePath'])
         
     
+    def loadSettings(self): 
+        paths = load_pickle('data.pickle')
         
+        self.ui.reportPath.setText(paths['reportsPath'])
+        self.ui.txtPath.setText(paths['TXTDirLocation'])
+        self.ui.convertPath.setText(paths['ispDataUploadPath'])
+        self.ui.dbPath.setText(paths['databasePath'])
     
     
     

@@ -1874,6 +1874,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_31 = QtWidgets.QHBoxLayout(self.widget_27)
         self.horizontalLayout_31.setObjectName("horizontalLayout_31")
         self.gcmsInputTable = QtWidgets.QTableWidget(self.widget_27)
+        self.gcmsInputTable.setStyleSheet("QTableWidget {\n"
+"    color:white; \n"
+"} \n"
+"\n"
+"QTableWidget QPushButton:hover {\n"
+"    color:gray; \n"
+"}")
         self.gcmsInputTable.setObjectName("gcmsInputTable")
         self.gcmsInputTable.setColumnCount(0)
         self.gcmsInputTable.setRowCount(0)
@@ -1911,7 +1918,20 @@ class Ui_MainWindow(object):
         self.settingBody.setStyleSheet("")
         self.settingBody.setObjectName("settingBody")
         self.widget_14 = QtWidgets.QWidget(self.settingBody)
-        self.widget_14.setGeometry(QtCore.QRect(30, 30, 541, 230))
+        self.widget_14.setGeometry(QtCore.QRect(30, 30, 741, 281))
+        self.widget_14.setStyleSheet("QPushButton {\n"
+"    padding: 10px; \n"
+"    width:60px;\n"
+"    height:10px;\n"
+"    text-align:center; \n"
+"} \n"
+"\n"
+"QWidget QLineEdit {\n"
+"    color: gray; \n"
+"    max-width:400px;\n"
+"    min-wdith:200px;\n"
+"} \n"
+"")
         self.widget_14.setObjectName("widget_14")
         self.verticalLayout_31 = QtWidgets.QVBoxLayout(self.widget_14)
         self.verticalLayout_31.setContentsMargins(0, 0, 0, 0)
@@ -1924,6 +1944,7 @@ class Ui_MainWindow(object):
         self.label_55.setObjectName("label_55")
         self.horizontalLayout_32.addWidget(self.label_55)
         self.reportPath = QtWidgets.QLineEdit(self.widget_42)
+        self.reportPath.setText("")
         self.reportPath.setReadOnly(True)
         self.reportPath.setObjectName("reportPath")
         self.horizontalLayout_32.addWidget(self.reportPath)
@@ -2421,9 +2442,9 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(4)
+        self.stackedWidget.setCurrentIndex(3)
         self.icpStack.setCurrentIndex(1)
-        self.gcmsStack.setCurrentIndex(3)
+        self.gcmsStack.setCurrentIndex(4)
         self.stackedWidget_2.setCurrentIndex(1)
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainer.setHidden) # type: ignore
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
