@@ -496,6 +496,7 @@ class MainWindow(QMainWindow):
                 self.ui.unitType.setText(limitResults[5])
                 self.ui.RightSideComment.setPlainText(limitResults[4]) 
             
+            
         except: 
             print('Error: Could not load in limits ')
        
