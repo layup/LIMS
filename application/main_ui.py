@@ -1,6 +1,10 @@
 #PYQT Imports 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QHeaderView, QLabel, QMainWindow, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle, QStyledItemDelegate, QAbstractItemView
+from PyQt5.QtWidgets import (
+    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
+    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
+    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem 
+)
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QObject, pyqtSlot, QDateTime
 
@@ -29,10 +33,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self) 
         
         paths = load_pickle('data.pickle')
-        print(paths)
-        
-
-        
+        #print(paths)
         
         if(isValidDatabase(paths['databasePath'])): 
             self.db = Database(paths['databasePath'])
@@ -45,9 +46,6 @@ class MainWindow(QMainWindow):
             #save_pickle(paths)
             
             self.db = Database(databasePathTemp)
-            
-
-
             
         #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
@@ -63,6 +61,8 @@ class MainWindow(QMainWindow):
        
         #load the setup 
         self.loadCreatePage()
+
+        self.ui.pushButton_6.clicked.connect(self.open_new_window)
         
         self.ui.NextSection.clicked.connect(lambda: self.proceedPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
@@ -71,7 +71,21 @@ class MainWindow(QMainWindow):
         
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
         self.showMaximized()
+        
+        
+    def open_new_window(self):
+        #data = 'Hello from Main Window!'
+        #new_window = NewWindow(data)
+        #new_window.show()
+        
+        data = [
+            [1, 'John', 'Doe'],
+            [2, 'Jane', 'Smith'],
+            [3, 'Bob', 'Johnson']
+        ]
 
+        dialog = CustomDialog(data)
+        dialog.exec_()
 
 
     ## Change QPushButton Checkable status when stackedWidget index changed
@@ -154,6 +168,7 @@ class MainWindow(QMainWindow):
             results = []
 
         self.ui.reportsTable.setRowCount(len(results))
+
     
         #inital columns 
         for row, current in enumerate(results): 
@@ -199,6 +214,8 @@ class MainWindow(QMainWindow):
         
         self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
+
+        self.ui.reportsTable.verticalHeader().setVisible(True)
 
         #TODO: if sleected open this thing 
 
@@ -303,11 +320,11 @@ class MainWindow(QMainWindow):
     def on_gcmsStack_currentChanged(self, index):
         
         if(index == 0): 
-            self.ui.gcmsTitleLabel.setText('GCMS Page')
+            self.ui.gcmsTitleLabel.setText('CHM Page')
             self.ui.gcmsSubTitleLabel.setText('')
         
         if(index == 1): 
-            self.ui.gcmsTitleLabel.setText('GCMS Defined Tests')
+            self.ui.gcmsTitleLabel.setText('CHM Defined Tests')
           
             
             totalTests = len(self.gcmsGetTotalTests())
@@ -317,12 +334,12 @@ class MainWindow(QMainWindow):
             self.gcmsLoadTestsNames()
 
         if(index == 2): 
-            self.ui.gcmsTitleLabel.setText('GCMS Defined Reports')
+            self.ui.gcmsTitleLabel.setText('CHM Defined Reports')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
             
             
         if(index == 3): 
-            self.ui.gcmsTitleLabel.setText('GCMS Tests Entry')
+            self.ui.gcmsTitleLabel.setText('CHM Tests Entry')
             self.ui.gcmsSubTitleLabel.setText('')
              
             self.gcmsClearEnteredTestsData()
@@ -333,7 +350,7 @@ class MainWindow(QMainWindow):
             self.ui.gcmsUnitVal.addItems(temp[1])
         
         if(index == 4): 
-            self.ui.gcmsTitleLabel.setText('GCMS Tests Database') 
+            self.ui.gcmsTitleLabel.setText('CHM Tests Database') 
             self.ui.gcmsSubTitleLabel.setText('')
             self.loadInputData(); 
             
@@ -1253,7 +1270,7 @@ class MainWindow(QMainWindow):
             errorCheck[0] = 1; 
             #self.ui.jobNumInput.setStyleSheet('border:1px solid red;')
          
-        if(reportType == 'ISP' or reportType == 'GCMS'):
+        if(reportType == 'ISP' or reportType == 'GCMS' or reportType == 'CHM'):
             errorCheck[1] = 0;
             
         else: 
@@ -1315,8 +1332,8 @@ class MainWindow(QMainWindow):
                 self.ui.icpDataField.show()
                 self.icpLoader()
             
-            if(reportType == 'GCMS'):
-                print('GCMS Loader')
+            if(reportType == 'CHM'):
+                print('CHM Loader')
                 
                 self.ui.createIcpReportBtn.setVisible(False)
                 self.ui.createGcmsReportBtn.setVisible(True)
@@ -2087,3 +2104,56 @@ class SaveMessageBoxWidget(QWidget):
 #            msg.buttonClicked.connect(self.removeDuplicate)
             print('Ok')
             self.removeDuplicate()
+
+
+class NewWindow(QMainWindow):
+    def __init__(self, data):
+        super().__init__()
+        self.setWindowTitle('New Window')
+
+        layout = QVBoxLayout()
+        label = QLabel(data)
+        layout.addWidget(label)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+
+class CustomDialog(QDialog):
+    def __init__(self, data):
+        super().__init__()
+        self.setWindowTitle('Custom Dialog')
+
+        layout = QVBoxLayout()
+        table_widget = QTableWidget()
+        table_widget.setRowCount(len(data))
+        table_widget.setColumnCount(len(data[0]))
+        
+        for row, rowData in enumerate(data):
+            for column, columnData in enumerate(rowData):
+                item = QTableWidgetItem(str(columnData))
+                table_widget.setItem(row, column, item)
+        layout.addWidget(table_widget)
+        
+        close_button = QPushButton('Close', self)
+        close_button.clicked.connect(self.close)
+        
+        save_button = QPushButton('Save', self)
+        
+        layout.addWidget(close_button)
+        layout.addWidget(save_button)
+
+        self.setLayout(layout)
+        
+    def save_sql(self): 
+        pass; 
+    
+    
+    #metals 
+    def icpMS(self): 
+        pass; 
+
+    #Text Files 
+    def icpOES(self): 
+        pass; 

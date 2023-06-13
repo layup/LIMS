@@ -179,7 +179,7 @@ def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unit
                 usedSamples += 4; 
         
     
-    fileName = 'W' + str(jobNum) + "_gcms.xlsx" 
+    fileName = 'W' + str(jobNum) + ".chm" 
     filePath = os.path.join(exportPath, fileName)
     print('Export Path: ', filePath)
     
@@ -372,7 +372,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     print('Current Page location: ', pageLocation); 
     
      
-    fileName = 'W' + str(jobNum) + "_isp.xlsx" 
+    fileName = 'W' + str(jobNum) + ".001" 
     filePath = os.path.join(exportPath, fileName)
     print('Export Path: ', filePath)
  

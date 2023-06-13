@@ -410,7 +410,7 @@ color: rgb(255, 255, 255);</string>
           <item>
            <widget class="QPushButton" name="gsmsBtn1">
             <property name="text">
-             <string>GCMS Tools </string>
+             <string>CHM Tools </string>
             </property>
             <property name="icon">
              <iconset resource="assets/resourse.qrc">
@@ -671,7 +671,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -946,16 +946,6 @@ QWidget#widget_2{
                 <attribute name="verticalHeaderStretchLastSection">
                  <bool>false</bool>
                 </attribute>
-                <row>
-                 <property name="text">
-                  <string>171823-9</string>
-                 </property>
-                </row>
-                <row>
-                 <property name="text">
-                  <string>171823-2</string>
-                 </property>
-                </row>
                 <column>
                  <property name="text">
                   <string>Job Number</string>
@@ -986,11 +976,6 @@ QWidget#widget_2{
                   <string>Open Report </string>
                  </property>
                 </column>
-                <item row="0" column="0">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </item>
                </widget>
               </item>
              </layout>
@@ -1068,7 +1053,7 @@ QWidget#widget_2{
               <item>
                <widget class="QLabel" name="label_22">
                 <property name="text">
-                 <string>ISP and GCMS Reports </string>
+                 <string>ISP and CHM Reports </string>
                 </property>
                </widget>
               </item>
@@ -1105,7 +1090,7 @@ QWidget#widget_2{
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>160</height>
+                  <height>200</height>
                  </size>
                 </property>
                 <property name="styleSheet">
@@ -1131,6 +1116,7 @@ QLineEdit {
 	border: 1px solid gray; 
 	color:white; 
 	background-color: rgb(55, 65, 84);
+	min-width: 190px; 
 }
 
 QPushButton { 
@@ -1171,8 +1157,8 @@ QPushButton::hover {
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>200</width>
-                     <height>24</height>
+                     <width>199</width>
+                     <height>0</height>
                     </size>
                    </property>
                    <property name="maximumSize">
@@ -1244,7 +1230,7 @@ QPushButton::hover {
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="1">
+                 <item row="4" column="1">
                   <widget class="QPushButton" name="NextSection">
                    <property name="minimumSize">
                     <size>
@@ -1263,6 +1249,35 @@ QPushButton::hover {
                    </property>
                    <property name="text">
                     <string>Next Section</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QLineEdit" name="dilutionInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>199</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label">
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Dilution Factor</string>
                    </property>
                   </widget>
                  </item>
@@ -1368,7 +1383,7 @@ QWidget {
               <string notr="true">background-color: rgb(66, 78, 101);</string>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2539,7 +2554,7 @@ QListWidget {
 }</string>
              </property>
              <property name="currentIndex">
-              <number>4</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <property name="styleSheet">
@@ -2660,7 +2675,7 @@ QPushButton::hover {
                      <item>
                       <widget class="QPushButton" name="gcmsReportTypeBtn">
                        <property name="text">
-                        <string>GC/MS Report Type</string>
+                        <string>CHM Report Type</string>
                        </property>
                       </widget>
                      </item>
@@ -2927,7 +2942,7 @@ QWidget#widget_37 QTextEdit {
                      <item row="3" column="0">
                       <widget class="QLabel" name="label_61">
                        <property name="text">
-                        <string>So Value</string>
+                        <string>Default Standard</string>
                        </property>
                       </widget>
                      </item>
@@ -3356,17 +3371,20 @@ p, li { white-space: pre-wrap; }
                      <string notr="true"/>
                     </property>
                     <layout class="QFormLayout" name="formLayout_3">
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_31">
-                       <property name="text">
-                        <string>Enter Standard</string>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="2" column="1">
                       <widget class="QLineEdit" name="gcmsStandardVal"/>
                      </item>
-                     <item row="7" column="1">
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="label_30">
+                       <property name="text">
+                        <string>Select Unit</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QComboBox" name="gcmsUnitVal"/>
+                     </item>
+                     <item row="9" column="1">
                       <widget class="QPushButton" name="gcmsProceedBtn">
                        <property name="text">
                         <string>Proceed</string>
@@ -3376,25 +3394,25 @@ p, li { white-space: pre-wrap; }
                        </property>
                       </widget>
                      </item>
+                     <item row="4" column="1">
+                      <widget class="QComboBox" name="standardVal"/>
+                     </item>
                      <item row="3" column="1">
-                      <widget class="QComboBox" name="gcmsUnitVal"/>
+                      <widget class="QComboBox" name="gcmsTests"/>
                      </item>
                      <item row="3" column="0">
-                      <widget class="QLabel" name="label_30">
+                      <widget class="QLabel" name="label_51">
                        <property name="text">
-                        <string>Enter Unit</string>
+                        <string>Parameter</string>
                        </property>
                       </widget>
                      </item>
                      <item row="4" column="0">
-                      <widget class="QLabel" name="label_51">
+                      <widget class="QLabel" name="label_31">
                        <property name="text">
-                        <string>Tests Name</string>
+                        <string>Standards</string>
                        </property>
                       </widget>
-                     </item>
-                     <item row="4" column="1">
-                      <widget class="QComboBox" name="gcmsTests"/>
                      </item>
                     </layout>
                    </widget>
@@ -3643,6 +3661,9 @@ QTableWidget QPushButton:hover {
          </widget>
          <widget class="QWidget" name="settingsPage">
           <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -3695,17 +3716,164 @@ QTableWidget QPushButton:hover {
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <widget class="QWidget" name="widget_14" native="true">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>30</y>
-                <width>741</width>
-                <height>281</height>
-               </rect>
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <property name="leftMargin">
+               <number>0</number>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widget_45" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QWidget {
+	background-color:white; 
+}
+
+QPushButton { 
+	border: 1px solid gray; 
+	border-radius: 5px;
+	color:white; 
+	background-color: #555555; 
+	min-width: 150px; 
+	min-height:25px; 
+} 
+QPushButton::disabled {
+	border: 1px solid gray; 
+	background-color: rgb(107, 108, 108);
+	color:gray;
+}
+
+QPushButton::hover {
+	background-color: rgb(107, 108, 108);
+}</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_32">
+                 <item>
+                  <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton">
+                   <property name="text">
+                    <string>Set Paths</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_2">
+                   <property name="text">
+                    <string>Set Units</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_3">
+                   <property name="text">
+                    <string>Set Authors</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_5">
+                   <property name="text">
+                    <string>Set Preferences</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_14">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_13">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_12">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_9">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QStackedWidget" name="settingsStack">
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <widget class="QWidget" name="settingsPaths">
+                 <widget class="QWidget" name="widget_14" native="true">
+                  <property name="geometry">
+                   <rect>
+                    <x>10</x>
+                    <y>30</y>
+                    <width>741</width>
+                    <height>281</height>
+                   </rect>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
 	padding: 10px; 
 	width:60px;
 	height:10px;
@@ -3715,124 +3883,174 @@ QTableWidget QPushButton:hover {
 QWidget QLineEdit {
 	color: gray; 
 	max-width:400px;
-	min-wdith:200px;
+	min-width:200px;
 } 
 </string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_31">
-               <item>
-                <widget class="QWidget" name="widget_42" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_32">
-                  <item>
-                   <widget class="QLabel" name="label_55">
-                    <property name="text">
-                     <string>Report Folder </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="reportPath">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="reportsPathBtn">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_31">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QWidget" name="widget_42" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_32">
+                      <item>
+                       <widget class="QLabel" name="label_55">
+                        <property name="text">
+                         <string>Report Folder </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="reportPath">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="reportsPathBtn">
+                        <property name="text">
+                         <string>Browse</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget_43" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_33">
+                      <item>
+                       <widget class="QLabel" name="label_59">
+                        <property name="text">
+                         <string>TXT Folder</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="txtPath">
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="txtPathBtn">
+                        <property name="text">
+                         <string>Browse</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget_48" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_37">
+                      <item>
+                       <widget class="QLabel" name="label_71">
+                        <property name="text">
+                         <string>Convert Folder</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="convertPath">
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="convertedPathBtn">
+                        <property name="text">
+                         <string>Browse</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget_49" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_38">
+                      <item>
+                       <widget class="QLabel" name="label_72">
+                        <property name="text">
+                         <string>Database Folder</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="dbPath">
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="dbPathBtn">
+                        <property name="text">
+                         <string>Browse</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_43" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_33">
-                  <item>
-                   <widget class="QLabel" name="label_59">
-                    <property name="text">
-                     <string>TXT Folder</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="txtPath">
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="txtPathBtn">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                <widget class="QWidget" name="settingsUnits">
+                 <widget class="QWidget" name="widget_46" native="true">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>20</y>
+                    <width>331</width>
+                    <height>611</height>
+                   </rect>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_33">
+                   <item>
+                    <widget class="QWidget" name="widget_47" native="true">
+                     <layout class="QHBoxLayout" name="horizontalLayout_34">
+                      <item>
+                       <widget class="QLineEdit" name="lineEdit_2"/>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_4">
+                        <property name="text">
+                         <string>Add</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QListWidget" name="listWidget"/>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_48" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_37">
-                  <item>
-                   <widget class="QLabel" name="label_71">
-                    <property name="text">
-                     <string>Convert Folder</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="convertPath">
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="convertedPathBtn">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widget_49" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_38">
-                  <item>
-                   <widget class="QLabel" name="label_72">
-                    <property name="text">
-                     <string>Database Folder</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="dbPath">
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="dbPathBtn">
-                    <property name="text">
-                     <string>Browse</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
-             </widget>
+                <widget class="QWidget" name="settingsAuthors"/>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>

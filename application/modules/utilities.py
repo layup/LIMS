@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import (
     QFileDialog
 )
 
-REPORTS_TYPE = ['','ISP','GCMS']
+REPORTS_TYPE = ['','ISP','GCMS', 'CHM']
 #MATRIX_TYPE = ['','food', 'water', 'apples']
 
 PARAMETERS_TYPE = {}
