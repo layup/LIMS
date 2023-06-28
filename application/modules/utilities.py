@@ -17,8 +17,10 @@ from string import printable
 
 
 from PyQt5.QtWidgets import (
-    QFileDialog
+    QFileDialog, QPushButton, QTableWidgetItem, 
+    QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip 
 )
+from PyQt5.QtCore import Qt
 
 REPORTS_TYPE = ['','ISP','GCMS', 'CHM']
 #MATRIX_TYPE = ['','food', 'water', 'apples']
@@ -490,6 +492,8 @@ def icp_upload(filePath, db):
     
     if(filePath.endswith('.txt')):
         icpMethod1(filePath, db)
+        #processMethod1(filePath,db)
+        #result = processMethod1(filePath)
         
     elif(filePath.endswith('.xlsx')):
         icpMethod2(filePath, db)
@@ -502,6 +506,7 @@ def icp_upload(filePath, db):
 #TODO: sort by name  
 #FIXME: issue sometimes cuts off the ending, so we can just have a cut off section.
 #read line by line and just add the line instead 
+#FIXME: tracking the icpData is wrong as well 
 def icpMethod1(filePath, db): 
 
     file1 = open(filePath, 'r')
@@ -546,7 +551,6 @@ def icpMethod1(filePath, db):
     print(loadPath)
     newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
      
-    
     print('Writing CSV File: {}'.format(newPath))
     f = open(newPath, 'w')
     writer = csv.writer(f)
@@ -555,14 +559,13 @@ def icpMethod1(filePath, db):
     spiltLengths = []
     
     jobNumbers = []
-    jobData = {
-        
-    }
+    jobData = {}
     
     elementData = {}
     currentJob = ''
-    
 
+    sampleNumbers = []
+    
     for start in startingPostion: 
         running = True; 
         counter = 1; 
@@ -592,6 +595,8 @@ def icpMethod1(filePath, db):
                 temp.append(splitLine[0])
                 temp.append(splitLine[1])
 
+                sampleNumbers.append([splitLine[2], start+counter, splitLine[3], splitLine[6]])
+
                 if(currentJob =='' ):
                     currentJob = splitLine[2]
   
@@ -613,6 +618,7 @@ def icpMethod1(filePath, db):
             #print(len(splitLine))
 
     
+    
     spiltLengths = numpy.array(spiltLengths)
     unique, counts = numpy.unique(spiltLengths, return_counts=True)
     #print(dict(zip(unique, counts)))
@@ -620,6 +626,15 @@ def icpMethod1(filePath, db):
     f.close()
     file1.close()
     
+
+    #TODO: factor in a way to show all the things and the lines where duplicates are 
+        
+        
+    print(sampleNumbers)
+   
+    save = viewIcpTable(filePath, sampleNumbers,1 ) 
+    print('Save: ', save)
+
     #print(jobNumbers)
     
     #FIXME: uploading same data
@@ -628,16 +643,18 @@ def icpMethod1(filePath, db):
     #save to database
     todayDate = date.today()
     #save to database 
-    for (key, value) in jobData.items(): 
-        #print(key)
-        sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
-        jobNum = key.split('-')[0]
-        tempData = json.dumps(value)
-        db.execute(sql, (key,jobNum,newPath, tempData, todayDate))
-        db.commit()
+    if(save): 
+        for (key, value) in jobData.items(): 
+            #print(key)
+            sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
+            jobNum = key.split('-')[0]
+            tempData = json.dumps(value)
+            db.execute(sql, (key,jobNum,newPath, tempData, todayDate))
+            db.commit()
+        return jobNumber,jobData
+    else: 
+        return False; 
     
-    
-    return jobNumbers, jobData; 
 
 #scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
 def icpMethod2(filePath, db): 
@@ -802,3 +819,87 @@ def saveGcmsData():
     
     
     pass; 
+
+def viewIcpTable(filePath, data, reportType): 
+    print('Viewing ICP Table')
+
+    dialog = icpTableView(filePath, data, reportType)
+    
+    if dialog.exec_() == QDialog.Accepted:
+        return True; 
+    else:
+        return False; 
+
+
+class icpTableView(QDialog):
+    def __init__(self, filePath, data, reportType):
+        super().__init__()
+        
+        self.resize(600, 500)
+        self.setWindowTitle(filePath)
+    
+        headers = ['Sample Number', 'Line', 'Element', 'Value', 'duplicate Line'] 
+
+        layout = QVBoxLayout()
+        
+        table_widget = QTableWidget()
+        table_widget.setRowCount(len(data))
+        table_widget.setColumnCount(len(headers))
+        table_widget.setHorizontalHeaderLabels(headers)
+    
+        seen = {}
+        
+        for row, rowData in enumerate(data):
+            sampleNum = rowData[0]
+            line = rowData[1]
+            parameterName = rowData[2]
+            
+            if (sampleNum, parameterName) in seen: 
+                previousRow = seen[(sampleNum, parameterName)] 
+                item = QTableWidgetItem(str(previousRow))
+                table_widget.setItem(row,4, item)
+            else: 
+                seen[(sampleNum, parameterName)] = line
+            
+            for column, columnData in enumerate(rowData):
+                item = QTableWidgetItem(str(columnData))
+                table_widget.setItem(row, column, item)
+                
+        layout.addWidget(table_widget)
+        
+        size_grip = QSizeGrip(self)
+        layout.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
+        
+        save_button = QPushButton('Save', self)
+        save_button.clicked.connect(self.save_and_close)
+        
+        close_button = QPushButton('Close', self)
+        close_button.clicked.connect(self.reject)
+        
+        layout.addWidget(close_button)
+        layout.addWidget(save_button)
+
+        self.setLayout(layout)
+
+        
+    def save_and_close(self):
+        self.accept()
+
+            
+        
+def save_sql(self): 
+    pass; 
+
+
+
+def save(self): 
+    print("Saving time")
+
+#metals 
+def icpMS(self): 
+    pass; 
+
+#Text Files 
+def icpOES(self): 
+    pass; 
+    

@@ -18,6 +18,7 @@ import os
 from modules.utilities import * 
 
 
+#define default values 
 pageRows = 46
 defaultFont = Font(name="Times New Roman", size=9)
 

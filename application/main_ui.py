@@ -56,8 +56,8 @@ class MainWindow(QMainWindow):
         self.ui.reportsBtn1.setChecked(True)
         
 
-        fileLocationsDictonary = load_pickle('data.pickle')
-        print(fileLocationsDictonary)
+        #fileLocationsDictonary = load_pickle('data.pickle')
+        #print(fileLocationsDictonary)
        
         #load the setup 
         self.loadCreatePage()
@@ -84,8 +84,13 @@ class MainWindow(QMainWindow):
             [3, 'Bob', 'Johnson']
         ]
 
-        dialog = CustomDialog(data)
-        dialog.exec_()
+        dialog = CustomDialog(data, 1)
+        #dialog.exec_()
+        
+        if dialog.exec_() == QDialog.accept:
+            print('Dialog closed with Accept')
+        else:
+            print('Dialog closed with Reject')
 
 
     ## Change QPushButton Checkable status when stackedWidget index changed
@@ -324,7 +329,7 @@ class MainWindow(QMainWindow):
             self.ui.gcmsSubTitleLabel.setText('')
         
         if(index == 1): 
-            self.ui.gcmsTitleLabel.setText('CHM Defined Tests')
+            self.ui.gcmsTitleLabel.setText('CHM Defined Parameters')
           
             
             totalTests = len(self.gcmsGetTotalTests())
@@ -345,6 +350,7 @@ class MainWindow(QMainWindow):
             self.gcmsClearEnteredTestsData()
             
             temp = self.getTestsAndUnits()
+            print(temp)
             
             self.ui.gcmsTests.addItems(temp[0])
             self.ui.gcmsUnitVal.addItems(temp[1])
@@ -390,7 +396,8 @@ class MainWindow(QMainWindow):
         current_widget = self.ui.stackedWidget.currentWidget()
         
         if(self.prev_index == 5): 
-            print('Do you want to save?')
+            pass; 
+            #print('Do you want to save?')
         # Access the previous and current widgets
 
         # Do something with the widgets
@@ -403,11 +410,34 @@ class MainWindow(QMainWindow):
     #---------------- Defined Elements -----------------------
     
     
+    def loadElementLimits(self): 
+        print('CHANGE')
+        reportType = self.ui.reportTypeDropdown.currentText()
+        elementName = self.ui.elementNameinput.text().lower()
+
+        limitsQuery = 'SELECT * from icpLimits WHERE reportType = ? and element = ?'
+        
+        try: 
+            self.db.execute(limitsQuery, (reportType, elementName))
+            limitResults = self.db.fetchone()
+            print('results: ', limitResults)
+            if(limitResults is None): 
+                self.clearElementLimits()
+            else: 
+                self.ui.lowerLimit.setText(str(limitResults[2]))
+                self.ui.upperLimit.setText(str(limitResults[3]))
+                self.ui.unitType.setText(limitResults[5])
+                self.ui.RightSideComment.setPlainText(limitResults[4]) 
+            
+            
+        except: 
+            print('Error on loadElementLimits: Could not load in limits ')
+       
     
     
+    #---------------------ISP PAGE ----------------------------
     
-    
-    #---------------------------------------------------------
+
     
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
@@ -430,10 +460,7 @@ class MainWindow(QMainWindow):
         symbolName = self.ui.symbolInput.text().lower().strip()
         elementName = self.ui.elementNameinput.text().lower().strip()
         
-        lowVal = self.ui.lowValueInput.text()
-        standVal = self.ui.standardValueInput.text()
-        highVal = self.ui.HighValueInput.text()
-        
+
         reportType = self.ui.reportTypeDropdown.currentText()
         lowerLimit = self.ui.lowerLimit.text()
         upperLimit = self.ui.upperLimit.text()
@@ -445,7 +472,7 @@ class MainWindow(QMainWindow):
         
         if(symbolName != "" and elementName != ""):
             
-            defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol, lowValue, standValue, highValue) VALUES (?,?,?,?,?)'
+            defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol) VALUES (?,?)'
             #definedLimitsQuery = 'INSERT OR REPLACE INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)'
             
             loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'  
@@ -456,7 +483,7 @@ class MainWindow(QMainWindow):
             updateLimit = 'UPDATE icpLimits SET lowerLimit = ?, maxLimit = ?, comments =?, units =? WHERE reportType=? AND element=?' 
 
             try:
-                self.db.execute(defineElementQuery, (elementName, symbolName, lowVal, standVal, highVal) )
+                self.db.execute(defineElementQuery, (elementName, symbolName) )
                 
                 if(limitResults): 
                     self.db.execute(updateLimit, (lowerLimit, upperLimit, comment, unitType, reportType, elementName))
@@ -493,30 +520,7 @@ class MainWindow(QMainWindow):
         except: 
             print('Error: could not delete item')
             
-    
-    def loadElementLimits(self): 
-        print('CHANGE')
-        reportType = self.ui.reportTypeDropdown.currentText()
-        elementName = self.ui.elementNameinput.text().lower()
 
-        limitsQuery = 'SELECT * from icpLimits WHERE reportType = ? and element = ?'
-        
-        try: 
-            self.db.execute(limitsQuery, (reportType, elementName))
-            limitResults = self.db.fetchone()
-            print('results: ', limitResults)
-            if(limitResults is None): 
-                self.clearElementLimits()
-            else: 
-                self.ui.lowerLimit.setText(str(limitResults[2]))
-                self.ui.upperLimit.setText(str(limitResults[3]))
-                self.ui.unitType.setText(limitResults[5])
-                self.ui.RightSideComment.setPlainText(limitResults[4]) 
-            
-            
-        except: 
-            print('Error: Could not load in limits ')
-       
         
                 
     @pyqtSlot()
@@ -525,12 +529,13 @@ class MainWindow(QMainWindow):
         
         if(reportText != ''): 
            
-            createReportquerry = 'INSERT INTO icpReportType values (?)'
+            createReportquerry = 'INSERT INTO icpReportType (reportType) values (?)'
             
             try:
                 self.db.execute(createReportquerry, (reportText,) )
                 self.db.commit()
                 self.ui.reportsList.addItem(reportText)
+                self.ui.reportNameInput.setText("")
             except sqlite3.IntegrityError as e:
                 print(e)
 
@@ -550,8 +555,20 @@ class MainWindow(QMainWindow):
         
    
     def on_definedElements_clicked(self):
-        print('Defined Elements')
-         
+        try:
+            self.isp_load_element_data();
+        except: 
+            print('Error: Could not loaded the defined element data')
+
+          
+    def on_definedElements_currentRowChanged(self):
+        try:
+            self.isp_load_element_data();
+        except: 
+            print('Error: Could not loaded the defined element data')
+            
+            
+    def isp_load_element_data(self): 
         selected_item = self.ui.definedElements.currentItem()
         
         if selected_item is not None:
@@ -563,7 +580,7 @@ class MainWindow(QMainWindow):
             
             self.db.execute(loadElement, (selected_item_text,))
             elementResult = self.db.fetchone()
-           
+            
             reportType = self.ui.reportTypeDropdown.currentText()
             
             self.db.execute(loadLimits, (selected_item_text, reportType))
@@ -574,9 +591,9 @@ class MainWindow(QMainWindow):
                 
                 self.ui.elementNameinput.setText(elementResult[0])
                 self.ui.symbolInput.setText(elementResult[1])
-                self.ui.lowValueInput.setText(elementResult[2])
-                self.ui.HighValueInput.setText(elementResult[3])
-                self.ui.standardValueInput.setText(elementResult[4])
+                #self.ui.lowValueInput.setText(elementResult[2])
+                #self.ui.HighValueInput.setText(elementResult[3])
+                #self.ui.standardValueInput.setText(elementResult[4])
                 
                 if(limitResults is None): 
                     self.clearElementLimits()
@@ -591,11 +608,14 @@ class MainWindow(QMainWindow):
                 self.ui.elementNameinput.setText(selected_item_text)
             
         else:
-            print("No item selected.")
+            print("No item selected.") 
 
     def on_reportsList_clicked(self): 
         reportType = self.ui.reportsList.currentItem().text()
         self.ui.footerComments.setText(None)
+        
+        
+        self.ui.icpReportNameLabel.setText(reportType) 
         
         try:
             loadFooterComment = 'SELECT footerComment from icpReportType WHERE reportType = ?'
@@ -613,7 +633,7 @@ class MainWindow(QMainWindow):
         
 
     @pyqtSlot() 
-    def on_saveFooter_clicked(self):        
+    def on_saveFooterBtn_clicked(self):        
         saveComment = self.ui.footerComments.toPlainText()
         reportType = self.ui.reportsList.currentItem()
                 
@@ -630,6 +650,32 @@ class MainWindow(QMainWindow):
                 print("Error: updating footer not working")            
         else: 
             print('Nothing is the same')
+
+    @pyqtSlot() 
+    def on_deleteFooterBtn_clicked(self): 
+        reportType = self.ui.icpReportNameLabel.text()
+        print(reportType)
+        
+        deleteQuery = 'DELETE FROM icpReportType WHERE reportType = ?'
+        
+        if(reportType != ""): 
+            try: 
+                self.db.execute(deleteQuery, (reportType, ))
+                self.db.commit()
+                self.clearFooterReportContent(); 
+
+                item = self.ui.reportsList.currentRow(); 
+                
+                if(item != -1): 
+                    self.ui.reportsList.takeItem(item)
+                
+            except: 
+                print("Error on_deleteFooterBtn_clicked: Deleting Report Type")
+        
+    
+    def clearFooterReportContent(self): 
+        self.ui.icpReportNameLabel.setText("")
+        self.ui.footerComments.clear()
         
         
     
@@ -653,9 +699,6 @@ class MainWindow(QMainWindow):
     def clearElementInfo(self): 
         self.ui.symbolInput.clear()
         self.ui.elementNameinput.clear()
-        self.ui.lowValueInput.clear()
-        self.ui.HighValueInput.clear()
-        self.ui.standardValueInput.clear()
         
         self.ui.lowerLimit.clear()
         self.ui.upperLimit.clear()
@@ -737,7 +780,7 @@ class MainWindow(QMainWindow):
         
         selectedTests = self.ui.gcmsDefinedtests.currentItem()
         
-        print('selected Tests: ', selectedTests)
+        #print('selected Tests: ', selectedTests)
         
         if selectedTests is not None:
             try: 
@@ -898,15 +941,23 @@ class MainWindow(QMainWindow):
         inquery = 'SELECT testName, unitType FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
         results = self.db.query(inquery)
         
+        self.chmParameters = {}
+        
         tests = ['']
         units = ['']
         
         for testName, unitType in results: 
+            
+            
             if(testName != '' ): 
                 tests.append(testName)
+                
+                self.chmParameters[testName] = unitType 
             
             if(unitType != '' and unitType not in units):
                 units.append(unitType)
+                
+        print(self.chmParameters)
         
         return (tests,units)
         
@@ -919,6 +970,30 @@ class MainWindow(QMainWindow):
     #TODO: connect from the defined values in gcms Defined Tests Page
     #TODO: make sure to add a date for the table so we can sort it by the most recent date
     #TODO: duplication error
+    #TODO: set defaults 
+
+    def on_gcmsTests_activated(self, index): 
+        if(index in self.chmParameters): 
+            unitVal = self.chmParameters[index]
+            print(unitVal) 
+
+            if(unitVal == ''):
+                print("nothing") 
+                self.ui.gcmsUnitVal.setCurrentIndex(0); 
+            
+            else: 
+                print("something else")
+                index = self.ui.gcmsUnitVal.findText(unitVal) 
+                print(index)
+                
+                self.ui.gcmsUnitVal.setCurrentIndex(index)
+                
+                
+                
+                
+
+    
+            
 
     @pyqtSlot()    
     def on_gcmsProceedBtn_clicked(self):
@@ -1155,10 +1230,7 @@ class MainWindow(QMainWindow):
             self.db.commit()
         except:
             print('Could not delete item')
-        
-
-
-        
+    
     
 
     def replaceError(self,sampleName):
@@ -1185,7 +1257,27 @@ class MainWindow(QMainWindow):
     #-------------------------------------------------------------
     
     # ----------------------- Settings Page ------------------------
+    
+    
+    def on_settingsStack_currentChanged(self, index): 
+        
+        if(index == 2): 
+            print("authors") 
+      
+    @pyqtSlot()
+    def on_setPathsBtn_clicked(self): 
+        self.ui.settingsStack.setCurrentIndex(0)
+    
+    @pyqtSlot() 
+    def on_setUnitsBtn_clicked(self): 
+        pass;  
 
+    @pyqtSlot()
+    def on_setAuthorsBtn_clicked(self): 
+        self.ui.settingsStack.setCurrentIndex(2)   
+        self.loadAuthors()
+         
+    
     
     @pyqtSlot()
     def on_reportsPathBtn_clicked(self): 
@@ -1238,21 +1330,85 @@ class MainWindow(QMainWindow):
         self.ui.convertPath.setText(paths['ispDataUploadPath'])
         self.ui.dbPath.setText(paths['databasePath'])
     
+
+    #load authors 
+    def loadAuthors(self): 
+        authorsQuery = 'SELECT * FROM authors'
+
+        try: 
+            results = self.db.query(authorsQuery)
+            print(results)
+
+            for author in results: 
+                self.ui.authorList.addItem(author[0])
+            
+            
+        except: 
+            print('Error: could not load authors')
+        
+        
     
+    #delete authors 
+    #save authors 
+    
+    #clearAuthorName 
+    
+    def clearAuthorData(self): 
+        self.ui.authorNameLine.clear()
+        self.ui.authorPostionLine.clear()
+        
+    @pyqtSlot()  
+    def on_saveAuthorBtn_clicked(self): 
+        authorName = self.ui.authorNameLine.text()
+        authorPosition = self.ui.authorPostionLine.text()
+        
+        if((authorName != None or '') and (authorPosition != None or "")): 
+            sql = 'INSERT OR REPLACE INTO authors (authorName, authorPosition) VALUES (?,?)'
+            try:
+                self.db.execute(sql, (authorName, authorPosition,) )
+                self.db.commit()
+
+            except sqlite3.IntegrityError as e:
+                print(e) 
+ 
+    
+    #add authors 
+    @pyqtSlot()  
+    def on_addAuthor_clicked(self): 
+        print('adding author')
+
+        authorName = self.ui.enterAuthorName.text()
+
+        sql = "SELECT authorName FROM authors"
+        result = self.db.fetchall(sql)
+        
+        print(result)
+        
+        if(authorName != ''): 
+            self.ui.authorList.addItem(authorName)
+            self.ui.authorNameLine.setText(authorName)
+            
     
     
     # ----------------------- PROCESS PAGE ------------------------
   
     @pyqtSlot()
     def proceedPage(self):
-        
+        #TODO: add the dilution factor
         jobNum = self.ui.jobNumInput.text().strip()
         reportType = self.ui.reportType.currentText()
         parameter = self.ui.paramType.currentText()
+        dilution = self.ui.dilutionInput.text()
+
+        if(dilution == ''): 
+            self.dilution = 1; 
+        else: 
+            self.dilution = dilution 
         
         print('JobNumber: ', jobNum)
         print('ReportType: ', reportType)
         print('Parameter: ', parameter)
+        print('Dilution: ', dilution )
         
         #0 = name 
         #1 = reportType 
@@ -1400,16 +1556,13 @@ class MainWindow(QMainWindow):
                 if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):
                                         
                     GSMS_TESTS_LISTS.append(temp)
-
-                    
-                    
+ 
                 #if(temp not in ICP_TESTS_LISTS and 'ICP' in temp):
                 #    ICP_TESTS_LISTS.append(temp)
                     
                 #if(temp not in tests): 
                 #    tests.append(temp)
      
-        
         
         testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
         testsResults = self.db.query(testsQuery, (self.jobNum,))
@@ -1419,8 +1572,7 @@ class MainWindow(QMainWindow):
             for item in testsResults: 
                 if(item[1] not in GSMS_TESTS_LISTS):
                     GSMS_TESTS_LISTS.append(item[1])
-                    
-                    
+                     
         
         GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
         print(GSMS_TESTS_LISTS) 
@@ -1755,7 +1907,11 @@ class MainWindow(QMainWindow):
             
             #set distal factor to default of 1 
             item4 = QtWidgets.QTableWidgetItem()
-            item4.setText('1')
+            if(self.dilution == ''):
+                item4.setText('1')
+            else: 
+                item4.setText(str(self.dilution))
+                
             self.ui.dataTable.setItem(i, 4, item4)
 
         #adding hardness and Ph 
@@ -1782,7 +1938,8 @@ class MainWindow(QMainWindow):
         #TODO: check if the sampleData's aren't empty 
         
         
-        #TODO: combine both the datasets; 
+        #TODO: combine both the datasets;
+        #TODO: does this effect hardness and also what about the new values we enter in 
         
         machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
         machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
@@ -1807,20 +1964,34 @@ class MainWindow(QMainWindow):
                     #currentCell.setText(i,j, item)
                     
                     if sample in machine1 and symbol in machine1[sample]: 
-                        machine1Val = machine1[sample][symbol]
+                        machine1Val = machine1[sample][symbol] 
                         print(symbol, ' 1  ', machine1Val)      
                         
-                        item.setText(machine1Val)
+                        if(is_float(machine1Val) and self.dilution != 1 ): 
+                            print('is float bro')
+                            temp = float(machine1Val)
+                            temp = temp * float(self.dilution)
+                            temp = round(temp, 3)
+                            item.setText(str(temp))
+                        else: 
+                            item.setText(machine1Val)
                         #currentCell.setText(i,j, item)
                         
                     
                     if sample in machine2 and symbol in machine2[sample]: 
-                        machine2Val = machine2[sample][symbol]
-                        machine2Val = round(machine2Val, 3 )
+                        machine2Val = machine2[sample][symbol] 
                         
                         print(symbol, ' 2  ', machine2Val) 
                         
-                        item.setText(str(machine2Val))
+                        if(is_float(machine2Val) and self.dilution != 1): 
+                            print('is float ')
+                            temp = float(machine2Val)
+                            temp = temp * float(self.dilution)
+                            temp = round(temp, 3)
+                            item.setText(str(temp))
+                        else: 
+                            machine2Val = round(machine2Val, 3 )
+                            item.setText(str(machine2Val))
                         #currentCell.setText(i,j, item)
                 
                     self.ui.dataTable.setItem(i,j+5, item)
@@ -2120,10 +2291,15 @@ class NewWindow(QMainWindow):
         self.setCentralWidget(widget)
 
 
+
+#check for duplicates 
+
 class CustomDialog(QDialog):
-    def __init__(self, data):
+    def __init__(self, data, reportType):
         super().__init__()
         self.setWindowTitle('Custom Dialog')
+        
+        print(reportType)
 
         layout = QVBoxLayout()
         table_widget = QTableWidget()
@@ -2140,15 +2316,24 @@ class CustomDialog(QDialog):
         close_button.clicked.connect(self.close)
         
         save_button = QPushButton('Save', self)
+        save_button.clicked.connect(self.accept)
         
         layout.addWidget(close_button)
         layout.addWidget(save_button)
 
         self.setLayout(layout)
+        self.setFixedWidth(800)
+        self.setFixedHeight(500)
         
     def save_sql(self): 
         pass; 
+
+    def close(self): 
+        print("Closing time")    
     
+    def save(self): 
+        print("Saving time")
+        self.accept
     
     #metals 
     def icpMS(self): 
@@ -2157,3 +2342,4 @@ class CustomDialog(QDialog):
     #Text Files 
     def icpOES(self): 
         pass; 
+    
