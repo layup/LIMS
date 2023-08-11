@@ -1,29 +1,24 @@
 
-import sys
 import os 
 import re
 import csv
 import numpy
-import inquirer
 import sqlite3 
 import json 
 import string
 import pickle 
-from copy import copy
-import pandas as pd 
 import openpyxl
+from copy import copy
 from datetime import date
-from string import printable
 
-
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QFileDialog, QPushButton, QTableWidgetItem, 
     QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip 
 )
-from PyQt5.QtCore import Qt
 
 from modules.constants import *
-
+from modules.dialogBoxes import *
 
 def is_float(value):
     try:
@@ -35,9 +30,7 @@ def is_float(value):
 
 def search_list_of_lists(lists, targets):
     for sublist in lists:
-        
         if all(target in sublist for target in targets):
-            
             return sublist 
     return None
 
@@ -59,16 +52,14 @@ def remove_unicode_characters(text):
     return cleaned_text
 
 def remove_escape_characters(text):
-    # Define the regex pattern to match escape characters including \x sequences
+    #Define the regex pattern to match escape characters including \x sequences
     #escape_pattern = r'\\[xX][0-9a-fA-F]{2}|\\x1a|\.'
-
-    # Use regex substitution to remove escape characters
+    #Use regex substitution to remove escape characters
+    
     #cleaned_text = re.sub(escape_pattern, '', text)
-
     #return cleaned_text
     
     characters_to_remove = ['\x1a', '\n']
-
     cleaned_string = text; 
     
     for char in characters_to_remove:
@@ -117,23 +108,18 @@ def isValidDatabase(database_path):
         print
         return False
 
-
-
 def saveNewLocation():
     location = getFileLocation()
     
     text = input('Save File Name')
-    
     save_pickle({text:location})
 
 
 def scanDir(path): 
     print("Scanning Dir: ", path)    
-    
-    #print(dir_path)
+
     obj = os.scandir(path)
     #file = os.listdir(path)
-    
     
     for entry in obj :
         if entry.is_dir() or entry.is_file():
@@ -143,24 +129,17 @@ def scanDir(path):
     obj.close()
 
 def scanForTXTFolders(jobNum): 
-    #print('jobnumber: ', jobNum)
-
     fileLocationsDictonary = load_pickle('data.pickle')
     TXTLocation = fileLocationsDictonary['TXTDirLocation']
-    
     locationsObject = os.scandir(TXTLocation)
-    #print(locationsObject)
-    
+
     txtFolderLocations = [] 
     
     for entry in locationsObject: 
         if(entry.is_dir()):
             if(re.match('^TXT-[a-zA-Z]{3}$', entry.name)):
-
                 txtFolderLocations.append(os.path.join(TXTLocation, entry.name))
             
-    
-    #print(txtFolderLocations)
     locationsObject.close()
     return processTXTFolders(jobNum, txtFolderLocations)
   
@@ -170,9 +149,6 @@ def processTXTFolders(jobNum, locations):
     
     fileName = "W" + jobNum + ".TXT"
     
-    #print("list")
-    #print(locations)
-   
     for i in range(len(locations)): 
         tempLocationObject = os.scandir(locations[i]) 
 
@@ -214,7 +190,6 @@ def processClientInfo(jobNum, fileLocation):
     #grab the file names 
     sampleNames = {}
     
-
     #have the information about the file, what kind of reports and etc 
     sampleTests = {}
 
@@ -342,14 +317,12 @@ def processClientInfo(jobNum, fileLocation):
                         pass; 
                        
                     #append onto them 
-
                         
                     #TODO: solve this later, add previous name onto current name sample 
                     if((not bool(prevSampleMatchCheck)) and not( bool(prevSampleTestsCheck))): 
                         print('prev was apart of the name yo')
                         
-                        
-            
+                    
             #print('---------------------------') 
                 
                     
@@ -372,15 +345,10 @@ def processClientInfo(jobNum, fileLocation):
 def icp_upload(filePath, db): 
     print('Scanning the file')
 
-    
     if(filePath.endswith('.txt')):
         icpMethod1(filePath, db)
-        #processMethod1(filePath,db)
-        #result = processMethod1(filePath)
-        
     elif(filePath.endswith('.xlsx')):
         icpMethod2(filePath, db)
-        
     else: 
         print("Not valid file type")
     
@@ -422,7 +390,6 @@ def icpMethod1(filePath, db):
 
         count += 1
 
-            
     #update headers 
     headerUpdate = Lines[startingPostion[0] + 1]; 
     headerUpdate = headerUpdate.split()
@@ -501,7 +468,6 @@ def icpMethod1(filePath, db):
             #print(len(splitLine))
 
     
-    
     spiltLengths = numpy.array(spiltLengths)
     unique, counts = numpy.unique(spiltLengths, return_counts=True)
     #print(dict(zip(unique, counts)))
@@ -509,16 +475,13 @@ def icpMethod1(filePath, db):
     f.close()
     file1.close()
     
-
     #TODO: factor in a way to show all the things and the lines where duplicates are 
-        
         
     print(sampleNumbers)
    
     save = viewIcpTable(filePath, sampleNumbers,1 ) 
     print('Save: ', save)
 
-    #print(jobNumbers)
     
     #FIXME: uploading same data
     #we can have a check in place in the file where it is saved 
@@ -538,7 +501,6 @@ def icpMethod1(filePath, db):
     else: 
         return False; 
     
-
 #scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
 def icpMethod2(filePath, db): 
     
@@ -606,7 +568,6 @@ def icpMethod2(filePath, db):
         db.execute(query, (key, jobNum, newPath, tempData, todayDate))
         db.commit()
 
-    
     newWb = openpyxl.Workbook()
     ws2 = newWb.active 
     
@@ -620,8 +581,7 @@ def icpMethod2(filePath, db):
     column_num = 1;
     for item in tableNames: 
         ws2.cell(row=2, column=column_num).value = item; 
-        column_num += 1; 
-    
+        column_num += 1;  
    
     row_num = 3; 
     for row_value in selectedRows:
@@ -646,22 +606,18 @@ def icpMethod2(filePath, db):
     return; 
 
 def formatJobSampleString(inputString): 
-
     sample = inputString.strip()
-    
     match = re.match(r'(\d+)-0+(\d+)', sample)
     
     if match: 
         first_part = match.group(1)
         second_part = match.group(2)
-
         formatted_string = f"{first_part}-{second_part}"
         
         return formatted_string; 
 
 
 def formatStringArray(inputArray): 
-    
     outputArray = []
     
     for sample in inputArray: 
@@ -677,7 +633,6 @@ def formatStringArray(inputArray):
 
             # Construct the desired format
             formatted_string = f"{first_part}-{second_part}"
-
             outputArray.append(formatted_string)
 
     
@@ -685,22 +640,16 @@ def formatStringArray(inputArray):
         
 
 def createReport(db, jobNum, reportType, parameter): 
-
     sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, status) values (?,?,?,?,0)'
     currentDate = date.today()
     db.execute(sql, (jobNum, reportType, parameter, currentDate))
     db.commit()
     
     
-
-    
 def saveClientInformation(db): 
-    
     pass; 
 
 def saveGcmsData(): 
-    
-    
     pass; 
 
 def viewIcpTable(filePath, data, reportType): 
@@ -769,10 +718,8 @@ class icpTableView(QDialog):
         self.accept()
 
             
-        
 def save_sql(self): 
     pass; 
-
 
 def save(self): 
     print("Saving time")

@@ -46,11 +46,14 @@ def icp_load_element_data(self):
         
 
 def icpReportHander(self, tests, totalSamples): 
+    print('[FUNCTION]: icpReportHander(self, tests, totalSamples)')
+    print(tests)
+    print(totalSamples)
     #FIXME: adjust based on the sample information
     #FIXME: adjust the limits 
     #FIXME: adjust the unit amount  
+    
     initalColumns = 5; 
-    #totalSamples = len(self.sampleNames)
     totalTests = len(tests)
     sampleData = {}
     unitType = []
@@ -79,6 +82,7 @@ def icpReportHander(self, tests, totalSamples):
     elementsWithLimits = self.getElementLimits(); 
     #print(elementsWithLimits)    
 
+
     limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
     commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
     limits = self.db.query(limitQuery, (self.parameter,))
@@ -95,6 +99,7 @@ def icpReportHander(self, tests, totalSamples):
 
 
     print('ICP HANDLER')
+    print(sampleData)
     print(limits)
     #print(self.reportType)
     #print(footerComment)
@@ -104,16 +109,17 @@ def icpReportHander(self, tests, totalSamples):
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
 
     
-#TODO: sidebar have a s
+#TODO: have a helper change the hardness values when cal and mg values change 
+#TODO: remove ref value
 def icpLoader(self): 
-    print('LOADING ICP STUFF')
+    print('[FUNCTION]: icpLoader')
+    print('***Loading ')
     
-    #load the given data information and column 
     columnNames = [
         'Element Name', 
         'Element symbol',
         'Unit Value', 
-        'REF Value', #TODO: remove ref value
+        'REF Value', 
         'distal factor'
     ]
     
@@ -123,8 +129,7 @@ def icpLoader(self):
     #setting up the table
     totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
     initalColumns = len(columnNames)
-    
-    
+     
     self.loadClientInfo()
     
     #check if haas data to load into the file location 
@@ -133,7 +138,6 @@ def icpLoader(self):
     
     sampleData = list(self.db.query(sql1, (self.jobNum,)))
     sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
-    
     
     selectedSampleNames = []
     
@@ -177,7 +181,6 @@ def icpLoader(self):
         item2 = self.ui.dataTable.horizontalHeaderItem(i)
         item2.setText(key)
     
-    
     #Get all the names of the elments then sort them
     elementNames = []
         
@@ -188,16 +191,9 @@ def icpLoader(self):
     elementNames.sort()
     
     queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
-
-    #print(elementNames)
-    #print(len(elementNames))
-    
-    #self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
-    
     hardnessLocation = {}
-    #TODO: load in the right Elements and the unit values 
+
     for i, value in enumerate(elementNames): 
-        
         currentSymbol = elementSymbols[value]
         
         if(currentSymbol in ['Mg', 'Ca']): 
@@ -218,10 +214,10 @@ def icpLoader(self):
             item3.setText('mg/L')
         self.ui.dataTable.setItem(i, 2, item3)
         
-        #set distal factor to default of 1 
         item4 = QtWidgets.QTableWidgetItem()
         if(self.dilution == ''):
-            item4.setText('1')
+            distalFactorDefault = '1'           
+            item4.setText(distalFactorDefault)
         else: 
             item4.setText(str(self.dilution))
             
@@ -243,60 +239,40 @@ def icpLoader(self):
             item3.setText('ug/L')
             self.ui.dataTable.setItem(postion, 2, item3) 
     
-    
-    #print(hardnessLocation)
-    
-    #TODO: combine the two tables so can easily iterate through them lol 
-    #TODO: check if the sampleData's aren't empty 
-    
-    
+
     #TODO: combine both the datasets;
     #TODO: does this effect hardness and also what about the new values we enter in 
     
     machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
     machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
     
-    print(machine1)
-    print(machine2)
-    
-    
+    print('***Element Values')
     for i in range(len(elementNames)): 
         item = self.ui.dataTable.item(i, 1)
         
         if(item != None): 
             symbol = item.text()
-            #print(symbol)
-            
             for j, sample in enumerate(selectedSampleNames): 
+                print(f'*Sample: {sample}')
                 item = QtWidgets.QTableWidgetItem(); 
-                #currentCell = self.ui.dataTable
-                #machine1Val = machine1[sample][symbol]
-                #machine2Val = machine2[sample][symbol]
-                
-                #currentCell.setText(i,j, item)
                 
                 if sample in machine1 and symbol in machine1[sample]: 
                     machine1Val = machine1[sample][symbol] 
-                    print(symbol, ' 1  ', machine1Val)      
+                    print(f'Machine 1: {symbol} {machine1Val}')
                     
                     if(is_float(machine1Val) and self.dilution != 1 ): 
-                        print('is float bro')
                         temp = float(machine1Val)
                         temp = temp * float(self.dilution)
                         temp = round(temp, 3)
                         item.setText(str(temp))
                     else: 
                         item.setText(machine1Val)
-                    #currentCell.setText(i,j, item)
-                    
-                
+            
                 if sample in machine2 and symbol in machine2[sample]: 
                     machine2Val = machine2[sample][symbol] 
-                    
-                    print(symbol, ' 2  ', machine2Val) 
+                    print(f'Machine 2: {symbol} {machine2Val}')
                     
                     if(is_float(machine2Val) and self.dilution != 1): 
-                        print('is float ')
                         temp = float(machine2Val)
                         temp = temp * float(self.dilution)
                         temp = round(temp, 3)
@@ -304,34 +280,32 @@ def icpLoader(self):
                     else: 
                         machine2Val = round(machine2Val, 3 )
                         item.setText(str(machine2Val))
-                    #currentCell.setText(i,j, item)
             
                 self.ui.dataTable.setItem(i,j+5, item)
 
 
+    print('***Hardness Calculations')
     for j, sample in enumerate(selectedSampleNames):   
+        print(f'*Sample: {sample}')
         item = QtWidgets.QTableWidgetItem();  
         
         if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
             calcium = machine1[sample]['Ca'] 
             magnesium = machine1[sample]['Mg'] 
             
-            print('cal: ', calcium)
-            print('mag: ', magnesium)
+            print('calcium: ', calcium)
+            print('magnesium: ', magnesium)
             
             result = hardnessCalc(calcium, magnesium, self.dilution)
-            print('result: ', result)
+            print('Result: ', result)
             item.setText(str(result))
             self.ui.dataTable.setItem(33, j+5, item)
             
-            #item.setText(str(result))
-            #self.ui.dataTable.setItem(34,j+5, item)
-    
     column_width = self.ui.dataTable.columnWidth(2)
     padding = 10
     total_width = column_width + padding
     self.ui.dataTable.setColumnWidth(2, total_width)    
 
     self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-    self.ui.createIcpReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
+    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
 

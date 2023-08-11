@@ -19,8 +19,8 @@ from modules.dialogBoxes import *
 from modules.utilities import * 
 
 from interface import *
-from pages.icp_tools import icp_load_element_data, icpLoader, chmReportHandler
-from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader
+from pages.icp_tools import icp_load_element_data, icpLoader, icpReportHander
+from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader, chmReportHandler 
 from widgets.widgets import * 
     
 class MainWindow(QMainWindow):
@@ -44,7 +44,6 @@ class MainWindow(QMainWindow):
             databasePathTemp = openFile()
             self.db = Database(databasePathTemp)
             
-        #define other widget setups 
         self.setWindowTitle("Laboratory Information management System") 
         self.ui.LeftMenuContainerMini.hide()
 
@@ -63,88 +62,55 @@ class MainWindow(QMainWindow):
         
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
         self.showMaximized()
-                
-    def loadCreatePage(self): 
-        print('**Loading User Information')
-        
-        #load the report Types
-        self.ui.reportType.addItems(REPORTS_TYPE)
-
-        paramResults = sorted(self.getReportTypeList())
-        paramResults.insert(0, "")
-       
-        self.ui.paramType.addItems(paramResults)
-        
-        #based on what the reportType is should load the appropriate parameters Type 
-        
     
-    def loadReportsPage(self): 
+
+   #------------- Client Data Change  --------------     
+   
+    def on_clientName_1_textChanged(self):
+        self.clientInfo['clientName'] = self.ui.clientName_1.text()
+     
+    def on_date_1_textChanged(self): 
+        self.clientInfo['date'] = self.ui.date_1.text()
     
-        print('**Loading Report Page')
-       
-        #FIXME: include the other table and also some how to open up this table again  
-        #TODO: sort by date or somethingsetDatabase
-        
-        query = 'SELECT * FROM jobs' 
-        try: 
-            results = list(self.db.query(query)) 
-        except: 
-            results = []
-
-        self.ui.reportsTable.setRowCount(len(results))
-
-        #inital columns 
-        for row, current in enumerate(results): 
-            item = QtWidgets.QTableWidgetItem() 
-            item.setTextAlignment(Qt.AlignCenter)
-            item.setText(str(current[1])) 
-            self.ui.reportsTable.setItem(row, 0, item)  
-
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[2]))
-            self.ui.reportsTable.setItem(row, 1, item2)  
-            
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[3]))
-            self.ui.reportsTable.setItem(row, 2, item2)
-            
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[5]))
-            self.ui.reportsTable.setItem(row, 3, item2)  
-             
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-
+    def on_time_1_textChanged(self):
+        self.clientInfo['time'] = self.ui.time_1.text()
     
-            if(current[4] == 1): 
-                item2.setText('COMPLETE')
-            else: 
-                item2.setText("INCOMPLETE")
-                
-            self.ui.reportsTable.setItem(row,4, item2)   
-              
-            button = QPushButton("Open")
-            self.ui.reportsTable.setCellWidget(row,5, button)
-            button.clicked.connect(lambda _, row=row: print(row));
-            
-         
-        #button = QPushButton("Click me!")
-        #self.ui.reportsTable.setCellWidget(1,1, button)
+    def on_attention_1_textChanged(self):
+        self.clientInfo['attn'] = self.ui.attention_1.text()
         
-        self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
-
-        self.ui.reportsTable.verticalHeader().setVisible(True)
-
-        #TODO: if sleected open this thing 
-
-    def on_table_double_clicked(self, index):
-    # Open the row data
-        row = index.row()
-        print(f"Double clicked on row {row}")
+    def on_addy1_1_textChanged(self): 
+        self.clientInfo['addy1'] = self.ui.addy1_1.text()
+        
+    def on_addy2_1_textChanged(self): 
+        self.clientInfo['addy2'] = self.ui.addy2_1.text()
+    
+    def on_addy3_1_textChanged(self): 
+        self.clientInfo['addy3'] = self.ui.addy3_1.text()
+        
+    def on_sampleType1_1_textChanged(self):
+        self.clientInfo['sampleType1'] = self.ui.sampleType1_1.text()
+        
+    def on_sampleType_2_textChanged(self):
+        self.clientInfo['sampleType2'] = self.ui.sampleType2_1.text()
+    
+    def on_totalSamples_1_textChanged(self): 
+        self.clientInfo['totalSamples'] = self.ui.totalSamples_1.text() 
+    
+    def on_recvTemp_1_textChanged(self): 
+        self.clientInfo['recvTemp'] = self.ui.recvTemp_1.text()
+        
+    def on_tel_1_textChanged(self):
+        self.clientInfo['tel'] = self.ui.tel_1.text()
+    
+    def on_email_1_textChanged(self):
+        self.clientInfo['email'] = self.ui.email_1.text()
+    
+    def on_fax_1_textChanged(self): 
+        self.clientInfo['fax'] = self.ui.fax_1.text()
+    
+    def on_payment_1_textChanged(self): 
+        self.clientInfo['payment'] = self.ui.payment_1.text()
+        #print(self.clientInfo)
     
     #------------- Define Menu Button presses --------------
     
@@ -315,20 +281,118 @@ class MainWindow(QMainWindow):
         #print(f"Previous widget: {prev_widget}")
         #print(f"Current widget: {current_widget}")
         
+    #------------- Loading  --------------  
+    
+    def loadClientInfo(self): 
+        print('**Applying Client Infomation ')
+        #clear the first page 
+        self.ui.jobNumInput.setText('')
+        
+        #set the header parameter 
+        self.ui.jobNum.setText("W" + self.jobNum)
+        self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
+        self.ui.parameterHeader.setText(self.parameter); 
+        self.ui.reportTypeHeader.setText(self.reportType)
+        self.ui.clientName_1.setText(self.clientInfo['clientName'])
+        self.ui.date_1.setText(self.clientInfo['date'])
+        self.ui.time_1.setText(self.clientInfo['time'])
+        self.ui.attention_1.setText(self.clientInfo['attn'])
+        self.ui.addy1_1.setText(self.clientInfo['addy1'])
+        self.ui.addy2_1.setText(self.clientInfo['addy2'])
+        self.ui.addy3_1.setText(self.clientInfo['addy3'])
+        self.ui.sampleType1_1.setText(self.clientInfo['sampleType1'])
+        self.ui.sampleType2_1.setText(self.clientInfo['sampleType2'])
+        self.ui.totalSamples_1.setText(self.clientInfo['totalSamples'])
+        self.ui.recvTemp_1.setText(self.clientInfo['recvTemp'])
+        self.ui.tel_1.setText(self.clientInfo['tel'])
+        self.ui.email_1.setText(self.clientInfo['email'])
+        self.ui.fax_1.setText(self.clientInfo['fax'])
+        self.ui.payment_1.setText(self.clientInfo['payment'])
+               
+    def loadCreatePage(self): 
+        #TODO: based on what the reportType is should load the appropriate parameters Type 
+        print('**Loading User Information')
+ 
+        #load the report Types
+        self.ui.reportType.addItems(REPORTS_TYPE)
+        
+        paramResults = sorted(self.getReportTypeList())
+        paramResults.insert(0, "")
+        self.ui.paramType.addItems(paramResults)
+            
+    def loadReportsPage(self): 
+        #FIXME: include the other table and also some how to open up this table again  
+        #TODO: sort by date or somethingsetDatabase
+        print('**Loading Report Page')
+        query = 'SELECT * FROM jobs' 
+        
+        try: 
+            results = list(self.db.query(query)) 
+        except: 
+            results = []
 
+        self.ui.reportsTable.setRowCount(len(results))
+
+        #inital columns 
+        for row, current in enumerate(results): 
+            item = QtWidgets.QTableWidgetItem() 
+            item.setTextAlignment(Qt.AlignCenter)
+            item.setText(str(current[1])) 
+            self.ui.reportsTable.setItem(row, 0, item)  
+
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[2]))
+            self.ui.reportsTable.setItem(row, 1, item2)  
+            
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[3]))
+            self.ui.reportsTable.setItem(row, 2, item2)
+            
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+            item2.setText(str(current[5]))
+            self.ui.reportsTable.setItem(row, 3, item2)  
+             
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setTextAlignment(Qt.AlignCenter)
+
+            if(current[4] == 1): 
+                item2.setText('COMPLETE')
+            else: 
+                item2.setText("INCOMPLETE")
+                
+            self.ui.reportsTable.setItem(row,4, item2)   
+              
+            button = QPushButton("Open")
+            self.ui.reportsTable.setCellWidget(row,5, button)
+            button.clicked.connect(lambda _, row=row: print(row));
+        
+        self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
+
+        self.ui.reportsTable.verticalHeader().setVisible(True)
+
+        #TODO: if sleected open this thing 
+
+    def on_table_double_clicked(self, index):
+    # Open the row data
+        row = index.row()
+        print(f"Double clicked on row {row}")
+        
     #---------------- Defined Elements -----------------------
     
     def loadElementLimits(self): 
-        print('CHANGE')
+        print('[Function]: loadElementLimits')
         reportType = self.ui.reportTypeDropdown.currentText()
         elementName = self.ui.elementNameinput.text().lower()
-
         limitsQuery = 'SELECT * from icpLimits WHERE reportType = ? and element = ?'
         
         try: 
             self.db.execute(limitsQuery, (reportType, elementName))
             limitResults = self.db.fetchone()
-            print('results: ', limitResults)
+            print('Element Results: ', limitResults)
             if(limitResults is None): 
                 self.clearElementLimits()
             else: 
@@ -340,20 +404,18 @@ class MainWindow(QMainWindow):
             print('Error on loadElementLimits: Could not load in limits ')
        
     
-    #---------------------ISP PAGE ----------------------------
+    #---------------------ICP PAGE ----------------------------
     #TODO: deal with the side panel page 
     
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
         currentText = self.ui.elementInput.text()
-        
         if(currentText != ''): 
             print(currentText)
             self.ui.definedElements.addItem(currentText)
             self.ui.elementInput.clear()
         else: 
             print("Please enter not blank")
-         
          
     @pyqtSlot()
     def on_saveCompBtn_clicked(self): 
@@ -398,18 +460,17 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_deleteCompBtn_clicked(self):
+        #TODO: are you sure you wanted to delete this time popup
+        #TODO: error when deleting nothing
         print("Deleting the componenet")
 
         elementName = self.ui.elementNameinput.text().lower()
-        print(elementName)
-        #TODO: are you sure you wanted to delete this time popup
-        #TODO: error when deleting nothing
+        print(f'Element Name: {elementName}')
         
         deleteQuery = 'DELETE FROM icpElements WHERE element = ?'
         
         try: 
             deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
-            
             self.db.execute(deleteQuery, (elementName,))
             self.db.commit()
 
@@ -427,7 +488,6 @@ class MainWindow(QMainWindow):
         reportText = self.ui.reportNameInput.text()
         
         if(reportText != ''): 
-           
             createReportquerry = 'INSERT INTO icpReportType (reportType) values (?)'
             
             try:
@@ -442,7 +502,6 @@ class MainWindow(QMainWindow):
             print("Error No Report Name")
 
     def loadReportList(self): 
-        
         loadquerry = 'SELECT * FROM icpReportType' 
         results = self.db.query(loadquerry)
         
@@ -569,7 +628,6 @@ class MainWindow(QMainWindow):
         self.ui.dataTable.setRowCount(0)
     
     def updateIcpTable(self, result): 
-        
         textLabelUpdate = 'Total Search Results: ' + str(len(result))
 
         self.ui.icpLabel.setText(textLabelUpdate)
@@ -727,7 +785,6 @@ class MainWindow(QMainWindow):
     
     
     def getTestsAndUnits(self): 
-        
         inquery = 'SELECT testName, unitType FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
         results = self.db.query(inquery)
         
@@ -737,7 +794,6 @@ class MainWindow(QMainWindow):
         units = ['']
         
         for testName, unitType in results: 
-            
             
             if(testName != '' ): 
                 tests.append(testName)
@@ -750,10 +806,8 @@ class MainWindow(QMainWindow):
         print(self.chmParameters)
         
         return (tests,units)
-        
 
-
-    # -------------------- GCMS Data Entering --------------------
+    # -------------------- CHM Data Entering --------------------
     
     #TODO: have error handling for duplicates 
     #TODO: takes in the values from the 
@@ -770,7 +824,7 @@ class MainWindow(QMainWindow):
             if(unitVal == ''):
                 print("nothing") 
                 self.ui.gcmsUnitVal.setCurrentIndex(0); 
-            
+                
             else: 
                 print("something else")
                 index = self.ui.gcmsUnitVal.findText(unitVal) 
@@ -797,7 +851,6 @@ class MainWindow(QMainWindow):
             self.ui.gcmsStandardVal_2.setText(standards)
             self.ui.gcmsUnitVal_2.setText(units)
             self.ui.gcmsTests_2.setText(tests)  
-            
         else: 
             errorTitle = 'Cannot Proceed with CHM Process'
             errorMsg = ''
@@ -814,7 +867,6 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()   
     def on_gcmsAddTestsBtn_2_clicked(self): 
-        
         standards = self.ui.gcmsStandardVal_2.text().strip()
         units = self.ui.gcmsUnitVal_2.text().strip()
         testName = self.ui.gcmsTests_2.text().strip()  
@@ -829,9 +881,7 @@ class MainWindow(QMainWindow):
         errorCheck[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1; 
         errorCheck[2] = 0 if sampleVal != '' else 1; 
                 
-        
         if(sum(errorCheck) == 0): 
-            
             sampleNum = testNum + '-' + sampleNum; 
             
             checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?)'
@@ -839,14 +889,12 @@ class MainWindow(QMainWindow):
             result = self.db.fetchone()[0]
             
             if(result == 1): 
-                
                 msgBox = QMessageBox()  
                 msgBox.setText("Duplicate Sample");
                 duplicateMsg = "Would you like to overwrite existing sample " + str(sampleNum) + " ?"
                 msgBox.setInformativeText(duplicateMsg);
                 msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
                 msgBox.setDefaultButton(QMessageBox.Yes);
-                
                 x = msgBox.exec_()
 
                 if(x == QMessageBox.Yes): 
@@ -896,7 +944,6 @@ class MainWindow(QMainWindow):
         self.ui.gcmsUnitVal.clear()
         self.ui.gcmsTests.clear() 
            
-
     def gcmsClearEnteredTestsData(self): 
         self.ui.gcmsTestsValueWidget.setEnabled(False)
         self.ui.widget_28.setEnabled(True)
@@ -912,7 +959,6 @@ class MainWindow(QMainWindow):
         self.ui.gcmsTestsJobNum.clear()
         self.ui.gcmsTestsSample.clear()
         self.ui.gcmsTestsVal.clear()
-        
         self.ui.gcmsTestsLists.clear()
 
 
@@ -934,7 +980,6 @@ class MainWindow(QMainWindow):
         self.ui.gcmsInputTable.setColumnCount(len(TableHeader))
         self.ui.gcmsInputTable.setHorizontalHeaderLabels(TableHeader)
         
-        
         query = 'SELECT * FROM gcmsTestsData ORDER BY jobNum ASC'
         results = self.db.query(query, [])
         print(results)
@@ -943,7 +988,6 @@ class MainWindow(QMainWindow):
         for i, result in enumerate(results):
             for j in range(len(TableHeader)-1): 
                  self.ui.gcmsInputTable.setItem(i, j, QtWidgets.QTableWidgetItem(str(result[j])))     
-            
             
             #button.setText("Delete")
             #button.clicked.connect(self.handleDeleteButtonClick)
@@ -969,7 +1013,6 @@ class MainWindow(QMainWindow):
     
     
     # ----------------------- Settings Page ------------------------
-    
     def on_settingsStack_currentChanged(self, index): 
         if(index == 2): 
             self.ui.authorList.clear()
@@ -995,7 +1038,6 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['reportsPath'] = newLocation; 
             save_pickle(paths)
-
             self.ui.reportPath.setText(paths['reportsPath'])
         
     @pyqtSlot()
@@ -1249,34 +1291,6 @@ class MainWindow(QMainWindow):
         if(column >= 5):
             print(self.ui.dataTable.item(row,column).text())
             
-        
-        
-    def loadClientInfo(self): 
-        print('**Applying Client Infomation ')
-        #clear the first page 
-        self.ui.jobNumInput.setText('')
-        
-        #set the header parameter 
-        self.ui.jobNum.setText("W" + self.jobNum)
-        self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
-        self.ui.parameterHeader.setText(self.parameter); 
-        self.ui.reportTypeHeader.setText(self.reportType)
-        self.ui.clientName_1.setText(self.clientInfo['clientName'])
-        self.ui.date_1.setText(self.clientInfo['date'])
-        self.ui.time_1.setText(self.clientInfo['time'])
-        self.ui.attention_1.setText(self.clientInfo['attn'])
-        self.ui.addy1_1.setText(self.clientInfo['addy1'])
-        self.ui.addy2_1.setText(self.clientInfo['addy2'])
-        self.ui.addy3_1.setText(self.clientInfo['addy3'])
-        self.ui.sampleType1_1.setText(self.clientInfo['sampleType1'])
-        self.ui.sampleType2_1.setText(self.clientInfo['sampleType2'])
-        self.ui.totalSamples_1.setText(self.clientInfo['totalSamples'])
-        self.ui.recvTemp_1.setText(self.clientInfo['recvTemp'])
-        self.ui.tel_1.setText(self.clientInfo['tel'])
-        self.ui.email_1.setText(self.clientInfo['email'])
-        self.ui.fax_1.setText(self.clientInfo['fax'])
-        self.ui.payment_1.setText(self.clientInfo['payment'])
-
 
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
@@ -1291,54 +1305,9 @@ class MainWindow(QMainWindow):
             if(item != None): 
                 widget = item.widget()
                 self.ui.formLayout.removeWidget(widget)
-            
     
-    def on_clientName_1_textChanged(self):
-        self.clientInfo['clientName'] = self.ui.clientName_1.text()
-     
-    def on_date_1_textChanged(self): 
-        self.clientInfo['date'] = self.ui.date_1.text()
-    
-    def on_time_1_textChanged(self):
-        self.clientInfo['time'] = self.ui.time_1.text()
-    
-    def on_attention_1_textChanged(self):
-        self.clientInfo['attn'] = self.ui.attention_1.text()
-        
-    def on_addy1_1_textChanged(self): 
-        self.clientInfo['addy1'] = self.ui.addy1_1.text()
-        
-    def on_addy2_1_textChanged(self): 
-        self.clientInfo['addy2'] = self.ui.addy2_1.text()
-    
-    def on_addy3_1_textChanged(self): 
-        self.clientInfo['addy3'] = self.ui.addy3_1.text()
-        
-    def on_sampleType1_1_textChanged(self):
-        self.clientInfo['sampleType1'] = self.ui.sampleType1_1.text()
-        
-    def on_sampleType_2_textChanged(self):
-        self.clientInfo['sampleType2'] = self.ui.sampleType2_1.text()
-    
-    def on_totalSamples_1_textChanged(self): 
-        self.clientInfo['totalSamples'] = self.ui.totalSamples_1.text() 
-    
-    def on_recvTemp_1_textChanged(self): 
-        self.clientInfo['recvTemp'] = self.ui.recvTemp_1.text()
-        
-    def on_tel_1_textChanged(self):
-        self.clientInfo['tel'] = self.ui.tel_1.text()
-    
-    def on_email_1_textChanged(self):
-        self.clientInfo['email'] = self.ui.email_1.text()
-    
-    def on_fax_1_textChanged(self): 
-        self.clientInfo['fax'] = self.ui.fax_1.text()
-    
-    def on_payment_1_textChanged(self): 
-        self.clientInfo['payment'] = self.ui.payment_1.text()
-        #print(self.clientInfo)
-    
+    # ----------------------- SQL Queries ------------------------ 
+
     def getReportTypeList(self): 
         getReportsQuery = 'SELECT * FROM icpReportType' 
         reportTypes = self.db.query(getReportsQuery)
@@ -1350,7 +1319,6 @@ class MainWindow(QMainWindow):
             temp.append(item[0])
             
         return temp; 
-
 
     #SQL Query Functions 
     def getElementLimits(self): 

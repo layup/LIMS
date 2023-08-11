@@ -11,16 +11,27 @@ from PyQt5.QtWidgets import (
     QSpacerItem, QSizePolicy
 )
 
+from modules.excel.chmExcel import createChmReport
 
 def chmLoader(self): 
-    print('CHM LOADER')
-    
-    self.loadClientInfo()
-
     #TODO: scan in the TXT Tests, scan in from Defined Tests too 
     #TODO: fix the error checking 
     
+    print('[FUNCTION]: chmLoader')
+  
+    columnNames = [
+        'Tests', 
+        'Display Name',
+        'Unit', 
+        'Standard Recovery', 
+        'Distal factor'
+    ]
     
+    initalColumns = len(columnNames)
+    GSMS_TESTS_LISTS = []
+    
+    self.loadClientInfo()
+
     #load sample names 
     for i, (key,value) in enumerate(self.sampleNames.items()):
         item = SampleNameWidget(key, value)
@@ -28,26 +39,14 @@ def chmLoader(self):
         item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
     
     self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
-    
-    GSMS_TESTS_LISTS = []
-    #ICP_TESTS_LISTS = []
-    #tests = []
-    
+        
     for (currentJob ,testList) in self.sampleTests.items(): 
         for item in testList: 
-            
             temp = remove_escape_characters(str(item)) 
             
-            if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):
-                                    
+            if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):          
                 GSMS_TESTS_LISTS.append(temp)
 
-            #if(temp not in ICP_TESTS_LISTS and 'ICP' in temp):
-            #    ICP_TESTS_LISTS.append(temp)
-                
-            #if(temp not in tests): 
-            #    tests.append(temp)
-    
     
     testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
     testsResults = self.db.query(testsQuery, (self.jobNum,))
@@ -62,22 +61,10 @@ def chmLoader(self):
     GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
     print(GSMS_TESTS_LISTS) 
 
-
-    #inital setup 
-    columnNames = [
-        'Tests', 
-        'Display Name',
-        'Unit', 
-        'Standard Recovery', 
-        'Distal factor'
-    ]
-    
-    initalColumns = len(columnNames)
     self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
     self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
     self.ui.dataTable.horizontalHeader().setVisible(True)
     self.ui.dataTable.verticalHeader().setVisible(True)
-
     self.ui.dataTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     
     #inital columns 
@@ -90,10 +77,8 @@ def chmLoader(self):
     #set the names of the columns 
     #self.ui.dataTable.setHorizontalHeaderLabels(columnNames)
     
-    
     #populate with sample names 
     for i , (key,value ) in enumerate(self.sampleNames.items(), start=initalColumns):
-
         item = QtWidgets.QTableWidgetItem()
         self.ui.dataTable.setHorizontalHeaderItem(i, item)
         item2 = self.ui.dataTable.horizontalHeaderItem(i)
@@ -136,7 +121,6 @@ def chmLoader(self):
                 if result is not None: 
                     #print(result)
                     
-                
                     #value
                     item = QtWidgets.QTableWidgetItem()
                     item.setText(str(result[2]))
@@ -161,24 +145,24 @@ def chmLoader(self):
     #TODO: add the item changed thing 
     #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
 
-
-    self.ui.createGcmsReportBtn.clicked.connect(lambda: self.chmReportHandler(GSMS_TESTS_LISTS)); 
+    self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, GSMS_TESTS_LISTS)); 
     
 def chmReportHandler(self, tests):
-    
-    print('Tests: ', tests)
     #FIXME: adjust based on the sample information 
     #FIXME: crashes when doing gcms to icp without closing program 
+    print('[FUNCTION]: chmReportHandler')
+    print('*Tests: ', tests)
+    
     initalColumns = 5; 
     totalSamples = len(self.sampleNames)
     totalTests = len(tests)
+    
     sampleData = {}
     unitType = []
     recovery = []
     displayNames = []
     
-    for col in range(initalColumns, totalSamples + initalColumns ): 
-        
+    for col in range(initalColumns, totalSamples + initalColumns): 
         currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
         print('currentJob Test: ', currentJob)
         jobValues = []
@@ -200,7 +184,7 @@ def chmReportHandler(self, tests):
                 displayNames.append(testsName)
             else: 
                 displayNames.append(tests[row])
-    
+                
         except: 
             print("Error: appending test name")
             displayNames.append(tests[row])
@@ -221,14 +205,10 @@ def chmReportHandler(self, tests):
         except: 
             recovery.append('')       
             
-
-    #print("UNITS TESTING: ", unitType)
-    
-    createGcmsReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
+    createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
 
 
 def chmLoadTestsData(self): 
-    
     selectedTests = self.ui.gcmsDefinedtests.currentItem()
             
     if selectedTests is not None:

@@ -1,3 +1,4 @@
+import math 
 import os 
 
 from openpyxl import Workbook, load_workbook
@@ -7,10 +8,6 @@ from openpyxl.cell.rich_text import TextBlock, CellRichText
 from openpyxl.worksheet.page import PageMargins
 from openpyxl.drawing.image import Image
 from openpyxl.worksheet.header_footer import HeaderFooter
-
-import math 
-import re 
-import os 
 
 from modules.utilities import * 
 from modules.constants import *
@@ -24,167 +21,14 @@ thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
 
-
-def createGcmsReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType, recovery):
-    print('CREATING GCMS REPORT')
-    print(clientInfo)
-    print(sampleNames)
-    print(sampleData)
-    print(testInfo)
-    print(unitType)
-    print(recovery)
-    print("--------------------")
-   
-    #FIXME: picke saving and loading without being fucked up, get path of where things should be saved
-    temp = load_pickle('data.pickle') 
-    exportPath = temp['reportsPath']
-    
-    wb = Workbook()
-    ws = wb.active
-    
-    pageSetup(ws); 
-    createFooters(ws); 
-
-    #SETTING UP MAIN INFORMATION 
+def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, foooterComment): 
+    #TODO: missing the report type that will get called into this thing 
     #TODO: determine how far out the longest thing is 
     #FIXME: check out for none issue when they appear
-    
-    ws = createHeader(ws, clientInfo, 'D')
-    ws.column_dimensions['A'].width = 20 #120px 
-    #ws.column_dimensions['G'].width = 14 
-    ws.column_dimensions['H'].width = 19
-    ws.print_title_rows = '1:8' # the first two rows
-    
-    
-    #INSERT NEW COLUMN FOR So
-    totalCols = 8 
-    pageSize = 61 
-    
-    
-    #FIXME: add the proper job number instead of placeholder 
-    jobNumLocation = ws.cell(row=1, column=8)
-    jobNumLocation.value = "W" + str(jobNum)
-    jobNumLocation.alignment = Alignment(horizontal='right', vertical='center')
+    #TODO: tests how many of the tests need footer comments 
+    #TODO: determine how long the extra tests comments are 
+    #TODO: factor that into the size insertion 
 
-    sampleSections = []
-    samplePlacement = []
-    currentWord = ''
-    temp = []
-    
-    totalSamples = len(sampleData.keys())
-    print('Total Samples: ', totalSamples)
-    #FIXME: so page amounts change based on column width, so takes in how many pages we want 
-    formatRows(ws, totalSamples, totalCols, pageSize);
-    
-    #can only display 4 at a time 
-    currentWord = ""
-    temp = []
-    
-    for i, (key,value) in enumerate(sampleNames.items(), start=1): 
-        
-        stripedWord = " ".join(value.split())
-
-        #print(key," ".join(value.split()))
-        currentWord += " " + str(i) + ") " + stripedWord + " "
-        temp.append(key)
-
-        if(i % 4 == 0): 
-            print(currentWord)
-            sampleSections.append(currentWord)
-            samplePlacement.append(temp)
-            currentWord = ""
-            temp = []
-    
-    if(currentWord != ''):
-        sampleSections.append(currentWord)
-        samplePlacement.append(temp) 
-    
-    print('Sample Placement: ', samplePlacement)
-    print('Sample Sections: ', sampleSections)
-    
-    
-    pageSize = 56; 
-    allocatedSpace = 20; 
-    
-    testSize = len(testInfo)
-    tableSize = 6 + testSize 
-    totalSampleSections = len(sampleSections)
-    print('Total Sample Sections: ', totalSampleSections)
-    
-    totalTablesWithComments = math.floor((pageSize - allocatedSpace)/tableSize)
-    print('Tables with comments: ' , totalTablesWithComments)
-    
-    #totalTablesWithoutComments = math.floor((pageSize - (8+6))/tableSize)
-    #print('Tables without comments: ', totalTablesWithoutComments)
-    
-    totalPages = math.ceil(totalSampleSections/totalTablesWithComments)
-    print('Total Pages: ', totalPages)
-    
-    usedSamples = 0; 
-    pageLocation = 9; 
-    totalTests = len(testInfo)
-
-    #determine when the next page is? 
-    counter = 0; 
-    
-    for currentPage in range(totalPages): 
-        
-        print('current page:', currentPage)
-        sampleAmount = len(samplePlacement[counter])
-  
-        
-        if(currentPage != 0): 
-            pageLocation = (pageSize * currentPage) - (8 * (currentPage-1)) + 1  
-        else: 
-            pageLocation = 9; 
-        
-        #last page 
-        if(currentPage+1 == totalPages): 
- 
-            remainingSamples = totalSampleSections - counter; 
-            
-            for i in range(remainingSamples): 
-                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
-                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
-                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)
-                
-                if(i+1 == remainingSamples): 
-                    pageLocation = insertComments(ws, pageLocation)  
-                    pageLocation+=1; 
-             
-                    img = Image('signature.png')
-                    cell = ws.cell(row=pageLocation, column=3)
-                    coordinate = cell.coordinate
-                    ws.add_image(img, coordinate)
-                        
-                counter+=1; 
-                usedSamples += 4;
-        
-        #not the last page
-        else: 
-            print('Not Last Page')
-            for i in range(totalTablesWithComments): 
-                pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
-                pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
-                pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)   
-                
-                if(i+1 == totalTablesWithComments): 
-                    comment = ws.cell(row=pageLocation, column=1)
-                    comment.value = 'continued on next page....'
-                    comment.font = Font(bold=True, size=9, name="Times New Roman")  
-                    
-                counter+=1; 
-                usedSamples += 4; 
-        
-    
-    fileName = 'W' + str(jobNum) + ".chm" 
-    filePath = os.path.join(exportPath, fileName)
-    print('Export Path: ', filePath)
-    
-    wb.save(filePath)
-    
-
-def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, foooterComment): 
     print('ICP general Information')
     print(clientInfo)
     print(sampleNames)
@@ -194,7 +38,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     print(limitElements)
     print(limits)
     print('-------------------------')
-    #TODO: missing the report type that will get called into this thing 
+        
     temp = load_pickle('data.pickle') 
     exportPath = temp['reportsPath']
 
@@ -216,28 +60,21 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     ws = wb.active
     
     pageSetup(ws);    
-    createFooters(ws); 
+    reportTitle = 'ICP REPORT'
+    createFooters(ws, reportTitle, jobNum); 
 
-    #SETTING UP MAIN INFORMATION 
-    #TODO: determine how far out the longest thing is 
-    #FIXME: check out for none issue when they appear
-    #TODO: add the job number to the end of this thing mf 
-        
     ws = createHeader(ws, clientInfo, 'D')
     ws.column_dimensions['A'].width = 20 #120px 
     ws.column_dimensions['H'].width = 19 
     ws.print_title_rows = '1:8' # the first two rows
-
-    #FIXME: add this to the header information  
-    jobNumLocation = ws.cell(row=1, column=8)
-    jobNumLocation.value = "W" + str(jobNum)
-    jobNumLocation.alignment = Alignment(horizontal='right', vertical='center')
     
     #determine how many rows the sample name will take 
     sampleSections = []
     samplePlacement = []    
     selectedNames = []
-    
+        
+    #determine how many sample sections we will need 
+   
     currentWord = ''
     temp = []
     
@@ -265,34 +102,12 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         currentWord = ""
         temp = [] 
             
-
-    #insert sample names section
     print('Sample Placement: ', samplePlacement)
     print('Sample Sections: ', sampleSections)
+    
     totalTests = len(testInfo)
     totalPages = len(samplePlacement)
     
-    
-    #for loop that goes through each page, tell the starting page 
-    #insert the sample names 
-    #insert the test headers 
-    #insert the test data 
-    #insert the ending or continue to next page  
-    
-    #793 = total size of page 1 
-    #first page has 61 pages (61 + 61 - 8) or (61 * (total) - (8 * total - 1))
-    #next page is only 45 pages + 8 (not accounted for)
-    #start = 9, insert 41 things, end = 50, page end = 61 
-    #[0,1,2]
-    #if 0, start at 9
-    #if 1 = (61 * i) - (8 * (i-1)) + 1 =  62
-    #if 2 = (61 * 2) - (8 * 1) + 1 = 115 
-    #if 2 = (61 * 3) - (8 * 2) + 1 = 
-    
-    
-    #TODO: tests how many of the tests need footer comments 
-    #TODO: determine how long the extra tests comments are 
-    #TODO: factor that into the size insertion 
     totalCols = 8 
     pageSize = 61; 
     pageLocation = 9; 
@@ -303,7 +118,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     
     print('Total Samples: ', totalSamples);
     formatRows(ws, totalSamples, totalCols, pageSize)
-    #how do we know where to start each loop? 
+
     for currentPage in range(totalPages): 
         
         sampleAmount = len(samplePlacement[currentPage])
@@ -316,28 +131,14 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1, totalCols ) 
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
-            #TODO: insert the comment 
             if(totalPages > 1): 
                 comment = ws.cell(row=pageLocation, column=1)
                 comment.value = 'Continued on next page ....'
                 comment.font = Font(bold=True, size=9, name="Times New Roman")
             else: 
                 print('Insert comment and signature') 
-                
-                for (i, value) in enumerate(foooterComment):
-                    comment = ws.cell(row=pageLocation, column=1)
-                    comment.value = value
-                    comment.font = Font(size=9, name="Times New Roman") 
-                    pageLocation+=1; 
-                    
-                pageLocation+=1; 
-                img = Image('signature.png')
-                cell = ws.cell(row=pageLocation, column=4)
-                coordinate = cell.coordinate
-                ws.add_image(img, coordinate)
-
-
-            
+                insertSignature(ws, pageLocation, [3,6])
+                  
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 
             print('Starting Location: ', pageLocation) 
@@ -351,13 +152,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
                     comment.value = value
                     comment.font = Font(size=9, name="Times New Roman") 
                     pageLocation+=1; 
-
-
-                pageLocation+=1; 
-                img = Image('signature.png')
-                cell = ws.cell(row=pageLocation, column=4)
-                coordinate = cell.coordinate
-                ws.add_image(img, coordinate)
+ 
+                insertSignature(ws, pageLocation, [3,6])
             else: 
                 comment = ws.cell(row=pageLocation, column=1)
                 comment.value = 'Continued on next page ....'
@@ -369,7 +165,6 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     print(f'The width of the worksheet is {maxWidth} columns')
     print('Current Page location: ', pageLocation); 
     
-     
     fileName = 'W' + str(jobNum) + ".001" 
     filePath = os.path.join(exportPath, fileName)
     print('Export Path: ', filePath)
@@ -377,7 +172,6 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     wb.save(filePath)
 
 def pageSetup(ws): 
-   
     # set the default view to page layout
     ws.sheet_view.view = "pageLayout" 
 
@@ -402,38 +196,59 @@ def pageSetup(ws):
     
 #FORMATS WAY MORE THEN NEEDED BUT W/
 def formatRows(ws, totalSamples, totalCols, pageSize): 
-
+    window_conversion = 0.75 
+    row_height_pixels = 13
+    
     totalPages = math.ceil(totalSamples/4) 
-    print('Total Pages: ', totalPages)
-
     totalRows = (pageSize * totalPages) - (8 * (totalPages-1))
+    
+    print('Total Pages: ', totalPages)
     print('Total Rows: ', totalRows)
 
     for row in ws.iter_rows(min_row=1, max_col=totalCols, max_row=totalRows): 
-        
         for cell in row:
             cell.font = defaultFont 
-            
-            #if(cell.row < 10): 
-            ws.row_dimensions[cell.row].height = 13
+            ws.row_dimensions[cell.row].height = (row_height_pixels * window_conversion)
             
 
-
-def createFooters(ws): 
+def generateSampleHeaderNames(ws, sampleNames): 
+    sampleSections = []
+    samplePlacement = []
     
-    #Setting up the headers and footers 
+    currentWord = ""
+    temp = []
+
+    for i, (key,value) in enumerate(sampleNames.items(), start=1): 
+        stripedWord = " ".join(value.split())
+        currentWord += " " + str(i) + ") " + stripedWord + " "
+        temp.append(key)
+
+        if(i % 4 == 0): 
+            print(currentWord)
+            sampleSections.append(currentWord)
+            samplePlacement.append(temp)
+            currentWord = ""
+            temp = []
+    
+    if(currentWord != ''):
+        sampleSections.append(currentWord)
+        samplePlacement.append(temp) 
+
+        
+    return sampleSections, samplePlacement 
+
+def createFooters(ws, title, jobNumber): 
     ws.oddHeader.fontName = 'Times New Roman'
     ws.oddHeader.fontSize = 14
 
     ws.evenHeader.left.font_name = 'Times New Roman'
     ws.evenHeader.left.font_size = 14
     
-    ws.oddHeader.left.text  = 'GCMS - Report Form: &D'
-    ws.evenHeader.left.text = 'GCMS - Report Form: &D' 
+    ws.oddHeader.left.text  = title + ': &D'
+    ws.evenHeader.left.text = title + ': &D' 
     
-    
-    ws.oddHeader.right.text  = "Page &P of &N"
-    ws.evenFooter.right.text = "Page &P of &N"
+    ws.oddHeader.right.text  = f"Page &P of &N \n W{jobNumber}"
+    ws.evenFooter.right.text = f"Page &P of &N \n W{jobNumber}"
     
     ws.oddFooter.left.text  = '&BT:&B 250 656 1334 \n&BE:&B info@mblabs.com'
     ws.evenFooter.left.text = '&BT:&B 250 656 1334 \n&BE:&B info@mblabs.com' 
@@ -448,10 +263,7 @@ def createFooters(ws):
 def createHeader(ws, clientInfo, column2): 
     
     ws['A1'] = clientInfo['clientName']
-    
-    #font = Font(size=9)
-    #ws['A1'].font = font
-    
+        
     if(clientInfo['attn'] is None): 
         ws['A2'] = '*' 
     else: 
@@ -467,28 +279,18 @@ def createHeader(ws, clientInfo, column2):
     ws[column2 + '2'] = "Source: " + clientInfo['sampleType1']
     ws[column2 + '3'] = "Type: " + clientInfo['sampleType2']
     ws[column2 + '4'] = "No. of Samples: " + clientInfo['totalSamples']
-    ws[column2 + '5'] = "Arrival temp: " + clientInfo['recvTemp']
-    ws[column2 + '6'] = "PD: " + clientInfo['payment']
+    ws[column2 + '6'] = "Arrival temp: " + clientInfo['recvTemp']
+    ws[column2 + '7'] = "PD: " + clientInfo['payment']
     
     return ws 
      
-def createComments(ws):
-    pass;      
-
-def mergeSampleSection(ws, row, col): 
-    
-    pass; 
-
 def nextPage(curVal, curPage): 
-    
     #minue 9 for each interation that we increase 
-    
     pageEnds = [47]
     
     for i in range(10):
         pageEnds.append(pageEnds[i] + 37)
         
-    
     if(curVal > pageEnds[curPage]): 
         print('FALSE')
         return False 
@@ -497,7 +299,6 @@ def nextPage(curVal, curPage):
         return True; 
 
 def insertSampleName(ws, row, sampleSection, totalRows): 
-    
     temp = ws.cell(row=row, column=1)
     temp.value = 'Samples: ' + sampleSection
     temp.border = Border(bottom=thinBorder)
@@ -508,7 +309,6 @@ def insertSampleName(ws, row, sampleSection, totalRows):
     return row + 3; 
     
 def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, totalCols): 
-    
     tests = ws.cell(row=pageLocation, column=1)
     if(reportType == 0):
         tests.value = 'Tests'
@@ -560,7 +360,6 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, total
     
     pageLocation+=1; 
     
-        
     for i in range(1,totalCols+1): 
         current = ws.cell(row=pageLocation, column=i) 
         
@@ -585,7 +384,6 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, total
 
 #will change how we get the tests and unit type, will be saved somewhere 
 def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType, recovery): 
-
     print('test info fam: ', testInfo)
     counter = pageLocation
 
@@ -610,11 +408,8 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
         
         recoveryPlacement.border = Border(left=thinBorder, right=thinBorder)
         recoveryPlacement.alignment = Alignment(horizontal='center', vertical='center')  
-        
-
-        
-        counter+=1; 
     
+        counter+=1; 
     
     counter = pageLocation 
     
@@ -642,7 +437,6 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
         ws.cell(row=pageLocation, column=i).border = Border(top=thinBorder)
             
     pageLocation += 1; 
-
     
     return pageLocation; 
 
@@ -661,14 +455,6 @@ def insertComments(ws, pageLocation):
     pageLocation+=5; 
     return pageLocation; 
 
-
-
-def insertSignature(ws, pageLocation): 
-    
-    name1 = 'R. Bilodeau'
-    title1 = 'Analytical Chemist'
-    name2 = 'H. Hartmann'
-    
 
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
     #variables 
@@ -841,3 +627,25 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
     pageLocation +=1; 
     
     return pageLocation; 
+
+
+def insertSignature(ws, pageLocation, startColumn): 
+    names = [
+        'R. Bilodeau', 
+        'H. Hartmann'
+    ]
+    postions = [
+        'Analytical Chemist',
+        'Sr Analytical Chemist'
+    ]
+    
+    for i, col in enumerate(startColumn): 
+        scientistName = ws.cell(row=pageLocation, column=col) 
+        scientistPostion = ws.cell(row=pageLocation+1, column=col)
+        
+        scientistName.value = names[i]
+        scientistPostion.value = postions[i]
+        
+        for j in range(2): 
+            signatureLine = ws.cell(row=pageLocation, column=col+j)
+            signatureLine.border = Border(top=thinBorder)
