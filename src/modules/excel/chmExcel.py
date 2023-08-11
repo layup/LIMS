@@ -44,11 +44,9 @@ def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitT
     ws.column_dimensions['H'].width = 19
     ws.print_title_rows = '1:8' # the first two rows
     
-    #INSERT NEW COLUMN FOR So
     totalCols = 8 
     pageSize = 61 
  
-
     sampleSections = []
     samplePlacement = []
     currentWord = ''
