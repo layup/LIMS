@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
     QSpacerItem, QSizePolicy
 )
 
-
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 
         super(SampleNameWidget ,self).__init__(parent)
@@ -25,8 +24,6 @@ class SampleNameWidget(QWidget):
         layout.addWidget(self.label)
         layout.addWidget(self.edit)
         layout.addWidget(self.button)
-
-  
         
         self.setLayout(layout)
 
@@ -56,7 +53,6 @@ class SaveMessageBoxWidget(QWidget):
 
 
 #check for duplicates 
-
 class CustomDialog(QDialog):
     def __init__(self, data, reportType):
         super().__init__()

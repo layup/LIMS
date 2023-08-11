@@ -1,28 +1,27 @@
-#PYQT Imports 
+import sys 
+import re 
+import pickle
+
 from PyQt5 import QtWidgets
+from PyQt5.Qt import Qt
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem 
+    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
+    QSpacerItem, QSizePolicy
 )
-from PyQt5.Qt import Qt
-from PyQt5.QtCore import QObject, pyqtSlot, QDateTime
 
-#general Imports 
-import sys 
-import pandas as pd
-import json
-import sys 
-import re 
-import asyncio
-import pickle
-import string
-
-
+from modules.constants import *
 from modules.createExcel import * 
-from modules.utilities import * 
 from modules.dbManager import *
+from modules.dialogBoxes import *
+from modules.utilities import * 
+
 from interface import *
+from pages.icp_tools import icp_load_element_data, icpLoader, chmReportHandler
+from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader
+from widgets.widgets import * 
     
 class MainWindow(QMainWindow):
     
@@ -33,12 +32,14 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self) 
         
         paths = load_pickle('data.pickle')
-        print(paths)
+        print('**Paths')
+        for key, value in paths.items():
+            print(key, value)
        
-        
         if(isValidDatabase(paths['databasePath'])): 
             self.db = Database(paths['databasePath'])
         else: 
+            #TODO: add popup 
             print('Database not valid')
             databasePathTemp = openFile()
             self.db = Database(databasePathTemp)
@@ -52,7 +53,6 @@ class MainWindow(QMainWindow):
         self.ui.settingsStack.setCurrentIndex(3)
         self.ui.reportsBtn1.setChecked(True)
         
-       
         #load the setup 
         self.loadCreatePage()
 
@@ -61,84 +61,11 @@ class MainWindow(QMainWindow):
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
         
-        
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
         self.showMaximized()
-        
-        
-    def open_new_window(self):
-        #data = 'Hello from Main Window!'
-        #new_window = NewWindow(data)
-        #new_window.show()
-        
-        data = [
-            [1, 'John', 'Doe'],
-            [2, 'Jane', 'Smith'],
-            [3, 'Bob', 'Johnson']
-        ]
-
-        dialog = CustomDialog(data, 1)
-        #dialog.exec_()
-        
-        if dialog.exec_() == QDialog.accept:
-            print('Dialog closed with Accept')
-        else:
-            print('Dialog closed with Reject')
-
-
-    ## Change QPushButton Checkable status when stackedWidget index changed
-    def messageBox(self):
-        msgBox = QMessageBox()  
-        msgBox.setText("The document has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
-        msgBox.setDefaultButton(QMessageBox.Save);
-        #msgBox.buttonClicked.connect(self.msgbtn)
-        x = msgBox.exec_()  # this will show our messagebox
-        
-        if(x == QMessageBox.Save): 
-            self.ui.stackedWidget.setCurrentIndex(0)  
-            self.activeCreation = False; 
-        if(x == QMessageBox.Discard):
-            self.ui.stackedWidget.setCurrentIndex(0) 
-            self.activeCreation = False; 
-        if(x == QMessageBox.Cancel):
-            pass 
-        
-    
-    def loadReport(self): 
-        msgBox = QMessageBox()  
-        msgBox.setText("Report Already Exists");
-        msgBox.setInformativeText("Would you like to load existing report or overwrite report?");
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
-        msgBox.setDefaultButton(QMessageBox.Yes);
-        
-        x = msgBox.exec_()
-
-        if(x == QMessageBox.Yes): 
-            pass
-            #FIXME: load in the values as well 
-        if(x == QMessageBox.No):
-            pass 
-        if(x == QMessageBox.Cancel):
-            pass 
-        
-    def deleteBox(self, title, message, action):
-        msgBox = QMessageBox()  
-        msgBox.setText(title);
-        msgBox.setInformativeText(message);
-        msgBox.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-        x = msgBox.exec_() 
-        
-        if(x == QMessageBox.Yes): 
-            pass
-        if(x == QMessageBox.No):
-            pass 
-        
-            
-
+                
     def loadCreatePage(self): 
-        print('Loading user information')
+        print('**Loading User Information')
         
         #load the report Types
         self.ui.reportType.addItems(REPORTS_TYPE)
@@ -153,7 +80,7 @@ class MainWindow(QMainWindow):
     
     def loadReportsPage(self): 
     
-        print('Loading Report Page')
+        print('**Loading Report Page')
        
         #FIXME: include the other table and also some how to open up this table again  
         #TODO: sort by date or somethingsetDatabase
@@ -161,7 +88,6 @@ class MainWindow(QMainWindow):
         query = 'SELECT * FROM jobs' 
         try: 
             results = list(self.db.query(query)) 
-            #print(results)
         except: 
             results = []
 
@@ -189,7 +115,6 @@ class MainWindow(QMainWindow):
             item2.setText(str(current[5]))
             self.ui.reportsTable.setItem(row, 3, item2)  
              
-           
             item2 = QtWidgets.QTableWidgetItem()
             item2.setTextAlignment(Qt.AlignCenter)
 
@@ -323,12 +248,10 @@ class MainWindow(QMainWindow):
         if(index == 1): 
             self.ui.gcmsTitleLabel.setText('CHM Defined Parameters')
           
-            
             totalTests = len(self.gcmsGetTotalTests())
             
             self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
-
-            self.gcmsLoadTestsNames()
+            chmLoadTestsNames(self)
 
         if(index == 2): 
             self.ui.gcmsTitleLabel.setText('CHM Defined Reports')
@@ -342,6 +265,7 @@ class MainWindow(QMainWindow):
             self.gcmsClearEnteredTestsData()
             
             temp = self.getTestsAndUnits()
+            print('*CHM Tests and Unit Values')
             print(temp)
             
             self.ui.gcmsTests.addItems(temp[0])
@@ -352,10 +276,7 @@ class MainWindow(QMainWindow):
             self.ui.gcmsSubTitleLabel.setText('')
             self.loadInputData(); 
             
-
-
     def on_stackedWidget_currentChanged(self, index):
-        #print('Running')
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
@@ -365,7 +286,7 @@ class MainWindow(QMainWindow):
             #if index in [1,2,3,4]:
             #    btn.setAutoExclusive(False)
             #    btn.setChecked(False)
-            #else:s
+            
             btn.setAutoExclusive(True)
                    
         if(index == 0): 
@@ -380,8 +301,6 @@ class MainWindow(QMainWindow):
             print('Settings baby')
             self.loadSettings()
             
-        
-        
         self.prev_index = (index - 1) % self.ui.stackedWidget.count()
         print('prev index: ', self.prev_index)
         prev_widget = self.ui.stackedWidget.widget(self.prev_index)
@@ -390,17 +309,14 @@ class MainWindow(QMainWindow):
         if(self.prev_index == 5): 
             pass; 
             #print('Do you want to save?')
+            
         # Access the previous and current widgets
-
         # Do something with the widgets
         #print(f"Previous widget: {prev_widget}")
         #print(f"Current widget: {current_widget}")
-
-    #--------------------------------------------------------- 
         
 
     #---------------- Defined Elements -----------------------
-    
     
     def loadElementLimits(self): 
         print('CHANGE')
@@ -420,27 +336,21 @@ class MainWindow(QMainWindow):
                 self.ui.upperLimit.setText(str(limitResults[3]))
                 self.ui.unitType.setText(limitResults[5])
                 self.ui.RightSideComment.setPlainText(limitResults[4]) 
-            
-            
         except: 
             print('Error on loadElementLimits: Could not load in limits ')
        
     
-    
     #---------------------ISP PAGE ----------------------------
     #TODO: deal with the side panel page 
     
-    
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
-
         currentText = self.ui.elementInput.text()
         
         if(currentText != ''): 
             print(currentText)
             self.ui.definedElements.addItem(currentText)
             self.ui.elementInput.clear()
-            
         else: 
             print("Please enter not blank")
          
@@ -452,7 +362,6 @@ class MainWindow(QMainWindow):
         symbolName = self.ui.symbolInput.text().lower().strip()
         elementName = self.ui.elementNameinput.text().lower().strip()
         
-
         reportType = self.ui.reportTypeDropdown.currentText()
         lowerLimit = self.ui.lowerLimit.text()
         upperLimit = self.ui.upperLimit.text()
@@ -499,7 +408,7 @@ class MainWindow(QMainWindow):
         deleteQuery = 'DELETE FROM icpElements WHERE element = ?'
         
         try: 
-            self.deleteBox("DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
+            deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
             
             self.db.execute(deleteQuery, (elementName,))
             self.db.commit()
@@ -546,63 +455,21 @@ class MainWindow(QMainWindow):
    
     def on_definedElements_clicked(self):
         try:
-            self.isp_load_element_data();
+            icp_load_element_data(self);
         except: 
             print('Error: Could not loaded the defined element data')
 
           
     def on_definedElements_currentRowChanged(self):
         try:
-            self.isp_load_element_data();
+            icp_load_element_data(self);
         except: 
             print('Error: Could not loaded the defined element data')
             
-            
-    def isp_load_element_data(self): 
-        selected_item = self.ui.definedElements.currentItem()
-        
-        if selected_item is not None:
-            selected_item_text = selected_item.text()
-            print(selected_item_text); 
-            
-            loadElement = 'SELECT * FROM icpElements WHERE element = ?'
-            loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'
-            
-            self.db.execute(loadElement, (selected_item_text,))
-            elementResult = self.db.fetchone()
-            
-            reportType = self.ui.reportTypeDropdown.currentText()
-            
-            self.db.execute(loadLimits, (selected_item_text, reportType))
-            limitResults = self.db.fetchone()
-            
-            print(elementResult); 
-            if elementResult: 
-                
-                self.ui.elementNameinput.setText(elementResult[0])
-                self.ui.symbolInput.setText(elementResult[1])
-                
-                
-                if(limitResults is None): 
-                    self.clearElementLimits()
-                else: 
-                    self.ui.lowerLimit.setText(str(limitResults[2]))
-                    self.ui.upperLimit.setText(str(limitResults[3]))
-                    self.ui.unitType.setText(limitResults[5])
-                    self.ui.RightSideComment.setPlainText(limitResults[4])
-                
-            else: 
-                self.clearElementInfo()
-                self.ui.elementNameinput.setText(selected_item_text)
-            
-        else:
-            print("No item selected.") 
-
+    
     def on_reportsList_clicked(self): 
         reportType = self.ui.reportsList.currentItem().text()
         self.ui.footerComments.setText(None)
-        
-        
         self.ui.icpReportNameLabel.setText(reportType) 
         
         try:
@@ -665,10 +532,7 @@ class MainWindow(QMainWindow):
         self.ui.icpReportNameLabel.setText("")
         self.ui.footerComments.clear()
         
-        
-    
     def loadDefinedElements(self): 
-
         self.ui.reportTypeDropdown.clear()
         self.ui.gcmsDefinedtests.clear()
         self.ui.definedElements.clear()
@@ -757,56 +621,12 @@ class MainWindow(QMainWindow):
         print('Something is being selected')
         selected_item = self.ui.reportsList.currentItem()
     
-                
   
-   # ----------------------- GCMS TEST PAGE -----------------------
+   # ----------------------- CHM TEST PAGE -----------------------
    #TODO: if the txt name changes update the listName 
-   #keep track of the currentIndex when first getting it 
+   #TODO: keep track of the currentIndex when first getting it 
    
-    
-    def gcmsLoadTestsData(self): 
-        
-        selectedTests = self.ui.gcmsDefinedtests.currentItem()
-        
-        #print('selected Tests: ', selectedTests)
-        
-        if selectedTests is not None:
-            try: 
-                getTestsData = 'SELECT * FROM gcmsTests WHERE testName = ?'
-                self.db.execute(getTestsData, (selectedTests.text(),))
-                results = self.db.fetchone() 
-                
-                print(results)
-            
-                self.ui.gcmsTxtName.setText(str(results[0]))
-                self.ui.gcmsUnitType.setText(str(results[1]))
-                self.ui.gcmsRefValue.setText(str(results[2]))
-                self.ui.gcmsDisplayName.setText(str(results[3]))
-            except: 
-                #item is not in the database yet 
-                print('Error: selected Text was None') 
-                self.gcmsClearDefinedTestsValues()
-                self.ui.gcmsTxtName.setText(selectedTests.text())
-                
-        
-    def gcmsLoadTestsNames(self): 
-        
-        self.gcmsClearDefinedTestsValues(); 
-        self.ui.gcmsDefinedtests.clear()
-        self.ui.testsInputLabel.clear()
-    
-        getTestNamesQuery = 'SELECT testName FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
-        testNames = self.db.query(getTestNamesQuery)           
-        
-        print(testNames)
-        
-        for test in testNames: 
-            self.ui.gcmsDefinedtests.addItem(test[0])
-
-        
-    
     def gcmsGetListValues(self): 
-        
         values = []
         
         for index in range(self.ui.gcmsDefinedtests.count()):
@@ -816,11 +636,8 @@ class MainWindow(QMainWindow):
         return values; 
     
     def gcmsGetTotalTests(self): 
-        
         test = 'SELECT * FROM gcmsTests'
-        
         return self.db.query(test)
-        
     
     def gcmsClearDefinedTestsValues(self): 
         self.ui.gcmsDisplayName.clear()
@@ -829,39 +646,30 @@ class MainWindow(QMainWindow):
         self.ui.gcmsRefValue.clear()
         self.ui.gcmsComment.clear()
      
-
-    
     
     @pyqtSlot() 
     def on_gcmsAddTestsBtn_clicked(self): 
-        
-        existingTests = self.gcmsGetListValues()
-        print(existingTests)
-        
+        existingTests = self.gcmsGetListValues()        
         currentText = self.ui.testsInputLabel.text()
-
         
         if(currentText != '' and currentText not in existingTests): 
             #clear values 
             self.gcmsClearDefinedTestsValues()
             self.ui.testsInputLabel.clear()
-            #add to testse 
             self.ui.gcmsDefinedtests.addItem(currentText)
-            
+    
             totalItems = len(self.gcmsGetListValues())
-            
             self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
             self.ui.gcmsTxtName.setText(currentText)
             
         else: 
-            print('Please enter a valid tests')
+            errorTitle = 'Invald Tests'
+            errorMsg = 'Please enter a valid test'
+            showErrorDialog(self, errorTitle, errorMsg)
 
-    
-    
+
     @pyqtSlot()
     def on_gcmsSaveTestBtn_clicked(self):
-
-        
         displayName = self.ui.gcmsDisplayName.text().strip()
         txtName = self.ui.gcmsTxtName.text().strip()
         unitType = self.ui.gcmsUnitType.text().strip()
@@ -871,7 +679,6 @@ class MainWindow(QMainWindow):
         print(txtName, unitType, recoveryVal, displayName)
         
         if(txtName != ""):
-            
             definedTestsValues = 'INSERT OR REPLACE INTO gcmsTests (testName, unitType, recoveryVal, displayName) VALUES (?,?,?, ?)' 
             
             try:
@@ -883,18 +690,17 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()    
     def on_gcmsDeleteTestBtn_clicked(self): 
-        
         txtName = self.ui.gcmsTxtName.text().strip()
         selected_item = self.ui.gcmsDefinedtests.currentItem()
-
-        print(txtName)
-        print(selected_item)
-
+        
         deleteQuery = 'DELETE FROM gcmstests WHERE testName = ?'
         
+        print(f'[QUERY]: {deleteQuery}')
+        print(f'TXT Name: {txtName}, Selected Item: {selected_item}')
+        
         try: 
-            self.deleteBox("DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
-            
+            #TODO: make sure it deletes 
+            deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
             self.db.execute(deleteQuery, (txtName,))
             self.db.commit()
 
@@ -910,19 +716,15 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()
     def on_gcmsDefinedtests_clicked(self): 
-        self.gcmsLoadTestsData()
+        chmLoadTestsData(self)
             
-
     def on_gcmsDefinedtests_currentRowChanged(self):
-
         try:
-            self.gcmsLoadTestsData()
-        
+            chmLoadTestsData(self)
         except: 
+            #TODO: add error
             print('error')
-        
-        
-    #-------------------------------------------------------------
+    
     
     def getTestsAndUnits(self): 
         
@@ -976,102 +778,57 @@ class MainWindow(QMainWindow):
                 
                 self.ui.gcmsUnitVal.setCurrentIndex(index)
                 
-                
-                
-                
- 
 
     @pyqtSlot()    
-    def on_gcmsProceedBtn_clicked(self):
-        #check if the there is standard and entered unit
-        
-    
-        errorCheck = [0,0,0]
-        
+    def on_gcmsProceedBtn_clicked(self):            
         standards = self.ui.gcmsStandardVal.text().strip()
         units = self.ui.gcmsUnitVal.currentText()
         tests = self.ui.gcmsTests.currentText()
-        
-        if(standards != '' and is_real_number(standards)): 
-            errorCheck[0] = 0 
-        else: 
-            errorCheck[0] = 1; 
-            
-        if(units != ''): 
-            errorCheck[1] = 0
-        else: 
-            errorCheck[1] = 1; 
-            
-        if(tests != ''): 
-            errorCheck[2] = 0 
-        else: 
-            errorCheck[2] = 1; 
-        
+
+        errorCheck = [0,0,0]
+
+        errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
+        errorCheck[1] = 0 if units != '' else 1; 
+        errorCheck[2] = 0 if tests != '' else 1; 
         
         if(sum(errorCheck) == 0):
             self.ui.gcmsTestsValueWidget.setEnabled(True)
             self.ui.widget_28.setEnabled(False)
-            
             self.ui.gcmsStandardVal_2.setText(standards)
             self.ui.gcmsUnitVal_2.setText(units)
             self.ui.gcmsTests_2.setText(tests)  
             
         else: 
-            outputMessage = ''
+            errorTitle = 'Cannot Proceed with CHM Process'
+            errorMsg = ''
             
             if(errorCheck[0] == 1): 
-               
-                outputMessage += 'Please Enter a Valid Standard Number\n'
-
+                errorMsg += 'Please Enter a Valid Standard Number\n'
             if(errorCheck[1] == 1): 
-              
-                outputMessage += 'Please Select a Unit\n'
-                
+                errorMsg += 'Please Select a Unit\n'
             if(errorCheck[2] == 1): 
-               
-                outputMessage += 'Please Select a Tests\n'
-            
+                errorMsg += 'Please Select a Tests\n'
                 
-            msg = QMessageBox() 
-            msg.setWindowTitle("Error")
-            msg.setText(outputMessage)
-            x = msg.exec_()  # this will show our messagebox 
-    
-        pass; 
-           
+            showErrorDialog(self, errorTitle, errorMsg)
+            
 
     @pyqtSlot()   
     def on_gcmsAddTestsBtn_2_clicked(self): 
-        
-        errorCheck = [0,0,0]
         
         standards = self.ui.gcmsStandardVal_2.text().strip()
         units = self.ui.gcmsUnitVal_2.text().strip()
         testName = self.ui.gcmsTests_2.text().strip()  
         
-        
-        errorCheck = [0,0,0]
-        
         testNum = self.ui.gcmsTestsJobNum.text().strip()
         sampleNum = self.ui.gcmsTestsSample.text().strip()
         sampleVal = self.ui.gcmsTestsVal.text().strip()
         
+        errorCheck = [0,0,0]
         
-        if(testNum != '' and is_real_number(testNum)): 
-           errorCheck[0] = 0 
-        else: 
-            errorCheck[0] = 1; 
-        
-        if(sampleNum != '' and is_real_number(sampleNum)): 
-           errorCheck[1] = 0 
-        else: 
-            errorCheck[1] = 1; 
-
-        if(sampleVal != ''): 
-            errorCheck[2] = 0
-        else: 
-            errorCheck[2] = 1; 
-        
+        errorCheck[0] = 0 if (testNum != '' and is_real_number(testNum)) else 1; 
+        errorCheck[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1; 
+        errorCheck[2] = 0 if sampleVal != '' else 1; 
+                
         
         if(sum(errorCheck) == 0): 
             
@@ -1080,7 +837,6 @@ class MainWindow(QMainWindow):
             checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?)'
             self.db.execute(checkInquery, (sampleNum, testName))
             result = self.db.fetchone()[0]
-            
             
             if(result == 1): 
                 
@@ -1115,23 +871,19 @@ class MainWindow(QMainWindow):
                 
 
         else: 
-            outputMessage = ''
+            errorTitle = 'Cannot add Tests '
+            errorMsg = ''
             
             if(errorCheck[0] == 1): 
-                outputMessage += 'Please Enter a Valid Job Number\n'
+                errorMsg += 'Please Enter a Valid Job Number\n'
 
             if(errorCheck[1] == 1): 
-
-                outputMessage += 'Please Enter a Valid Sample Number\n'
+                errorMsg += 'Please Enter a Valid Sample Number\n'
                 
             if(errorCheck[2] == 1): 
+                errorMsg += 'Please Enter a Valid Sample Value \n'
             
-                outputMessage += 'Please Enter a Valid Sample Value \n'
-            
-            msg = QMessageBox() 
-            msg.setWindowTitle("Error")
-            msg.setText(outputMessage)
-            x = msg.exec_()  # this will show our messagebox 
+            showErrorDialog(self, errorTitle, errorMsg)
     
             
             
@@ -1146,7 +898,6 @@ class MainWindow(QMainWindow):
            
 
     def gcmsClearEnteredTestsData(self): 
-        
         self.ui.gcmsTestsValueWidget.setEnabled(False)
         self.ui.widget_28.setEnabled(True)
             
@@ -1166,7 +917,6 @@ class MainWindow(QMainWindow):
 
 
     def addToGcmsTestsData(self, sampleNum, testName, sampleVal, standards, units, jobNum ): 
-
         addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
         
         try:
@@ -1218,42 +968,14 @@ class MainWindow(QMainWindow):
             print('Could not delete item')
     
     
-
-    def replaceError(self,sampleName):
-        msgBox = QMessageBox()  
-        msgBox.setText("Duplicate Data?");
-        message = 'There is sample named ' + str(sampleName) 
-        
-        msgBox.setInformativeText(message);
-        msgBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Save);
-        msgBox.setDefaultButton(QMessageBox.Save);
-        #msgBox.buttonClicked.connect(self.msgbtn)
-        x = msgBox.exec_()  # this will show our messagebox
-        
-        if(x == QMessageBox.Save): 
-            pass      
-
-
-        if(x == QMessageBox.Cancel):
-            pass 
-        
-
-        
-    
-    #-------------------------------------------------------------
-    
     # ----------------------- Settings Page ------------------------
     
-    
     def on_settingsStack_currentChanged(self, index): 
-        
         if(index == 2): 
-
             self.ui.authorList.clear()
             self.clearAuthorData()
             self.loadAuthors()
         
-      
     @pyqtSlot()
     def on_setPathsBtn_clicked(self): 
         self.ui.settingsStack.setCurrentIndex(0)
@@ -1266,7 +988,6 @@ class MainWindow(QMainWindow):
     def on_setAuthorsBtn_clicked(self): 
         self.ui.settingsStack.setCurrentIndex(2)   
          
-    
     @pyqtSlot()
     def on_reportsPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
@@ -1277,7 +998,6 @@ class MainWindow(QMainWindow):
 
             self.ui.reportPath.setText(paths['reportsPath'])
         
-    
     @pyqtSlot()
     def on_txtPathBtn_clicked(self): 
         paths = load_pickle('data.pickle')
@@ -1285,9 +1005,7 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['TXTDirLocation'] = newLocation; 
             save_pickle(paths)
-
             self.ui.txtPath.setText(paths['TXTDirLocation'])
-    
     
     @pyqtSlot() 
     def on_convertedPathBtn_clicked(self): 
@@ -1296,7 +1014,6 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['ispDataUploadPath'] = newLocation; 
             save_pickle(paths) 
-
             self.ui.convertPath.setText(paths['ispDataUploadPath'])
         
     @pyqtSlot()  
@@ -1306,33 +1023,28 @@ class MainWindow(QMainWindow):
         if(newLocation != ''): 
             paths['databasePath'] = newLocation; 
             save_pickle(paths)  
-
             self.ui.dbPath.setText(paths['databasePath'])
         
-    
     def loadSettings(self): 
         paths = load_pickle('data.pickle')
-        
         self.ui.reportPath.setText(paths['reportsPath'])
         self.ui.txtPath.setText(paths['TXTDirLocation'])
         self.ui.convertPath.setText(paths['ispDataUploadPath'])
         self.ui.dbPath.setText(paths['databasePath'])
     
 
-    #load authors 
     def loadAuthors(self): 
         authorsQuery = 'SELECT * FROM authors ORDER BY authorName ASC'
 
         try: 
             results = self.db.query(authorsQuery)
+            print('Loading Authors')
             print(results)
-
             for author in results: 
                 self.ui.authorList.addItem(author[0])
             
         except: 
             print('Error: could not load authors')
-        
         
     def clearAuthorData(self): 
         self.ui.authorNameLine.clear()
@@ -1356,15 +1068,12 @@ class MainWindow(QMainWindow):
     @pyqtSlot()  
     def on_deleteAuthorBtn_clicked(self): 
         deleteQuery = 'DELETE FROM authors WHERE authorName = ?' 
-
         authorName = self.ui.authorList.currentItem().text() 
         
         try: 
             self.db.execute(deleteQuery, (authorName,))
             self.db.commit()
             self.removeAuthorFromAuthorList(authorName)
-
-            
         except:
             print("Error: Could not delete author: ", authorName)
 
@@ -1372,10 +1081,8 @@ class MainWindow(QMainWindow):
     def on_authorList_currentItemChanged(self, authorName):   
         if(authorName != None):  
             self.loadAuthorInfo(authorName.text())
-        
     
     def removeAuthorFromAuthorList(self, authorName): 
-        
         for row in range(self.ui.authorList.count()): 
             item = self.ui.authorList.item(row)
             if item.text() == authorName: 
@@ -1389,13 +1096,11 @@ class MainWindow(QMainWindow):
         try: 
             self.db.execute(authorInfoQuery, (authorName, )) 
             result = self.db.fetchone()
-
             self.ui.authorNameLine.setText(result[0])
             self.ui.authorPostionLine.setText(result[1])
             
         except: 
             print("Error loading author info")
-
             self.clearAuthorData()
             self.ui.enterAuthorName.clear()
             self.ui.authorNameLine.setText(authorName)
@@ -1421,64 +1126,29 @@ class MainWindow(QMainWindow):
             new_item_index = self.ui.authorList.count() - 1
             self.ui.authorList.setCurrentRow(new_item_index)
 
-
-
     
     # ----------------------- PROCESS PAGE ------------------------
   
     @pyqtSlot()
     def createReportPage(self):
-        #TODO: add the dilution factor
         jobNum = self.ui.jobNumInput.text().strip()
         reportType = self.ui.reportType.currentText()
         parameter = self.ui.paramType.currentText()
         dilution = self.ui.dilutionInput.text()
+        self.dilution = 1 if dilution == '' else dilution 
 
-        if(dilution == ''): 
-            self.dilution = 1; 
-        else: 
-            self.dilution = dilution 
+        print('*JobNumber: ', jobNum)
+        print('*ReportType: ', reportType)
+        print('*Parameter: ', parameter)
+        print('*Dilution: ', dilution )
         
-        print('JobNumber: ', jobNum)
-        print('ReportType: ', reportType)
-        print('Parameter: ', parameter)
-        print('Dilution: ', dilution )
-        
-        #0 = name 
-        #1 = reportType 
-        #2 = parameter 
-        #3 = TXT file exists
         errorCheck = [0, 0, 0, 0]     
-
         fileExist = scanForTXTFolders(jobNum)
-        print(fileExist)
      
-     
-        if(re.match('^([0-9]{6})$', jobNum)): 
-            errorCheck[0] = 0; 
-        else: 
-            errorCheck[0] = 1; 
-            #self.ui.jobNumInput.setStyleSheet('border:1px solid red;')
-         
-        if(reportType == 'ISP' or reportType == 'GCMS' or reportType == 'CHM'):
-            errorCheck[1] = 0;
-            
-        else: 
-            errorCheck[1] = 1; 
-        
-        if(parameter != ''): 
-            errorCheck[2] = 0
-        else: 
-            errorCheck[2] = 1
-            
-        if(fileExist != None): 
-            errorCheck[3] = 0;
-        else: 
-            errorCheck[3] = 1; 
-        
-            
-        print("ErrorCheck: ", errorCheck)
-        
+        errorCheck[0] = 0 if re.match('^([0-9]{6})$', jobNum) else 1 
+        errorCheck[1] = 0 if reportType in REPORTS_TYPE else 1
+        errorCheck[2] = 0 if parameter != '' else 1
+        errorCheck[3] = 0 if fileExist != '' else 1    
         
         if(sum(errorCheck) == 0): 
             self.jobNum = jobNum; 
@@ -1504,7 +1174,7 @@ class MainWindow(QMainWindow):
                 print('Report Exists')
                 print(reportResult)
                 #TODO: load the report if exists
-                self.loadReport()            
+                loadReportDialog(self)          
   
             self.ui.stackedWidget.setCurrentIndex(5)
             self.ui.stackedWidget_2.setCurrentIndex(0) 
@@ -1521,7 +1191,7 @@ class MainWindow(QMainWindow):
                 self.ui.createGcmsReportBtn.setVisible(False)
                 
                 self.ui.icpDataField.show()
-                self.icpLoader()
+                icpLoader(self)
             
             if(reportType == 'CHM'):
                 print('CHM Loader')
@@ -1530,33 +1200,29 @@ class MainWindow(QMainWindow):
                 self.ui.createGcmsReportBtn.setVisible(True)
                 
                 self.ui.icpDataField.hide() 
-                self.gcmsLoader()
+                chmLoader(self)
             
         else: 
-            #TODO: can combine into one function that print errors to the screen 
-            # param(total errors, [error messages], add style) 
-            outputMessage = ''
+            errorTitle = 'Cannot Proceed to Report Creation Screen '
+            errorMsg = ''
             
             if(errorCheck[0] == 1): 
                 print('Error: Please Enter a valid job number')
-                outputMessage += 'Please Enter a Valid Job Number\n'
+                errorMsg += 'Please Enter a Valid Job Number\n'
 
             if(errorCheck[1] == 1): 
                 print("Error: Please Select a reportType")
-                outputMessage += 'Please Select a Report Type\n'
+                errorMsg += 'Please Select a Report Type\n'
                 
             if(errorCheck[2] == 1): 
                 print('Error: Please Select a parameter')
-                outputMessage += 'Please Select a Parmeter\n'
+                errorMsg += 'Please Select a Parmeter\n'
             
             if(errorCheck[3] == 1): 
                 print("Error: TXT File doesn't exist")
-                outputMessage += 'TXT File could not be located\n'
+                errorMsg += 'TXT File could not be located\n'
                 
-            msg = QMessageBox() 
-            msg.setWindowTitle("Error")
-            msg.setText(outputMessage)
-            x = msg.exec_()  # this will show our messagebox
+            showErrorDialog(self, errorTitle, errorMsg)
 
     
     def populateAuthorNames(self): 
@@ -1573,235 +1239,12 @@ class MainWindow(QMainWindow):
         except: 
             print('Error: Could not load the authors for Create Report Page ')
         
-    
-     
     # -------------------------------------------------------------
     
-    def gcmsLoader(self): 
-        print('GCMS LOADER')
-        
-        self.loadClientInfo()
-    
-        #TODO: scan in the TXT Tests, scan in from Defined Tests too 
-        #TODO: fix the error checking 
-        
-        
-        
-        #load sample names 
-        for i, (key,value) in enumerate(self.sampleNames.items()):
-            item = SampleNameWidget(key, value)
-            self.ui.formLayout_5.addRow(item)
-            item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
-        
-        self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
-        
-        GSMS_TESTS_LISTS = []
-        #ICP_TESTS_LISTS = []
-        #tests = []
-        
-        for (currentJob ,testList) in self.sampleTests.items(): 
-            for item in testList: 
-                
-                temp = remove_escape_characters(str(item)) 
-                
-                if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):
-                                        
-                    GSMS_TESTS_LISTS.append(temp)
- 
-                #if(temp not in ICP_TESTS_LISTS and 'ICP' in temp):
-                #    ICP_TESTS_LISTS.append(temp)
-                    
-                #if(temp not in tests): 
-                #    tests.append(temp)
-     
-        
-        testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
-        testsResults = self.db.query(testsQuery, (self.jobNum,))
-        
-        #TODO: can create a list and combine unique values
-        if(testsResults != None): 
-            for item in testsResults: 
-                if(item[1] not in GSMS_TESTS_LISTS):
-                    GSMS_TESTS_LISTS.append(item[1])
-                     
-        
-        GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
-        print(GSMS_TESTS_LISTS) 
-
-    
-        #inital setup 
-        columnNames = [
-            'Tests', 
-            'Display Name',
-            'Unit', 
-            'Standard Recovery', 
-            'Distal factor'
-        ]
-        
-        initalColumns = len(columnNames)
-        self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
-        self.ui.dataTable.setColumnCount(initalColumns + int(self.clientInfo['totalSamples']))
-        self.ui.dataTable.horizontalHeader().setVisible(True)
-        self.ui.dataTable.verticalHeader().setVisible(True)
-
-        self.ui.dataTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        
-        #inital columns 
-        for i in range(initalColumns): 
-            item = QtWidgets.QTableWidgetItem()
-            self.ui.dataTable.setHorizontalHeaderItem(i, item)
-            item2 = self.ui.dataTable.horizontalHeaderItem(i)
-            item2.setText(columnNames[i])
-            
-        #set the names of the columns 
-        #self.ui.dataTable.setHorizontalHeaderLabels(columnNames)
-     
-        
-        #populate with sample names 
-        for i , (key,value ) in enumerate(self.sampleNames.items(), start=initalColumns):
-
-            item = QtWidgets.QTableWidgetItem()
-            self.ui.dataTable.setHorizontalHeaderItem(i, item)
-            item2 = self.ui.dataTable.horizontalHeaderItem(i)
-            item2.setText(key)
-            
-        #displayNamesQuery = 'SELECT * gcmsTests'
-        #displayResults = self.db.query(displayNamesQuery) 
-        #print(displayResults)
-        
-        #list tests 
-        for i, value in enumerate(GSMS_TESTS_LISTS): 
-            item = QtWidgets.QTableWidgetItem()
-            item.setText(value)
-            self.ui.dataTable.setItem(i, 0, item)
-            
-            #TODO: search for the display name 
-            displayQuery = 'SELECT displayName FROM gcmsTests WHERE testName = ?'
-            self.db.execute(displayQuery, [value,])
-            result = self.db.fetchone()
-            print(result)
-            
-            if(result): 
-                displayNameItem  = QtWidgets.QTableWidgetItem() 
-                displayNameItem.setText(result[0])
-                self.ui.dataTable.setItem(i, 1, displayNameItem) 
-            
-            item2 = QtWidgets.QTableWidgetItem() 
-            item2.setText(str(1))
-            self.ui.dataTable.setItem(i, 4, item2) 
-        
-            #go down each column and determine if there is a match
-           # print(i, value)
-            for column in range(initalColumns, self.ui.dataTable.columnCount()):
-                header_item = self.ui.dataTable.horizontalHeaderItem(column)
-                if header_item is not None:
-                    column_name = header_item.text()
-
-                    result = search_list_of_lists(testsResults,[column_name, value] )
-                    
-                    if result is not None: 
-                        #print(result)
-                        
-                    
-                        #value
-                        item = QtWidgets.QTableWidgetItem()
-                        item.setText(str(result[2]))
-                        self.ui.dataTable.setItem(i, column, item) 
-                        
-                        #So 
-                        #item = QtWidgets.QTableWidgetItem()
-                        #item.setText(str(result[3]))
-                        #self.ui.dataTable.setItem(i, 3, item)
-                        
-                        #recovery  
-                        item = QtWidgets.QTableWidgetItem()
-                        item.setText(str(result[3]))
-                        self.ui.dataTable.setItem(i, 3, item)
-                        
-                        #unit 
-                        item = QtWidgets.QTableWidgetItem()
-                        item.setText(result[4])
-                        self.ui.dataTable.setItem(i, 2, item) 
-                        
-        
-        #TODO: add the item changed thing 
-        #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
-    
-    
-        self.ui.createGcmsReportBtn.clicked.connect(lambda: self.GcmsReportHandler(GSMS_TESTS_LISTS)); 
-        
-    
-    def GcmsReportHandler(self, tests):
-        
-        print('Tests: ', tests)
-        #FIXME: adjust based on the sample information 
-        #FIXME: crashes when doing gcms to icp without closing program 
-        initalColumns = 5; 
-        totalSamples = len(self.sampleNames)
-        totalTests = len(tests)
-        sampleData = {}
-        unitType = []
-        recovery = []
-        displayNames = []
-        
-        for col in range(initalColumns, totalSamples + initalColumns ): 
-           
-            currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
-            print('currentJob Test: ', currentJob)
-            jobValues = []
-            for row in range(totalTests): 
-                try: 
-                    currentItem = self.ui.dataTable.item(row, col).text()
-                    jobValues.append(currentItem)
-                except: 
-                    jobValues.append('ND')
-                    
-            sampleData[currentJob] = jobValues
-            #print(currentJob, sampleData[currentJob])
-            
-        for row in range(totalTests): 
-            try: 
-                testsName = self.ui.dataTable.item(row, 1).text()
-                print('Row: ',row, 'TestName: ', testsName)
-                if(testsName): 
-                    displayNames.append(testsName)
-                else: 
-                    displayNames.append(tests[row])
-        
-            except: 
-                print("Error: appending test name")
-                displayNames.append(tests[row])
-            
-            try: 
-                currentVal = self.ui.dataTable.item(row, 2).text()
-                unitType.append(currentVal)
-            except: 
-                unitType.append('')
-            
-            try: 
-                recoveryVal = self.ui.dataTable.item(row, 3).text()
-                
-                if(is_float(recoveryVal)): 
-                    recovery.append(float(recoveryVal))
-                else: 
-                    recovery.append(recoveryVal) 
-            except: 
-                recovery.append('')       
-                
-        
-        
-            
-        #print("UNITS TESTING: ", unitType)
-        
-        createGcmsReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
-
     def handle_item_changed(self, item, test): 
         row = item.row()
         column = item.column()
         value = item.text()
-        
-        #print(test)
-        #print(f"Row {row}, Column {column} changed to {value}")
         
         if(column >= 5):
             print(self.ui.dataTable.item(row,column).text())
@@ -1809,6 +1252,7 @@ class MainWindow(QMainWindow):
         
         
     def loadClientInfo(self): 
+        print('**Applying Client Infomation ')
         #clear the first page 
         self.ui.jobNumInput.setText('')
         
@@ -1817,7 +1261,6 @@ class MainWindow(QMainWindow):
         self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
         self.ui.parameterHeader.setText(self.parameter); 
         self.ui.reportTypeHeader.setText(self.reportType)
-        
         self.ui.clientName_1.setText(self.clientInfo['clientName'])
         self.ui.date_1.setText(self.clientInfo['date'])
         self.ui.time_1.setText(self.clientInfo['time'])
@@ -1835,360 +1278,10 @@ class MainWindow(QMainWindow):
         self.ui.payment_1.setText(self.clientInfo['payment'])
 
 
-    #TODO: sidebar have a s
-    def icpLoader(self): 
-        print('LOADING ICP STUFF')
-        
-        self.loadClientInfo()
-        
-        #check if haas data to load into the file location 
-        sql1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
-        sql2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
-        
-        sampleData = list(self.db.query(sql1, (self.jobNum,)))
-        sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
-        
-        
-        selectedSampleNames = []
-        
-        for item in sampleData:
-            selectedSampleNames.append(item[0])
-        
-        #TODO: can remove if you really think about it needs to combine both machines 
-        for item in sampleData2: 
-            if(item[0] not in selectedSampleNames): 
-                selectedSampleNames.append(item[0]) 
-        
-        totalSamples = len(selectedSampleNames)     
-        print('SelectedSampleItems: ', selectedSampleNames)    
-        
-        #create the sample names based on that         
-        for i, (key, value) in enumerate(self.sampleNames.items()):
-            
-            if(key in selectedSampleNames):
-                print('active:', key)
-                item = SampleNameWidget(key, value)
-                self.ui.formLayout_5.addRow(item)
-                item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
-        
-        self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets()) 
-        
-        #load the given data information and column 
-        columnNames = [
-            'Element Name', 
-            'Element symbol',
-            'Unit Value', 
-            'REF Value', #TODO: remove ref value
-            'distal factor'
-        ]
-        
-        addtionalRows = [
-            'pH', 
-            'Hardness', 
-        ]
-        
-        excludedElements = [
-            'U', 'S'
-        ]
-        
-        
-        #setting up the table
-        totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
-        initalColumns = len(columnNames)
-        
-        self.ui.dataTable.setRowCount(totalRows)
-        self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
-        self.ui.dataTable.horizontalHeader().setVisible(True)
-        self.ui.dataTable.verticalHeader().setVisible(True)
-
-        #inital columns 
-        for i in range(initalColumns): 
-            item = QtWidgets.QTableWidgetItem()
-            self.ui.dataTable.setHorizontalHeaderItem(i, item)
-            item2 = self.ui.dataTable.horizontalHeaderItem(i)
-            item2.setText(columnNames[i])
-        
-        #set the sampleNames 
-        for i , (key) in enumerate(selectedSampleNames, start=initalColumns):
-            item = QtWidgets.QTableWidgetItem()
-            self.ui.dataTable.setHorizontalHeaderItem(i, item)
-            item2 = self.ui.dataTable.horizontalHeaderItem(i)
-            item2.setText(key)
-        
-       
-        #Get all the names of the elments then sort them
-        elementNames = []
-         
-        for (key,value) in periodic_table.items(): 
-            if(key not in excludedElements): 
-                elementNames.append(value)
-            
-        elementNames.sort()
-        
-        queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
-        
-        
-        
-        #print(elementNames)
-        #print(len(elementNames))
-        
-        #self.ui.createReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
-        
-        hardnessLocation = {}
-        #TODO: load in the right Elements and the unit values 
-        for i, value in enumerate(elementNames): 
-            
-            currentSymbol = elementSymbols[value]
-            
-            if(currentSymbol in ['Mg', 'Ca']): 
-                hardnessLocation[currentSymbol] = int(i); 
-            
-            item = QtWidgets.QTableWidgetItem() 
-            item.setText(value) 
-            self.ui.dataTable.setItem(i, 0, item)
-
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setText(currentSymbol)
-            self.ui.dataTable.setItem(i, 1, item2)
-            
-            item3 = QtWidgets.QTableWidgetItem()
-            if(currentSymbol in icpMachine2Symbols): 
-                item3.setText('ug/L')
-            else: 
-                item3.setText('mg/L')
-            self.ui.dataTable.setItem(i, 2, item3)
-            
-            #set distal factor to default of 1 
-            item4 = QtWidgets.QTableWidgetItem()
-            if(self.dilution == ''):
-                item4.setText('1')
-            else: 
-                item4.setText(str(self.dilution))
-                
-            self.ui.dataTable.setItem(i, 4, item4)
-
-        #adding hardness and Ph 
-        for i, value in enumerate(addtionalRows): 
-            postion = totalRows - i - 1; 
-            item = QtWidgets.QTableWidgetItem()  
-            item.setText(value)
-            self.ui.dataTable.setItem(postion ,0 , item)
-            
-            if(value == 'Hardness'): 
-                item2 = QtWidgets.QTableWidgetItem()
-                item2.setText("CaC0₃")
-                self.ui.dataTable.setItem(postion, 1, item2) 
-                
-                item3 = QtWidgets.QTableWidgetItem()
-                item3.setText('ug/L')
-                self.ui.dataTable.setItem(postion, 2, item3) 
-       
-        
-
-        #print(hardnessLocation)
-        
-        #TODO: combine the two tables so can easily iterate through them lol 
-        #TODO: check if the sampleData's aren't empty 
-        
-        
-        #TODO: combine both the datasets;
-        #TODO: does this effect hardness and also what about the new values we enter in 
-        
-        machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
-        machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
-        
-        print(machine1)
-        print(machine2)
-        
-        
-        for i in range(len(elementNames)): 
-            item = self.ui.dataTable.item(i, 1)
-            
-            if(item != None): 
-                symbol = item.text()
-                #print(symbol)
-                
-                for j, sample in enumerate(selectedSampleNames): 
-                    item = QtWidgets.QTableWidgetItem(); 
-                    #currentCell = self.ui.dataTable
-                    #machine1Val = machine1[sample][symbol]
-                    #machine2Val = machine2[sample][symbol]
-                    
-                    #currentCell.setText(i,j, item)
-                    
-                    if sample in machine1 and symbol in machine1[sample]: 
-                        machine1Val = machine1[sample][symbol] 
-                        print(symbol, ' 1  ', machine1Val)      
-                        
-                        if(is_float(machine1Val) and self.dilution != 1 ): 
-                            print('is float bro')
-                            temp = float(machine1Val)
-                            temp = temp * float(self.dilution)
-                            temp = round(temp, 3)
-                            item.setText(str(temp))
-                        else: 
-                            item.setText(machine1Val)
-                        #currentCell.setText(i,j, item)
-                        
-                    
-                    if sample in machine2 and symbol in machine2[sample]: 
-                        machine2Val = machine2[sample][symbol] 
-                        
-                        print(symbol, ' 2  ', machine2Val) 
-                        
-                        if(is_float(machine2Val) and self.dilution != 1): 
-                            print('is float ')
-                            temp = float(machine2Val)
-                            temp = temp * float(self.dilution)
-                            temp = round(temp, 3)
-                            item.setText(str(temp))
-                        else: 
-                            machine2Val = round(machine2Val, 3 )
-                            item.setText(str(machine2Val))
-                        #currentCell.setText(i,j, item)
-                
-                    self.ui.dataTable.setItem(i,j+5, item)
-
-
-        for j, sample in enumerate(selectedSampleNames):   
-            item = QtWidgets.QTableWidgetItem();  
-            
-            if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
-                calcium = machine1[sample]['Ca'] 
-                magnesium = machine1[sample]['Mg'] 
-                
-                print('cal: ', calcium)
-                print('mag: ', magnesium)
-                
-                result = hardnessCalc(calcium, magnesium, self.dilution)
-                print('result: ', result)
-                item.setText(str(result))
-                self.ui.dataTable.setItem(33, j+5, item)
-                
-                #item.setText(str(result))
-                #self.ui.dataTable.setItem(34,j+5, item)
-                
-                    
-        ''' 
-        for col, currentSample in enumerate(sampleData, start=5): 
-            #tempName = currentSample[0]
-            #print(i,currentSample) 
-            
-            currentSampleVal = json.loads(currentSample[2])
-            for row in range(len(elementNames)): 
-                item = QtWidgets.QTableWidgetItem(); 
-                
-                cellValue = self.ui.dataTable.item(row, 1).text()
-
-                #determine if both things have been loaded yet
-                #TODO: add a side reload button 
-                if(cellValue in currentSampleVal): 
-                    item.setText(currentSampleVal[cellValue])
-                else: 
-                    item.setText('ND')
-                    
-                self.ui.dataTable.setItem(row, col, item)
-                
-            #determine the hardness postion 
-            hardnessVals = {}
-            item = QtWidgets.QTableWidgetItem() 
-            
-            for (key, value) in hardnessLocation.items(): 
-                #get the row location
-                cellValue2 = self.ui.dataTable.item(value, col).text()
-                #print(cellValue2)
-                hardnessVals[key] = cellValue2
-
-            if not (['ND', 'uncal'] in hardnessValshardnessVals.items()): 
-                result = hardnessCalc(hardnessVals['Ca'], hardnessVals['Mg'])
-                item.setText(str(result))
-                #print(result)
-                
-            else: 
-                item.setText('ND')
-            
-            self.ui.dataTable.setItem(len(elementNames), col, item) 
-        '''    
-            #TODO: add text change items for when the values are changed
-                
-        
-        
-        column_width = self.ui.dataTable.columnWidth(2)
-        padding = 10
-        total_width = column_width + padding
-        self.ui.dataTable.setColumnWidth(2, total_width)    
-
-        self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-        self.ui.createIcpReportBtn.clicked.connect(lambda: self.icpReportHander(elementNames, totalSamples)); 
-    
-    def icpReportHander(self, tests, totalSamples): 
-        #FIXME: adjust based on the sample information
-        #FIXME: adjust the limits 
-        #FIXME: adjust the unit amount  
-        initalColumns = 5; 
-        #totalSamples = len(self.sampleNames)
-        totalTests = len(tests)
-        sampleData = {}
-        unitType = []
-        
-        #print(totalSamples)
-        
-        #FIXME: have something determine the lower values of the things 
-        for col in range(initalColumns, totalSamples + initalColumns ): 
-            currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
-            jobValues = []
-            for row in range(totalTests + 2): 
-                try: 
-                    currentItem = self.ui.dataTable.item(row, col).text()
-                    jobValues.append(currentItem)
-                except: 
-                    jobValues.append('ND')
-                    
-            sampleData[currentJob] = jobValues
-            #print(currentJob, sampleData[currentJob])
-            
-        for i in range(totalTests): 
-            try: 
-                currentItem = self.ui.dataTable.item(i, 2).text()
-                unitType.append(currentItem)
-            except: 
-                unitType.append('')
-        
-        elementsWithLimits = self.getElementLimits(); 
-        #print(elementsWithLimits)    
-
-        limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
-        commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
-        limits = self.db.query(limitQuery, (self.parameter,))
-        
-        self.db.execute(commentQuery, (self.parameter,))
-        commentResults = self.db.fetchone()
- 
-        footerComments = ''
-        
-        if(commentResults[0]):
-            footerComments = pickle.loads(commentResults[0])
-            footerList = '\n'.join(footerComments)
-            footerComments = footerList.split('\n')
-
-
-        print('ICP HANDLER')
-        print(limits)
-        #print(self.reportType)
-        #print(footerComment)
-        print('--------')
-   
-        #load the footer comment 
-        createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
-        
-        
-        
-
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
         print(self.sampleNames)
-
-    
+ 
     def removeWidgets(self): 
         count = self.ui.formLayout_5.count(); 
 
@@ -2246,7 +1339,6 @@ class MainWindow(QMainWindow):
         self.clientInfo['payment'] = self.ui.payment_1.text()
         #print(self.clientInfo)
     
-    
     def getReportTypeList(self): 
         getReportsQuery = 'SELECT * FROM icpReportType' 
         reportTypes = self.db.query(getReportsQuery)
@@ -2281,118 +1373,22 @@ class MainWindow(QMainWindow):
         
         return total; 
     
-
-
-class SampleNameWidget(QWidget): 
-    def __init__(self, labelName, valueName, parent=None): 
-        super(SampleNameWidget ,self).__init__(parent)
     
-        newName = str(valueName).strip()
-    
-        self.label = QLabel(labelName)
-        self.edit = QLineEdit(valueName)
-        self.button = QPushButton()
+    def open_new_window(self):
+        #data = 'Hello from Main Window!'
+        #new_window = NewWindow(data)
+        #new_window.show()
         
-        pixmapi = getattr(QStyle, 'SP_TitleBarCloseButton')
-        icon = self.style().standardIcon(pixmapi)
-        self.button.setIcon(icon)
+        data = [
+            [1, 'John', 'Doe'],
+            [2, 'Jane', 'Smith'],
+            [3, 'Bob', 'Johnson']
+        ]
 
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self.label)
-        layout.addWidget(self.edit)
-        layout.addWidget(self.button)
+        dialog = CustomDialog(data, 1)
+        #dialog.exec_()
         
-        self.setLayout(layout)
-
-class SaveMessageBoxWidget(QWidget): 
-    
-    def __init__(self):
-        super().__init__()
-        
-        self.error_popup()
-
-    def removeDuplicate(self):
-        print('def removeDuplicate(self): ...')
-#        curItem = self.listWidget_2.currentItem()
-#        self.listWidget_2.takeItem(curItem)
-
-    def error_popup(self):
-        msg = QMessageBox.critical(
-            self, 
-            'Title', 
-            "You can't select more than one wicket-keeper", 
-            QMessageBox.Yes | QMessageBox.Cancel
-        )
-        if msg == QMessageBox.Yes:
-#            msg.buttonClicked.connect(self.removeDuplicate)
-            print('Ok')
-            self.removeDuplicate()
-
-
-class NewWindow(QMainWindow):
-    def __init__(self, data):
-        super().__init__()
-        self.setWindowTitle('New Window')
-
-        layout = QVBoxLayout()
-        label = QLabel(data)
-        layout.addWidget(label)
-
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
-
-
-
-#check for duplicates 
-
-class CustomDialog(QDialog):
-    def __init__(self, data, reportType):
-        super().__init__()
-        self.setWindowTitle('Custom Dialog')
-        
-        print(reportType)
-
-        layout = QVBoxLayout()
-        table_widget = QTableWidget()
-        table_widget.setRowCount(len(data))
-        table_widget.setColumnCount(len(data[0]))
-        
-        for row, rowData in enumerate(data):
-            for column, columnData in enumerate(rowData):
-                item = QTableWidgetItem(str(columnData))
-                table_widget.setItem(row, column, item)
-        layout.addWidget(table_widget)
-        
-        close_button = QPushButton('Close', self)
-        close_button.clicked.connect(self.close)
-        
-        save_button = QPushButton('Save', self)
-        save_button.clicked.connect(self.accept)
-        
-        layout.addWidget(close_button)
-        layout.addWidget(save_button)
-
-        self.setLayout(layout)
-        self.setFixedWidth(800)
-        self.setFixedHeight(500)
-        
-    def save_sql(self): 
-        pass; 
-
-    def close(self): 
-        print("Closing time")    
-    
-    def save(self): 
-        print("Saving time")
-        self.accept
-    
-    #metals 
-    def icpMS(self): 
-        pass; 
-
-    #Text Files 
-    def icpOES(self): 
-        pass; 
-    
+        if dialog.exec_() == QDialog.accept:
+            print('Dialog closed with Accept')
+        else:
+            print('Dialog closed with Reject')

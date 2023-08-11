@@ -301,9 +301,16 @@ QPushButton::checked {
           <item>
            <widget class="QFrame" name="TopNav">
             <property name="styleSheet">
-             <string notr="true">color: white; 
-border:none; 
-padding-left: 10px; </string>
+             <string notr="true">#logo {
+	color: white; 
+	border:none; 
+	padding-left: 10px; 
+
+}
+
+QFrame {
+	border:none;
+}</string>
             </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
@@ -328,13 +335,6 @@ color: rgb(255, 255, 255);</string>
                </property>
                <property name="text">
                 <string>MB LABS LTD.</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_62">
-               <property name="text">
-                <string>Date</string>
                </property>
               </widget>
              </item>
@@ -3358,13 +3358,13 @@ QPushButton::hover {
                       <widget class="QPushButton" name="gcmsSaveReportBtn">
                        <property name="minimumSize">
                         <size>
-                         <width>0</width>
+                         <width>160</width>
                          <height>0</height>
                         </size>
                        </property>
                        <property name="maximumSize">
                         <size>
-                         <width>140</width>
+                         <width>160</width>
                          <height>16777215</height>
                         </size>
                        </property>
@@ -3377,13 +3377,13 @@ QPushButton::hover {
                       <widget class="QPushButton" name="gcmsDeleteReportBtn">
                        <property name="minimumSize">
                         <size>
-                         <width>0</width>
+                         <width>160</width>
                          <height>0</height>
                         </size>
                        </property>
                        <property name="maximumSize">
                         <size>
-                         <width>140</width>
+                         <width>160</width>
                          <height>16777215</height>
                         </size>
                        </property>
