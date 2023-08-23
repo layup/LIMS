@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1256</width>
-    <height>794</height>
+    <width>1332</width>
+    <height>872</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -57,6 +57,10 @@
        <string notr="true">QWidget {
 	background-color: #323a47
 } 
+
+QFrame {
+	border:none;
+}
 
 QPushButton {
 	padding: 5px;
@@ -305,6 +309,7 @@ QPushButton::checked {
 	color: white; 
 	border:none; 
 	padding-left: 10px; 
+	font-size:bold;
 
 }
 
@@ -334,7 +339,7 @@ QFrame {
 color: rgb(255, 255, 255);</string>
                </property>
                <property name="text">
-                <string>MB LABS LTD.</string>
+                <string>MB LABS LTD</string>
                </property>
               </widget>
              </item>
@@ -588,7 +593,11 @@ QLabel {
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">QWidget {
+             <string notr="true">#searchBar {
+	max-width: 300px; 
+}
+
+QWidget {
 	border: none; 
 }
 
@@ -597,12 +606,16 @@ QPushButton {
 	padding: 2px; 
 	margin: 0;
 	height: 25px; 
+	border-top-right-radius: 5px; 
+	border-bottom-right-radius: 5px; 
 }
 
 QLineEdit {
 	margin: 0px; 
 	border: none;
 	height:25px; 
+	border-top-left-radius: 5px; 
+	border-bottom-left-radius: 5px; 
 }
 
 QLineEdit:focus {
@@ -626,7 +639,7 @@ QLineEdit:focus {
              <item>
               <widget class="QLineEdit" name="searchLine">
                <property name="text">
-                <string>Search Job Number</string>
+                <string/>
                </property>
                <property name="maxLength">
                 <number>20</number>
@@ -677,7 +690,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -783,12 +796,12 @@ QLineEdit {
 	border-radius: 5px; 
 	padding: 5px; 
 	background-color: white; 
-	margin-left: 10px; 
+	
 }</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <property name="spacing">
-               <number>0</number>
+               <number>12</number>
               </property>
               <property name="leftMargin">
                <number>12</number>
@@ -815,7 +828,7 @@ QLineEdit {
                  </size>
                 </property>
                 <property name="text">
-                 <string>Search Job Number</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -1348,11 +1361,9 @@ QPushButton::hover {
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">
-QWidget {
-
+              <string notr="true">QWidget { 
 	color:white; 
-}</string>
+} </string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_10">
               <property name="spacing">
@@ -1394,7 +1405,7 @@ QWidget {
               <string notr="true">background-color: rgb(66, 78, 101);</string>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="icpMenu">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2519,7 +2530,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_19">
            <property name="spacing">
-            <number>0</number>
+            <number>-1</number>
            </property>
            <property name="leftMargin">
             <number>12</number>
@@ -2688,7 +2699,7 @@ QListWidget {
 }</string>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="gcmsMenuPage">
               <property name="styleSheet">
@@ -2729,19 +2740,19 @@ QPushButton:hover{
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_17">
                   <property name="spacing">
-                   <number>1</number>
+                   <number>-1</number>
                   </property>
                   <property name="leftMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="rightMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <item>
                    <spacer name="horizontalSpacer_10">
@@ -4068,7 +4079,7 @@ QWidget#settingsAuthors QPushButton {
 }</string>
                 </property>
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>3</number>
                 </property>
                 <widget class="QWidget" name="settingsPaths">
                  <widget class="QWidget" name="widget_14" native="true">
@@ -4405,7 +4416,26 @@ QWidget QLineEdit {
                   </item>
                  </layout>
                 </widget>
-                <widget class="QWidget" name="settingsHome"/>
+                <widget class="QWidget" name="settingsHome">
+                 <widget class="QWidget" name="verticalLayoutWidget">
+                  <property name="geometry">
+                   <rect>
+                    <x>140</x>
+                    <y>130</y>
+                    <width>271</width>
+                    <height>231</height>
+                   </rect>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_41">
+                   <item>
+                    <widget class="QLineEdit" name="lineEdit_3"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="lineEdit_4"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
                </widget>
               </item>
              </layout>
@@ -4853,7 +4883,7 @@ QPushButton::hover {
                  <string notr="true"/>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="ClientInfoPage">
                  <property name="styleSheet">
@@ -5356,7 +5386,7 @@ QWidget#dataEntryBody {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1256</width>
+     <width>1332</width>
      <height>22</height>
     </rect>
    </property>

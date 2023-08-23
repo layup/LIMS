@@ -1,5 +1,5 @@
 
-REPORTS_TYPE = ['','ISP','GCMS', 'CHM']
+REPORTS_TYPE = ['','CHM','ICP']
 
 GSMS_values = {
     "001": ["ALkalinity", "mg/L"], 

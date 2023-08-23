@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy
+    QSpacerItem, QSizePolicy, QCompleter
 )
 
 from modules.constants import *
@@ -51,9 +51,12 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(1)
         self.ui.settingsStack.setCurrentIndex(3)
         self.ui.reportsBtn1.setChecked(True)
-        
+
+
         #load the setup 
         self.loadCreatePage()
+        self.loadStartup()
+        self.loadTabFunctionality()
 
         #self.ui.pushButton_6.clicked.connect(self.open_new_window)
         self.ui.NextSection.clicked.connect(lambda: self.createReportPage())
@@ -111,6 +114,12 @@ class MainWindow(QMainWindow):
     def on_payment_1_textChanged(self): 
         self.clientInfo['payment'] = self.ui.payment_1.text()
         #print(self.clientInfo)
+   
+    #------------- Search Button Presses ------------------- 
+    
+    def on_searchLine_clicked(self): 
+        print('This is being clicked')
+        self.ui.searchLine.clear()
     
     #------------- Define Menu Button presses --------------
     
@@ -177,6 +186,7 @@ class MainWindow(QMainWindow):
         self.ui.icpStack.setCurrentIndex(3)
         
     def on_icpStack_currentChanged(self, index):
+        #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
         
         if(index == 0): 
             self.ui.icpPageTitle.setText("ICP Page")
@@ -185,7 +195,6 @@ class MainWindow(QMainWindow):
         if(index == 1): 
             columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
         
-            #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
             icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
             icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
             
@@ -213,7 +222,6 @@ class MainWindow(QMainWindow):
         
         if(index == 1): 
             self.ui.gcmsTitleLabel.setText('CHM Defined Parameters')
-          
             totalTests = len(self.gcmsGetTotalTests())
             
             self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
@@ -223,11 +231,9 @@ class MainWindow(QMainWindow):
             self.ui.gcmsTitleLabel.setText('CHM Defined Reports')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
             
-            
         if(index == 3): 
             self.ui.gcmsTitleLabel.setText('CHM Tests Entry')
             self.ui.gcmsSubTitleLabel.setText('')
-             
             self.gcmsClearEnteredTestsData()
             
             temp = self.getTestsAndUnits()
@@ -269,8 +275,8 @@ class MainWindow(QMainWindow):
             
         self.prev_index = (index - 1) % self.ui.stackedWidget.count()
         print('prev index: ', self.prev_index)
-        prev_widget = self.ui.stackedWidget.widget(self.prev_index)
-        current_widget = self.ui.stackedWidget.currentWidget()
+        #prev_widget = self.ui.stackedWidget.widget(self.prev_index)
+        #current_widget = self.ui.stackedWidget.currentWidget()
         
         if(self.prev_index == 5): 
             pass; 
@@ -282,6 +288,30 @@ class MainWindow(QMainWindow):
         #print(f"Current widget: {current_widget}")
         
     #------------- Loading  --------------  
+    
+    def loadStartup(self): 
+        jobList = self.getAllJobs();  
+        jobList_as_strings = [str(item) for item in jobList]
+        
+        
+        completer = QCompleter(jobList_as_strings)
+        completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
+        completer.setMaxVisibleItems(10)
+        
+        self.ui.lineEdit.setCompleter(completer)
+        self.ui.searchLine.setCompleter(completer)
+        
+        self.ui.searchLine.setPlaceholderText("Enter Job Number...")
+        self.ui.lineEdit.setPlaceholderText("Enter Job Number...")
+
+        
+    def loadTabFunctionality(self): 
+        #self.ui.gcmsTestsSample.editingFinished.connect(self.on_tab_pressed1)
+        pass; 
+        
+    def on_tab_pressed1(self): 
+        self.ui.gcmsTestsVal.setFocus()
+    
     
     def loadClientInfo(self): 
         print('**Applying Client Infomation ')
@@ -666,14 +696,12 @@ class MainWindow(QMainWindow):
             else: 
                 self.updateIcpTable(machine1Data)
 
-    #button activations  
     @pyqtSlot()
     def on_icpUploadBtn_clicked(self): 
         fileLocation = openFile()
         print(fileLocation)
         icp_upload(fileLocation, self.db) 
-        
-        #check if the file is .xlsx or txt document 
+         
     
     def on_reportlist_doubleClicked(self): 
         print('Something is being selected')
@@ -1226,8 +1254,8 @@ class MainWindow(QMainWindow):
             
             self.populateAuthorNames() 
 
-            if('ISP' in reportType):
-                print('ISP Loader')
+            if('ICP' in reportType):
+                print('***ICP Loader')
                 
                 self.ui.createIcpReportBtn.setVisible(True)
                 self.ui.createGcmsReportBtn.setVisible(False)
@@ -1236,7 +1264,7 @@ class MainWindow(QMainWindow):
                 icpLoader(self)
             
             if(reportType == 'CHM'):
-                print('CHM Loader')
+                print('***CHM Loader')
                 
                 self.ui.createIcpReportBtn.setVisible(False)
                 self.ui.createGcmsReportBtn.setVisible(True)
@@ -1282,6 +1310,8 @@ class MainWindow(QMainWindow):
             print('Error: Could not load the authors for Create Report Page ')
         
     # -------------------------------------------------------------
+    
+    
     
     def handle_item_changed(self, item, test): 
         row = item.row()
@@ -1340,6 +1370,15 @@ class MainWindow(QMainWindow):
         total = self.db.fetchone()[0]
         
         return total; 
+    
+    def getAllJobs(self): 
+        jobsQuery = 'SELECT DISTINCT jobNum FROM jobs'
+        
+        self.db.execute(jobsQuery)
+        names = self.db.fetchall()
+        data_list = [item[0] for item in names]
+
+        return data_list; 
     
     
     def open_new_window(self):

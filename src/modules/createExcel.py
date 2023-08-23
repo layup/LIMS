@@ -196,7 +196,8 @@ def pageSetup(ws):
     
 #FORMATS WAY MORE THEN NEEDED BUT W/
 def formatRows(ws, totalSamples, totalCols, pageSize): 
-    window_conversion = 0.75 
+    #window_conversion = 0.75 
+    window_conversion = 1 
     row_height_pixels = 13
     
     totalPages = math.ceil(totalSamples/4) 
@@ -457,7 +458,6 @@ def insertComments(ws, pageLocation):
 
 
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
-    #variables 
 
     counter = pageLocation; 
     
@@ -472,10 +472,6 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
 
         temp = testInfo[item]
         symbolRow.value = elementSymbols[temp]
-        #try: 
-        #    unitRow.value = unitType[item]
-        #except: 
-        #    print("error")
         
         elementRow.border = Border(right=thinBorder) 
         symbolRow.border  = Border(right=thinBorder) 
@@ -493,6 +489,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
     for currentCol, sample in enumerate(samplePlacement, start=3): 
         
         print(currentCol, sample)
+        print(f'**Sample: {sample}, Column: {currentCol}')
         
         for j in range(0, totalTests+2): 
             currentSample = ws.cell(row=counter+j, column=currentCol)        
@@ -505,47 +502,92 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
             comment.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
             
             currentVal = sampleData[sample][j]
-            #print(j, currentVal)
-            #print(j)
+            print(j, currentVal)
+
+            if(floatCheck(currentVal)): 
+                currentVal = float(currentVal) 
+                
+                if j in limitRef: 
+                    lowerLimit = limitRef[j][1]
+                    higherLimit = limitRef[j][2]
+                    
+                    currentSample.value = significantFiguresConvert(currentVal)
+                    
+                    if lowerLimit and currentVal < lowerLimit:
+                        currentSample.value = '< ' + f'{lowerLimit:.3f}' 
+                        
+                    if(currentVal == 0): 
+                        currentSample.value = '< ' + f'{lowerLimit:.3f}' 
+                else: 
+                    currentSample.value = significantFiguresConvert(currentVal)   
+                    
+                    if(currentVal == 0): 
+                        currentSample.value = '< ' + f'{lowerLimit:.3f}' 
+                        
+            else: 
+                currentSample.value = 'ND'
+
+                if(currentVal == 'Uncal'): 
+                    if j in limitRef:                 
+                        lowerLimit = limitRef[j][1] 
+                        if(lowerLimit): 
+                            currentSample.value =  '< ' + f'{lowerLimit:.3f}' 
+                        
+  
+                    
+                    
             
-            #FIXME: this is wrong atm uncal means something else 
+            ''' 
             try: 
-                temp = float(currentVal)
+                currentVal = float(currentVal)
+                #print('Current value: ', currentVal)
         
                 if j in limitRef: 
                     lower = limitRef[j][1]
-                    higher = limitRef[j][2]
-                    currentSample.value = temp 
+                    #higher = limitRef[j][2]
+                    currentSample.value = significantFiguresConvert(currentVal)
                     #print('{} Lower: {} | Highser: {}'.format(j, lower,higher))
                     
                     if(lower != ''): 
-                        if(temp < lower): 
-
+                        if(currentVal < lower): 
                             currentSample.value = '< ' + f'{lower:.3f}'
 
-                    if(higher != ''): 
-                        if(temp > higher): 
-                            currentSample.value = '> ' + f'{higher:3f}'
+                    #if(higher != ''): 
+                    #    if(temp > higher): 
+                    #        currentSample.value = '> ' + f'{higher:3f}'
                     
-                    if(temp == 0): 
+                    if(currentVal == 0): 
                        #currentSample.value = 'ND' 
                        currentSample.value = '< ' + f'{lower:.3f}'
                 
                 #no limit exists for the given thing
                 else: 
-                    currentSample.value = temp 
+                    currentSample.value = significantFiguresConvert(currentVal)  
                     
-                    if(temp == 0): 
+                    if(currentVal == 0): 
                         #currentSample.value = 'ND'  
                         currentSample.value = '< ' + f'{lower:.3f}'
 
             except:
                 if(currentVal == 'Uncal'):
                     #currentSample.value = 'n/a'
-                    currentSample.value = 'ND'
-                else: 
-                    currentSample.value = currentVal
+                    if j in limitRef: 
+                        lower = limitRef[j][1] 
+                        currentSample.value =  '< ' + f'{lower:.3f}'
                     
+                
+                elif(currentVal == ''): 
+                    currentSample.value = 'BLANK'
+                    
+                elif(currentVal == 'ND'): 
+                    currentSample.value = 'ND2' 
+                    
+                else:                   
+                    currentVal = float(currentVal)
+                    currentSample.value = significantFiguresConvert(currentVal)  
+                    
+                    
+           '''         
             if j in limitRef: 
                 higher = limitRef[j][2]
                 limitComment = limitRef[j][3]
@@ -649,3 +691,23 @@ def insertSignature(ws, pageLocation, startColumn):
         for j in range(2): 
             signatureLine = ws.cell(row=pageLocation, column=col+j)
             signatureLine.border = Border(top=thinBorder)
+
+            
+def significantFiguresConvert(value): 
+    if(value >= 100): 
+        return int(f'{value:.0f}')
+    if(value >=10): 
+        return (f'{value:.1f}')
+    if(value >= 1): 
+        return (f'{value:.2f}')
+    if(value < 1): 
+        return (f'{value:.2f}') 
+    
+    return value; 
+
+def floatCheck(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

@@ -33,6 +33,10 @@ class Ui_MainWindow(object):
 "    background-color: #323a47\n"
 "} \n"
 "\n"
+"QFrame {\n"
+"    border:none;\n"
+"}\n"
+"\n"
 "QPushButton {\n"
 "    padding: 5px;\n"
 "    border:none; \n"
@@ -155,9 +159,17 @@ class Ui_MainWindow(object):
         self.verticalLayout.setContentsMargins(0, -1, 0, -1)
         self.verticalLayout.setObjectName("verticalLayout")
         self.TopNav = QtWidgets.QFrame(self.LeftMenuSubContainer)
-        self.TopNav.setStyleSheet("color: white; \n"
-"border:none; \n"
-"padding-left: 10px; ")
+        self.TopNav.setStyleSheet("#logo {\n"
+"    color: white; \n"
+"    border:none; \n"
+"    padding-left: 10px; \n"
+"    font-size:bold;\n"
+"\n"
+"}\n"
+"\n"
+"QFrame {\n"
+"    border:none;\n"
+"}")
         self.TopNav.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.TopNav.setFrameShadow(QtWidgets.QFrame.Raised)
         self.TopNav.setObjectName("TopNav")
@@ -174,9 +186,6 @@ class Ui_MainWindow(object):
 "color: rgb(255, 255, 255);")
         self.logo.setObjectName("logo")
         self.gridLayout.addWidget(self.logo, 0, 0, 1, 1)
-        self.label_62 = QtWidgets.QLabel(self.TopNav)
-        self.label_62.setObjectName("label_62")
-        self.gridLayout.addWidget(self.label_62, 1, 0, 1, 1)
         self.verticalLayout.addWidget(self.TopNav)
         self.reportsBtn1 = QtWidgets.QPushButton(self.LeftMenuSubContainer)
         self.reportsBtn1.setIcon(icon)
@@ -279,12 +288,16 @@ class Ui_MainWindow(object):
 "    padding: 2px; \n"
 "    margin: 0;\n"
 "    height: 25px; \n"
+"    border-top-right-radius: 5px; \n"
+"    border-bottom-right-radius: 5px; \n"
 "}\n"
 "\n"
 "QLineEdit {\n"
 "    margin: 0px; \n"
 "    border: none;\n"
 "    height:25px; \n"
+"    border-top-left-radius: 5px; \n"
+"    border-bottom-left-radius: 5px; \n"
 "}\n"
 "\n"
 "QLineEdit:focus {\n"
@@ -300,6 +313,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_22.setSpacing(0)
         self.horizontalLayout_22.setObjectName("horizontalLayout_22")
         self.searchLine = QtWidgets.QLineEdit(self.searchBar)
+        self.searchLine.setText("")
         self.searchLine.setMaxLength(20)
         self.searchLine.setDragEnabled(True)
         self.searchLine.setCursorMoveStyle(QtCore.Qt.LogicalMoveStyle)
@@ -380,12 +394,12 @@ class Ui_MainWindow(object):
 "    border-radius: 5px; \n"
 "    padding: 5px; \n"
 "    background-color: white; \n"
-"    margin-left: 10px; \n"
+"    \n"
 "}")
         self.widget_9.setObjectName("widget_9")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.widget_9)
         self.horizontalLayout_5.setContentsMargins(12, -1, -1, -1)
-        self.horizontalLayout_5.setSpacing(0)
+        self.horizontalLayout_5.setSpacing(12)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.pushButton_6 = QtWidgets.QPushButton(self.widget_9)
         self.pushButton_6.setMinimumSize(QtCore.QSize(130, 30))
@@ -393,6 +407,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.pushButton_6)
         self.lineEdit = QtWidgets.QLineEdit(self.widget_9)
         self.lineEdit.setMinimumSize(QtCore.QSize(0, 30))
+        self.lineEdit.setText("")
         self.lineEdit.setObjectName("lineEdit")
         self.horizontalLayout_5.addWidget(self.lineEdit)
         self.verticalLayout_17.addWidget(self.widget_9)
@@ -1247,7 +1262,6 @@ class Ui_MainWindow(object):
         self.gsmsPage.setObjectName("gsmsPage")
         self.verticalLayout_19 = QtWidgets.QVBoxLayout(self.gsmsPage)
         self.verticalLayout_19.setContentsMargins(12, 12, 12, 12)
-        self.verticalLayout_19.setSpacing(0)
         self.verticalLayout_19.setObjectName("verticalLayout_19")
         self.gcmsHeader = QtWidgets.QWidget(self.gsmsPage)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
@@ -1396,8 +1410,7 @@ class Ui_MainWindow(object):
 "")
         self.gcmsMenuBody.setObjectName("gcmsMenuBody")
         self.horizontalLayout_17 = QtWidgets.QHBoxLayout(self.gcmsMenuBody)
-        self.horizontalLayout_17.setContentsMargins(12, 12, 12, 12)
-        self.horizontalLayout_17.setSpacing(1)
+        self.horizontalLayout_17.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_17.setObjectName("horizontalLayout_17")
         spacerItem16 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_17.addItem(spacerItem16)
@@ -1746,13 +1759,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_28 = QtWidgets.QHBoxLayout(self.widget_21)
         self.horizontalLayout_28.setObjectName("horizontalLayout_28")
         self.gcmsSaveReportBtn = QtWidgets.QPushButton(self.widget_21)
-        self.gcmsSaveReportBtn.setMinimumSize(QtCore.QSize(0, 0))
-        self.gcmsSaveReportBtn.setMaximumSize(QtCore.QSize(140, 16777215))
+        self.gcmsSaveReportBtn.setMinimumSize(QtCore.QSize(160, 0))
+        self.gcmsSaveReportBtn.setMaximumSize(QtCore.QSize(160, 16777215))
         self.gcmsSaveReportBtn.setObjectName("gcmsSaveReportBtn")
         self.horizontalLayout_28.addWidget(self.gcmsSaveReportBtn)
         self.gcmsDeleteReportBtn = QtWidgets.QPushButton(self.widget_21)
-        self.gcmsDeleteReportBtn.setMinimumSize(QtCore.QSize(0, 0))
-        self.gcmsDeleteReportBtn.setMaximumSize(QtCore.QSize(140, 16777215))
+        self.gcmsDeleteReportBtn.setMinimumSize(QtCore.QSize(160, 0))
+        self.gcmsDeleteReportBtn.setMaximumSize(QtCore.QSize(160, 16777215))
         self.gcmsDeleteReportBtn.setObjectName("gcmsDeleteReportBtn")
         self.horizontalLayout_28.addWidget(self.gcmsDeleteReportBtn)
         spacerItem21 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -2718,9 +2731,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(5)
         self.icpStack.setCurrentIndex(2)
-        self.gcmsStack.setCurrentIndex(2)
+        self.gcmsStack.setCurrentIndex(0)
         self.settingsStack.setCurrentIndex(2)
-        self.stackedWidget_2.setCurrentIndex(0)
+        self.stackedWidget_2.setCurrentIndex(1)
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainer.setHidden) # type: ignore
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
         self.gsmsBtn2.toggled['bool'].connect(self.gsmsBtn1.setChecked) # type: ignore
@@ -2738,18 +2751,15 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.logo.setText(_translate("MainWindow", "MB LABS LTD."))
-        self.label_62.setText(_translate("MainWindow", "Date"))
+        self.logo.setText(_translate("MainWindow", "MB LABS LTD"))
         self.reportsBtn1.setText(_translate("MainWindow", "Reports "))
         self.createReportBtn1.setText(_translate("MainWindow", "Create Report"))
         self.icpBtn1.setText(_translate("MainWindow", "ICP Tools"))
         self.gsmsBtn1.setText(_translate("MainWindow", "CHM Tools "))
         self.settingBtn1.setText(_translate("MainWindow", "Settings"))
-        self.searchLine.setText(_translate("MainWindow", "Search Job Number"))
         self.label_21.setText(_translate("MainWindow", "Reports"))
         self.totalReportsHeader.setText(_translate("MainWindow", "Total Reports "))
         self.pushButton_6.setText(_translate("MainWindow", "Search"))
-        self.lineEdit.setText(_translate("MainWindow", "Search Job Number"))
         self.reportsTable.setSortingEnabled(False)
         item = self.reportsTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Job Number"))

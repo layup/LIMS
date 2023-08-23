@@ -59,6 +59,7 @@ def chmLoader(self):
                     
     
     GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
+    print('**FOUND CHM TESTS')
     print(GSMS_TESTS_LISTS) 
 
     self.ui.dataTable.setRowCount(len(GSMS_TESTS_LISTS))
@@ -90,15 +91,17 @@ def chmLoader(self):
     
     #list tests 
     for i, value in enumerate(GSMS_TESTS_LISTS): 
+        print('Current Test: ', value)
         item = QtWidgets.QTableWidgetItem()
         item.setText(value)
         self.ui.dataTable.setItem(i, 0, item)
         
         #TODO: search for the display name 
-        displayQuery = 'SELECT displayName FROM gcmsTests WHERE testName = ?'
+        displayQuery = 'SELECT * FROM gcmsTests WHERE testName = ?'
+        
         self.db.execute(displayQuery, [value,])
         result = self.db.fetchone()
-        print(result)
+        print(f'Query Result: {result}')
         
         if(result): 
             displayNameItem  = QtWidgets.QTableWidgetItem() 
@@ -216,7 +219,7 @@ def chmLoadTestsData(self):
             getTestsData = 'SELECT * FROM gcmsTests WHERE testName = ?'
             self.db.execute(getTestsData, (selectedTests.text(),))
             results = self.db.fetchone() 
-            
+            print('Results:') 
             print(results)
         
             self.ui.gcmsTxtName.setText(str(results[0]))
