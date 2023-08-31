@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy
+    QSpacerItem, QSizePolicy, QDesktopWidget
 )
 
 class SampleNameWidget(QWidget): 
@@ -102,3 +102,6 @@ class CustomDialog(QDialog):
     def icpOES(self): 
         pass; 
     
+
+
+

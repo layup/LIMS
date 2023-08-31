@@ -1,4 +1,3 @@
-
 import os 
 import re
 import csv
@@ -51,21 +50,6 @@ def remove_unicode_characters(text):
 
     return cleaned_text
 
-def remove_escape_characters(text):
-    #Define the regex pattern to match escape characters including \x sequences
-    #escape_pattern = r'\\[xX][0-9a-fA-F]{2}|\\x1a|\.'
-    #Use regex substitution to remove escape characters
-    
-    #cleaned_text = re.sub(escape_pattern, '', text)
-    #return cleaned_text
-    
-    characters_to_remove = ['\x1a', '\n']
-    cleaned_string = text; 
-    
-    for char in characters_to_remove:
-        cleaned_string = cleaned_string.replace(char, '')
-        
-    return cleaned_string
 
 def hardnessCalc(calcium, magnesium, dilution):
     calcium = float(calcium) * float(dilution)
@@ -351,11 +335,9 @@ def icp_upload(filePath, db):
         icpMethod2(filePath, db)
     else: 
         print("Not valid file type")
-    
     return; 
     
 #TODO: sort by name  
-#FIXME: issue sometimes cuts off the ending, so we can just have a cut off section.
 #read line by line and just add the line instead 
 #FIXME: tracking the icpData is wrong as well 
 def icpMethod1(filePath, db): 
@@ -416,6 +398,7 @@ def icpMethod1(filePath, db):
 
     sampleNumbers = []
     
+    #TODO: missing the last row 
     for start in startingPostion: 
         running = True; 
         counter = 1; 
@@ -433,7 +416,6 @@ def icpMethod1(filePath, db):
             spiltLengths.append(len(splitLine))
 
             if(re.search('\d{6}-\d{1,2}', splitLine[2])):
-                #create a temp format 
                 temp = []
                 temp.append(splitLine[2])
                 temp.append(1)
@@ -447,10 +429,10 @@ def icpMethod1(filePath, db):
 
                 sampleNumbers.append([splitLine[2], start+counter, splitLine[3], splitLine[6]])
 
-                if(currentJob =='' ):
+                if(currentJob == ''):
                     currentJob = splitLine[2]
   
-                elif(currentJob != splitLine[2]):
+                elif(currentJob != splitLine[2]): 
                     jobData[currentJob] = elementData   
                     elementData = {}
                     currentJob = splitLine[2]
@@ -459,18 +441,16 @@ def icpMethod1(filePath, db):
     
                 jobNumber = splitLine[2].split('-')[0]
                 if(jobNumber not in jobNumbers):
-                    #print(jobNumber)
                     jobNumbers.append(jobNumber)
                     
                 if(temp): 
                     writer.writerow(temp)
-            
-            #print(len(splitLine))
 
-    
+        jobData[currentJob] = elementData   
+
     spiltLengths = numpy.array(spiltLengths)
     unique, counts = numpy.unique(spiltLengths, return_counts=True)
-    #print(dict(zip(unique, counts)))
+
 
     f.close()
     file1.close()
@@ -478,20 +458,20 @@ def icpMethod1(filePath, db):
     #TODO: factor in a way to show all the things and the lines where duplicates are 
         
     print(sampleNumbers)
+    print('****')
+    print(jobData)
    
     save = viewIcpTable(filePath, sampleNumbers,1 ) 
-    print('Save: ', save)
+    print('Save Status: ', save)
 
     
     #FIXME: uploading same data
-    #we can have a check in place in the file where it is saved 
-    
-    #save to database
+
     todayDate = date.today()
     #save to database 
     if(save): 
         for (key, value) in jobData.items(): 
-            #print(key)
+            #print(key, value)
             sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
             jobNum = key.split('-')[0]
             tempData = json.dumps(value)
@@ -601,8 +581,6 @@ def icpMethod2(filePath, db):
     
     newWb.save(newPath)
     
-
-
     return; 
 
 def formatJobSampleString(inputString): 
@@ -639,10 +617,10 @@ def formatStringArray(inputArray):
     return(outputArray)
         
 
-def createReport(db, jobNum, reportType, parameter): 
-    sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, status) values (?,?,?,?,0)'
+def createReport(db, jobNum, reportType, parameter, dilution): 
+    sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, dilution) values (?,?,?,?,?)'
     currentDate = date.today()
-    db.execute(sql, (jobNum, reportType, parameter, currentDate))
+    db.execute(sql, (jobNum, reportType, parameter, currentDate, dilution))
     db.commit()
     
     

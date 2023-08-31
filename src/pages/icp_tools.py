@@ -53,16 +53,18 @@ def icpReportHander(self, tests, totalSamples):
     #FIXME: adjust the limits 
     #FIXME: adjust the unit amount  
     
-    initalColumns = 5; 
+    initalColumns = 4; 
     totalTests = len(tests)
+    additonalRows = 2 
     sampleData = {}
     unitType = []
     
     #FIXME: have something determine the lower values of the things 
-    for col in range(initalColumns, totalSamples + initalColumns ): 
+    for col in range(initalColumns, totalSamples + initalColumns): 
+        print(col)
         currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
         jobValues = []
-        for row in range(totalTests + 2): 
+        for row in range(totalTests + additonalRows): 
             try: 
                 currentItem = self.ui.dataTable.item(row, col).text()
                 jobValues.append(currentItem)
@@ -110,7 +112,8 @@ def icpReportHander(self, tests, totalSamples):
 
     
 #TODO: have a helper change the hardness values when cal and mg values change 
-#TODO: remove ref value
+#TODO: combine both the datasets;
+#TODO: does this effect hardness and also what about the new values we enter in 
 def icpLoader(self): 
     print('[FUNCTION]: icpLoader')
     print('***Loading ')
@@ -119,15 +122,10 @@ def icpLoader(self):
         'Element Name', 
         'Element symbol',
         'Unit Value', 
-        'REF Value', 
         'distal factor'
     ]
     
     addtionalRows = ['pH', 'Hardness']
-    excludedElements = ['U', 'S']
-    
-    #setting up the table
-    totalRows = len(periodic_table) + len(addtionalRows) - len(excludedElements)
     initalColumns = len(columnNames)
      
     self.loadClientInfo()
@@ -138,13 +136,25 @@ def icpLoader(self):
     
     sampleData = list(self.db.query(sql1, (self.jobNum,)))
     sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
+
+    queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
+    queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
+    
+    elements = list(self.db.query(queryDefinedElements))
+    elementNames = [t[0] for t in elements]
+    
+    print(elementNames)
+    limitResults = self.db.query(queryUnits, (self.parameter,)) 
+    elementUnitValues = {t[0]: t[1] for t in limitResults} 
+    
+    totalRows = len(elements) + len(addtionalRows)
     
     selectedSampleNames = []
     
     for item in sampleData:
         selectedSampleNames.append(item[0])
     
-    #TODO: can remove if you really think about it needs to combine both machines 
+
     for item in sampleData2: 
         if(item[0] not in selectedSampleNames): 
             selectedSampleNames.append(item[0]) 
@@ -181,38 +191,25 @@ def icpLoader(self):
         item2 = self.ui.dataTable.horizontalHeaderItem(i)
         item2.setText(key)
     
-    #Get all the names of the elments then sort them
-    elementNames = []
+    for i, element in enumerate(elements): 
+        elementName = element[0]
+        elementSymbol = element[1]
         
-    for (key,value) in periodic_table.items(): 
-        if(key not in excludedElements): 
-            elementNames.append(value)
+        elementNameCol = QtWidgets.QTableWidgetItem() 
+        elementNameCol.setText(elementName.capitalize()) 
+        self.ui.dataTable.setItem(i, 0, elementNameCol)
+            
+        elementSymbolCol = QtWidgets.QTableWidgetItem()
+        elementSymbolCol.setText(elementSymbol.capitalize())
+        self.ui.dataTable.setItem(i, 1, elementSymbolCol) 
         
-    elementNames.sort()
-    
-    queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
-    hardnessLocation = {}
-
-    for i, value in enumerate(elementNames): 
-        currentSymbol = elementSymbols[value]
-        
-        if(currentSymbol in ['Mg', 'Ca']): 
-            hardnessLocation[currentSymbol] = int(i); 
-        
-        item = QtWidgets.QTableWidgetItem() 
-        item.setText(value) 
-        self.ui.dataTable.setItem(i, 0, item)
-
-        item2 = QtWidgets.QTableWidgetItem()
-        item2.setText(currentSymbol)
-        self.ui.dataTable.setItem(i, 1, item2)
-        
-        item3 = QtWidgets.QTableWidgetItem()
-        if(currentSymbol in icpMachine2Symbols): 
-            item3.setText('ug/L')
+        unitTypeCol = QtWidgets.QTableWidgetItem() 
+        if(elementName in elementUnitValues):
+            unitTypeCol.setText(elementUnitValues[elementName])
         else: 
-            item3.setText('mg/L')
-        self.ui.dataTable.setItem(i, 2, item3)
+            unitTypeCol.setText('')
+            
+        self.ui.dataTable.setItem(i, 2, unitTypeCol)
         
         item4 = QtWidgets.QTableWidgetItem()
         if(self.dilution == ''):
@@ -221,33 +218,37 @@ def icpLoader(self):
         else: 
             item4.setText(str(self.dilution))
             
-        self.ui.dataTable.setItem(i, 4, item4)
+        self.ui.dataTable.setItem(i, 3, item4) 
+        
 
-    #adding hardness and Ph 
     for i, value in enumerate(addtionalRows): 
         postion = totalRows - i - 1; 
-        item = QtWidgets.QTableWidgetItem()  
-        item.setText(value)
-        self.ui.dataTable.setItem(postion ,0 , item)
+        elementName = QtWidgets.QTableWidgetItem()  
+        elementName.setText(value)
+        self.ui.dataTable.setItem(postion ,0 , elementName)
+
+        symbolName = QtWidgets.QTableWidgetItem()
+        unitValue = QtWidgets.QTableWidgetItem()
         
         if(value == 'Hardness'): 
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setText("CaC0₃")
-            self.ui.dataTable.setItem(postion, 1, item2) 
+            symbolName.setText("CaC0₃")
+            unitValue.setText('ug/L')
             
-            item3 = QtWidgets.QTableWidgetItem()
-            item3.setText('ug/L')
-            self.ui.dataTable.setItem(postion, 2, item3) 
-    
+            self.ui.dataTable.setItem(postion, 1, symbolName) 
+            self.ui.dataTable.setItem(postion, 2, unitValue) 
+        else: 
+            symbolName.setText("")
+            unitValue.setText('unit') 
 
-    #TODO: combine both the datasets;
-    #TODO: does this effect hardness and also what about the new values we enter in 
+            self.ui.dataTable.setItem(postion, 1, symbolName) 
+            self.ui.dataTable.setItem(postion, 2, unitValue) 
+            
     
     machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
     machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
     
     print('***Element Values')
-    for i in range(len(elementNames)): 
+    for i in range(len(elements)): 
         item = self.ui.dataTable.item(i, 1)
         
         if(item != None): 
@@ -280,8 +281,9 @@ def icpLoader(self):
                     else: 
                         machine2Val = round(machine2Val, 3 )
                         item.setText(str(machine2Val))
-            
-                self.ui.dataTable.setItem(i,j+5, item)
+                
+                sampleCol = j + len(columnNames)
+                self.ui.dataTable.setItem(i,sampleCol, item)
 
 
     print('***Hardness Calculations')
@@ -292,14 +294,16 @@ def icpLoader(self):
         if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
             calcium = machine1[sample]['Ca'] 
             magnesium = machine1[sample]['Mg'] 
+            result = hardnessCalc(calcium, magnesium, self.dilution)
+
+            item.setText(str(result))
+            sampleCol = j + len(columnNames)
             
+            self.ui.dataTable.setItem(33, sampleCol, item)
+
             print('calcium: ', calcium)
             print('magnesium: ', magnesium)
-            
-            result = hardnessCalc(calcium, magnesium, self.dilution)
             print('Result: ', result)
-            item.setText(str(result))
-            self.ui.dataTable.setItem(33, j+5, item)
             
     column_width = self.ui.dataTable.columnWidth(2)
     padding = 10

@@ -21,7 +21,8 @@ thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
 
-def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, foooterComment): 
+def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, footerComment): 
+    
     #TODO: missing the report type that will get called into this thing 
     #TODO: determine how far out the longest thing is 
     #FIXME: check out for none issue when they appear
@@ -136,8 +137,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
                 comment.value = 'Continued on next page ....'
                 comment.font = Font(bold=True, size=9, name="Times New Roman")
             else: 
-                print('Insert comment and signature') 
-                insertSignature(ws, pageLocation, [3,6])
+                insertIcpComment(ws, footerComment, pageLocation)
                   
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 
@@ -147,13 +147,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             if((currentPage+1) == totalPages): 
-                for (i, value) in enumerate(foooterComment):
-                    comment = ws.cell(row=pageLocation, column=1)
-                    comment.value = value
-                    comment.font = Font(size=9, name="Times New Roman") 
-                    pageLocation+=1; 
- 
-                insertSignature(ws, pageLocation, [3,6])
+                insertIcpComment(ws, footerComment, pageLocation)
+                
             else: 
                 comment = ws.cell(row=pageLocation, column=1)
                 comment.value = 'Continued on next page ....'
@@ -239,11 +234,15 @@ def generateSampleHeaderNames(ws, sampleNames):
     return sampleSections, samplePlacement 
 
 def createFooters(ws, title, jobNumber): 
-    ws.oddHeader.fontName = 'Times New Roman'
-    ws.oddHeader.fontSize = 14
+    ws.oddHeader.left.font = 'Times New Roman'
+    ws.oddHeader.left.size = 11
+    ws.oddHeader.right.font = 'Times New Roman'
+    ws.oddHeader.right.size = 11
 
-    ws.evenHeader.left.font_name = 'Times New Roman'
-    ws.evenHeader.left.font_size = 14
+    ws.evenHeader.left.font = 'Times New Roman'
+    ws.evenHeader.left.size = 11
+    ws.evenHeader.left.font = 'Times New Roman'
+    ws.evenHeader.left.size = 11
     
     ws.oddHeader.left.text  = title + ': &D'
     ws.evenHeader.left.text = title + ': &D' 
@@ -441,6 +440,26 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
     
     return pageLocation; 
 
+def insertIcpComment(ws, footerComment, pageLocation): 
+    for (i, value) in enumerate(footerComment):
+        comment = ws.cell(row=pageLocation, column=1)
+        comment.value = value
+        comment.font = Font(size=9, name="Times New Roman") 
+        pageLocation+=1; 
+    '''     
+    additonalComments = [
+        'Comments:', 
+        'All constituents tested meet Canadian and B.C drinking water standards.'
+    ]
+
+    for currentComment in additonalComments: 
+        comment = ws.cell(row=pageLocation, column=1)
+        comment.value = currentComment 
+        pageLocation+=1; 
+    '''
+    pageLocation +=2; 
+    insertSignature(ws, pageLocation, [3,6])
+
 def insertComments(ws, pageLocation): 
 
     comments = { 
@@ -458,20 +477,18 @@ def insertComments(ws, pageLocation):
 
 
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
-
     counter = pageLocation; 
     
-    #insert elementName, symbol 
     #FIXME: need to change because will be loading elements and symbols based on the info 
     for item in range(totalTests): 
         elementRow = ws.cell(row=counter, column=1); 
         symbolRow = ws.cell(row=counter, column=2); 
         unitRow = ws.cell(row=counter, column=7)
         
-        elementRow.value = "{0}) {1}".format(item+1, testInfo[item])
+        elementRow.value = "{0}) {1}".format(item+1, testInfo[item].capitalize())
 
         temp = testInfo[item]
-        symbolRow.value = elementSymbols[temp]
+        symbolRow.value = elementSymbols[temp.capitalize()]
         
         elementRow.border = Border(right=thinBorder) 
         symbolRow.border  = Border(right=thinBorder) 
@@ -509,7 +526,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
                 
                 if j in limitRef: 
                     lowerLimit = limitRef[j][1]
-                    higherLimit = limitRef[j][2]
+                    upperLimit = limitRef[j][2]
                     
                     currentSample.value = significantFiguresConvert(currentVal)
                     
@@ -533,87 +550,24 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
                         if(lowerLimit): 
                             currentSample.value =  '< ' + f'{lowerLimit:.3f}' 
                         
-  
-                    
-                    
-            
-            ''' 
-            try: 
-                currentVal = float(currentVal)
-                #print('Current value: ', currentVal)
-        
-                if j in limitRef: 
-                    lower = limitRef[j][1]
-                    #higher = limitRef[j][2]
-                    currentSample.value = significantFiguresConvert(currentVal)
-                    #print('{} Lower: {} | Highser: {}'.format(j, lower,higher))
-                    
-                    if(lower != ''): 
-                        if(currentVal < lower): 
-                            currentSample.value = '< ' + f'{lower:.3f}'
-
-                    #if(higher != ''): 
-                    #    if(temp > higher): 
-                    #        currentSample.value = '> ' + f'{higher:3f}'
-                    
-                    if(currentVal == 0): 
-                       #currentSample.value = 'ND' 
-                       currentSample.value = '< ' + f'{lower:.3f}'
-                
-                #no limit exists for the given thing
-                else: 
-                    currentSample.value = significantFiguresConvert(currentVal)  
-                    
-                    if(currentVal == 0): 
-                        #currentSample.value = 'ND'  
-                        currentSample.value = '< ' + f'{lower:.3f}'
-
-            except:
-                if(currentVal == 'Uncal'):
-                    #currentSample.value = 'n/a'
-                    if j in limitRef: 
-                        lower = limitRef[j][1] 
-                        currentSample.value =  '< ' + f'{lower:.3f}'
-                    
-                
-                elif(currentVal == ''): 
-                    currentSample.value = 'BLANK'
-                    
-                elif(currentVal == 'ND'): 
-                    currentSample.value = 'ND2' 
-                    
-                else:                   
-                    currentVal = float(currentVal)
-                    currentSample.value = significantFiguresConvert(currentVal)  
-                    
-                    
-           '''         
             if j in limitRef: 
-                higher = limitRef[j][2]
+                upperLimit = limitRef[j][2]
                 limitComment = limitRef[j][3]
                 unitType = limitRef[j][4]
 
                 currentUnit.value = unitType
 
-                if(limitComment != ''): 
+                if(limitComment): 
                     comment.value = limitComment
                 #FIXME: insert the unit value if exists 
-                elif(higher != ''): 
-                    if(higher < 1): 
-                        comment.value = f'{higher:.3f}' + " " + unitType   
-                    else: 
-                        comment.value = f'{higher:.2f}' + " " + unitType
-                    
-                    if(higher > 10):  
-                        comment.value = f'{higher:.1f}' + " " + unitType  
+                elif(upperLimit): 
+                    comment.value = f'{significantFiguresConvert(upperLimit)} {unitType}'
+
                 else: 
                     comment.value = 'no limit listed'
             else: 
                 comment.value = 'no limit listed' 
                 
-            #print(currentSample.value) 
-    
-    
     sampleLocation += 1 
     pageLocation += totalTests;  
 
@@ -626,6 +580,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
         if(current != 8): 
             temp.border = Border(right=thinBorder)
         else: 
+            #TODO: add differet comments basedp m the hardness 
             temp.value = '0-75 mg/L = soft'
             temp.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
         
@@ -695,13 +650,13 @@ def insertSignature(ws, pageLocation, startColumn):
             
 def significantFiguresConvert(value): 
     if(value >= 100): 
-        return int(f'{value:.0f}')
+        return (f'{value:.0f}')
     if(value >=10): 
         return (f'{value:.1f}')
     if(value >= 1): 
         return (f'{value:.2f}')
     if(value < 1): 
-        return (f'{value:.2f}') 
+        return (f'{value:.3f}') 
     
     return value; 
 

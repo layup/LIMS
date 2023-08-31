@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QMessageBox
+from PyQt5.QtWidgets import QDialog, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QDesktopWidget 
 
 def loadReportDialog(self): 
     msgBox = QMessageBox()  
@@ -58,6 +58,7 @@ def deleteBox(self, title, message, action):
     msgBox = QMessageBox()  
     msgBox.setText(title);
     msgBox.setInformativeText(message);
+    msgBox.setIcon(QMessageBox.Question)
     msgBox.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
     x = msgBox.exec_() 
     
@@ -83,4 +84,38 @@ def replaceError(self,sampleName):
     if(x == QMessageBox.Cancel):
         pass 
     
-    
+class openJobDialog(QDialog):
+    def __init__(self, jobNum, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Open")
+        self.setFixedSize(300, 100)
+        
+        self.jobNum = jobNum
+        
+        self.center_on_screen()
+
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        label = QLabel(f"Do you want to open job number {self.jobNum}")
+        layout.addWidget(label)
+
+        button_layout = QHBoxLayout()  # Use QHBoxLayout for horizontal arrangement
+        layout.addLayout(button_layout)
+
+        yes_button = QPushButton("Yes")
+        yes_button.clicked.connect(self.accept)
+        button_layout.addWidget(yes_button)
+
+        no_button = QPushButton("No")
+        no_button.clicked.connect(self.reject)
+        button_layout.addWidget(no_button)
+
+
+    def center_on_screen(self):
+        desktop_rect = QDesktopWidget().availableGeometry(self)
+        self.move(desktop_rect.center() - self.rect().center())
+
+
+ 

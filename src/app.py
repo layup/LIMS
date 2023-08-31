@@ -30,30 +30,9 @@ class MainWindow(QMainWindow):
       
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
-        
-        paths = load_pickle('data.pickle')
-        print('**Paths')
-        for key, value in paths.items():
-            print(key, value)
-       
-        if(isValidDatabase(paths['databasePath'])): 
-            self.db = Database(paths['databasePath'])
-        else: 
-            #TODO: add popup 
-            print('Database not valid')
-            databasePathTemp = openFile()
-            self.db = Database(databasePathTemp)
-            
-        self.setWindowTitle("Laboratory Information management System") 
-        self.ui.LeftMenuContainerMini.hide()
-
-        self.activeCreation = False; 
-        self.ui.stackedWidget.setCurrentIndex(1)
-        self.ui.settingsStack.setCurrentIndex(3)
-        self.ui.reportsBtn1.setChecked(True)
-
-
+                    
         #load the setup 
+        self.loadDatabase()
         self.loadCreatePage()
         self.loadStartup()
         self.loadTabFunctionality()
@@ -62,10 +41,13 @@ class MainWindow(QMainWindow):
         self.ui.NextSection.clicked.connect(lambda: self.createReportPage())
         self.ui.clientInfoBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(0))
         self.ui.dataEntryBtn.clicked.connect(lambda: self.ui.stackedWidget_2.setCurrentIndex(1))
+        self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())   
         
-        self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())        
+        self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
+        self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal)
+      
+             
         self.showMaximized()
-    
 
    #------------- Client Data Change  --------------     
    
@@ -290,10 +272,17 @@ class MainWindow(QMainWindow):
     #------------- Loading  --------------  
     
     def loadStartup(self): 
+        self.setWindowTitle("Laboratory Information management System") 
+        self.ui.LeftMenuContainerMini.hide()
+
+        self.activeCreation = False; 
+        self.ui.stackedWidget.setCurrentIndex(1)
+        self.ui.settingsStack.setCurrentIndex(3)
+        self.ui.reportsBtn1.setChecked(True)
+         
         jobList = self.getAllJobs();  
         jobList_as_strings = [str(item) for item in jobList]
-        
-        
+         
         completer = QCompleter(jobList_as_strings)
         completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
         completer.setMaxVisibleItems(10)
@@ -304,7 +293,22 @@ class MainWindow(QMainWindow):
         self.ui.searchLine.setPlaceholderText("Enter Job Number...")
         self.ui.lineEdit.setPlaceholderText("Enter Job Number...")
 
-        
+       
+    def loadDatabase(self): 
+        paths = load_pickle('data.pickle')
+        print('**Paths')
+        for key, value in paths.items():
+            print(key, value)
+       
+        if(isValidDatabase(paths['databasePath'])): 
+            self.db = Database(paths['databasePath'])
+        else: 
+            #TODO: add popup 
+            print('Database not valid')
+            databasePathTemp = openFile()
+            self.db = Database(databasePathTemp)
+    
+     
     def loadTabFunctionality(self): 
         #self.ui.gcmsTestsSample.editingFinished.connect(self.on_tab_pressed1)
         pass; 
@@ -340,7 +344,6 @@ class MainWindow(QMainWindow):
         self.ui.payment_1.setText(self.clientInfo['payment'])
                
     def loadCreatePage(self): 
-        #TODO: based on what the reportType is should load the appropriate parameters Type 
         print('**Loading User Information')
  
         #load the report Types
@@ -351,10 +354,11 @@ class MainWindow(QMainWindow):
         self.ui.paramType.addItems(paramResults)
             
     def loadReportsPage(self): 
-        #FIXME: include the other table and also some how to open up this table again  
-        #TODO: sort by date or somethingsetDatabase
+        self.ui.reportsHeader.setText('Reports History'); 
+        self.ui.totalReportsHeader.setText('Recently created reports')
+        
         print('**Loading Report Page')
-        query = 'SELECT * FROM jobs' 
+        query = 'SELECT * FROM jobs ORDER BY creationDate DESC' 
         
         try: 
             results = list(self.db.query(query)) 
@@ -365,51 +369,68 @@ class MainWindow(QMainWindow):
 
         #inital columns 
         for row, current in enumerate(results): 
-            item = QtWidgets.QTableWidgetItem() 
-            item.setTextAlignment(Qt.AlignCenter)
-            item.setText(str(current[1])) 
-            self.ui.reportsTable.setItem(row, 0, item)  
+            jobNumCol = QtWidgets.QTableWidgetItem() 
+            jobNumCol.setTextAlignment(Qt.AlignCenter)
+            jobNumCol.setText(str(current[1])) 
+            self.ui.reportsTable.setItem(row, 0, jobNumCol)  
 
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[2]))
-            self.ui.reportsTable.setItem(row, 1, item2)  
+            reportTypeCol = QtWidgets.QTableWidgetItem()
+            reportTypeCol.setTextAlignment(Qt.AlignCenter)
+            reportTypeCol.setText(str(current[2]))
+            self.ui.reportsTable.setItem(row, 1, reportTypeCol)  
             
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[3]))
-            self.ui.reportsTable.setItem(row, 2, item2)
+            paramCol = QtWidgets.QTableWidgetItem()
+            paramCol.setTextAlignment(Qt.AlignCenter)
+            paramCol.setText(str(current[3]))
+            self.ui.reportsTable.setItem(row, 2, paramCol)
+
+            distilCol = QtWidgets.QTableWidgetItem()
+            distilCol.setTextAlignment(Qt.AlignCenter)
+            distilCol.setText(str(current[4]))
+            self.ui.reportsTable.setItem(row, 3, distilCol)
             
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-            item2.setText(str(current[5]))
-            self.ui.reportsTable.setItem(row, 3, item2)  
+            dateCol = QtWidgets.QTableWidgetItem()
+            dateCol.setTextAlignment(Qt.AlignCenter)
+            dateCol.setText(str(current[5]))
+            self.ui.reportsTable.setItem(row, 4, dateCol)  
              
-            item2 = QtWidgets.QTableWidgetItem()
-            item2.setTextAlignment(Qt.AlignCenter)
-
-            if(current[4] == 1): 
-                item2.setText('COMPLETE')
-            else: 
-                item2.setText("INCOMPLETE")
-                
-            self.ui.reportsTable.setItem(row,4, item2)   
               
             button = QPushButton("Open")
             self.ui.reportsTable.setCellWidget(row,5, button)
-            button.clicked.connect(lambda _, row=row: print(row));
+            button.clicked.connect(lambda _, row=row: self.openExistingReport(row));
         
+        self.ui.reportsTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
         self.ui.reportsTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.ui.reportsTable.doubleClicked.connect(self.on_table_double_clicked )
 
         self.ui.reportsTable.verticalHeader().setVisible(True)
 
-        #TODO: if sleected open this thing 
 
     def on_table_double_clicked(self, index):
     # Open the row data
         row = index.row()
         print(f"Double clicked on row {row}")
+        
+    def openExistingReport(self, row): 
+        rowData = []
+        
+        for i in range(4): 
+            item =self.ui.reportsTable.item(row, i) 
+            if(item): 
+                rowData.append(item.text()) 
+                
+        print(rowData) 
+      
+        popup = openJobDialog(rowData[0], self)
+        result = popup.exec_()
+        
+        if result == QDialog.Accepted:
+            print("User clicked 'Yes'")
+            self.createReportPage(rowData[0], rowData[1], rowData[2], rowData[3], True) 
+            
+        else:
+            print("User clicked 'No'")
+        
         
     #---------------- Defined Elements -----------------------
     
@@ -439,6 +460,7 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()
     def on_addElementBtn_clicked(self): 
+        #TODO: makeing sure not inserting duplicates 
         currentText = self.ui.elementInput.text()
         if(currentText != ''): 
             print(currentText)
@@ -462,6 +484,35 @@ class MainWindow(QMainWindow):
         comment = self.ui.RightSideComment.toPlainText() 
         
         print(symbolName, elementName)
+        
+        #TODO: cannot save without a something
+        #TODO: make the thing lowercase 
+
+        
+        errorCheck = [0,0,0]
+
+        #errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
+        #errorCheck[1] = 0 if units != '' else 1; 
+        #errorCheck[2] = 0 if tests != '' else 1; 
+        
+        if(sum(errorCheck) == 0):
+            pass; 
+            #self.ui.gcmsTestsValueWidget.setEnabled(True)
+            #self.ui.widget_28.setEnabled(False)
+            #self.ui.gcmsStandardValShow.setText(standards)
+            #self.ui.gcmsUnitValShow.setText(units)
+            #self.ui.gcmsTestsShow.setText(tests)  
+        else: 
+            errorTitle = 'Cannot Proceed with CHM Process'
+            errorMsg = ''
+            
+            if(errorCheck[0] == 1): 
+                errorMsg += 'Please Enter a Valid Standard Number\n'
+            if(errorCheck[1] == 1): 
+                errorMsg += 'Please Select a Unit\n'
+            if(errorCheck[2] == 1): 
+                errorMsg += 'Please Select a Tests\n'
+        
         
         if(symbolName != "" and elementName != ""):
             
@@ -807,9 +858,8 @@ class MainWindow(QMainWindow):
     def on_gcmsDefinedtests_currentRowChanged(self):
         try:
             chmLoadTestsData(self)
-        except: 
-            #TODO: add error
-            print('error')
+        except Exception as e:
+            print("An error occurred:", e)
     
     
     def getTestsAndUnits(self): 
@@ -876,9 +926,9 @@ class MainWindow(QMainWindow):
         if(sum(errorCheck) == 0):
             self.ui.gcmsTestsValueWidget.setEnabled(True)
             self.ui.widget_28.setEnabled(False)
-            self.ui.gcmsStandardVal_2.setText(standards)
-            self.ui.gcmsUnitVal_2.setText(units)
-            self.ui.gcmsTests_2.setText(tests)  
+            self.ui.gcmsStandardValShow.setText(standards)
+            self.ui.gcmsUnitValShow.setText(units)
+            self.ui.gcmsTestsShow.setText(tests)  
         else: 
             errorTitle = 'Cannot Proceed with CHM Process'
             errorMsg = ''
@@ -895,9 +945,9 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()   
     def on_gcmsAddTestsBtn_2_clicked(self): 
-        standards = self.ui.gcmsStandardVal_2.text().strip()
-        units = self.ui.gcmsUnitVal_2.text().strip()
-        testName = self.ui.gcmsTests_2.text().strip()  
+        standards = self.ui.gcmsStandardValShow.text().strip()
+        units = self.ui.gcmsUnitValShow.text().strip()
+        testName = self.ui.gcmsTestsShow.text().strip()  
         
         testNum = self.ui.gcmsTestsJobNum.text().strip()
         sampleNum = self.ui.gcmsTestsSample.text().strip()
@@ -945,7 +995,7 @@ class MainWindow(QMainWindow):
                 self.ui.gcmsTestsLists.addItem(sampleNum)
                 self.gcmsClearSampleJob() 
                 
-
+                
         else: 
             errorTitle = 'Cannot add Tests '
             errorMsg = ''
@@ -980,9 +1030,9 @@ class MainWindow(QMainWindow):
         self.ui.gcmsUnitVal.clear()
         self.ui.gcmsTests.clear()
         
-        self.ui.gcmsStandardVal_2.clear()
-        self.ui.gcmsUnitVal_2.clear()
-        self.ui.gcmsTests_2.clear()
+        self.ui.gcmsStandardValShow.clear()
+        self.ui.gcmsUnitValShow.clear()
+        self.ui.gcmsTestsShow.clear()
             
         self.ui.gcmsTestsJobNum.clear()
         self.ui.gcmsTestsSample.clear()
@@ -1200,11 +1250,19 @@ class MainWindow(QMainWindow):
     # ----------------------- PROCESS PAGE ------------------------
   
     @pyqtSlot()
-    def createReportPage(self):
-        jobNum = self.ui.jobNumInput.text().strip()
-        reportType = self.ui.reportType.currentText()
-        parameter = self.ui.paramType.currentText()
-        dilution = self.ui.dilutionInput.text()
+    def createReportPage(self, jobNum = None, reportType = None, parameter = None, dilution =None, method2= None):
+        
+        if(jobNum == None): 
+            jobNum = self.ui.jobNumInput.text().strip()
+            
+        if(reportType == None): 
+            reportType = self.ui.reportType.currentText()
+            
+        if(parameter == None): 
+            parameter = self.ui.paramType.currentText()
+            
+        if(dilution == None): 
+            dilution = self.ui.dilutionInput.text()
         self.dilution = 1 if dilution == '' else dilution 
 
         print('*JobNumber: ', jobNum)
@@ -1239,12 +1297,13 @@ class MainWindow(QMainWindow):
             
             if reportResult is None:  
                 print('No Exists, adding to the file')
-                createReport(self.db, jobNum, reportType, parameter)
+                createReport(self.db, jobNum, reportType, parameter, self.dilution)
             else: 
-                print('Report Exists')
-                print(reportResult)
-                #TODO: load the report if exists
-                loadReportDialog(self)          
+                if(method2 is not True): 
+                    print('Report Exists')
+                    print(reportResult)
+                    #TODO: load the report if exists
+                    loadReportDialog(self)          
   
             self.ui.stackedWidget.setCurrentIndex(5)
             self.ui.stackedWidget_2.setCurrentIndex(0) 
