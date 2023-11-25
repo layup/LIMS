@@ -1,9 +1,9 @@
-from app import *
 from modules.dbManager import * 
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
@@ -38,11 +38,12 @@ def chmLoader(self):
         self.ui.formLayout_5.addRow(item)
         item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
     
-    self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())
+    self.ui.stackedWidget.currentChanged.connect(self.deleteAllSampleWidgets)
         
     for (currentJob ,testList) in self.sampleTests.items(): 
         for item in testList: 
-            temp = remove_escape_characters(str(item)) 
+
+            temp = removeIllegalCharacters(str(item)) 
             
             if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):          
                 GSMS_TESTS_LISTS.append(temp)

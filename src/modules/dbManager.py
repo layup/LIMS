@@ -43,4 +43,6 @@ class Database:
     def query(self, sql, params=None):
         self.cursor.execute(sql, params or ())
         return self.fetchall()
-        
+
+
+ 

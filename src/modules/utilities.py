@@ -19,6 +19,16 @@ from PyQt5.QtWidgets import (
 from modules.constants import *
 from modules.dialogBoxes import *
 
+def removeIllegalCharacters(input_string):
+    # Define a regular expression pattern to match illegal and escape characters
+    pattern = r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]'
+    
+    # Use re.sub to replace matched characters with an empty string
+    cleaned_string = re.sub(pattern, '', input_string)
+    
+    return cleaned_string
+
+
 def is_float(value):
     try:
         float(value)
@@ -340,11 +350,11 @@ def icp_upload(filePath, db):
 #TODO: sort by name  
 #read line by line and just add the line instead 
 #FIXME: tracking the icpData is wrong as well 
+ #TODO: insert try catch block 
 def icpMethod1(filePath, db): 
 
     file1 = open(filePath, 'r')
     fname = os.path.basename(filePath)
-    #TODO: insert try catch block 
     fname = fname.split('.txt')[0]
     #remove extenion 
     
@@ -482,13 +492,12 @@ def icpMethod1(filePath, db):
         return False; 
     
 #scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
+#TODO: insert try catch block 
 def icpMethod2(filePath, db): 
-    
     wb = openpyxl.load_workbook(filePath)
     sheets = wb.sheetnames 
     
     fname = os.path.basename(filePath)
-    #TODO: insert try catch block 
     fname = fname.split('.xlsx')[0]
     
     print('Method 2')
@@ -506,7 +515,6 @@ def icpMethod2(filePath, db):
     elementConversion = ['As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
     elementColumns = ['I', 'J', 'M', "Q", 'U', 'AA', 'AC']
     selectedRows = []
-    #jobNumbers = []
 
     sampleInfo = {}
 
@@ -624,11 +632,6 @@ def createReport(db, jobNum, reportType, parameter, dilution):
     db.commit()
     
     
-def saveClientInformation(db): 
-    pass; 
-
-def saveGcmsData(): 
-    pass; 
 
 def viewIcpTable(filePath, data, reportType): 
     print('Viewing ICP Table')
@@ -696,17 +699,4 @@ class icpTableView(QDialog):
         self.accept()
 
             
-def save_sql(self): 
-    pass; 
 
-def save(self): 
-    print("Saving time")
-
-#metals 
-def icpMS(self): 
-    pass; 
-
-#Text Files 
-def icpOES(self): 
-    pass; 
-    

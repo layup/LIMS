@@ -107,5 +107,8 @@ periodic_table = {
 elementSymbols = {v: k for k, v in periodic_table.items()}
 icpMachine2Symbols = ['As', 'Se', 'Cd', 'Hg', 'Pb', 'U']
 
-
 icpReportRows = ['Ag', 'Al', 'Au', 'B', 'Ba', 'Be', 'Ca', 'Co', 'Cr', 'Cu', 'Fe', 'K', 'La', 'Mg', 'Mn', 'Mo', 'Na', 'Ni', 'P', 'S', 'Sc', 'Si', 'Sn', 'Sr', 'Ti', 'V', 'W', 'Zn', 'As', 'Se', 'Cd', 'Sb', 'Hg', 'Pb', 'U']
+
+
+###Excel Constants 
+

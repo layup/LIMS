@@ -1,14 +1,3 @@
-import math 
-import os 
-
-from openpyxl import Workbook, load_workbook
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, Alignment, borders, Border, Side
-from openpyxl.cell.rich_text import TextBlock, CellRichText 
-from openpyxl.worksheet.page import PageMargins
-from openpyxl.drawing.image import Image
-from openpyxl.worksheet.header_footer import HeaderFooter
-
 from modules.utilities import * 
 from modules.constants import *
 from modules.createExcel import *

@@ -1,29 +1,29 @@
-from app import *
+from PyQt5 import QtWidgets
+
 from modules.dbManager import * 
+from modules.dbFunctions import *
 from modules.constants import *
 from modules.utilities import *
-from modules.excel.icpExcel import * 
 from widgets.widgets import *
 
+
+from modules.excel.icpExcel import createIcpReport
+
 def icp_load_element_data(self): 
-    selected_item = self.ui.definedElements.currentItem()
+    print('[FUNCTION]: icp_load_element_data')
+    selectedElement = self.ui.definedElements.currentItem()
     
-    if selected_item is not None:
-        selected_item_text = selected_item.text()
-        print(selected_item_text); 
-        
-        loadElement = 'SELECT * FROM icpElements WHERE element = ?'
-        loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'
-        
-        self.db.execute(loadElement, (selected_item_text,))
-        elementResult = self.db.fetchone()
-        
+    if selectedElement is not None:
+        selectedElementText = selectedElement.text()
+        #TODO: don't I have a global element that can do all of this stuff 
         reportType = self.ui.reportTypeDropdown.currentText()
         
-        self.db.execute(loadLimits, (selected_item_text, reportType))
-        limitResults = self.db.fetchone()
+        elementResult = loadIcpElement(self.db, selectedElementText)
+        limitResults = loadIcpLimit(self.db, selectedElementText, reportType)
         
-        print(elementResult); 
+        print(f'Selected Element: {selectedElementText}');  
+        print(f'Query Results: {elementResult}, {limitResults}'); 
+        
         if elementResult: 
             self.ui.elementNameinput.setText(elementResult[0])
             self.ui.symbolInput.setText(elementResult[1])
@@ -34,15 +34,12 @@ def icp_load_element_data(self):
                 self.ui.lowerLimit.setText(str(limitResults[2]))
                 self.ui.upperLimit.setText(str(limitResults[3]))
                 self.ui.unitType.setText(limitResults[5])
-                self.ui.RightSideComment.setPlainText(limitResults[4])
-            
+                self.ui.RightSideComment.setPlainText(limitResults[4]) 
         else: 
             self.clearElementInfo()
-            self.ui.elementNameinput.setText(selected_item_text)
-        
+            self.ui.elementNameinput.setText(selectedElementText)
     else:
         print("No item selected.") 
-        
         
 
 def icpReportHander(self, tests, totalSamples): 
@@ -84,7 +81,7 @@ def icpReportHander(self, tests, totalSamples):
     elementsWithLimits = self.getElementLimits(); 
     #print(elementsWithLimits)    
 
-
+    #TODO: have in own function 
     limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
     commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
     limits = self.db.query(limitQuery, (self.parameter,))
@@ -108,6 +105,7 @@ def icpReportHander(self, tests, totalSamples):
     print('--------')
 
     #load the footer comment 
+    #TODO: can just pass the self and remove some of the unessary info 
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
 
     
@@ -136,11 +134,10 @@ def icpLoader(self):
     
     sampleData = list(self.db.query(sql1, (self.jobNum,)))
     sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
-
-    queryDefinedElements = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
+    
     queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
     
-    elements = list(self.db.query(queryDefinedElements))
+    elements = getIcpElementsList(self.db) 
     elementNames = [t[0] for t in elements]
     
     print(elementNames)
@@ -171,7 +168,10 @@ def icpLoader(self):
             self.ui.formLayout_5.addRow(item)
             item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
     
-    self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())     
+    #self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())     
+    self.ui.stackedWidget.currentChanged.connect(self.deleteAllSampleWidgets)
+
+
     self.ui.dataTable.setRowCount(totalRows)
     self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
     self.ui.dataTable.horizontalHeader().setVisible(True)
@@ -313,3 +313,6 @@ def icpLoader(self):
     self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
     self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
 
+
+def calculateHardness(self): 
+    pass; 
