@@ -53,54 +53,6 @@ class SaveMessageBoxWidget(QWidget):
 
 
 #check for duplicates 
-class CustomDialog(QDialog):
-    def __init__(self, data, reportType):
-        super().__init__()
-        self.setWindowTitle('Custom Dialog')
-        
-        print(reportType)
-
-        layout = QVBoxLayout()
-        table_widget = QTableWidget()
-        table_widget.setRowCount(len(data))
-        table_widget.setColumnCount(len(data[0]))
-        
-        for row, rowData in enumerate(data):
-            for column, columnData in enumerate(rowData):
-                item = QTableWidgetItem(str(columnData))
-                table_widget.setItem(row, column, item)
-        layout.addWidget(table_widget)
-        
-        close_button = QPushButton('Close', self)
-        close_button.clicked.connect(self.close)
-        
-        save_button = QPushButton('Save', self)
-        save_button.clicked.connect(self.accept)
-        
-        layout.addWidget(close_button)
-        layout.addWidget(save_button)
-
-        self.setLayout(layout)
-        self.setFixedWidth(800)
-        self.setFixedHeight(500)
-        
-    def save_sql(self): 
-        pass; 
-
-    def close(self): 
-        print("Closing time")    
-    
-    def save(self): 
-        print("Saving time")
-        self.accept
-    
-    #metals 
-    def icpMS(self): 
-        pass; 
-
-    #Text Files 
-    def icpOES(self): 
-        pass; 
     
 
 class ChmTestsDialog(QDialog):
@@ -163,7 +115,7 @@ class ChmTestsDialog(QDialog):
 
     def get_user_input(self):
         result = self.exec_()
-
+        
         if result == QDialog.Accepted:
             return {
                 "display_name": self.display_name_line.text(),

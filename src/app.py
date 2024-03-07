@@ -24,7 +24,6 @@ from pages.icp_tools import icp_load_element_data, icpLoader, icpReportHander
 from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader, chmReportHandler 
 from widgets.widgets import * 
     
-    
 #TODO: need to have more class objects that deal with insertion, that way we can have lazy loading isntead of constant 
 # need to get more info 
 class MainWindow(QMainWindow):
@@ -35,27 +34,25 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
 
-        
+
         #load the setup 
         self.loadDatabase()
         self.loadCreatePage()
         self.loadStartup()
         self.loadTabFunctionality()
-        self.zeroIndexStacksSetup()
-
-        #self.ui.pushButton_6.clicked.connect(self.open_new_window)
+        self.settingsSetup()
+        
         self.ui.NextSection.clicked.connect(lambda: self.createReportPage())
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())   
         
         self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
         self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal)
-      
-        self.showMaximized()
+       
 
    #******************************************************************
    #    inline Slot Function Calls 
-   #****************************************************************** 
-   
+   #******************************************************************  
+   #FIXME: not sure if it is good pratice to have just something like this 
     def on_clientName_1_textChanged(self):
         self.clientInfo['clientName'] = self.ui.clientName_1.text()
      
@@ -280,7 +277,7 @@ class MainWindow(QMainWindow):
             
         if(index == 4): 
             print('Settings baby')
-            self.loadSettings()
+         
             
         self.prev_index = (index - 1) % self.ui.stackedWidget.count()
         print('prev index: ', self.prev_index)
@@ -304,10 +301,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Laboratory Information management System") 
         self.setStyle(QStyleFactory.create('Fusion'))
         self.ui.LeftMenuContainerMini.hide()
+        
+        self.showMaximized()
 
         self.activeCreation = False; 
         self.ui.stackedWidget.setCurrentIndex(1)
-        self.ui.settingsStack.setCurrentIndex(3)
+        #self.ui.settingsStack.setCurrentIndex(3)
         self.ui.reportsBtn1.setChecked(True)
          
         jobList = getAllJobNumbersList(self.db) 
@@ -322,28 +321,31 @@ class MainWindow(QMainWindow):
         
         self.ui.searchLine.setPlaceholderText("Enter Job Number...")
         self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
-        
-    def zeroIndexStacksSetup(self): 
+
+        #set the stacks to home page 
         self.ui.stackedWidget.setCurrentIndex(0) 
         self.ui.gcmsStack.setCurrentIndex(0)
         self.ui.icpStack.setCurrentIndex(0)
+        
+
 
        
     def loadDatabase(self): 
-        paths = load_pickle('data.pickle')
+        self.paths = load_pickle('data.pickle')
         print('**Paths')
-        for key, value in paths.items():
+        for key, value in self.paths.items():
             print(key, value)
+
        
-        if(isValidDatabase(paths['databasePath'])): 
-            self.db = Database(paths['databasePath'])
+        if(isValidDatabase(self.paths['databasePath'])): 
+            self.db = Database(self.paths['databasePath'])
         else: 
             #TODO: add popup 
             print('Database not valid')
+            
             databasePathTemp = openFile()
             self.db = Database(databasePathTemp)
-    
-     
+
     def loadTabFunctionality(self): 
         #self.ui.gcmsTestsSample.editingFinished.connect(self.on_tab_pressed1)
         pass; 
@@ -1142,23 +1144,29 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    Settings Page Options 
    #****************************************************************** 
-    def on_settingsStack_currentChanged(self, index): 
-        if(index == 2): 
+    def settingsSetup(self): 
+        self.loadSettings() 
+        self.ui.SettingsTab.setCurrentIndex(0) 
+        #connect the buttons 
+        self.ui.SettingsTab.currentChanged.connect(self.settingsTab_changes)
+         
+    def settingsTab_changes(self, index):  
+
+        if(index == 0): 
+           self.loadSettings() 
+
+        if(index == 1): 
             self.ui.authorList.clear()
             self.clearAuthorData()
             self.loadAuthors()
-        
-    @pyqtSlot()
-    def on_setPathsBtn_clicked(self): 
-        self.ui.settingsStack.setCurrentIndex(0)
-    
-    @pyqtSlot() 
-    def on_setUnitsBtn_clicked(self): 
-        pass;  
 
-    @pyqtSlot()
-    def on_setAuthorsBtn_clicked(self): 
-        self.ui.settingsStack.setCurrentIndex(2)   
+
+    #TODO: have a path object that will deal with all of the other bs that I have writen here 
+    def loadSettings(self): 
+        self.ui.reportPath.setText(self.paths['reportsPath'])
+        self.ui.txtPath.setText(self.paths['TXTDirLocation'])
+        self.ui.convertPath.setText(self.paths['ispDataUploadPath'])
+        self.ui.dbPath.setText(self.paths['databasePath'])
          
     @pyqtSlot()
     def on_reportsPathBtn_clicked(self): 
@@ -1196,20 +1204,6 @@ class MainWindow(QMainWindow):
             save_pickle(paths)  
             self.ui.dbPath.setText(paths['databasePath'])
         
-    #TODO: have a path object that will deal with all of the other bs that I have writen here 
-    def loadSettings(self): 
-        paths = load_pickle('data.pickle')
-        self.ui.reportPath.setText(paths['reportsPath'])
-        self.ui.txtPath.setText(paths['TXTDirLocation'])
-        self.ui.convertPath.setText(paths['ispDataUploadPath'])
-        self.ui.dbPath.setText(paths['databasePath'])
-
-
-
-    #******************************************************************
-    #    Settings Page Options 
-    #       - Author Settings 
-    #****************************************************************** 
     def loadAuthors(self): 
         authorsQuery = 'SELECT * FROM authors ORDER BY authorName ASC'
 
@@ -1240,7 +1234,6 @@ class MainWindow(QMainWindow):
 
             except sqlite3.IntegrityError as e:
                 print(e) 
-         
         
     @pyqtSlot()  
     def on_deleteAuthorBtn_clicked(self): 
@@ -1450,32 +1443,7 @@ class MainWindow(QMainWindow):
         elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
         elementWithLimits = self.db.query(elementsQuery, ('Water',))    
         
-        temp = []
-
-        for item in elementWithLimits: 
-            #print(item)
-            temp.append(item[0]) 
-        
-        return temp; 
-    
-    def open_new_window(self):
-        #data = 'Hello from Main Window!'
-        #new_window = NewWindow(data)
-        #new_window.show()
-        
-        data = [
-            [1, 'John', 'Doe'],
-            [2, 'Jane', 'Smith'],
-            [3, 'Bob', 'Johnson']
-        ]
-
-        dialog = CustomDialog(data, 1)
-        #dialog.exec_()
-        
-        if dialog.exec_() == QDialog.accept:
-            print('Dialog closed with Accept')
-        else:
-            print('Dialog closed with Reject')
+        return [item[0] for item in elementWithLimits]
 
     @pyqtSlot()
     def on_testBtn_clicked(self): 

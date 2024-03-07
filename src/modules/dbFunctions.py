@@ -73,6 +73,19 @@ def getTotalElements(db):
     
     return total; 
 
+#TODO: define which report this is going to be  
+def getElementLimits(db): 
+    elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
+    elementWithLimits = db.query(elementsQuery, ('Water',))    
+
+    temp = []
+
+    for item in elementWithLimits: 
+        #print(item)
+        temp.append(item[0]) 
+
+    return temp; 
+
 def loadIcpElement(db, elementName): 
     query = 'SELECT * FROM icpElements WHERE element = ?'
     db.execute(query, (elementName,))
@@ -160,3 +173,9 @@ def getAuthorInfo(db, authorName):
             print(e) 
             return None 
 #TODO: import previous functions later on 
+
+
+
+#******************************************************************
+#    Settings Options 
+#****************************************************************** 

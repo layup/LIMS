@@ -98,7 +98,7 @@ def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitT
                 if(i+1 == remainingSamples): 
                     pageLocation = insertComments(ws, pageLocation)  
                     pageLocation+=2; 
-                    insertSignature(ws, pageLocation, [4,7])
+                    insertSignature(ws, pageLocation, [3,6])
                         
                 counter+=1; 
                 usedSamples += 4;

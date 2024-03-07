@@ -78,7 +78,7 @@ def icpReportHander(self, tests, totalSamples):
         except: 
             unitType.append('')
     
-    elementsWithLimits = self.getElementLimits(); 
+    elementsWithLimits = getElementLimits(self.db); 
     #print(elementsWithLimits)    
 
     #TODO: have in own function 

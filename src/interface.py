@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1268, 947)
+        MainWindow.resize(1200, 767)
         MainWindow.setMinimumSize(QtCore.QSize(1200, 600))
         MainWindow.setStyleSheet("/***************************\n"
 "TOP HEADER  \n"
@@ -159,8 +159,15 @@ class Ui_MainWindow(object):
 "    border: 1px solid gray; \n"
 "    background-color: rgb(55, 65, 84);\n"
 "} \n"
+"\n"
+"QComboBox{\n"
+"    padding:2px;\n"
+"    padding-left: 10px; \n"
+"}\n"
+"\n"
 "#createReportWidget QComboBox::item:selected {\n"
-"    background-color:rgb(66, 78, 101)\n"
+"    background-color:rgb(66, 78, 101);\n"
+"    \n"
 "}\n"
 "\n"
 "#createReportWidget QListView {\n"
@@ -620,7 +627,16 @@ class Ui_MainWindow(object):
 "/* Styles for the highlighted options */\n"
 "#chmDatabaseTableWidget  QListView::item:selected {\n"
 "    background-color: rgb(66, 78, 101);\n"
-"}")
+"}\n"
+"\n"
+"\n"
+"/***************************\n"
+"** Settings Page     \n"
+"***************************/\n"
+"\n"
+"#fileLocationsWidget QLabel {\n"
+"    min-width: 110px; \n"
+"} ")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("QPushButton {\n"
 "    font-size: 14px\n"
@@ -948,8 +964,7 @@ class Ui_MainWindow(object):
         self.reportsSearchWidget = QtWidgets.QWidget(self.reportsPage)
         self.reportsSearchWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.reportsSearchWidget.setMaximumSize(QtCore.QSize(16777215, 50))
-        self.reportsSearchWidget.setStyleSheet("\n"
-"")
+        self.reportsSearchWidget.setStyleSheet("")
         self.reportsSearchWidget.setObjectName("reportsSearchWidget")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.reportsSearchWidget)
         self.horizontalLayout_5.setContentsMargins(12, -1, -1, -1)
@@ -1104,8 +1119,7 @@ class Ui_MainWindow(object):
         self.createReportWidget = QtWidgets.QWidget(self.createPageBody)
         self.createReportWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.createReportWidget.setMaximumSize(QtCore.QSize(350, 200))
-        self.createReportWidget.setStyleSheet("\n"
-"")
+        self.createReportWidget.setStyleSheet("")
         self.createReportWidget.setObjectName("createReportWidget")
         self.verticalLayout_42 = QtWidgets.QVBoxLayout(self.createReportWidget)
         self.verticalLayout_42.setContentsMargins(-1, 20, -1, 12)
@@ -1747,9 +1761,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_20.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_20.setObjectName("verticalLayout_20")
         self.gcmsMenuBody = QtWidgets.QWidget(self.gcmsMenuPage)
-        self.gcmsMenuBody.setStyleSheet("\n"
-"\n"
-"")
+        self.gcmsMenuBody.setStyleSheet("")
         self.gcmsMenuBody.setObjectName("gcmsMenuBody")
         self.horizontalLayout_17 = QtWidgets.QHBoxLayout(self.gcmsMenuBody)
         self.horizontalLayout_17.setContentsMargins(0, 0, 0, 0)
@@ -1825,13 +1837,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7.addWidget(self.label_54, 2, 0, 1, 1)
         self.horizontalLayout_19.addWidget(self.chmTestsWidget)
         self.chmTestInfoWidget = QtWidgets.QWidget(self.gcmsTestValuesPage)
-        self.chmTestInfoWidget.setStyleSheet("\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"")
+        self.chmTestInfoWidget.setStyleSheet("")
         self.chmTestInfoWidget.setObjectName("chmTestInfoWidget")
         self.verticalLayout_22 = QtWidgets.QVBoxLayout(self.chmTestInfoWidget)
         self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
@@ -2250,156 +2256,18 @@ class Ui_MainWindow(object):
         self.settingBody.setStyleSheet("")
         self.settingBody.setObjectName("settingBody")
         self.horizontalLayout_25 = QtWidgets.QHBoxLayout(self.settingBody)
-        self.horizontalLayout_25.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_25.setContentsMargins(12, 12, 12, 12)
         self.horizontalLayout_25.setObjectName("horizontalLayout_25")
-        self.widget_45 = QtWidgets.QWidget(self.settingBody)
-        self.widget_45.setMinimumSize(QtCore.QSize(250, 0))
-        self.widget_45.setStyleSheet("QWidget {\n"
-"    background-color:white; \n"
-"}\n"
-"\n"
-"QPushButton { \n"
-"    border: 1px solid gray; \n"
-"    border-radius: 5px;\n"
-"    color:white; \n"
-"    background-color: #555555; \n"
-"    min-width: 150px; \n"
-"    min-height:25px; \n"
-"} \n"
-"QPushButton::disabled {\n"
-"    border: 1px solid gray; \n"
-"    background-color: rgb(107, 108, 108);\n"
-"    color:gray;\n"
-"}\n"
-"\n"
-"QPushButton::hover {\n"
-"    background-color: rgb(107, 108, 108);\n"
-"}")
-        self.widget_45.setObjectName("widget_45")
-        self.verticalLayout_32 = QtWidgets.QVBoxLayout(self.widget_45)
-        self.verticalLayout_32.setObjectName("verticalLayout_32")
-        spacerItem20 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_32.addItem(spacerItem20)
-        self.setPathsBtn = QtWidgets.QPushButton(self.widget_45)
-        self.setPathsBtn.setObjectName("setPathsBtn")
-        self.verticalLayout_32.addWidget(self.setPathsBtn)
-        self.setUnitsBtn = QtWidgets.QPushButton(self.widget_45)
-        self.setUnitsBtn.setObjectName("setUnitsBtn")
-        self.verticalLayout_32.addWidget(self.setUnitsBtn)
-        self.setAuthorsBtn = QtWidgets.QPushButton(self.widget_45)
-        self.setAuthorsBtn.setObjectName("setAuthorsBtn")
-        self.verticalLayout_32.addWidget(self.setAuthorsBtn)
-        self.setPreferencesBtn = QtWidgets.QPushButton(self.widget_45)
-        self.setPreferencesBtn.setObjectName("setPreferencesBtn")
-        self.verticalLayout_32.addWidget(self.setPreferencesBtn)
-        spacerItem21 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_32.addItem(spacerItem21)
-        spacerItem22 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_32.addItem(spacerItem22)
-        spacerItem23 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_32.addItem(spacerItem23)
-        spacerItem24 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_32.addItem(spacerItem24)
-        self.horizontalLayout_25.addWidget(self.widget_45)
-        self.settingsStack = QtWidgets.QStackedWidget(self.settingBody)
-        self.settingsStack.setStyleSheet("\n"
-"QWidget#settingsAuthors QPushButton {\n"
-"    min-width: 100px; \n"
-"    min-height: 30px;\n"
-"    text-align: center;\n"
-"    padding: 1px 0;\n"
-"}")
-        self.settingsStack.setObjectName("settingsStack")
-        self.settingsPaths = QtWidgets.QWidget()
-        self.settingsPaths.setObjectName("settingsPaths")
-        self.widget_14 = QtWidgets.QWidget(self.settingsPaths)
-        self.widget_14.setGeometry(QtCore.QRect(10, 30, 741, 281))
-        self.widget_14.setStyleSheet("QPushButton {\n"
-"    padding: 10px; \n"
-"    width:60px;\n"
-"    height:10px;\n"
-"    text-align:center; \n"
-"} \n"
-"\n"
-"QWidget QLineEdit {\n"
-"    color: gray; \n"
-"    max-width:400px;\n"
-"    min-width:200px;\n"
-"} \n"
-"")
-        self.widget_14.setObjectName("widget_14")
-        self.verticalLayout_31 = QtWidgets.QVBoxLayout(self.widget_14)
-        self.verticalLayout_31.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_31.setObjectName("verticalLayout_31")
-        self.widget_42 = QtWidgets.QWidget(self.widget_14)
-        self.widget_42.setObjectName("widget_42")
-        self.horizontalLayout_32 = QtWidgets.QHBoxLayout(self.widget_42)
-        self.horizontalLayout_32.setObjectName("horizontalLayout_32")
-        self.label_55 = QtWidgets.QLabel(self.widget_42)
-        self.label_55.setObjectName("label_55")
-        self.horizontalLayout_32.addWidget(self.label_55)
-        self.reportPath = QtWidgets.QLineEdit(self.widget_42)
-        self.reportPath.setText("")
-        self.reportPath.setReadOnly(True)
-        self.reportPath.setObjectName("reportPath")
-        self.horizontalLayout_32.addWidget(self.reportPath)
-        self.reportsPathBtn = QtWidgets.QPushButton(self.widget_42)
-        self.reportsPathBtn.setObjectName("reportsPathBtn")
-        self.horizontalLayout_32.addWidget(self.reportsPathBtn)
-        self.verticalLayout_31.addWidget(self.widget_42)
-        self.widget_43 = QtWidgets.QWidget(self.widget_14)
-        self.widget_43.setObjectName("widget_43")
-        self.horizontalLayout_33 = QtWidgets.QHBoxLayout(self.widget_43)
-        self.horizontalLayout_33.setObjectName("horizontalLayout_33")
-        self.label_59 = QtWidgets.QLabel(self.widget_43)
-        self.label_59.setObjectName("label_59")
-        self.horizontalLayout_33.addWidget(self.label_59)
-        self.txtPath = QtWidgets.QLineEdit(self.widget_43)
-        self.txtPath.setReadOnly(True)
-        self.txtPath.setObjectName("txtPath")
-        self.horizontalLayout_33.addWidget(self.txtPath)
-        self.txtPathBtn = QtWidgets.QPushButton(self.widget_43)
-        self.txtPathBtn.setObjectName("txtPathBtn")
-        self.horizontalLayout_33.addWidget(self.txtPathBtn)
-        self.verticalLayout_31.addWidget(self.widget_43)
-        self.widget_48 = QtWidgets.QWidget(self.widget_14)
-        self.widget_48.setObjectName("widget_48")
-        self.horizontalLayout_37 = QtWidgets.QHBoxLayout(self.widget_48)
-        self.horizontalLayout_37.setObjectName("horizontalLayout_37")
-        self.label_71 = QtWidgets.QLabel(self.widget_48)
-        self.label_71.setObjectName("label_71")
-        self.horizontalLayout_37.addWidget(self.label_71)
-        self.convertPath = QtWidgets.QLineEdit(self.widget_48)
-        self.convertPath.setReadOnly(True)
-        self.convertPath.setObjectName("convertPath")
-        self.horizontalLayout_37.addWidget(self.convertPath)
-        self.convertedPathBtn = QtWidgets.QPushButton(self.widget_48)
-        self.convertedPathBtn.setObjectName("convertedPathBtn")
-        self.horizontalLayout_37.addWidget(self.convertedPathBtn)
-        self.verticalLayout_31.addWidget(self.widget_48)
-        self.widget_49 = QtWidgets.QWidget(self.widget_14)
-        self.widget_49.setObjectName("widget_49")
-        self.horizontalLayout_38 = QtWidgets.QHBoxLayout(self.widget_49)
-        self.horizontalLayout_38.setObjectName("horizontalLayout_38")
-        self.label_72 = QtWidgets.QLabel(self.widget_49)
-        self.label_72.setObjectName("label_72")
-        self.horizontalLayout_38.addWidget(self.label_72)
-        self.dbPath = QtWidgets.QLineEdit(self.widget_49)
-        self.dbPath.setReadOnly(True)
-        self.dbPath.setObjectName("dbPath")
-        self.horizontalLayout_38.addWidget(self.dbPath)
-        self.dbPathBtn = QtWidgets.QPushButton(self.widget_49)
-        self.dbPathBtn.setObjectName("dbPathBtn")
-        self.horizontalLayout_38.addWidget(self.dbPathBtn)
-        self.verticalLayout_31.addWidget(self.widget_49)
-        self.settingsStack.addWidget(self.settingsPaths)
-        self.settingsUnits = QtWidgets.QWidget()
-        self.settingsUnits.setObjectName("settingsUnits")
-        self.widget_46 = QtWidgets.QWidget(self.settingsUnits)
-        self.widget_46.setGeometry(QtCore.QRect(20, 20, 331, 611))
+        self.SettingsTab = QtWidgets.QTabWidget(self.settingBody)
+        self.SettingsTab.setObjectName("SettingsTab")
+        self.prefrenceTab = QtWidgets.QWidget()
+        self.prefrenceTab.setObjectName("prefrenceTab")
+        self.horizontalLayout_46 = QtWidgets.QHBoxLayout(self.prefrenceTab)
+        self.horizontalLayout_46.setObjectName("horizontalLayout_46")
+        self.widget_46 = QtWidgets.QWidget(self.prefrenceTab)
+        self.widget_46.setMaximumSize(QtCore.QSize(300, 16777215))
         self.widget_46.setObjectName("widget_46")
         self.verticalLayout_33 = QtWidgets.QVBoxLayout(self.widget_46)
-        self.verticalLayout_33.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_33.setObjectName("verticalLayout_33")
         self.widget_47 = QtWidgets.QWidget(self.widget_46)
         self.widget_47.setObjectName("widget_47")
@@ -2415,12 +2283,92 @@ class Ui_MainWindow(object):
         self.authorList_2 = QtWidgets.QListWidget(self.widget_46)
         self.authorList_2.setObjectName("authorList_2")
         self.verticalLayout_33.addWidget(self.authorList_2)
-        self.settingsStack.addWidget(self.settingsUnits)
-        self.settingsAuthors = QtWidgets.QWidget()
-        self.settingsAuthors.setObjectName("settingsAuthors")
-        self.horizontalLayout_39 = QtWidgets.QHBoxLayout(self.settingsAuthors)
+        self.horizontalLayout_46.addWidget(self.widget_46)
+        self.fileLocationsWidget = QtWidgets.QWidget(self.prefrenceTab)
+        self.fileLocationsWidget.setStyleSheet("\n"
+"")
+        self.fileLocationsWidget.setObjectName("fileLocationsWidget")
+        self.verticalLayout_31 = QtWidgets.QVBoxLayout(self.fileLocationsWidget)
+        self.verticalLayout_31.setContentsMargins(0, 0, 0, 20)
+        self.verticalLayout_31.setObjectName("verticalLayout_31")
+        self.widget_42 = QtWidgets.QWidget(self.fileLocationsWidget)
+        self.widget_42.setObjectName("widget_42")
+        self.horizontalLayout_32 = QtWidgets.QHBoxLayout(self.widget_42)
+        self.horizontalLayout_32.setObjectName("horizontalLayout_32")
+        self.label_55 = QtWidgets.QLabel(self.widget_42)
+        self.label_55.setObjectName("label_55")
+        self.horizontalLayout_32.addWidget(self.label_55)
+        self.reportPath = QtWidgets.QLineEdit(self.widget_42)
+        self.reportPath.setText("")
+        self.reportPath.setReadOnly(True)
+        self.reportPath.setObjectName("reportPath")
+        self.horizontalLayout_32.addWidget(self.reportPath)
+        self.reportsPathBtn = QtWidgets.QPushButton(self.widget_42)
+        self.reportsPathBtn.setObjectName("reportsPathBtn")
+        self.horizontalLayout_32.addWidget(self.reportsPathBtn)
+        self.verticalLayout_31.addWidget(self.widget_42)
+        self.widget_43 = QtWidgets.QWidget(self.fileLocationsWidget)
+        self.widget_43.setObjectName("widget_43")
+        self.horizontalLayout_33 = QtWidgets.QHBoxLayout(self.widget_43)
+        self.horizontalLayout_33.setObjectName("horizontalLayout_33")
+        self.label_59 = QtWidgets.QLabel(self.widget_43)
+        self.label_59.setObjectName("label_59")
+        self.horizontalLayout_33.addWidget(self.label_59)
+        self.txtPath = QtWidgets.QLineEdit(self.widget_43)
+        self.txtPath.setReadOnly(True)
+        self.txtPath.setObjectName("txtPath")
+        self.horizontalLayout_33.addWidget(self.txtPath)
+        self.txtPathBtn = QtWidgets.QPushButton(self.widget_43)
+        self.txtPathBtn.setObjectName("txtPathBtn")
+        self.horizontalLayout_33.addWidget(self.txtPathBtn)
+        self.verticalLayout_31.addWidget(self.widget_43)
+        self.widget_48 = QtWidgets.QWidget(self.fileLocationsWidget)
+        self.widget_48.setObjectName("widget_48")
+        self.horizontalLayout_37 = QtWidgets.QHBoxLayout(self.widget_48)
+        self.horizontalLayout_37.setObjectName("horizontalLayout_37")
+        self.label_71 = QtWidgets.QLabel(self.widget_48)
+        self.label_71.setObjectName("label_71")
+        self.horizontalLayout_37.addWidget(self.label_71)
+        self.convertPath = QtWidgets.QLineEdit(self.widget_48)
+        self.convertPath.setReadOnly(True)
+        self.convertPath.setObjectName("convertPath")
+        self.horizontalLayout_37.addWidget(self.convertPath)
+        self.convertedPathBtn = QtWidgets.QPushButton(self.widget_48)
+        self.convertedPathBtn.setObjectName("convertedPathBtn")
+        self.horizontalLayout_37.addWidget(self.convertedPathBtn)
+        self.verticalLayout_31.addWidget(self.widget_48)
+        self.widget_49 = QtWidgets.QWidget(self.fileLocationsWidget)
+        self.widget_49.setObjectName("widget_49")
+        self.horizontalLayout_38 = QtWidgets.QHBoxLayout(self.widget_49)
+        self.horizontalLayout_38.setObjectName("horizontalLayout_38")
+        self.label_72 = QtWidgets.QLabel(self.widget_49)
+        self.label_72.setObjectName("label_72")
+        self.horizontalLayout_38.addWidget(self.label_72)
+        self.dbPath = QtWidgets.QLineEdit(self.widget_49)
+        self.dbPath.setReadOnly(True)
+        self.dbPath.setObjectName("dbPath")
+        self.horizontalLayout_38.addWidget(self.dbPath)
+        self.dbPathBtn = QtWidgets.QPushButton(self.widget_49)
+        self.dbPathBtn.setObjectName("dbPathBtn")
+        self.horizontalLayout_38.addWidget(self.dbPathBtn)
+        self.verticalLayout_31.addWidget(self.widget_49)
+        self.widget_10 = QtWidgets.QWidget(self.fileLocationsWidget)
+        self.widget_10.setObjectName("widget_10")
+        self.horizontalLayout_47 = QtWidgets.QHBoxLayout(self.widget_10)
+        self.horizontalLayout_47.setObjectName("horizontalLayout_47")
+        self.label_35 = QtWidgets.QLabel(self.widget_10)
+        self.label_35.setObjectName("label_35")
+        self.horizontalLayout_47.addWidget(self.label_35)
+        self.verticalLayout_31.addWidget(self.widget_10)
+        spacerItem20 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_31.addItem(spacerItem20)
+        self.horizontalLayout_46.addWidget(self.fileLocationsWidget)
+        self.SettingsTab.addTab(self.prefrenceTab, "")
+        self.icpTab = QtWidgets.QWidget()
+        self.icpTab.setObjectName("icpTab")
+        self.horizontalLayout_39 = QtWidgets.QHBoxLayout(self.icpTab)
         self.horizontalLayout_39.setObjectName("horizontalLayout_39")
-        self.widget_52 = QtWidgets.QWidget(self.settingsAuthors)
+        self.widget_52 = QtWidgets.QWidget(self.icpTab)
         self.widget_52.setMaximumSize(QtCore.QSize(400, 16777215))
         self.widget_52.setObjectName("widget_52")
         self.verticalLayout_35 = QtWidgets.QVBoxLayout(self.widget_52)
@@ -2441,7 +2389,7 @@ class Ui_MainWindow(object):
         self.authorList.setObjectName("authorList")
         self.verticalLayout_35.addWidget(self.authorList)
         self.horizontalLayout_39.addWidget(self.widget_52)
-        self.widget_56 = QtWidgets.QWidget(self.settingsAuthors)
+        self.widget_56 = QtWidgets.QWidget(self.icpTab)
         self.widget_56.setObjectName("widget_56")
         self.verticalLayout_36 = QtWidgets.QVBoxLayout(self.widget_56)
         self.verticalLayout_36.setObjectName("verticalLayout_36")
@@ -2456,8 +2404,8 @@ class Ui_MainWindow(object):
         self.deleteAuthorBtn = QtWidgets.QPushButton(self.widget_55)
         self.deleteAuthorBtn.setObjectName("deleteAuthorBtn")
         self.horizontalLayout_36.addWidget(self.deleteAuthorBtn)
-        spacerItem25 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_36.addItem(spacerItem25)
+        spacerItem21 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_36.addItem(spacerItem21)
         self.verticalLayout_36.addWidget(self.widget_55)
         self.widget_53 = QtWidgets.QWidget(self.widget_56)
         self.widget_53.setObjectName("widget_53")
@@ -2476,28 +2424,14 @@ class Ui_MainWindow(object):
         self.authorPostionLine.setObjectName("authorPostionLine")
         self.gridLayout_11.addWidget(self.authorPostionLine, 1, 1, 1, 1)
         self.verticalLayout_36.addWidget(self.widget_53)
-        spacerItem26 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_36.addItem(spacerItem26)
+        spacerItem22 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_36.addItem(spacerItem22)
         self.horizontalLayout_39.addWidget(self.widget_56)
-        spacerItem27 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_39.addItem(spacerItem27)
-        self.settingsStack.addWidget(self.settingsAuthors)
-        self.settingsHome = QtWidgets.QWidget()
-        self.settingsHome.setObjectName("settingsHome")
-        self.verticalLayoutWidget = QtWidgets.QWidget(self.settingsHome)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(140, 130, 271, 231))
-        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
-        self.verticalLayout_41 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-        self.verticalLayout_41.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout_41.setObjectName("verticalLayout_41")
-        self.lineEdit_3 = QtWidgets.QLineEdit(self.verticalLayoutWidget)
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.verticalLayout_41.addWidget(self.lineEdit_3)
-        self.lineEdit_4 = QtWidgets.QLineEdit(self.verticalLayoutWidget)
-        self.lineEdit_4.setObjectName("lineEdit_4")
-        self.verticalLayout_41.addWidget(self.lineEdit_4)
-        self.settingsStack.addWidget(self.settingsHome)
-        self.horizontalLayout_25.addWidget(self.settingsStack)
+        self.SettingsTab.addTab(self.icpTab, "")
+        self.chmTab = QtWidgets.QWidget()
+        self.chmTab.setObjectName("chmTab")
+        self.SettingsTab.addTab(self.chmTab, "")
+        self.horizontalLayout_25.addWidget(self.SettingsTab)
         self.verticalLayout_9.addWidget(self.settingBody)
         self.stackedWidget.addWidget(self.settingsPage)
         self.dataPage = QtWidgets.QWidget()
@@ -2580,8 +2514,8 @@ class Ui_MainWindow(object):
         self.parameterHeader.setObjectName("parameterHeader")
         self.formLayout_6.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.parameterHeader)
         self.horizontalLayout_7.addWidget(self.widget_13, 0, QtCore.Qt.AlignLeft)
-        spacerItem28 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem28)
+        spacerItem23 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem23)
         self.icpDataField = QtWidgets.QWidget(self.Header_2)
         self.icpDataField.setMaximumSize(QtCore.QSize(300, 16777215))
         self.icpDataField.setObjectName("icpDataField")
@@ -2949,12 +2883,13 @@ class Ui_MainWindow(object):
 "")
         self.tabSectionWidget.setObjectName("tabSectionWidget")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.tabSectionWidget)
-        self.gridLayout_3.setContentsMargins(0, 4, 0, 4)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.reportsFooter = QtWidgets.QWidget(self.tabSectionWidget)
         self.reportsFooter.setStyleSheet("")
         self.reportsFooter.setObjectName("reportsFooter")
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout(self.reportsFooter)
+        self.horizontalLayout_13.setContentsMargins(-1, 0, 12, 0)
         self.horizontalLayout_13.setObjectName("horizontalLayout_13")
         self.createIcpReportBtn = QtWidgets.QPushButton(self.reportsFooter)
         self.createIcpReportBtn.setObjectName("createIcpReportBtn")
@@ -2976,8 +2911,8 @@ class Ui_MainWindow(object):
         self.tabSectionContainer.setObjectName("tabSectionContainer")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.tabSectionContainer)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        spacerItem29 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem29)
+        spacerItem24 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem24)
         self.gridLayout_3.addWidget(self.tabSectionContainer, 0, 0, 1, 1)
         self.verticalLayout_11.addWidget(self.tabSectionWidget)
         self.verticalLayout_14.addWidget(self.Main)
@@ -2986,7 +2921,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.MainBodyContainer)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1268, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1200, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -3006,11 +2941,11 @@ class Ui_MainWindow(object):
         self.actionUpload_ISP_Files.setObjectName("actionUpload_ISP_Files")
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(4)
         self.icpStack.setCurrentIndex(0)
-        self.gcmsStack.setCurrentIndex(1)
+        self.gcmsStack.setCurrentIndex(4)
         self.tabWidget.setCurrentIndex(0)
-        self.settingsStack.setCurrentIndex(0)
+        self.SettingsTab.setCurrentIndex(0)
         self.reportsTab.setCurrentIndex(0)
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainer.setHidden) # type: ignore
         self.toggleMenu.toggled['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
@@ -3171,10 +3106,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.chmDataTab1), _translate("MainWindow", "Database Section"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.chmAddTab), _translate("MainWindow", "Input Section"))
         self.label_11.setText(_translate("MainWindow", "Settings"))
-        self.setPathsBtn.setText(_translate("MainWindow", "Set Paths"))
-        self.setUnitsBtn.setText(_translate("MainWindow", "Set Units"))
-        self.setAuthorsBtn.setText(_translate("MainWindow", "Set Authors"))
-        self.setPreferencesBtn.setText(_translate("MainWindow", "Set Preferences"))
+        self.pushButton_4.setText(_translate("MainWindow", "Add"))
         self.label_55.setText(_translate("MainWindow", "Report Folder "))
         self.reportsPathBtn.setText(_translate("MainWindow", "Browse"))
         self.label_59.setText(_translate("MainWindow", "TXT Folder"))
@@ -3183,12 +3115,15 @@ class Ui_MainWindow(object):
         self.convertedPathBtn.setText(_translate("MainWindow", "Browse"))
         self.label_72.setText(_translate("MainWindow", "Database Folder"))
         self.dbPathBtn.setText(_translate("MainWindow", "Browse"))
-        self.pushButton_4.setText(_translate("MainWindow", "Add"))
+        self.label_35.setText(_translate("MainWindow", "Database 2 Folder "))
+        self.SettingsTab.setTabText(self.SettingsTab.indexOf(self.prefrenceTab), _translate("MainWindow", "Preferences"))
         self.addAuthor.setText(_translate("MainWindow", "Add"))
         self.saveAuthorBtn.setText(_translate("MainWindow", "Save"))
         self.deleteAuthorBtn.setText(_translate("MainWindow", "Delete"))
         self.label_27.setText(_translate("MainWindow", "Author Name "))
         self.label_64.setText(_translate("MainWindow", "Author Position"))
+        self.SettingsTab.setTabText(self.SettingsTab.indexOf(self.icpTab), _translate("MainWindow", "ICP Settings"))
+        self.SettingsTab.setTabText(self.SettingsTab.indexOf(self.chmTab), _translate("MainWindow", "CHM Settings"))
         self.jobNumLabel2.setText(_translate("MainWindow", "Job Number:"))
         self.jobNum.setText(_translate("MainWindow", "W123456"))
         self.label_25.setText(_translate("MainWindow", "Client Name:"))
