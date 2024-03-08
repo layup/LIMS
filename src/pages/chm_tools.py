@@ -4,6 +4,7 @@ from modules.utilities import *
 from widgets.widgets import *
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
@@ -12,6 +13,18 @@ from PyQt5.QtWidgets import (
 )
 
 from modules.excel.chmExcel import createChmReport
+from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests 
+
+
+#******************************************************************
+#    Chemisty Setup 
+#****************************************************************** 
+
+def chemistySetup(self): 
+    pass; 
+
+    
+    
 
 def chmLoader(self): 
     #TODO: scan in the TXT Tests, scan in from Defined Tests too 
@@ -247,3 +260,190 @@ def chmLoadTestsNames(self):
     
     for test in testNames: 
         self.ui.gcmsDefinedtests.addItem(test[0])
+        
+        
+#******************************************************************
+#    Chemisty Database Section 
+#****************************************************************** 
+
+def loadChmDatabase(self): 
+    print('[FUNCTION]: loadChmDatabase, Loading Existing Data'); 
+    
+    TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value', 'Job Num', 'Delete']
+    chmTable = self.ui.chmInputTable 
+
+    #TODO: maybe move this somewhere else 
+    self.formatTable(chmTable) ;
+
+    results = loadChmTestsData(self.db) 
+    #print(results)
+    
+    chmTable.setRowCount(len(results))
+    chmTable.setColumnCount(len(TableHeader))
+    chmTable.setHorizontalHeaderLabels(TableHeader)
+    
+    for i, result in enumerate(results):
+        for j in range(len(TableHeader)-1):
+            data = str(result[j]) 
+            item = QTableWidgetItem(data)
+            item.setTextAlignment(Qt.AlignCenter)
+            
+            chmTable.setItem(i, j, item)     
+
+        button = QPushButton("Delete")
+        chmTable.setCellWidget(i ,6, button)
+        button.clicked.connect(lambda _, row=i: chmTableDeleteRow(self, row));
+        
+def chmTableDeleteRow(self, row): 
+    print(f'[FUNCTION]: chmTableDeleteRow, row to delete {row}')
+    
+    sampleNum = self.ui.chmInputTable.item(row, 0).text()
+    testsName = self.ui.chmInputTable.item(row, 1).text()
+    print(f'Sample Num: {sampleNum}, Tests Name: {testsName}')
+    
+    self.ui.chmInputTable.removeRow(row)
+    #deleteChmData(self.db, sampleNum, testsName)
+
+
+#******************************************************************
+#    Chemisty Input Data
+#****************************************************************** 
+
+
+
+#******************************************************************
+#    Chemisty Tests Info
+#****************************************************************** 
+#TODO: if the txt name changes update the listName 
+#TODO: keep track of the currentIndex when first getting it 
+
+def gcmsGetListValues(self): 
+    values = []
+    
+    for index in range(self.ui.gcmsDefinedtests.count()):
+        item = self.ui.gcmsDefinedtests.item(index)
+        values.append(item.text())
+        
+    return values; 
+
+
+def gcmsClearDefinedTestsValues(self): 
+    self.ui.gcmsDisplayName.clear()
+    self.ui.gcmsTxtName.clear()
+    self.ui.gcmsUnitType.clear()
+    self.ui.gcmsRefValue.clear()
+    self.ui.gcmsComment.clear()
+    
+
+@pyqtSlot() 
+def on_gcmsAddTestsBtn_clicked(self): 
+    existingTests = self.gcmsGetListValues()        
+    currentText = self.ui.testsInputLabel.text()
+    
+    if(currentText != '' and currentText not in existingTests): 
+        #clear values 
+        self.gcmsClearDefinedTestsValues()
+        self.ui.testsInputLabel.clear()
+        self.ui.gcmsDefinedtests.addItem(currentText)
+
+        totalItems = len(self.gcmsGetListValues())
+        self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
+        self.ui.gcmsTxtName.setText(currentText)
+        
+    else: 
+        errorTitle = 'Invald Tests'
+        errorMsg = 'Please enter a valid test'
+        showErrorDialog(self, errorTitle, errorMsg)
+
+
+@pyqtSlot()
+def on_gcmsSaveTestBtn_clicked(self):
+    print('[SLOT]: on_gcmsSaveTestBtn_clicked')
+    displayName = self.ui.gcmsDisplayName.text().strip()
+    txtName = self.ui.gcmsTxtName.text().strip()
+    unitType = self.ui.gcmsUnitType.text().strip()
+    recoveryVal = self.ui.gcmsRefValue.text()        
+    comment = self.ui.gcmsComment.toPlainText() 
+    
+    #print(txtName, unitType, recoveryVal, displayName)
+
+    if(txtName != ""):
+        insertChmTests(self.db, txtName, unitType, recoveryVal, displayName)
+        
+
+@pyqtSlot()    
+def on_gcmsDeleteTestBtn_clicked(self): 
+    txtName = self.ui.gcmsTxtName.text().strip()
+    selected_item = self.ui.gcmsDefinedtests.currentItem()
+    
+    deleteQuery = 'DELETE FROM gcmstests WHERE testName = ?'
+    
+    print(f'[QUERY]: {deleteQuery}')
+    print(f'TXT Name: {txtName}, Selected Item: {selected_item}')
+    
+    try: 
+        #TODO: make sure it deletes 
+        deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
+        self.db.execute(deleteQuery, (txtName,))
+        self.db.commit()
+
+        currentItem = self.ui.gcmsDefinedtests.currentRow()
+        self.ui.gcmsDefinedtests.takeItem(currentItem)
+        self.ui.gcmsDefinedtests.setCurrentItem(None)
+        
+        self.gcmsClearDefinedTestsValues()
+    
+    except: 
+        print('Error: could not delete item')
+    
+
+@pyqtSlot()
+def on_gcmsDefinedtests_clicked(self): 
+    chmLoadTestsData(self)
+        
+def on_gcmsDefinedtests_currentRowChanged(self):
+    try:
+        chmLoadTestsData(self)
+    except Exception as e:
+        print("An error occurred:", e)
+
+#TODO: move all the unitType and the basic assortment to the prefence item  
+def getTestsAndUnits(self): 
+    inquery = 'SELECT testName, unitType FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
+    results = self.db.query(inquery)
+    
+    self.chmParameters = {}
+    
+    tests = ['']
+    units = ['']
+    
+    for testName, unitType in results: 
+        
+        if(testName != '' ): 
+            tests.append(testName)
+            
+            self.chmParameters[testName] = unitType 
+        
+        if(unitType != '' and unitType not in units):
+            units.append(unitType)
+            
+    print(self.chmParameters)
+    
+    return (tests,units)
+
+
+#******************************************************************
+#    Chemisty Report Info
+#****************************************************************** 
+
+
+
+
+
+#******************************************************************
+#    Chemisty Class Definitions
+#****************************************************************** 
+
+
+class CreateTests(): 
+    pass; 

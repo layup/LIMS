@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>866</height>
+    <width>1238</width>
+    <height>846</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -453,7 +453,16 @@ icpMenuOptions QPushButton:hover{
 /***************************
 	CHM STACK 
 ***************************/
- /* 
+
+#chmTabWidget {
+	background-color: #323a47;
+}
+
+#chmTabWidget &gt;QPushButton {
+	min-width:30px
+}
+
+
 #chmMenuWidget { 
 	background-color: #323a47;
 	color:white; 
@@ -473,6 +482,15 @@ icpMenuOptions QPushButton:hover{
 
 #chmMenuWidget QPushButton::hover {
 	background-color: rgb(107, 108, 108);
+}
+
+#chmHeader  {
+	background-color: #323a47;
+	border-radius: 10px;
+	color:white; 
+}
+#chmHeader QLabel {
+	color:white; 
 }
 
 #chmPage {
@@ -519,83 +537,7 @@ icpMenuOptions QPushButton:hover{
 
 
 /***************************
-	CHM Page   
-***************************/
-#chmHeader  {
-	background-color: #323a47;
-	border-radius: 10px;
-	color:white; 
-}
-#chmHeader QLabel {
-	color:white; 
-}
-
-#chmPage {
-	background-color:  #788596;
-}
-
-/***************************
-	CHM Tab   
-***************************/
-#chmTabWidget {
-	background-color: #323a47;
-}
-
-#chmTabWidget QTabBar::tab {
-	background-color: #323a47;  
-	
-	color: white;             
-}
-#chmTabWidget QTabBar::tab:selected {
-	background-color:  rgb(107, 108, 108);
-}
-
-
-#chmInputTab &gt; QWidget {
-	background-color: #323a47;
-	border-radius: 5px;
-	color:white; 
-}
-
-#chmTabWidget QPushButton { 
-	padding: 4px;
-	border: 1px solid gray; 
-	border-radius: 5px;
-	color:white; 
-	background-color: #555555; 
-	min-width: 100px; 
-} 
-
-#chmTabWidget QPushButton::hover {
-	background-color: rgb(107, 108, 108);
-}
-
- #chmTabWidget QLabel {
-	color:white; 
-} 
-
-#chmTabWidget QListWidget {
-	color:white; 
-	padding: 4px;  
-	border: 1px solid gray;
-	background-color: rgb(55, 65, 84);
-}
-
-
- #chmTabWidget QLineEdit {
-	border: 1px solid #788596;
-	background-color: rgb(55, 65, 84);
-	color:white; 
-} 
-
-/***************************
-** CHM Input Data   
-***************************/
-
-
-
-/***************************
-** CHM Tests Info Section   
+** CHM TEXT PAGE  
 ***************************/
 
 #chmTestDisplayWidget  {
@@ -620,7 +562,7 @@ icpMenuOptions QPushButton:hover{
 
 
 /***************************
-** CHM Reports Info Section    
+** CHM REPORTS PAGE   
 ***************************/
 
 #chmReportsWidget {
@@ -648,8 +590,6 @@ icpMenuOptions QPushButton:hover{
 /***************************
 ** CHM Database Page    
 ***************************/
-
-
 #chmDatabasePage  {	
 	background-color:  #323a47;
 	border-radius: 10px;
@@ -1004,12 +944,6 @@ QLineEdit {
           </property>
           <item>
            <widget class="QFrame" name="TopNav">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>45</height>
-             </size>
-            </property>
             <property name="styleSheet">
              <string notr="true">#logo {
 	color: white; 
@@ -1345,7 +1279,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -2074,6 +2008,19 @@ QWidget#widget_2{
                     <string>Next Section</string>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_16">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </widget>
@@ -3173,313 +3120,162 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QTabWidget" name="chmTabWidget">
-             <property name="tabPosition">
-              <enum>QTabWidget::North</enum>
+            <widget class="QStackedWidget" name="gcmsStack">
+             <property name="styleSheet">
+              <string notr="true"/>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>4</number>
              </property>
-             <property name="elideMode">
-              <enum>Qt::ElideRight</enum>
-             </property>
-             <property name="usesScrollButtons">
-              <bool>false</bool>
-             </property>
-             <property name="tabsClosable">
-              <bool>false</bool>
-             </property>
-             <widget class="QWidget" name="chmDataTab">
-              <attribute name="title">
-               <string>Database</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_29">
+             <widget class="QWidget" name="gcmsMenuPage">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_20">
+               <property name="spacing">
+                <number>-1</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
-                <widget class="QTableWidget" name="chmInputTable">
-                 <property name="styleSheet">
-                  <string notr="true">QTableWidget {
-	color:white; 
-} 
-
-QTableWidget QPushButton:hover {
-	color:gray; 
-}</string>
-                 </property>
-                 <row>
-                  <property name="text">
-                   <string>1</string>
-                  </property>
-                 </row>
-                 <column>
-                  <property name="text">
-                   <string>test</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>test2</string>
-                  </property>
-                 </column>
-                 <item row="0" column="0">
-                  <property name="text">
-                   <string>test</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="chmInputTab">
-              <attribute name="title">
-               <string>Input Data</string>
-              </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_49">
-               <item>
-                <widget class="QWidget" name="widget_29" native="true">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>100</width>
-                   <height>150</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>250</width>
-                   <height>2000</height>
-                  </size>
-                 </property>
+                <widget class="QWidget" name="gcmsMenuBody" native="true">
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
-                 <layout class="QFormLayout" name="formLayout_9">
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_73">
-                    <property name="text">
-                     <string>Parameter</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QComboBox" name="gcmsTests">
-                    <item>
-                     <property name="text">
-                      <string>test2</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>test3</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_74">
-                    <property name="text">
-                     <string>Select Unit</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QComboBox" name="gcmsUnitVal"/>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="label_75">
-                    <property name="text">
-                     <string>Standards</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLineEdit" name="gcmsStandardVal"/>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QPushButton" name="gcmsProceedBtn">
-                    <property name="text">
-                     <string>Proceed</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_24">
-                    <property name="text">
-                     <string>New Entry</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="gcmsTestsValueWidget" native="true">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>100</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>300</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true"/>
-                 </property>
-                 <layout class="QFormLayout" name="formLayout_8">
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_58">
-                    <property name="text">
-                     <string>Default Values</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_62">
-                    <property name="text">
-                     <string>Parameter Name</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="gcmsTestsShow">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="text">
-                     <string>Test</string>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_65">
-                    <property name="layoutDirection">
-                     <enum>Qt::RightToLeft</enum>
-                    </property>
-                    <property name="autoFillBackground">
-                     <bool>false</bool>
-                    </property>
-                    <property name="text">
-                     <string>Unit Value</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QLineEdit" name="gcmsUnitValShow">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="text">
-                     <string>Test</string>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QLabel" name="label_66">
-                    <property name="text">
-                     <string>Standard Value</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLineEdit" name="gcmsStandardValShow">
-                    <property name="enabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="text">
-                     <string>Test</string>
-                    </property>
-                    <property name="readOnly">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="1">
-                   <widget class="QWidget" name="widget_34" native="true"/>
-                  </item>
-                  <item row="7" column="1">
-                   <widget class="QLabel" name="label_67">
-                    <property name="text">
-                     <string>Enter Values</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="0">
-                   <widget class="QLabel" name="label_68">
-                    <property name="text">
-                     <string>Job Number</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="1">
-                   <widget class="QLineEdit" name="gcmsTestsJobNum">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="maxLength">
-                     <number>10</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="0">
-                   <widget class="QLabel" name="label_69">
-                    <property name="text">
-                     <string>Sample Number</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="1">
-                   <widget class="QLineEdit" name="gcmsTestsSample"/>
-                  </item>
-                  <item row="10" column="0">
-                   <widget class="QLabel" name="label_70">
-                    <property name="text">
-                     <string>Sample Value</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="1">
-                   <widget class="QLineEdit" name="gcmsTestsVal">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="1">
-                   <widget class="QPushButton" name="gcmsAddTestsBtn_3">
-                    <property name="text">
-                     <string>Add</string>
-                    </property>
-                    <property name="checkable">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="12" column="1">
-                   <spacer name="verticalSpacer_12">
+                 <layout class="QHBoxLayout" name="horizontalLayout_17">
+                  <property name="spacing">
+                   <number>-1</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <spacer name="horizontalSpacer_10">
                     <property name="orientation">
-                     <enum>Qt::Vertical</enum>
+                     <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>20</width>
-                      <height>40</height>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item alignment="Qt::AlignVCenter">
+                   <widget class="QWidget" name="chmMenuWidget" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>350</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>350</width>
+                      <height>250</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,0,0,0,0">
+                     <property name="spacing">
+                      <number>-1</number>
+                     </property>
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SetDefaultConstraint</enum>
+                     </property>
+                     <item>
+                      <widget class="QPushButton" name="gcmsEnterTestsBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>222</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Enter CHM Data</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="gcmsViewDatabase">
+                       <property name="minimumSize">
+                        <size>
+                         <width>222</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>CHM Database</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="gcmsDefineTestBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>222</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>CHM Parameters</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="gcmsReportTypeBtn">
+                       <property name="minimumSize">
+                        <size>
+                         <width>222</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>CHM Report Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="chemTempBtn">
+                       <property name="text">
+                        <string>Temp</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_11">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
                      </size>
                     </property>
                    </spacer>
@@ -3487,79 +3283,22 @@ QTableWidget QPushButton:hover {
                  </layout>
                 </widget>
                </item>
-               <item>
-                <widget class="QWidget" name="widget_27" native="true">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>100</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true"/>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_32">
-                  <property name="leftMargin">
-                   <number>12</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>12</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_76">
-                    <property name="text">
-                     <string>Recently Added </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QListWidget" name="gcmsTestsLists"/>
-                  </item>
-                  <item>
-                   <widget class="QListView" name="listView"/>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="widget_11" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>200</height>
-                     </size>
-                    </property>
-                    <widget class="QPushButton" name="pushButton_3">
-                     <property name="geometry">
-                      <rect>
-                       <x>270</x>
-                       <y>10</y>
-                       <width>113</width>
-                       <height>32</height>
-                      </rect>
-                     </property>
-                     <property name="text">
-                      <string>upload Item</string>
-                     </property>
-                    </widget>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="chmTestsInfoTab">
-              <attribute name="title">
-               <string>Tests Info</string>
-              </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_55">
+             <widget class="QWidget" name="gcmsTestValuesPage">
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QWidget" name="chmTestsWidget" native="true">
                  <property name="maximumSize">
@@ -3571,7 +3310,7 @@ QTableWidget QPushButton:hover {
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_16">
+                 <layout class="QGridLayout" name="gridLayout_7">
                   <property name="topMargin">
                    <number>12</number>
                   </property>
@@ -3579,14 +3318,14 @@ QTableWidget QPushButton:hover {
                    <number>0</number>
                   </property>
                   <item row="1" column="0">
-                   <widget class="QWidget" name="widget_32" native="true">
+                   <widget class="QWidget" name="widget_18" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_54">
+                    <layout class="QHBoxLayout" name="horizontalLayout_23">
                      <property name="leftMargin">
                       <number>0</number>
                      </property>
@@ -3634,7 +3373,7 @@ QTableWidget QPushButton:hover {
                    </widget>
                   </item>
                   <item row="2" column="0">
-                   <widget class="QLabel" name="label_84">
+                   <widget class="QLabel" name="label_54">
                     <property name="text">
                      <string>TXT Test Names</string>
                     </property>
@@ -3644,11 +3383,11 @@ QTableWidget QPushButton:hover {
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="chmTestInfoWidget_2" native="true">
+                <widget class="QWidget" name="chmTestInfoWidget" native="true">
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_44">
+                 <layout class="QVBoxLayout" name="verticalLayout_22">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -3678,7 +3417,7 @@ QTableWidget QPushButton:hover {
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout_14">
+                    <layout class="QGridLayout" name="gridLayout_6">
                      <item row="0" column="2">
                       <widget class="QPushButton" name="gcmsSaveTestBtn">
                        <property name="text">
@@ -3694,7 +3433,7 @@ QTableWidget QPushButton:hover {
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <spacer name="horizontalSpacer_13">
+                      <spacer name="horizontalSpacer_12">
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
                        </property>
@@ -3727,9 +3466,9 @@ QTableWidget QPushButton:hover {
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout_15">
+                    <layout class="QGridLayout" name="gridLayout_13">
                      <item row="3" column="0">
-                      <widget class="QLabel" name="label_79">
+                      <widget class="QLabel" name="label_61">
                        <property name="font">
                         <font>
                          <weight>75</weight>
@@ -3742,7 +3481,7 @@ QTableWidget QPushButton:hover {
                       </widget>
                      </item>
                      <item row="2" column="0">
-                      <widget class="QLabel" name="label_80">
+                      <widget class="QLabel" name="label_60">
                        <property name="font">
                         <font>
                          <weight>75</weight>
@@ -3761,7 +3500,7 @@ QTableWidget QPushButton:hover {
                       <widget class="QLineEdit" name="gcmsRefValue"/>
                      </item>
                      <item row="0" column="0">
-                      <widget class="QLabel" name="label_81">
+                      <widget class="QLabel" name="label_57">
                        <property name="font">
                         <font>
                          <weight>75</weight>
@@ -3774,7 +3513,7 @@ QTableWidget QPushButton:hover {
                       </widget>
                      </item>
                      <item row="6" column="1">
-                      <spacer name="verticalSpacer_13">
+                      <spacer name="verticalSpacer_6">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
                        </property>
@@ -3790,7 +3529,7 @@ QTableWidget QPushButton:hover {
                       <widget class="QLineEdit" name="gcmsDisplayName"/>
                      </item>
                      <item row="1" column="0">
-                      <widget class="QLabel" name="label_82">
+                      <widget class="QLabel" name="label_13">
                        <property name="font">
                         <font>
                          <weight>75</weight>
@@ -3809,7 +3548,7 @@ QTableWidget QPushButton:hover {
                       <widget class="QTextEdit" name="gcmsComment"/>
                      </item>
                      <item row="5" column="0" alignment="Qt::AlignTop">
-                      <widget class="QLabel" name="label_83">
+                      <widget class="QLabel" name="label_42">
                        <property name="font">
                         <font>
                          <weight>75</weight>
@@ -3829,11 +3568,20 @@ QTableWidget QPushButton:hover {
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="chmReportInfoTab">
-              <attribute name="title">
-               <string>Report Info</string>
-              </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_53">
+             <widget class="QWidget" name="gcmsReportPage">
+              <layout class="QHBoxLayout" name="horizontalLayout_21">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QWidget" name="chmReportsWidget" native="true">
                  <property name="minimumSize">
@@ -3851,7 +3599,7 @@ QTableWidget QPushButton:hover {
                  <property name="styleSheet">
                   <string notr="true"/>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_41">
+                 <layout class="QVBoxLayout" name="verticalLayout_23">
                   <property name="leftMargin">
                    <number>12</number>
                   </property>
@@ -3859,14 +3607,14 @@ QTableWidget QPushButton:hover {
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWidget" name="widget_40" native="true">
+                   <widget class="QWidget" name="widget_39" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
                       <height>50</height>
                      </size>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_52">
+                    <layout class="QHBoxLayout" name="horizontalLayout_20">
                      <property name="spacing">
                       <number>-1</number>
                      </property>
@@ -3915,7 +3663,7 @@ QTableWidget QPushButton:hover {
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="chmReportsInfoWidget_2" native="true">
+                <widget class="QWidget" name="chmReportsInfoWidget" native="true">
                  <property name="styleSheet">
                   <string notr="true">
 
@@ -3945,7 +3693,7 @@ QLabel {
 
 </string>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_34">
+                 <layout class="QVBoxLayout" name="verticalLayout_26">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -3959,7 +3707,7 @@ QLabel {
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWidget" name="widget_22" native="true">
+                   <widget class="QWidget" name="widget_21" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>500</width>
@@ -3969,12 +3717,12 @@ QLabel {
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_50">
+                    <layout class="QHBoxLayout" name="horizontalLayout_28">
                      <item>
                       <widget class="QPushButton" name="gcmsSaveReportBtn">
                        <property name="minimumSize">
                         <size>
-                         <width>102</width>
+                         <width>0</width>
                          <height>0</height>
                         </size>
                        </property>
@@ -3993,7 +3741,7 @@ QLabel {
                       <widget class="QPushButton" name="gcmsDeleteReportBtn">
                        <property name="minimumSize">
                         <size>
-                         <width>102</width>
+                         <width>0</width>
                          <height>0</height>
                         </size>
                        </property>
@@ -4009,7 +3757,7 @@ QLabel {
                       </widget>
                      </item>
                      <item>
-                      <spacer name="horizontalSpacer_15">
+                      <spacer name="horizontalSpacer_14">
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
                        </property>
@@ -4035,10 +3783,10 @@ QLabel {
                     <property name="styleSheet">
                      <string notr="true"/>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_37">
+                    <layout class="QVBoxLayout" name="verticalLayout_27">
                      <item>
-                      <widget class="QWidget" name="widget_24" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_51">
+                      <widget class="QWidget" name="widget_20" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_27">
                         <property name="leftMargin">
                          <number>0</number>
                         </property>
@@ -4049,7 +3797,7 @@ QLabel {
                          <number>0</number>
                         </property>
                         <item>
-                         <widget class="QLabel" name="label_77">
+                         <widget class="QLabel" name="label_63">
                           <property name="text">
                            <string>Report Type</string>
                           </property>
@@ -4059,21 +3807,21 @@ QLabel {
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="icpReportType_2">
+                      <widget class="QLineEdit" name="icpReportType_3">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_78">
+                      <widget class="QLabel" name="label_50">
                        <property name="text">
                         <string>Footer Comment </string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QTextEdit" name="footerComments_3">
+                      <widget class="QTextEdit" name="footerComments_2">
                        <property name="autoFillBackground">
                         <bool>false</bool>
                        </property>
@@ -4087,7 +3835,7 @@ p, li { white-space: pre-wrap; }
                       </widget>
                      </item>
                      <item>
-                      <spacer name="verticalSpacer_9">
+                      <spacer name="verticalSpacer_8">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
                        </property>
@@ -4103,6 +3851,1357 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="gcmsTestsInsertPage">
+              <layout class="QHBoxLayout" name="horizontalLayout_30">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QWidget" name="widget_8" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_45">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QWidget" name="widget_28" native="true">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>150</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>250</width>
+                      <height>2000</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QFormLayout" name="formLayout_3">
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_51">
+                       <property name="text">
+                        <string>Parameter</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="gcmsTests">
+                       <item>
+                        <property name="text">
+                         <string>test2</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>test3</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_30">
+                       <property name="text">
+                        <string>Select Unit</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QComboBox" name="gcmsUnitVal"/>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_31">
+                       <property name="text">
+                        <string>Standards</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="gcmsStandardVal"/>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QPushButton" name="gcmsProceedBtn">
+                       <property name="text">
+                        <string>Proceed</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="gcmsTestsValueWidget" native="true">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>300</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QFormLayout" name="formLayout_7">
+                     <item row="0" column="1">
+                      <widget class="QLabel" name="label_34">
+                       <property name="text">
+                        <string>Default Values</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_53">
+                       <property name="text">
+                        <string>Parameter Name</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="gcmsTestsShow">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <property name="text">
+                        <string>Test</string>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_46">
+                       <property name="layoutDirection">
+                        <enum>Qt::RightToLeft</enum>
+                       </property>
+                       <property name="autoFillBackground">
+                        <bool>false</bool>
+                       </property>
+                       <property name="text">
+                        <string>Unit Value</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="gcmsUnitValShow">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <property name="text">
+                        <string>Test</string>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_45">
+                       <property name="text">
+                        <string>Standard Value</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="gcmsStandardValShow">
+                       <property name="enabled">
+                        <bool>true</bool>
+                       </property>
+                       <property name="text">
+                        <string>Test</string>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <widget class="QWidget" name="widget_33" native="true"/>
+                     </item>
+                     <item row="7" column="1">
+                      <widget class="QLabel" name="label_24">
+                       <property name="text">
+                        <string>Enter Values</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="0">
+                      <widget class="QLabel" name="label_43">
+                       <property name="text">
+                        <string>Job Number</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="1">
+                      <widget class="QLineEdit" name="gcmsTestsJobNum">
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="maxLength">
+                        <number>10</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="9" column="0">
+                      <widget class="QLabel" name="label_44">
+                       <property name="text">
+                        <string>Sample Number</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="9" column="1">
+                      <widget class="QLineEdit" name="gcmsTestsSample"/>
+                     </item>
+                     <item row="10" column="0">
+                      <widget class="QLabel" name="label_47">
+                       <property name="text">
+                        <string>Sample Value</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="10" column="1">
+                      <widget class="QLineEdit" name="gcmsTestsVal">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="11" column="1">
+                      <widget class="QPushButton" name="gcmsAddTestsBtn_2">
+                       <property name="text">
+                        <string>Add</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="12" column="1">
+                      <spacer name="verticalSpacer_11">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_26" native="true">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_30">
+                     <property name="leftMargin">
+                      <number>12</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>12</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_52">
+                       <property name="text">
+                        <string>Recently Added </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QListWidget" name="gcmsTestsLists"/>
+                     </item>
+                     <item>
+                      <widget class="QListView" name="listView"/>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_9" native="true">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>50</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>200</height>
+                        </size>
+                       </property>
+                       <widget class="QPushButton" name="pushButton">
+                        <property name="geometry">
+                         <rect>
+                          <x>270</x>
+                          <y>10</y>
+                          <width>113</width>
+                          <height>32</height>
+                         </rect>
+                        </property>
+                        <property name="text">
+                         <string>upload Item</string>
+                        </property>
+                       </widget>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="chmDatabasePage">
+              <layout class="QHBoxLayout" name="horizontalLayout_29">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QWidget" name="chmDatabaseTableWidget" native="true">
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_31">
+                  <item>
+                   <widget class="QTableWidget" name="gcmsInputTable_3">
+                    <property name="styleSheet">
+                     <string notr="true">QTableWidget {
+	color:white; 
+} 
+
+QTableWidget QPushButton:hover {
+	color:gray; 
+}</string>
+                    </property>
+                    <row>
+                     <property name="text">
+                      <string>1</string>
+                     </property>
+                    </row>
+                    <column>
+                     <property name="text">
+                      <string>test</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>test2</string>
+                     </property>
+                    </column>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="chmDataTab">
+              <layout class="QVBoxLayout" name="verticalLayout_43">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QTabWidget" name="chmTabWidget">
+                 <property name="tabPosition">
+                  <enum>QTabWidget::North</enum>
+                 </property>
+                 <property name="currentIndex">
+                  <number>3</number>
+                 </property>
+                 <property name="elideMode">
+                  <enum>Qt::ElideRight</enum>
+                 </property>
+                 <property name="usesScrollButtons">
+                  <bool>false</bool>
+                 </property>
+                 <property name="tabsClosable">
+                  <bool>false</bool>
+                 </property>
+                 <widget class="QWidget" name="chmDataTab">
+                  <attribute name="title">
+                   <string>Database</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_29">
+                   <item>
+                    <widget class="QTableWidget" name="chmInputTable">
+                     <property name="styleSheet">
+                      <string notr="true">QTableWidget {
+	color:white; 
+} 
+
+QTableWidget QPushButton:hover {
+	color:gray; 
+}</string>
+                     </property>
+                     <row>
+                      <property name="text">
+                       <string>1</string>
+                      </property>
+                     </row>
+                     <column>
+                      <property name="text">
+                       <string>test</string>
+                      </property>
+                     </column>
+                     <column>
+                      <property name="text">
+                       <string>test2</string>
+                      </property>
+                     </column>
+                     <item row="0" column="0">
+                      <property name="text">
+                       <string>test</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="chmInputTab">
+                  <attribute name="title">
+                   <string>Input Data</string>
+                  </attribute>
+                  <layout class="QHBoxLayout" name="horizontalLayout_55">
+                   <item>
+                    <widget class="QWidget" name="chmTestsWidget_2" native="true">
+                     <property name="maximumSize">
+                      <size>
+                       <width>350</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_16">
+                      <property name="topMargin">
+                       <number>12</number>
+                      </property>
+                      <property name="horizontalSpacing">
+                       <number>0</number>
+                      </property>
+                      <item row="1" column="0">
+                       <widget class="QWidget" name="widget_32" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_54">
+                         <property name="leftMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="topMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="rightMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <widget class="QLineEdit" name="testsInputLabel_2">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="gcmsAddTestsBtn_4">
+                           <property name="text">
+                            <string>Add Tests</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item row="3" column="0" colspan="2">
+                       <widget class="QListWidget" name="gcmsDefinedtests_2">
+                        <property name="font">
+                         <font>
+                          <pointsize>14</pointsize>
+                         </font>
+                        </property>
+                        <item>
+                         <property name="text">
+                          <string>test</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_84">
+                        <property name="text">
+                         <string>TXT Test Names</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="chmTestInfoWidget_2" native="true">
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_44">
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QWidget" name="chmTestsSaveWidget_2" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <layout class="QGridLayout" name="gridLayout_14">
+                         <item row="0" column="2">
+                          <widget class="QPushButton" name="gcmsSaveTestBtn_2">
+                           <property name="text">
+                            <string>Save Tests</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="3">
+                          <widget class="QPushButton" name="gcmsDeleteTestBtn_2">
+                           <property name="text">
+                            <string>Delete Tests</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="1">
+                          <spacer name="horizontalSpacer_13">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="0" column="0">
+                          <widget class="QPushButton" name="testBtn_2">
+                           <property name="text">
+                            <string>test</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QWidget" name="chmTestDisplayWidget_2" native="true">
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <layout class="QGridLayout" name="gridLayout_15">
+                         <item row="3" column="0">
+                          <widget class="QLabel" name="label_79">
+                           <property name="font">
+                            <font>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
+                           </property>
+                           <property name="text">
+                            <string>Default Standard</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="0">
+                          <widget class="QLabel" name="label_80">
+                           <property name="font">
+                            <font>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
+                           </property>
+                           <property name="text">
+                            <string>Unit Type </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="2" column="1">
+                          <widget class="QLineEdit" name="gcmsUnitType_2"/>
+                         </item>
+                         <item row="3" column="1">
+                          <widget class="QLineEdit" name="gcmsRefValue_2"/>
+                         </item>
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label_81">
+                           <property name="font">
+                            <font>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
+                           </property>
+                           <property name="text">
+                            <string>Display Name</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="6" column="1">
+                          <spacer name="verticalSpacer_13">
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>20</width>
+                             <height>40</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item row="0" column="1">
+                          <widget class="QLineEdit" name="gcmsDisplayName_2"/>
+                         </item>
+                         <item row="1" column="0">
+                          <widget class="QLabel" name="label_82">
+                           <property name="font">
+                            <font>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
+                           </property>
+                           <property name="text">
+                            <string>TXT Name</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QLineEdit" name="gcmsTxtName_2"/>
+                         </item>
+                         <item row="5" column="1">
+                          <widget class="QTextEdit" name="gcmsComment_2"/>
+                         </item>
+                         <item row="5" column="0" alignment="Qt::AlignTop">
+                          <widget class="QLabel" name="label_83">
+                           <property name="font">
+                            <font>
+                             <weight>75</weight>
+                             <bold>true</bold>
+                            </font>
+                           </property>
+                           <property name="text">
+                            <string>Test Comments </string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="chmTestsInfoTab">
+                  <attribute name="title">
+                   <string>Tests Info</string>
+                  </attribute>
+                  <layout class="QHBoxLayout" name="horizontalLayout_49">
+                   <item>
+                    <widget class="QWidget" name="widget_29" native="true">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>150</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>250</width>
+                       <height>2000</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QFormLayout" name="formLayout_9">
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_73">
+                        <property name="text">
+                         <string>Parameter</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QComboBox" name="gcmsTests_2">
+                        <item>
+                         <property name="text">
+                          <string>test2</string>
+                         </property>
+                        </item>
+                        <item>
+                         <property name="text">
+                          <string>test3</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_74">
+                        <property name="text">
+                         <string>Select Unit</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QComboBox" name="gcmsUnitVal_2"/>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="label_75">
+                        <property name="text">
+                         <string>Standards</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="1">
+                       <widget class="QLineEdit" name="gcmsStandardVal_2"/>
+                      </item>
+                      <item row="4" column="1">
+                       <widget class="QPushButton" name="gcmsProceedBtn_2">
+                        <property name="text">
+                         <string>Proceed</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="gcmsTestsValueWidget_2" native="true">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>300</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QFormLayout" name="formLayout_8">
+                      <item row="0" column="1">
+                       <widget class="QLabel" name="label_58">
+                        <property name="text">
+                         <string>Default Values</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_62">
+                        <property name="text">
+                         <string>Parameter Name</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QLineEdit" name="gcmsTestsShow_2">
+                        <property name="enabled">
+                         <bool>true</bool>
+                        </property>
+                        <property name="text">
+                         <string>Test</string>
+                        </property>
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0">
+                       <widget class="QLabel" name="label_65">
+                        <property name="layoutDirection">
+                         <enum>Qt::RightToLeft</enum>
+                        </property>
+                        <property name="autoFillBackground">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Unit Value</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QLineEdit" name="gcmsUnitValShow_2">
+                        <property name="enabled">
+                         <bool>true</bool>
+                        </property>
+                        <property name="text">
+                         <string>Test</string>
+                        </property>
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="0">
+                       <widget class="QLabel" name="label_66">
+                        <property name="text">
+                         <string>Standard Value</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="3" column="1">
+                       <widget class="QLineEdit" name="gcmsStandardValShow_2">
+                        <property name="enabled">
+                         <bool>true</bool>
+                        </property>
+                        <property name="text">
+                         <string>Test</string>
+                        </property>
+                        <property name="readOnly">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="6" column="1">
+                       <widget class="QWidget" name="widget_34" native="true"/>
+                      </item>
+                      <item row="7" column="1">
+                       <widget class="QLabel" name="label_67">
+                        <property name="text">
+                         <string>Enter Values</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="8" column="0">
+                       <widget class="QLabel" name="label_68">
+                        <property name="text">
+                         <string>Job Number</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="8" column="1">
+                       <widget class="QLineEdit" name="gcmsTestsJobNum_2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="maxLength">
+                         <number>10</number>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="9" column="0">
+                       <widget class="QLabel" name="label_69">
+                        <property name="text">
+                         <string>Sample Number</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="9" column="1">
+                       <widget class="QLineEdit" name="gcmsTestsSample_2"/>
+                      </item>
+                      <item row="10" column="0">
+                       <widget class="QLabel" name="label_70">
+                        <property name="text">
+                         <string>Sample Value</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="10" column="1">
+                       <widget class="QLineEdit" name="gcmsTestsVal_2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="11" column="1">
+                       <widget class="QPushButton" name="gcmsAddTestsBtn_3">
+                        <property name="text">
+                         <string>Add</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="12" column="1">
+                       <spacer name="verticalSpacer_12">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="widget_27" native="true">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>100</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_32">
+                      <property name="leftMargin">
+                       <number>12</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>12</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_76">
+                        <property name="text">
+                         <string>Recently Added </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QListWidget" name="gcmsTestsLists_2"/>
+                      </item>
+                      <item>
+                       <widget class="QListView" name="listView_2"/>
+                      </item>
+                      <item>
+                       <widget class="QWidget" name="widget_11" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>50</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>200</height>
+                         </size>
+                        </property>
+                        <widget class="QPushButton" name="pushButton_3">
+                         <property name="geometry">
+                          <rect>
+                           <x>270</x>
+                           <y>10</y>
+                           <width>113</width>
+                           <height>32</height>
+                          </rect>
+                         </property>
+                         <property name="text">
+                          <string>upload Item</string>
+                         </property>
+                        </widget>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="chmReportInfoTab">
+                  <attribute name="title">
+                   <string>Report Info</string>
+                  </attribute>
+                  <layout class="QHBoxLayout" name="horizontalLayout_53">
+                   <item>
+                    <widget class="QWidget" name="chmReportsWidget_2" native="true">
+                     <property name="minimumSize">
+                      <size>
+                       <width>350</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>300</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_41">
+                      <property name="leftMargin">
+                       <number>12</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QWidget" name="widget_40" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>50</height>
+                         </size>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_52">
+                         <property name="spacing">
+                          <number>-1</number>
+                         </property>
+                         <property name="leftMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="topMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="rightMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <widget class="QLineEdit" name="reportNameInput_3">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="addReportBtn_3">
+                           <property name="minimumSize">
+                            <size>
+                             <width>102</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string>Add Report</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QListWidget" name="reportsList_3"/>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="chmReportsInfoWidget_2" native="true">
+                     <property name="styleSheet">
+                      <string notr="true">
+
+#widget_20 {
+	background-color:  #323a47;
+} 
+
+
+#widget_21 {
+	background-color:  #323a47;
+	border-radius:10px; 
+}
+
+QTextEdit {
+	border: 1px solid gray;
+	background-color: rgb(55, 65, 84);
+	color: white; 
+} 
+
+QLineEdit {
+	border: 1px solid gray;
+	background-color: rgb(55, 65, 84);
+}
+QLabel {
+	background-color:  #323a47;
+}
+
+</string>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_34">
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QWidget" name="widget_22" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>500</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout_50">
+                         <item>
+                          <widget class="QPushButton" name="gcmsSaveReportBtn_2">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                           <property name="maximumSize">
+                            <size>
+                             <width>16777215</width>
+                             <height>16777215</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string>Save Report</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="gcmsDeleteReportBtn_2">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>0</height>
+                            </size>
+                           </property>
+                           <property name="maximumSize">
+                            <size>
+                             <width>16777215</width>
+                             <height>16777215</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string>Delete Report</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <spacer name="horizontalSpacer_15">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QWidget" name="chmReportsInfo_2" native="true">
+                        <property name="minimumSize">
+                         <size>
+                          <width>400</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true"/>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_37">
+                         <item>
+                          <widget class="QWidget" name="widget_24" native="true">
+                           <layout class="QHBoxLayout" name="horizontalLayout_51">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QLabel" name="label_77">
+                              <property name="text">
+                               <string>Report Type</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLineEdit" name="icpReportType_4">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_78">
+                           <property name="text">
+                            <string>Footer Comment </string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QTextEdit" name="footerComments_3">
+                           <property name="autoFillBackground">
+                            <bool>false</bool>
+                           </property>
+                           <property name="html">
+                            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <spacer name="verticalSpacer_9">
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>20</width>
+                             <height>40</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
                </item>
               </layout>
@@ -5731,7 +6830,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>1238</width>
      <height>22</height>
     </rect>
    </property>

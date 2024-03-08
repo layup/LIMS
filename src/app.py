@@ -20,8 +20,10 @@ from modules.dialogBoxes import *
 from modules.utilities import * 
 
 from interface import *
+
 from pages.icp_tools import icp_load_element_data, icpLoader, icpReportHander
-from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader, chmReportHandler 
+from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader, chmReportHandler, loadChmDatabase
+from pages.settingsPage import settingsSetup
 from widgets.widgets import * 
     
 #TODO: need to have more class objects that deal with insertion, that way we can have lazy loading isntead of constant 
@@ -34,20 +36,19 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
 
-
-        #load the setup 
+        # Load the setup 
         self.loadDatabase()
         self.loadCreatePage()
-        self.loadStartup()
-        self.loadTabFunctionality()
-        self.settingsSetup()
+        self.loadStartup() 
+        settingsSetup(self)
         
+        #TODO: not sure if need it 
+        self.ui.chmTabWidget.setAutoFillBackground(True)
+        
+        # Connect the singals 
         self.ui.NextSection.clicked.connect(lambda: self.createReportPage())
         self.ui.reportTypeDropdown.activated.connect(lambda: self.loadElementLimits())   
         
-        self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
-        self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal)
-       
 
    #******************************************************************
    #    inline Slot Function Calls 
@@ -123,8 +124,7 @@ class MainWindow(QMainWindow):
     
    #******************************************************************
    #    Menu Buttons 
-   #****************************************************************** 
-    
+   #******************************************************************  
     def on_reportsBtn1_toggled(self): 
         self.ui.stackedWidget.setCurrentIndex(0) 
     
@@ -158,21 +158,7 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    Stack Mangament 
    #****************************************************************** 
-             
-    def on_gsmsBtn1_clicked(self): 
-        self.ui.gcmsStack.setCurrentIndex(0)
 
-    def on_gcmsDefineTestBtn_clicked(self): 
-        self.ui.gcmsStack.setCurrentIndex(1)
-     
-    def on_gcmsReportTypeBtn_clicked(self): 
-        self.ui.gcmsStack.setCurrentIndex(2)
-        
-    def on_gcmsEnterTestsBtn_clicked(self): 
-        self.ui.gcmsStack.setCurrentIndex(3);     
-    
-    def on_gcmsViewDatabase_clicked(self): 
-        self.ui.gcmsStack.setCurrentIndex(4)
 
     def on_icpBtn1_clicked(self): 
         self.ui.icpStack.setCurrentIndex(0)
@@ -220,26 +206,18 @@ class MainWindow(QMainWindow):
             self.ui.icpLabel.setText("Total Reports:") 
             self.loadReportList()
 
-    def on_gcmsStack_currentChanged(self, index):
+                    
+    def on_chmTabWidget_currentChanged(self, index): 
+        print(f'CHM TAB CHANGE INDEX {index}')
         
-        if(index == 0): 
-            self.ui.chmTitleLabel.setText('CHM Page')
+        if(index == 0): # Database 
+            self.ui.chmTitleLabel.setText('Chemisty Tests Database') 
             self.ui.gcmsSubTitleLabel.setText('')
-        
-        if(index == 1): 
-            self.ui.chmTitleLabel.setText('CHM Defined Parameters')
-            totalTests = getChmTotalTests(self.db) 
+            loadChmDatabase(self);  
             
-            self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
-            chmLoadTestsNames(self)
-
-        if(index == 2): 
-            self.ui.chmTitleLabel.setText('CHM Defined Reports')
-            self.ui.gcmsSubTitleLabel.setText('Total Reports: ')
-            
-        if(index == 3): 
-            self.ui.chmTitleLabel.setText('CHM Tests Entry')
-            self.ui.gcmsSubTitleLabel.setText('')
+        if(index == 1): # Input Data
+            self.ui.chmTitleLabel.setText('Chemisty Data Entry')
+            self.ui.gcmsSubTitleLabel.setText('') 
             self.gcmsClearEnteredTestsData()
             
             temp = self.getTestsAndUnits()
@@ -249,11 +227,18 @@ class MainWindow(QMainWindow):
             self.ui.gcmsTests.addItems(temp[0])
             self.ui.gcmsUnitVal.addItems(temp[1])
         
-        if(index == 4): 
-            self.ui.chmTitleLabel.setText('CHM Tests Database') 
-            self.ui.gcmsSubTitleLabel.setText('')
-            self.loadChmDatabase(); 
+        if(index == 2): # Test Info  
+            self.ui.chmTitleLabel.setText('Chemisty Tests Information')
+            totalTests = getChmTotalTests(self.db) 
             
+            self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
+            chmLoadTestsNames(self)
+            
+        if(index == 3): # Report Info 
+            self.ui.chmTitleLabel.setText('Chemisty Reports Information')
+            self.ui.gcmsSubTitleLabel.setText('Total Reports: ') 
+
+        
     def on_stackedWidget_currentChanged(self, index):
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
@@ -267,16 +252,17 @@ class MainWindow(QMainWindow):
             
             btn.setAutoExclusive(True)
                    
-        if(index == 0): 
+        if(index == 0): # History
             self.loadReportsPage(); 
             
-        if(index == 1): 
+        if(index == 1): # 
             #self.ui.jobNumInput.setText('171981')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
             
-        if(index == 4): 
-            print('Settings baby')
+        if(index == 4): # Settings  
+            pass; 
+
          
             
         self.prev_index = (index - 1) % self.ui.stackedWidget.count()
@@ -300,18 +286,18 @@ class MainWindow(QMainWindow):
     def loadStartup(self): 
         self.setWindowTitle("Laboratory Information management System") 
         self.setStyle(QStyleFactory.create('Fusion'))
-        self.ui.LeftMenuContainerMini.hide()
         
+        self.ui.LeftMenuContainerMini.hide()
         self.showMaximized()
 
         self.activeCreation = False; 
-        self.ui.stackedWidget.setCurrentIndex(1)
-        #self.ui.settingsStack.setCurrentIndex(3)
         self.ui.reportsBtn1.setChecked(True)
          
+         #FIXME: make this better somehow 
         jobList = getAllJobNumbersList(self.db) 
         jobList_as_strings = [str(item) for item in jobList]
-         
+        
+        # Sets the completers
         completer = QCompleter(jobList_as_strings)
         completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
         completer.setMaxVisibleItems(10)
@@ -322,20 +308,23 @@ class MainWindow(QMainWindow):
         self.ui.searchLine.setPlaceholderText("Enter Job Number...")
         self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
 
-        #set the stacks to home page 
+        # Sets the stacks to home page 
         self.ui.stackedWidget.setCurrentIndex(0) 
-        self.ui.gcmsStack.setCurrentIndex(0)
         self.ui.icpStack.setCurrentIndex(0)
-        
+        self.ui.chmTabWidget.setCurrentIndex(0)
 
-
+    
+        # Sets the tab order for three widgets
+        self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
+        self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal) 
        
     def loadDatabase(self): 
+        # Set a global paths variable
         self.paths = load_pickle('data.pickle')
+        
         print('**Paths')
         for key, value in self.paths.items():
             print(key, value)
-
        
         if(isValidDatabase(self.paths['databasePath'])): 
             self.db = Database(self.paths['databasePath'])
@@ -345,21 +334,17 @@ class MainWindow(QMainWindow):
             
             databasePathTemp = openFile()
             self.db = Database(databasePathTemp)
-
-    def loadTabFunctionality(self): 
-        #self.ui.gcmsTestsSample.editingFinished.connect(self.on_tab_pressed1)
-        pass; 
         
     def on_tab_pressed1(self): 
         self.ui.gcmsTestsVal.setFocus()
     
-    
     def loadClientInfo(self): 
         print('**Applying Client Infomation ')
-        #clear the first page 
+        
+        # Clear the first page 
         self.ui.jobNumInput.setText('')
         
-        #set the header parameter 
+        # Set the header parameter 
         self.ui.jobNum.setText("W" + self.jobNum)
         self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
         self.ui.parameterHeader.setText(self.parameter); 
@@ -413,8 +398,7 @@ class MainWindow(QMainWindow):
                 results = []
 
         historyTable = self.ui.reportsTable 
-        
-        
+
         historyTable.setRowCount(len(results))
         historyTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         historyTable.doubleClicked.connect(self.on_table_double_clicked )
@@ -550,8 +534,7 @@ class MainWindow(QMainWindow):
         
         #TODO: cannot save without a something
         #TODO: make the thing lowercase 
-
-        
+        #FIXME: have proper save buttons
         errorCheck = [0,0,0]
 
         #errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
@@ -576,7 +559,7 @@ class MainWindow(QMainWindow):
             if(errorCheck[2] == 1): 
                 errorMsg += 'Please Select a Tests\n'
         
-        
+        #FIXME: move this all to the db function 
         if(symbolName != "" and elementName != ""):
             
             defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol) VALUES (?,?)'
@@ -978,7 +961,7 @@ class MainWindow(QMainWindow):
         
             self.ui.gcmsTestsValueWidget.setEnabled(True)
             #TODO: rename the widget thing
-            self.ui.widget_28.setEnabled(False)
+            self.ui.widget_29.setEnabled(False)
             self.ui.gcmsStandardValShow.setText(standards)
             self.ui.gcmsUnitValShow.setText(units)
             self.ui.gcmsTestsShow.setText(tests)  
@@ -1078,7 +1061,7 @@ class MainWindow(QMainWindow):
            
     def gcmsClearEnteredTestsData(self): 
         self.ui.gcmsTestsValueWidget.setEnabled(False)
-        self.ui.widget_28.setEnabled(True)
+        self.ui.widget_29.setEnabled(True)
             
         self.ui.gcmsStandardVal.clear()
         self.ui.gcmsUnitVal.clear()
@@ -1103,194 +1086,7 @@ class MainWindow(QMainWindow):
 
         except sqlite3.IntegrityError as e:
             print(e) 
- 
- 
-    def loadChmDatabase(self): 
-        print('[FUNCTION]: loadChmDatabase, Loading Existing Data'); 
-        
-        TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value', 'Job Num', 'Delete']
-        chmTable = self.ui.gcmsInputTable 
-
-        self.formatTable(chmTable) ;
-
-        results = loadChmTestsData(self.db) 
-        #print(results)
-        
-        self.ui.gcmsInputTable.setRowCount(len(results))
-        self.ui.gcmsInputTable.setColumnCount(len(TableHeader))
-        self.ui.gcmsInputTable.setHorizontalHeaderLabels(TableHeader)
-        
-        for i, result in enumerate(results):
-            for j in range(len(TableHeader)-1):
-                data = str(result[j]) 
-                item = QTableWidgetItem(data)
-                item.setTextAlignment(Qt.AlignCenter)
-                
-                self.ui.gcmsInputTable.setItem(i, j, item)     
-
-            button = QPushButton("Delete")
-            self.ui.gcmsInputTable.setCellWidget(i ,6, button)
-            button.clicked.connect(lambda _, row=i: self.chmTableDeleteRow(row));
-            
-    def chmTableDeleteRow(self, row): 
-        print(f'[FUNCTION]: chmTableDeleteRow, row to delete {row}')
-        
-        sampleNum = self.ui.gcmsInputTable.item(row, 0).text()
-        testsName = self.ui.gcmsInputTable.item(row, 1).text()
-        self.ui.gcmsInputTable.removeRow(row)
-        deleteChmData(self.db, sampleNum, testsName)
    
-    
-   #******************************************************************
-   #    Settings Page Options 
-   #****************************************************************** 
-    def settingsSetup(self): 
-        self.loadSettings() 
-        self.ui.SettingsTab.setCurrentIndex(0) 
-        #connect the buttons 
-        self.ui.SettingsTab.currentChanged.connect(self.settingsTab_changes)
-         
-    def settingsTab_changes(self, index):  
-
-        if(index == 0): 
-           self.loadSettings() 
-
-        if(index == 1): 
-            self.ui.authorList.clear()
-            self.clearAuthorData()
-            self.loadAuthors()
-
-
-    #TODO: have a path object that will deal with all of the other bs that I have writen here 
-    def loadSettings(self): 
-        self.ui.reportPath.setText(self.paths['reportsPath'])
-        self.ui.txtPath.setText(self.paths['TXTDirLocation'])
-        self.ui.convertPath.setText(self.paths['ispDataUploadPath'])
-        self.ui.dbPath.setText(self.paths['databasePath'])
-         
-    @pyqtSlot()
-    def on_reportsPathBtn_clicked(self): 
-        paths = load_pickle('data.pickle')
-        newLocation = getFileLocation()
-        if(newLocation != ''): 
-            paths['reportsPath'] = newLocation; 
-            save_pickle(paths)
-            self.ui.reportPath.setText(paths['reportsPath'])
-        
-    @pyqtSlot()
-    def on_txtPathBtn_clicked(self): 
-        paths = load_pickle('data.pickle')
-        newLocation = getFileLocation()
-        if(newLocation != ''): 
-            paths['TXTDirLocation'] = newLocation; 
-            save_pickle(paths)
-            self.ui.txtPath.setText(paths['TXTDirLocation'])
-    
-    @pyqtSlot() 
-    def on_convertedPathBtn_clicked(self): 
-        paths = load_pickle('data.pickle')
-        newLocation = getFileLocation() 
-        if(newLocation != ''): 
-            paths['ispDataUploadPath'] = newLocation; 
-            save_pickle(paths) 
-            self.ui.convertPath.setText(paths['ispDataUploadPath'])
-        
-    @pyqtSlot()  
-    def on_dbPathBtn_clicked(self):
-        paths = load_pickle('data.pickle')
-        newLocation = openFile()
-        if(newLocation != ''): 
-            paths['databasePath'] = newLocation; 
-            save_pickle(paths)  
-            self.ui.dbPath.setText(paths['databasePath'])
-        
-    def loadAuthors(self): 
-        authorsQuery = 'SELECT * FROM authors ORDER BY authorName ASC'
-
-        try: 
-            results = self.db.query(authorsQuery)
-            print('Loading Authors')
-            print(results)
-            for author in results: 
-                self.ui.authorList.addItem(author[0])
-            
-        except: 
-            print('Error: could not load authors')
-        
-    def clearAuthorData(self): 
-        self.ui.authorNameLine.clear()
-        self.ui.authorPostionLine.clear()
-        
-    @pyqtSlot()  
-    def on_saveAuthorBtn_clicked(self): 
-        authorName = self.ui.authorNameLine.text()
-        authorPosition = self.ui.authorPostionLine.text()
-        
-        if((authorName != None or '') and (authorPosition != None or "")): 
-            sql = 'INSERT OR REPLACE INTO authors (authorName, authorPosition) VALUES (?,?)'
-            try:
-                self.db.execute(sql, (authorName, authorPosition,) )
-                self.db.commit()
-
-            except sqlite3.IntegrityError as e:
-                print(e) 
-        
-    @pyqtSlot()  
-    def on_deleteAuthorBtn_clicked(self): 
-        deleteQuery = 'DELETE FROM authors WHERE authorName = ?' 
-        authorName = self.ui.authorList.currentItem().text() 
-        
-        try: 
-            self.db.execute(deleteQuery, (authorName,))
-            self.db.commit()
-            self.removeAuthorFromAuthorList(authorName)
-        except:
-            print("Error: Could not delete author: ", authorName)
-
-
-    def on_authorList_currentItemChanged(self, authorName):   
-        if(authorName != None):  
-            self.loadAuthorInfo(authorName.text())
-    
-    def removeAuthorFromAuthorList(self, authorName): 
-        for row in range(self.ui.authorList.count()): 
-            item = self.ui.authorList.item(row)
-            if item.text() == authorName: 
-                self.ui.authorList.takeItem(row)
-                break;         
-
-    
-    def loadAuthorInfo(self, authorName):             
-        result = getAuthorInfo(self.db, authorName) 
-        
-        if(result): 
-            self.ui.authorNameLine.setText(result[0])
-            self.ui.authorPostionLine.setText(result[1])
-        else: 
-            print("Error loading author info")
-            self.clearAuthorData()
-            self.ui.enterAuthorName.clear()
-            self.ui.authorNameLine.setText(authorName)
-            
-    
-    #add authors 
-    @pyqtSlot()  
-    def on_addAuthor_clicked(self): 
-
-        authorName = self.ui.enterAuthorName.text()
-
-        sql = "SELECT authorName FROM authors"
-        result = self.db.query(sql)
-        
-        print(result)
-        
-        if(authorName != ''): 
-            self.ui.authorList.addItem(authorName)
-            self.ui.authorNameLine.setText(authorName)
-         
-            new_item_index = self.ui.authorList.count() - 1
-            self.ui.authorList.setCurrentRow(new_item_index)
-
     
    #******************************************************************
    #    Create Report Process 
