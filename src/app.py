@@ -18,12 +18,14 @@ from modules.dbManager import *
 from modules.dbFunctions import * 
 from modules.dialogBoxes import *
 from modules.utilities import * 
+from assets import resource_rc
 
 from interface import *
 
 from pages.icp_tools import icp_load_element_data, icpLoader, icpReportHander
 from pages.chm_tools import chmLoadTestsNames, chmLoadTestsData, chmLoader, chmReportHandler, loadChmDatabase
 from pages.settingsPage import settingsSetup
+from pages.historyPage import historyPageSetup, loadReportsPage
 from widgets.widgets import * 
     
 #TODO: need to have more class objects that deal with insertion, that way we can have lazy loading isntead of constant 
@@ -41,9 +43,10 @@ class MainWindow(QMainWindow):
         self.loadCreatePage()
         self.loadStartup() 
         settingsSetup(self)
-        
+        historyPageSetup(self)
+                
         #TODO: not sure if need it 
-        self.ui.chmTabWidget.setAutoFillBackground(True)
+        #self.ui.chmTabWidget.setAutoFillBackground(True)
         
         # Connect the singals 
         self.ui.NextSection.clicked.connect(lambda: self.createReportPage())
@@ -98,30 +101,7 @@ class MainWindow(QMainWindow):
     
     def on_payment_1_textChanged(self): 
         self.clientInfo['payment'] = self.ui.payment_1.text()
-        #print(self.clientInfo)
-   
-   #******************************************************************
-   #   Reports/History Page 
-   #****************************************************************** 
-   #TODO: rename the whole section to history 
-    
-    def on_searchLine_clicked(self): 
-        print('This is being clicked')
-        self.ui.searchLine.clear()
-
-    @pyqtSlot()
-    def on_reportsSearchBtn_clicked(self): 
-        print('Searching the report database')
-
-        searchValueString = self.ui.reportsSearchLine.text()
-        print(f'Searching for Job Number: {searchValueString}')
-        
-        #try to convert to an int 
-        #TODO: if result don't work, don't clear the table 
-        self.clearReportsTable()
-        self.loadReportsPage(searchValueString)
-            
-    
+       
    #******************************************************************
    #    Menu Buttons 
    #******************************************************************  
@@ -156,35 +136,65 @@ class MainWindow(QMainWindow):
          self.ui.stackedWidget.setCurrentIndex(4)
          
    #******************************************************************
-   #    Stack Mangament 
+   #    Navigatioin Mangament 
    #****************************************************************** 
-
-
-    def on_icpBtn1_clicked(self): 
-        self.ui.icpStack.setCurrentIndex(0)
-    
-    def on_icpBtn2_clicked(self): 
-        self.ui.icpStack.setCurrentIndex(0)
-    
-    def on_icpDatabaseBtn_clicked(self): 
-        self.ui.icpStack.setCurrentIndex(1)
+   
+    def on_stackedWidget_currentChanged(self, index):
+        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
+                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
-    def on_icpElementsBtn_clicked(self): 
-        self.ui.icpStack.setCurrentIndex(2)
-       
-    def on_icpReportBtn_clicked(self): 
-        self.ui.icpStack.setCurrentIndex(3)
+        #print(btn_list)
+        #FIXME: issue that arises when the active creation setting is thing 
+        for btn in btn_list:
+            #if index in [1,2,3,4]:
+            #    btn.setAutoExclusive(False)
+            #    btn.setChecked(False)
+            
+            btn.setAutoExclusive(True)
+                   
+        if(index == 0): # History
+            self.ui.reportsHeader.setText('Reports History'); 
+            self.ui.totalReportsHeader.setText('Recently created reports')
+            loadReportsPage(self)
+            
+            
+        if(index == 1): # 
+            #self.ui.jobNumInput.setText('171981')
+            self.ui.reportType.setCurrentIndex(0)
+            self.ui.paramType.setCurrentIndex(0)
+            
+        if(index == 4): # Settings  
+            pass; 
+            
+        self.prev_index = (index - 1) % self.ui.stackedWidget.count()
+        print('prev index: ', self.prev_index)
+        #prev_widget = self.ui.stackedWidget.widget(self.prev_index)
+        #current_widget = self.ui.stackedWidget.currentWidget()
         
-    def on_icpStack_currentChanged(self, index):
+        if(self.prev_index == 5): 
+            pass; 
+            #print('Do you want to save?')
+            
+        # Access the previous and current widgets
+        # Do something with the widgets
+        #print(f"Previous widget: {prev_widget}")
+        #print(f"Current widget: {current_widget}")
+        
+    #FIXME: have a single header that is controlled by the global, instead of each having their own seperate one 
+        
+    def on_icpTabWidget_currentChanged(self, index):
         #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
         
-        if(index == 0): 
+        if(index == 0): #History 
             self.ui.icpPageTitle.setText("ICP Page")
             self.ui.icpLabel.setText("")
         
         #TODO: create a single function that loads this all to begin with isntead of having to reload this each time 
         #try lazy loading 
-        if(index == 1): 
+        if(index == 0): 
+            self.ui.icpPageTitle.setText("ICP History")
+        
+            
             columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
         
             icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
@@ -192,21 +202,23 @@ class MainWindow(QMainWindow):
             
             machine1Data = list(self.db.query(icpMachine1sql))
             #machine2Data = list(self.db.query(icpMachine2sql))
-            
+          
+            totalItems = len(machine1Data) 
+            self.ui.icpLabel.setText(f'Total Items in Database: {totalItems}')
+             
             self.updateIcpTable(machine1Data) 
         
-        if(index == 2): 
+        if(index == 1): # Elements 
             total = getTotalElements(self.db)
-            self.ui.icpPageTitle.setText("ICP Defined Elements")
+            self.ui.icpPageTitle.setText("ICP Elements Information")
             self.ui.icpLabel.setText("Total Elements: {}".format(total))
             self.loadDefinedElements()
 
-        if(index == 3): 
-            self.ui.icpPageTitle.setText("ICP Reports")
+        if(index == 2): #  Reports Info 
+            self.ui.icpPageTitle.setText("ICP Reports Information")
             self.ui.icpLabel.setText("Total Reports:") 
             self.loadReportList()
 
-                    
     def on_chmTabWidget_currentChanged(self, index): 
         print(f'CHM TAB CHANGE INDEX {index}')
         
@@ -215,7 +227,7 @@ class MainWindow(QMainWindow):
             self.ui.gcmsSubTitleLabel.setText('')
             loadChmDatabase(self);  
             
-        if(index == 1): # Input Data
+        if(index == 1): # Input Data 
             self.ui.chmTitleLabel.setText('Chemisty Data Entry')
             self.ui.gcmsSubTitleLabel.setText('') 
             self.gcmsClearEnteredTestsData()
@@ -238,46 +250,6 @@ class MainWindow(QMainWindow):
             self.ui.chmTitleLabel.setText('Chemisty Reports Information')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ') 
 
-        
-    def on_stackedWidget_currentChanged(self, index):
-        btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
-                    + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
-        
-        #print(btn_list)
-        #FIXME: issue that arises when the active creation setting is thing 
-        for btn in btn_list:
-            #if index in [1,2,3,4]:
-            #    btn.setAutoExclusive(False)
-            #    btn.setChecked(False)
-            
-            btn.setAutoExclusive(True)
-                   
-        if(index == 0): # History
-            self.loadReportsPage(); 
-            
-        if(index == 1): # 
-            #self.ui.jobNumInput.setText('171981')
-            self.ui.reportType.setCurrentIndex(0)
-            self.ui.paramType.setCurrentIndex(0)
-            
-        if(index == 4): # Settings  
-            pass; 
-
-         
-            
-        self.prev_index = (index - 1) % self.ui.stackedWidget.count()
-        print('prev index: ', self.prev_index)
-        #prev_widget = self.ui.stackedWidget.widget(self.prev_index)
-        #current_widget = self.ui.stackedWidget.currentWidget()
-        
-        if(self.prev_index == 5): 
-            pass; 
-            #print('Do you want to save?')
-            
-        # Access the previous and current widgets
-        # Do something with the widgets
-        #print(f"Previous widget: {prev_widget}")
-        #print(f"Current widget: {current_widget}")
         
    #******************************************************************
    #    Setup Loading
@@ -310,7 +282,7 @@ class MainWindow(QMainWindow):
 
         # Sets the stacks to home page 
         self.ui.stackedWidget.setCurrentIndex(0) 
-        self.ui.icpStack.setCurrentIndex(0)
+        self.ui.icpTabWidget.setCurrentIndex(0)
         self.ui.chmTabWidget.setCurrentIndex(0)
 
     
@@ -375,62 +347,10 @@ class MainWindow(QMainWindow):
         paramResults = sorted(getReportTypeList(self.db))
         paramResults.insert(0, "")
         self.ui.paramType.addItems(paramResults)
-            
-    def loadReportsPage(self, searchValue=None): 
-        print('[FUNCTION]: loadReportsPage')
-        print(f'Search Value: {searchValue}')
-        
-        #TODO: could move this to the section when moving to the page 
-        self.ui.reportsHeader.setText('Reports History'); 
-        self.ui.totalReportsHeader.setText('Recently created reports')
-        
-        if(searchValue): 
-            try: 
-                results = searchJobsList(self.db, searchValue)
-            except sqlite3.Error as e:
-                print(f"An error occurred: {e}")
-                results = []
-        else: 
-            try: 
-                results = getAllJobsList(self.db);
-            except sqlite3.Error as e:
-                print(f"An error occurred: {e}")
-                results = []
-
-        historyTable = self.ui.reportsTable 
-
-        historyTable.setRowCount(len(results))
-        historyTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        historyTable.doubleClicked.connect(self.on_table_double_clicked )
-
-        self.formatTable(historyTable)
-        
-        for row, current in enumerate(results): 
-            jobNumber = str(current[1])
-            reportType = str(current[2])
-            parameterType = str(current[3])
-            dilutionFactor = str(current[4])
-            creationDate = str(current[5])
-            
-            self.setTableItem(row, 0, jobNumber) 
-            self.setTableItem(row, 1, reportType)
-            self.setTableItem(row, 2, parameterType)
-            self.setTableItem(row, 3, dilutionFactor)
-            self.setTableItem(row, 4, creationDate) 
-             
-            button = QPushButton("Open")
-            button.clicked.connect(lambda _, row=row: self.openExistingReport(row));
-            historyTable.setCellWidget(row, 5, button)
     
-
-    def setTableItem(self, row, column, text, alignment=Qt.AlignCenter): 
-        item = QTableWidgetItem()
-        item.setTextAlignment(alignment)
-        item.setText(text)
-        self.ui.reportsTable.setItem(row, column, item)
-        
+    
+    # TODO: make this more a general application  
     def formatTable(self, table): 
-
         rowHeight = 25; 
         
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
@@ -439,42 +359,6 @@ class MainWindow(QMainWindow):
 
         #Disable editing for the entire table 
         table.setEditTriggers(QTableWidget.NoEditTriggers)
-
-    def addTableItem(self, table, item): 
-        pass; 
-        
-    def clearReportsTable(self): 
-        self.ui.reportsTable.clearContents()
-        self.ui.reportsTable.setRowCount(0)
-
-    def on_table_double_clicked(self, index):
-    # Open the row data
-        row = index.row()
-        print(f"Double clicked on row {row}")
-        
-    #TODO: save the user data that they have entered? that might be a pain in the ass that will get done later
-    def openExistingReport(self, row): 
-        print('[FUNCTION]: openExistingReport')
-        rowData = []
-        
-        for i in range(4): 
-            item =self.ui.reportsTable.item(row, i) 
-            if(item): 
-                rowData.append(item.text()) 
-                
-        print(rowData) 
-      
-        popup = openJobDialog(rowData[0], self)
-        result = popup.exec_()
-        
-        if result == QDialog.Accepted:
-            print('Opening Existing Report')
-            isExistingReport = True 
-            self.createReportPage(rowData[0], rowData[1], rowData[2], rowData[3], isExistingReport) 
-            
-        else:
-            print("Not Opening Existing Report'")
-        
         
    #******************************************************************
    #    Define Elements? 

@@ -21,8 +21,11 @@ from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests
 #****************************************************************** 
 
 def chemistySetup(self): 
+    
+    
     pass; 
 
+    # Connect signals 
     
     
 
@@ -317,7 +320,7 @@ def chmTableDeleteRow(self, row):
 #TODO: if the txt name changes update the listName 
 #TODO: keep track of the currentIndex when first getting it 
 
-def gcmsGetListValues(self): 
+def chmGetTestsValues(self): 
     values = []
     
     for index in range(self.ui.gcmsDefinedtests.count()):
@@ -327,7 +330,7 @@ def gcmsGetListValues(self):
     return values; 
 
 
-def gcmsClearDefinedTestsValues(self): 
+def chmClearDefinedTestsValues(self): 
     self.ui.gcmsDisplayName.clear()
     self.ui.gcmsTxtName.clear()
     self.ui.gcmsUnitType.clear()
@@ -337,16 +340,16 @@ def gcmsClearDefinedTestsValues(self):
 
 @pyqtSlot() 
 def on_gcmsAddTestsBtn_clicked(self): 
-    existingTests = self.gcmsGetListValues()        
+    existingTests = self.chmGetTestsValues()        
     currentText = self.ui.testsInputLabel.text()
     
     if(currentText != '' and currentText not in existingTests): 
         #clear values 
-        self.gcmsClearDefinedTestsValues()
+        self.chmClearDefinedTestsValues()
         self.ui.testsInputLabel.clear()
         self.ui.gcmsDefinedtests.addItem(currentText)
 
-        totalItems = len(self.gcmsGetListValues())
+        totalItems = len(self.chmGetTestsValues())
         self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
         self.ui.gcmsTxtName.setText(currentText)
         
@@ -391,7 +394,7 @@ def on_gcmsDeleteTestBtn_clicked(self):
         self.ui.gcmsDefinedtests.takeItem(currentItem)
         self.ui.gcmsDefinedtests.setCurrentItem(None)
         
-        self.gcmsClearDefinedTestsValues()
+        self.chmClearDefinedTestsValues()
     
     except: 
         print('Error: could not delete item')
