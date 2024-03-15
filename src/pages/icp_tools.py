@@ -1,13 +1,144 @@
-from PyQt5 import QtWidgets
 
-from modules.dbManager import * 
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSlot
+
+
 from modules.dbFunctions import *
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
 
-from modules.excel.icpExcel import createIcpReport
+#******************************************************************
+#    icp Setup 
+#****************************************************************** 
+#TODO: deal with the side panels 
+def icpSetup(self): 
+    
+    # load the icp database inital setup 
+    # self.updateIcpTable(machine1Data) 
+    
+    # Connect the signals/buttons 
+    self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.db))
+    self.ui.icpSearchBtn.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
+    
+    self.ui.addElementBtn.clicked.connect(lambda: on_addElementBtn_clicked(self))
+    self.ui.saveCompBtn.clicked.connect(lambda: on_saveCompBtn_clicked(self)) 
+    self.ui.deleteCompBtn.clicked.connect(lambda: on_deleteCompBtn_clicked(self))
+
+    self.ui.addReportBtn.clicked.connect(lambda: on_addReportBtn_clicked(self))
+    self.ui.definedElements.clicked.connect(lambda: on_definedElements_clicked(self))
+    self.ui.definedElements.currentRowChanged.connect(lambda: on_definedElements_currentRowChanged(self))
+
+    self.ui.reportsList.clicked.connect(lambda: on_reportsList_clicked(self))
+    self.ui.saveFooterBtn.clicked.connect(lambda: on_saveFooterBtn_clicked(self))
+    self.ui.deleteFooterBtn.clicked.connect(lambda: on_deleteFooterBtn_clicked(self))
+
+
+    #on_reportlist_doubleClicked
+    self.ui.reportsList.doubleClicked.connect(lambda: on_reportlist_doubleClicked())
+    self.ui.reportTypeDropdown.activated.connect(lambda: loadElementLimits(self)) 
+
+def loadReportList(self): 
+    results = loadIcpReportList(self.db)
+    self.ui.reportsList.clear()
+    
+    if(results): 
+        for item in results: 
+            self.ui.reportsList.addItem(item[0])    
+
+            
+def loadDefinedElements(self): 
+    self.ui.reportTypeDropdown.clear()
+    self.ui.gcmsDefinedtests.clear()
+    self.ui.definedElements.clear()
+
+    elements = getIcpElements(self.db)      
+    
+    reportType = getReportTypeList(self.db)
+    self.ui.reportTypeDropdown.addItems(reportType)     
+    
+    for element in elements: 
+        self.ui.definedElements.addItem(element[0])
+
+    clearElementInfo(self)
+    
+
+#******************************************************************
+#    ICP History 
+#****************************************************************** 
+
+@pyqtSlot()
+def on_icpUploadBtn_clicked(database): 
+    fileLocation = openFile()
+    print(fileLocation)
+    icp_upload(fileLocation, database) 
+
+
+@pyqtSlot()
+def on_icpSearchBtn_clicked(self): 
+    jobNum = self.ui.icpSearchInput.text() 
+    inquery = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 WHERE sampleName LIKE ?'
+    
+    if(jobNum == ''):
+        pass; 
+    else: 
+        machine1Data = list(self.db.query(inquery, ('%' + jobNum + '%',)))
+        
+        #TODO: create a message button, streamline the process 
+        #TODO: check to make sure not duplicate as well 
+        if not machine1Data: 
+            msgBox = QMessageBox()  
+            msgBox.setText("No Search Results");
+            msgBox.setInformativeText("No search results for given job number");
+            msgBox.setStandardButtons(QMessageBox.Ok);
+            x = msgBox.exec_()  # this will show our messagebox
+            
+        else: 
+            updateIcpTable(self, machine1Data)
+
+            
+def updateIcpTable(self, result): 
+    textLabelUpdate = 'Total Search Results: ' + str(len(result))
+
+    self.ui.icpLabel.setText(textLabelUpdate)
+    self.ui.icpTable.setRowCount(len(result)) 
+    self.ui.icpTable.setColumnWidth(3, 600)
+    
+    for i, data in enumerate(result):
+        #loops throught items in the order sql requested 
+        for j in range(len(data)): 
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(str(data[j]))
+            item.setTextAlignment(Qt.AlignHCenter)
+            self.ui.icpTable.setItem(i,j,item) 
+    
+    self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+
+#******************************************************************
+#    ICP Defined Elements  
+#****************************************************************** 
+
+def loadElementLimits(self): 
+    print('[Function]: loadElementLimits')
+    reportType = self.ui.reportTypeDropdown.currentText()
+    elementName = self.ui.elementNameinput.text().lower()
+    
+    try: 
+        limitResults = loadIcpLimit(self.db, elementName, reportType)
+        
+        if(limitResults is None): 
+            self.clearElementLimits()
+        else: 
+            #TODO: define what the limit values are equal to 
+            self.ui.lowerLimit.setText(str(limitResults[2]))
+            self.ui.upperLimit.setText(str(limitResults[3]))
+            self.ui.unitType.setText(limitResults[5])
+            self.ui.RightSideComment.setPlainText(limitResults[4]) 
+    except: 
+        print('Error on loadElementLimits: Could not load in limits ')
+
 
 def icp_load_element_data(self): 
     print('[FUNCTION]: icp_load_element_data')
@@ -29,290 +160,248 @@ def icp_load_element_data(self):
             self.ui.symbolInput.setText(elementResult[1])
             
             if(limitResults is None): 
-                self.clearElementLimits()
+                clearElementLimits(self)
             else: 
                 self.ui.lowerLimit.setText(str(limitResults[2]))
                 self.ui.upperLimit.setText(str(limitResults[3]))
                 self.ui.unitType.setText(limitResults[5])
                 self.ui.RightSideComment.setPlainText(limitResults[4]) 
         else: 
-            self.clearElementInfo()
+            clearElementInfo(self)
             self.ui.elementNameinput.setText(selectedElementText)
     else:
         print("No item selected.") 
-        
 
-def icpReportHander(self, tests, totalSamples): 
-    print('[FUNCTION]: icpReportHander(self, tests, totalSamples)')
-    print(tests)
-    print(totalSamples)
-    #FIXME: adjust based on the sample information
-    #FIXME: adjust the limits 
-    #FIXME: adjust the unit amount  
-    
-    initalColumns = 4; 
-    totalTests = len(tests)
-    additonalRows = 2 
-    sampleData = {}
-    unitType = []
-    
-    #FIXME: have something determine the lower values of the things 
-    for col in range(initalColumns, totalSamples + initalColumns): 
-        print(col)
-        currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
-        jobValues = []
-        for row in range(totalTests + additonalRows): 
-            try: 
-                currentItem = self.ui.dataTable.item(row, col).text()
-                jobValues.append(currentItem)
-            except: 
-                jobValues.append('ND')
-                
-        sampleData[currentJob] = jobValues
-        #print(currentJob, sampleData[currentJob])
+@pyqtSlot()
+def on_addElementBtn_clicked(self): 
+    print(f'[EVENT]: on_addElementBtn_clicked')
+    #TODO: makeing sure not inserting duplicates 
+    currentText = self.ui.elementInput.text()
+    if(currentText != ''): 
+        print(currentText)
+        self.ui.definedElements.addItem(currentText)
+        self.ui.elementInput.clear()
+    else: 
+        print('User entered a blank value, please enter a valid value')
         
-    for i in range(totalTests): 
+@pyqtSlot()
+def on_saveCompBtn_clicked(self): 
+    #TODO: remove white spaces just in case 
+    #TODO: check if they are valid limits
+    symbolName = self.ui.symbolInput.text().lower().strip()
+    elementName = self.ui.elementNameinput.text().lower().strip()
+    
+    reportType = self.ui.reportTypeDropdown.currentText()
+    lowerLimit = self.ui.lowerLimit.text()
+    upperLimit = self.ui.upperLimit.text()
+    unitType = self.ui.unitType.text().strip()
+    
+    comment = self.ui.RightSideComment.toPlainText() 
+    
+    print(symbolName, elementName)
+    
+    #TODO: cannot save without a something
+    #TODO: make the thing lowercase 
+    #FIXME: have proper save buttons
+    errorCheck = [0,0,0]
+
+    #errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
+    #errorCheck[1] = 0 if units != '' else 1; 
+    #errorCheck[2] = 0 if tests != '' else 1; 
+    
+    if(sum(errorCheck) == 0):
+        pass; 
+        #self.ui.gcmsTestsValueWidget.setEnabled(True)
+        #self.ui.widget_28.setEnabled(False)
+        #self.ui.gcmsStandardValShow.setText(standards)
+        #self.ui.gcmsUnitValShow.setText(units)
+        #self.ui.gcmsTestsShow.setText(tests)  
+    else: 
+        errorTitle = 'Cannot Proceed with CHM Process'
+        errorMsg = ''
+        
+        if(errorCheck[0] == 1): 
+            errorMsg += 'Please Enter a Valid Standard Number\n'
+        if(errorCheck[1] == 1): 
+            errorMsg += 'Please Select a Unit\n'
+        if(errorCheck[2] == 1): 
+            errorMsg += 'Please Select a Tests\n'
+    
+    #FIXME: move this all to the db function 
+    if(symbolName != "" and elementName != ""):
+        
+        defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol) VALUES (?,?)'
+        #definedLimitsQuery = 'INSERT OR REPLACE INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)'
+        
+        loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'  
+        self.db.execute(loadLimits, (elementName, reportType))
+        limitResults = self.db.fetchone()
+        
+        insertLimit = 'INSERT INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)' 
+        updateLimit = 'UPDATE icpLimits SET lowerLimit = ?, maxLimit = ?, comments =?, units =? WHERE reportType=? AND element=?' 
+
+        try:
+            self.db.execute(defineElementQuery, (elementName, symbolName) )
+            
+            if(limitResults): 
+                self.db.execute(updateLimit, (lowerLimit, upperLimit, comment, unitType, reportType, elementName))
+            else: 
+                self.db.execute(insertLimit, (reportType, elementName, lowerLimit, upperLimit, comment, unitType))
+            
+            self.db.commit()
+
+        except sqlite3.IntegrityError as e:
+            print(e)
+
+@pyqtSlot()
+def on_deleteCompBtn_clicked(self):
+    #TODO: are you sure you wanted to delete this time popup
+    #TODO: error when deleting nothing
+    print("Deleting the componenet")
+
+    elementName = self.ui.elementNameinput.text().lower()
+    print(f'Element Name: {elementName}')
+    
+    deleteQuery = 'DELETE FROM icpElements WHERE element = ?'
+    
+    try: 
+        deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
+        self.db.execute(deleteQuery, (elementName,))
+        self.db.commit()
+
+        currentItem = self.ui.definedElements.currentRow()
+        self.ui.definedElements.takeItem(currentItem)
+        self.ui.definedElements.setCurrentItem(None)
+        clearElementInfo(self)
+    
+    except: 
+        print('Error: could not delete item')
+    
+
+def on_definedElements_clicked(self):
+    try:
+        icp_load_element_data(self);
+    except: 
+        print('Error: Could not loaded the defined element data')
+
+        
+def on_definedElements_currentRowChanged(self):
+    try:
+        icp_load_element_data(self);
+    except: 
+        print('Error: Could not loaded the defined element data')
+    
+        
+def clearElementInfo(self): 
+    self.ui.symbolInput.clear()
+    self.ui.elementNameinput.clear()
+    
+    self.ui.lowerLimit.clear()
+    self.ui.upperLimit.clear()
+    self.ui.unitType.clear()
+    self.ui.RightSideComment.clear()
+    
+def clearElementLimits(self): 
+    self.ui.lowerLimit.clear()
+    self.ui.upperLimit.clear()
+    self.ui.unitType.clear()
+    self.ui.RightSideComment.clear()
+
+#******************************************************************
+#    ICP Defined Reports   
+#****************************************************************** 
+
+@pyqtSlot()
+def on_addReportBtn_clicked(self): 
+    reportText = self.ui.reportNameInput.text()
+    
+    if(reportText != ''): 
+        createReportquerry = 'INSERT INTO icpReportType (reportType) values (?)'
+        try:
+            self.db.execute(createReportquerry, (reportText,) )
+            self.db.commit()
+            self.ui.reportsList.addItem(reportText)
+            self.ui.reportNameInput.setText("")
+        except sqlite3.IntegrityError as e:
+            print(e)
+
+    else: 
+        print("Error No Report Name")
+
+@pyqtSlot() 
+def on_saveFooterBtn_clicked(self):        
+    saveComment = self.ui.footerComments.toPlainText()
+    reportType = self.ui.reportsList.currentItem()
+            
+    if(saveComment != ''):            
+        commentLists = saveComment.split('\n')
+        list_binary = pickle.dumps(commentLists)
+                    
         try: 
-            currentItem = self.ui.dataTable.item(i, 2).text()
-            unitType.append(currentItem)
+            updateFooterCommentQuery = 'UPDATE icpReportType SET footerComment = ? WHERE reportType = ?'
+            self.db.execute(updateFooterCommentQuery, (list_binary, reportType.text()))
+            self.db.commit()
         except: 
-            unitType.append('')
-    
-    elementsWithLimits = getElementLimits(self.db); 
-    #print(elementsWithLimits)    
+            print("Error: updating footer not working")            
+    else: 
+        print('Nothing is the same')
 
-    #TODO: have in own function 
-    limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
-    commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
-    limits = self.db.query(limitQuery, (self.parameter,))
+@pyqtSlot() 
+def on_deleteFooterBtn_clicked(self): 
+    reportType = self.ui.icpReportNameLabel.text()
+    print(reportType)
     
-    self.db.execute(commentQuery, (self.parameter,))
-    commentResults = self.db.fetchone()
+    deleteQuery = 'DELETE FROM icpReportType WHERE reportType = ?'
+    
+    if(reportType != ""): 
+        try: 
+            self.db.execute(deleteQuery, (reportType, ))
+            self.db.commit()
+            clearFooterReportContent(self); 
 
-    footerComments = ''
-    
-    if(commentResults[0]):
-        footerComments = pickle.loads(commentResults[0])
-        footerList = '\n'.join(footerComments)
-        footerComments = footerList.split('\n')
-
-
-    print('ICP HANDLER')
-    print(sampleData)
-    print(limits)
-    #print(self.reportType)
-    #print(footerComment)
-    print('--------')
-
-    #load the footer comment 
-    #TODO: can just pass the self and remove some of the unessary info 
-    createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
-
-    
-#TODO: have a helper change the hardness values when cal and mg values change 
-#TODO: combine both the datasets;
-#TODO: does this effect hardness and also what about the new values we enter in 
-def icpLoader(self): 
-    print('[FUNCTION]: icpLoader')
-    print('***Loading ')
-    
-    columnNames = [
-        'Element Name', 
-        'Element symbol',
-        'Unit Value', 
-        'distal factor'
-    ]
-    
-    addtionalRows = ['pH', 'Hardness']
-    initalColumns = len(columnNames)
-     
-    self.loadClientInfo()
-    
-    #check if haas data to load into the file location 
-    sql1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
-    sql2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
-    
-    sampleData = list(self.db.query(sql1, (self.jobNum,)))
-    sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
-    
-    queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
-    
-    elements = getIcpElementsList(self.db) 
-    elementNames = [t[0] for t in elements]
-    
-    print(elementNames)
-    limitResults = self.db.query(queryUnits, (self.parameter,)) 
-    elementUnitValues = {t[0]: t[1] for t in limitResults} 
-    
-    totalRows = len(elements) + len(addtionalRows)
-    
-    selectedSampleNames = []
-    
-    for item in sampleData:
-        selectedSampleNames.append(item[0])
-    
-
-    for item in sampleData2: 
-        if(item[0] not in selectedSampleNames): 
-            selectedSampleNames.append(item[0]) 
-    
-    totalSamples = len(selectedSampleNames)     
-    print('SelectedSampleItems: ', selectedSampleNames)    
-    
-    #create the sample names based on that         
-    for i, (key, value) in enumerate(self.sampleNames.items()):
-        
-        if(key in selectedSampleNames):
-            print('active:', key)
-            item = SampleNameWidget(key, value)
-            self.ui.formLayout_5.addRow(item)
-            item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
-    
-    #self.ui.stackedWidget.currentChanged.connect(lambda: self.removeWidgets())     
-    self.ui.stackedWidget.currentChanged.connect(self.deleteAllSampleWidgets)
-
-
-    self.ui.dataTable.setRowCount(totalRows)
-    self.ui.dataTable.setColumnCount(initalColumns + len(selectedSampleNames))
-    self.ui.dataTable.horizontalHeader().setVisible(True)
-    self.ui.dataTable.verticalHeader().setVisible(True)
-
-    #inital columns 
-    for i in range(initalColumns): 
-        item = QtWidgets.QTableWidgetItem()
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
-        item2 = self.ui.dataTable.horizontalHeaderItem(i)
-        item2.setText(columnNames[i])
-    
-    #set the sampleNames 
-    for i , (key) in enumerate(selectedSampleNames, start=initalColumns):
-        item = QtWidgets.QTableWidgetItem()
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
-        item2 = self.ui.dataTable.horizontalHeaderItem(i)
-        item2.setText(key)
-    
-    for i, element in enumerate(elements): 
-        elementName = element[0]
-        elementSymbol = element[1]
-        
-        elementNameCol = QtWidgets.QTableWidgetItem() 
-        elementNameCol.setText(elementName.capitalize()) 
-        self.ui.dataTable.setItem(i, 0, elementNameCol)
+            item = self.ui.reportsList.currentRow(); 
             
-        elementSymbolCol = QtWidgets.QTableWidgetItem()
-        elementSymbolCol.setText(elementSymbol.capitalize())
-        self.ui.dataTable.setItem(i, 1, elementSymbolCol) 
-        
-        unitTypeCol = QtWidgets.QTableWidgetItem() 
-        if(elementName in elementUnitValues):
-            unitTypeCol.setText(elementUnitValues[elementName])
-        else: 
-            unitTypeCol.setText('')
+            if(item != -1): 
+                self.ui.reportsList.takeItem(item)
             
-        self.ui.dataTable.setItem(i, 2, unitTypeCol)
-        
-        item4 = QtWidgets.QTableWidgetItem()
-        if(self.dilution == ''):
-            distalFactorDefault = '1'           
-            item4.setText(distalFactorDefault)
-        else: 
-            item4.setText(str(self.dilution))
-            
-        self.ui.dataTable.setItem(i, 3, item4) 
-        
+        except: 
+            print("Error on_deleteFooterBtn_clicked: Deleting Report Type")
 
-    for i, value in enumerate(addtionalRows): 
-        postion = totalRows - i - 1; 
-        elementName = QtWidgets.QTableWidgetItem()  
-        elementName.setText(value)
-        self.ui.dataTable.setItem(postion ,0 , elementName)
-
-        symbolName = QtWidgets.QTableWidgetItem()
-        unitValue = QtWidgets.QTableWidgetItem()
-        
-        if(value == 'Hardness'): 
-            symbolName.setText("CaC0₃")
-            unitValue.setText('ug/L')
             
-            self.ui.dataTable.setItem(postion, 1, symbolName) 
-            self.ui.dataTable.setItem(postion, 2, unitValue) 
-        else: 
-            symbolName.setText("")
-            unitValue.setText('unit') 
-
-            self.ui.dataTable.setItem(postion, 1, symbolName) 
-            self.ui.dataTable.setItem(postion, 2, unitValue) 
-            
+def on_reportsList_clicked(self): 
+    reportType = self.ui.reportsList.currentItem().text()
+    self.ui.footerComments.setText(None)
+    self.ui.icpReportNameLabel.setText(reportType) 
     
-    machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
-    machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
+    try:
+        result = loadIcpFooterComment(self.db, reportType)
+        list_binary = result[0]
+        
+        #TODO: what the hell is this function even doing? 
+        if(list_binary): 
+            commentList = pickle.loads(list_binary)
+            text = '\n'.join(commentList)
+            self.ui.footerComments.insertPlainText(text)
+            
+    except:
+        print("Error: Couldn't load comment") 
+
     
-    print('***Element Values')
-    for i in range(len(elements)): 
-        item = self.ui.dataTable.item(i, 1)
-        
-        if(item != None): 
-            symbol = item.text()
-            for j, sample in enumerate(selectedSampleNames): 
-                print(f'*Sample: {sample}')
-                item = QtWidgets.QTableWidgetItem(); 
-                
-                if sample in machine1 and symbol in machine1[sample]: 
-                    machine1Val = machine1[sample][symbol] 
-                    print(f'Machine 1: {symbol} {machine1Val}')
-                    
-                    if(is_float(machine1Val) and self.dilution != 1 ): 
-                        temp = float(machine1Val)
-                        temp = temp * float(self.dilution)
-                        temp = round(temp, 3)
-                        item.setText(str(temp))
-                    else: 
-                        item.setText(machine1Val)
-            
-                if sample in machine2 and symbol in machine2[sample]: 
-                    machine2Val = machine2[sample][symbol] 
-                    print(f'Machine 2: {symbol} {machine2Val}')
-                    
-                    if(is_float(machine2Val) and self.dilution != 1): 
-                        temp = float(machine2Val)
-                        temp = temp * float(self.dilution)
-                        temp = round(temp, 3)
-                        item.setText(str(temp))
-                    else: 
-                        machine2Val = round(machine2Val, 3 )
-                        item.setText(str(machine2Val))
-                
-                sampleCol = j + len(columnNames)
-                self.ui.dataTable.setItem(i,sampleCol, item)
+def clearFooterReportContent(self): 
+    self.ui.icpReportNameLabel.setText("")
+    self.ui.footerComments.clear()
+    
 
 
-    print('***Hardness Calculations')
-    for j, sample in enumerate(selectedSampleNames):   
-        print(f'*Sample: {sample}')
-        item = QtWidgets.QTableWidgetItem();  
-        
-        if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
-            calcium = machine1[sample]['Ca'] 
-            magnesium = machine1[sample]['Mg'] 
-            result = hardnessCalc(calcium, magnesium, self.dilution)
-
-            item.setText(str(result))
-            sampleCol = j + len(columnNames)
-            
-            self.ui.dataTable.setItem(33, sampleCol, item)
-
-            print('calcium: ', calcium)
-            print('magnesium: ', magnesium)
-            print('Result: ', result)
-            
-    column_width = self.ui.dataTable.columnWidth(2)
-    padding = 10
-    total_width = column_width + padding
-    self.ui.dataTable.setColumnWidth(2, total_width)    
-
-    self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
+#******************************************************************
+#    ICP Classes  
+#****************************************************************** 
 
 
-def calculateHardness(self): 
-    pass; 
+    
+
+
+
+def on_reportlist_doubleClicked(): 
+    print('Something is being selected')
+    #selected_item = self.ui.reportsList.currentItem()

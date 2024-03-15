@@ -1,10 +1,9 @@
-from modules.dbManager import * 
-from modules.constants import *
-from modules.utilities import *
-from widgets.widgets import *
+
+
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QDir, pyqtSignal 
+from PyQt5.uic import loadUi 
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
@@ -14,6 +13,9 @@ from PyQt5.QtWidgets import (
 
 from modules.excel.chmExcel import createChmReport
 from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests 
+from modules.constants import *
+from modules.utilities import *
+from widgets.widgets import *
 
 
 #******************************************************************
@@ -22,12 +24,21 @@ from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests
 
 def chemistySetup(self): 
     
-    
-    pass; 
 
-    # Connect signals 
+    # Connect Signal/Buttons 
+    self.ui.gcmsAddTestsBtn.clicked.connect(lambda: on_chmAddTestsBtn_clicked(self))
+    self.ui.gcmsSaveTestBtn.clicked.connect(lambda: on_chmSaveTestBtn_clicked(self))
+    self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))
+    self.ui.gcmsDefinedtests.clicked.connect(lambda: on_chmDefinedtests_clicked(self))
+        
+    self.ui.gcmsDefinedtests.currentRowChanged.connect(lambda: on_chmDefinedtests_currentRowChanged(self)) 
     
+    # CHM input data signals
+    self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
+    self.ui.gcmsProceedBtn.clicked.connect(lambda: on_gcmsProceedBtn_clicked(self))
+    self.ui.gcmsAddTestsBtn_2.clicked.connect(lambda: on_gcmsAddTestsBtn_2_clicked(self))
     
+
 
 def chmLoader(self): 
     #TODO: scan in the TXT Tests, scan in from Defined Tests too 
@@ -246,13 +257,13 @@ def chmLoadTestsData(self):
         except: 
             #item is not in the database yet 
             print('Error: selected Text was None') 
-            self.gcmsClearDefinedTestsValues()
+            chmClearDefinedTestsValues(self)
             self.ui.gcmsTxtName.setText(selectedTests.text())
             
             
 def chmLoadTestsNames(self): 
     
-    self.gcmsClearDefinedTestsValues(); 
+    chmClearDefinedTestsValues(self); 
     self.ui.gcmsDefinedtests.clear()
     self.ui.testsInputLabel.clear()
 
@@ -263,6 +274,14 @@ def chmLoadTestsNames(self):
     
     for test in testNames: 
         self.ui.gcmsDefinedtests.addItem(test[0])
+
+def chmClearDefinedTestsValues(self): 
+    self.ui.gcmsDisplayName.clear()
+    self.ui.gcmsTxtName.clear()
+    self.ui.gcmsUnitType.clear()
+    self.ui.gcmsRefValue.clear()
+    self.ui.gcmsComment.clear() 
+        
         
         
 #******************************************************************
@@ -285,6 +304,10 @@ def loadChmDatabase(self):
     chmTable.setColumnCount(len(TableHeader))
     chmTable.setHorizontalHeaderLabels(TableHeader)
     
+    # hide the vertical rows 
+    chmTable.verticalHeader().setVisible(False)
+    
+    
     for i, result in enumerate(results):
         for j in range(len(TableHeader)-1):
             data = str(result[j]) 
@@ -293,9 +316,11 @@ def loadChmDatabase(self):
             
             chmTable.setItem(i, j, item)     
 
-        button = QPushButton("Delete")
-        chmTable.setCellWidget(i ,6, button)
-        button.clicked.connect(lambda _, row=i: chmTableDeleteRow(self, row));
+        #TODO: add the edit button 
+        deleteBtn = QPushButton("Delete")
+        editbtn = QPushButton('Edit')
+        chmTable.setCellWidget(i ,6, deleteBtn)
+        deleteBtn.clicked.connect(lambda _, row=i: chmTableDeleteRow(self, row));
         
 def chmTableDeleteRow(self, row): 
     print(f'[FUNCTION]: chmTableDeleteRow, row to delete {row}')
@@ -311,15 +336,179 @@ def chmTableDeleteRow(self, row):
 #******************************************************************
 #    Chemisty Input Data
 #****************************************************************** 
+#TODO: have error handling for duplicates 
+#TODO: takes in the values from the 
+#TODO: connect from the defined values in gcms Defined Tests Page
+#TODO: make sure to add a date for the table so we can sort it by the most recent date
+#TODO: duplication error
+#TODO: set defaults 
+
+def on_gcmsTests_activated(self, index): 
+    if(index in self.chmParameters): 
+        unitVal = self.chmParameters[index]
+        print(unitVal) 
+
+        if(unitVal == ''):
+            print("nothing") 
+            self.ui.gcmsUnitVal.setCurrentIndex(0); 
+            
+        else: 
+            print("something else")
+            index = self.ui.gcmsUnitVal.findText(unitVal) 
+            print(index)
+            
+            self.ui.gcmsUnitVal.setCurrentIndex(index)
+            
+
+@pyqtSlot()    
+def on_gcmsProceedBtn_clicked(self):            
+    standards = self.ui.gcmsStandardVal.text().strip()
+    units = self.ui.gcmsUnitVal.currentText()
+    tests = self.ui.gcmsTests.currentText()
+
+    errorCheck = [0,0,0]
+
+    errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
+    errorCheck[1] = 0 if units != '' else 1; 
+    errorCheck[2] = 0 if tests != '' else 1; 
+    
+    if(sum(errorCheck) == 0):
+    
+        self.ui.gcmsTestsValueWidget.setEnabled(True)
+        #TODO: rename the widget thing
+        self.ui.widget_29.setEnabled(False)
+        self.ui.gcmsStandardValShow.setText(standards)
+        self.ui.gcmsUnitValShow.setText(units)
+        self.ui.gcmsTestsShow.setText(tests)  
+    else: 
+        errorTitle = 'Cannot Proceed with CHM Process'
+        errorMsg = ''
+        
+        if(errorCheck[0] == 1): 
+            errorMsg += 'Please Enter a Valid Standard Number\n'
+        if(errorCheck[1] == 1): 
+            errorMsg += 'Please Select a Unit\n'
+        if(errorCheck[2] == 1): 
+            errorMsg += 'Please Select a Tests\n'
+            
+        showErrorDialog(self, errorTitle, errorMsg)
+        
+
+@pyqtSlot()   
+def on_gcmsAddTestsBtn_2_clicked(self): 
+    standards = self.ui.gcmsStandardValShow.text().strip()
+    units = self.ui.gcmsUnitValShow.text().strip()
+    testName = self.ui.gcmsTestsShow.text().strip()  
+    
+    testNum = self.ui.gcmsTestsJobNum.text().strip()
+    sampleNum = self.ui.gcmsTestsSample.text().strip()
+    sampleVal = self.ui.gcmsTestsVal.text().strip()
+    
+    errorCheck = [0,0,0]
+    
+    errorCheck[0] = 0 if (testNum != '' and is_real_number(testNum)) else 1; 
+    errorCheck[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1; 
+    errorCheck[2] = 0 if sampleVal != '' else 1; 
+            
+    if(sum(errorCheck) == 0): 
+        sampleNum = testNum + '-' + sampleNum; 
+        
+        #TODO: move to own function 
+        checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?)'
+        self.db.execute(checkInquery, (sampleNum, testName))
+        result = self.db.fetchone()[0]
+        
+        if(result == 1): 
+            #TODO: message box in own function 
+            msgBox = QMessageBox()  
+            msgBox.setText("Duplicate Sample");
+            duplicateMsg = "Would you like to overwrite existing sample " + str(sampleNum) + " ?"
+            msgBox.setInformativeText(duplicateMsg);
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
+            msgBox.setDefaultButton(QMessageBox.Yes);
+            x = msgBox.exec_()
+
+            if(x == QMessageBox.Yes): 
+                addToChmTestsData(self.db, sampleNum, testName, sampleVal, standards, units, testNum)
+                
+                matching_items = self.ui.gcmsTestsLists.findItems(sampleNum, Qt.MatchExactly) 
+                if not matching_items: 
+                    self.ui.gcmsTestsLists.addItem(sampleNum)
+                
+                chmClearSampleJob(self) 
+                
+            if(x == QMessageBox.No):
+                chmClearSampleJob(self) 
+                
+            if(x == QMessageBox.Cancel):
+                pass 
+            
+        else: 
+            addToChmTestsData(self.db, sampleNum, testName, sampleVal, standards, units, testNum)
+            self.ui.gcmsTestsLists.addItem(sampleNum)
+            chmClearSampleJob(self) 
+            
+            
+    else: 
+        errorTitle = 'Cannot add Tests '
+        errorMsg = ''
+        
+        if(errorCheck[0] == 1): 
+            errorMsg += 'Please Enter a Valid Job Number\n'
+
+        if(errorCheck[1] == 1): 
+            errorMsg += 'Please Enter a Valid Sample Number\n'
+            
+        if(errorCheck[2] == 1): 
+            errorMsg += 'Please Enter a Valid Sample Value \n'
+        
+        showErrorDialog(self, errorTitle, errorMsg)
+
+        
+def chmClearSampleJob(self): 
+    self.ui.gcmsTestsSample.clear()
+    self.ui.gcmsTestsVal.clear() 
+        
+#FIXME: not used anywhere 
+def gcmsClearSideData(self): 
+    self.ui.gcmsStandardVal.clear()
+    self.ui.gcmsUnitVal.clear()
+    self.ui.gcmsTests.clear() 
+        
+def chmClearEnteredTestsData(self): 
+    self.ui.gcmsTestsValueWidget.setEnabled(False)
+    self.ui.widget_29.setEnabled(True)
+        
+    self.ui.gcmsStandardVal.clear()
+    self.ui.gcmsUnitVal.clear()
+    self.ui.gcmsTests.clear()
+    
+    self.ui.gcmsStandardValShow.clear()
+    self.ui.gcmsUnitValShow.clear()
+    self.ui.gcmsTestsShow.clear()
+        
+    self.ui.gcmsTestsJobNum.clear()
+    self.ui.gcmsTestsSample.clear()
+    self.ui.gcmsTestsVal.clear()
+    self.ui.gcmsTestsLists.clear()
 
 
+def addToChmTestsData(database, sampleNum, testName, sampleVal, standards, units, jobNum ): 
+    addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
+    
+    try:
+        database.execute(addInquery, (sampleNum, testName, sampleVal, standards, units, jobNum,) )
+        database.commit()
+
+    except sqlite3.IntegrityError as e:
+        print(e) 
 
 #******************************************************************
 #    Chemisty Tests Info
 #****************************************************************** 
 #TODO: if the txt name changes update the listName 
 #TODO: keep track of the currentIndex when first getting it 
-
+    
 def chmGetTestsValues(self): 
     values = []
     
@@ -328,24 +517,18 @@ def chmGetTestsValues(self):
         values.append(item.text())
         
     return values; 
-
-
-def chmClearDefinedTestsValues(self): 
-    self.ui.gcmsDisplayName.clear()
-    self.ui.gcmsTxtName.clear()
-    self.ui.gcmsUnitType.clear()
-    self.ui.gcmsRefValue.clear()
-    self.ui.gcmsComment.clear()
     
 
 @pyqtSlot() 
-def on_gcmsAddTestsBtn_clicked(self): 
+def on_chmAddTestsBtn_clicked(self): 
     existingTests = self.chmGetTestsValues()        
     currentText = self.ui.testsInputLabel.text()
-    
+
+
+ 
     if(currentText != '' and currentText not in existingTests): 
         #clear values 
-        self.chmClearDefinedTestsValues()
+        chmClearDefinedTestsValues(self)
         self.ui.testsInputLabel.clear()
         self.ui.gcmsDefinedtests.addItem(currentText)
 
@@ -360,7 +543,7 @@ def on_gcmsAddTestsBtn_clicked(self):
 
 
 @pyqtSlot()
-def on_gcmsSaveTestBtn_clicked(self):
+def on_chmSaveTestBtn_clicked(self):
     print('[SLOT]: on_gcmsSaveTestBtn_clicked')
     displayName = self.ui.gcmsDisplayName.text().strip()
     txtName = self.ui.gcmsTxtName.text().strip()
@@ -375,7 +558,7 @@ def on_gcmsSaveTestBtn_clicked(self):
         
 
 @pyqtSlot()    
-def on_gcmsDeleteTestBtn_clicked(self): 
+def on_chmDeleteTestBtn_clicked(self): 
     txtName = self.ui.gcmsTxtName.text().strip()
     selected_item = self.ui.gcmsDefinedtests.currentItem()
     
@@ -394,17 +577,17 @@ def on_gcmsDeleteTestBtn_clicked(self):
         self.ui.gcmsDefinedtests.takeItem(currentItem)
         self.ui.gcmsDefinedtests.setCurrentItem(None)
         
-        self.chmClearDefinedTestsValues()
+        chmClearDefinedTestsValues(self)
     
     except: 
         print('Error: could not delete item')
     
 
 @pyqtSlot()
-def on_gcmsDefinedtests_clicked(self): 
+def on_chmDefinedtests_clicked(self): 
     chmLoadTestsData(self)
         
-def on_gcmsDefinedtests_currentRowChanged(self):
+def on_chmDefinedtests_currentRowChanged(self):
     try:
         chmLoadTestsData(self)
     except Exception as e:
@@ -448,5 +631,66 @@ def getTestsAndUnits(self):
 #****************************************************************** 
 
 
-class CreateTests(): 
-    pass; 
+
+class MacroDialog(QDialog): 
+    # Define Signals 
+    dataUpdate = pyqtSignal(dict)
+    testsUpdate = pyqtSignal(list)
+     
+    def __init__(self, data, item, title):
+        super().__init__()
+        # Load the UI file
+        ui_path = QDir.currentPath() + '/ui/macroDialog.ui'
+        self.ui = loadUi(ui_path, self)
+        
+        #set the titles 
+        self.setWindowTitle(title) 
+        self.title.setText(title)
+
+        #set the data
+        self.data = data 
+        self.item = item
+        self.processData()
+
+        # Connect button signals to slots
+        self.saveButton.clicked.connect(self.handleSave)
+        self.cancelButton.clicked.connect(self.handleCancel) 
+
+
+class CreateTestsDialog(QDialog): 
+    
+    
+    
+    def __init__(self, database, title): 
+        super().__init__()
+        
+        # Load the UI File 
+        ui_path = QDir.currentPath() + '/ui/addTestsDialog.ui'
+        self.ui = loadUi(ui_path, self)
+
+        #set the titles 
+        self.setWindowTitle('Add New Chemical') 
+        self.title.setText(title)
+        
+        # Assign data 
+        self.db = database 
+        self.processRequest()
+        
+        # Connect the buttons     
+        self.cancelBtn.clicked.connect(self.handleCancelBtn)
+        self.saveBtn.clicked.connect(self.handleSaveBtn)
+        
+    def processRequest(): 
+        pass; 
+            
+            
+
+        
+        
+    def handleCancelBtn(self): 
+        pass; 
+    
+    
+    def handleSaveBtn(self): 
+        pass; 
+    

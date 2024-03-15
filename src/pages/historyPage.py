@@ -15,6 +15,8 @@ from modules.dbFunctions import searchJobsList, getAllJobsList
 from modules.dialogBoxes import openJobDialog
 #from modules.utilities import * 
 
+from pages.createReportPage import createReportPage
+
 def historyPageSetup(self): 
     
     historyTable = self.ui.reportsTable 
@@ -126,7 +128,7 @@ def openExistingReport(self, row):
     if result == QDialog.Accepted:
         print('Opening Existing Report')
         isExistingReport = True 
-        self.createReportPage(rowData[0], rowData[1], rowData[2], rowData[3], isExistingReport) 
+        createReportPage(self, rowData[0], rowData[1], rowData[2], rowData[3], isExistingReport) 
         
     else:
         print("Not Opening Existing Report'")

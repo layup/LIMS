@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1331</width>
-    <height>881</height>
+    <width>1200</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,9 +20,9 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/***************************
-TOP HEADER  
-***************************/
+   <string notr="true">/******************************************************************
+/	Top Header 
+/******************************************************************/
 
 #topHeader {
 	background-color: #323a47;
@@ -88,9 +88,14 @@ TOP HEADER
 }
 
 
-/***************************
-History Page 
-***************************/
+/******************************************************************
+/	Side Bar Menu  
+/******************************************************************/
+
+
+/******************************************************************
+/	Reports History Page 
+/******************************************************************/
 
 #reportsTableWidget  {	
 	background-color:  #323a47;
@@ -106,22 +111,15 @@ History Page
 }
 
 
-
 #reportsTable::item:selected {
-    background-color: rgb(66, 78, 101); /* Background color for selected items in QTableWidget */
+    background-color: rgb(66, 78, 101); 
 
 }
 
-/* Styles for the headers */
+
 #reportsTable  QHeaderView {
 	background-color: #555555;
-	
-	/*
-	background-color:rgb(55, 65, 84); 
-	border:1px solid white; 
-	border-bottom:1px solid white; 
-	border-right:1px solid white; 
-	*/ 
+
 }
 
 #reportsTable QHeaderView::section {
@@ -148,9 +146,10 @@ History Page
 
 }
 
-/***************************
-Report Page ? 
-***************************/
+
+/******************************************************************
+/	Report Page 
+/******************************************************************/
 
 
 #reportsPage {
@@ -197,9 +196,9 @@ Report Page ?
 	border-radius: 5px; 
 }
 
-/***************************
-Create Report Page
-***************************/
+/******************************************************************
+/	Create Report Page  
+/******************************************************************/
 
 #createPage {
 	background-color:#788596;
@@ -275,9 +274,9 @@ QComboBox{
 	border-radius: 5px;
 } 
 
-/***************************
-	Create Page lient Info/Tests Data Page 
-***************************/
+/******************************************************************
+/	Creating Reports Section  
+/******************************************************************/
 #clientInfoTab QLabel {
 	color:white; 
 }
@@ -324,9 +323,9 @@ QComboBox{
 	background-color:  #788596;
 } 
 
-/***************************
-	ISP Tab  
-***************************/
+/******************************************************************
+/	ICP Tab  
+/******************************************************************/
 
 #icpTabWidget {
 	background-color: #323a47;
@@ -400,9 +399,9 @@ QComboBox{
 
 
 
-/***************************
-	ISP Elements Page
-***************************/
+/******************************************************************
+/	ICP Elements Page  
+/******************************************************************/
 
 #icpElementsWidget  {
 	border-radius: 10px;
@@ -469,9 +468,9 @@ QComboBox{
     background: white;
 }
 
-/***************************
-** ISP Reports 
-***************************/
+/******************************************************************
+/	ICP Reports Info Page  
+/******************************************************************/
 
 #icpReportTypeWidget { 
 	background-color: #323a47;
@@ -487,9 +486,14 @@ QComboBox{
 	background-color: #323a47;
 	border-radius: 10px;
 } 
-/***************************
-** ISP History Database 
-***************************/
+/******************************************************************
+/	ICP Histroy Page  
+/******************************************************************/
+
+#icpUploadBtn  {
+	background-color:red; 
+} 
+
 #icpData {
 	background-color: #323a47
 }
@@ -508,9 +512,9 @@ QComboBox{
 }
 
 
-/***************************
-	CHM Page   
-***************************/
+/******************************************************************
+/	CHM Tab 
+/******************************************************************/
 #chmHeader  {
 	background-color: #323a47;
 	border-radius: 10px;
@@ -524,9 +528,7 @@ QComboBox{
 	background-color:  #788596;
 }
 
-/***************************
-	CHM Tab   
-***************************/
+
 #chmTabWidget {
 	background-color: #323a47;
 }
@@ -539,7 +541,6 @@ QComboBox{
 #chmTabWidget QTabBar::tab:selected {
 	background-color:  rgb(107, 108, 108);
 }
-
 
 #chmInputTab &gt; QWidget {
 	background-color: #323a47;
@@ -578,15 +579,15 @@ QComboBox{
 	color:white; 
 } 
 
-/***************************
-** CHM Input Data   
-***************************/
+/******************************************************************
+/	CHM Input Data  
+/******************************************************************/
 
 
 
-/***************************
-** CHM Tests Info Section   
-***************************/
+/******************************************************************
+/	CHM Test Info Page  
+/******************************************************************/
 
 #chmTestDisplayWidget  {
 	background-color: #323a47;
@@ -609,9 +610,9 @@ QComboBox{
 } 
 
 
-/***************************
-** CHM Reports Info Section    
-***************************/
+/******************************************************************
+/	CHM Reports Info Section  
+/******************************************************************/
 
 #chmReportsWidget {
 	background-color: #323a47;
@@ -635,9 +636,9 @@ QComboBox{
 	color:white; 
 }
 
-/***************************
-** CHM Database Page    
-***************************/
+/******************************************************************
+/	CHM Database Page  
+/******************************************************************/
 
 
 #chmDatabasePage  {	
@@ -655,16 +656,9 @@ QComboBox{
     background-color: rgb(66, 78, 101); /* Background color for selected items in QTableWidget */
 }
 
-/* Styles for the headers */
 #chmInputTable  QHeaderView {
 	background-color: #555555;
-	
-	/*
-	background-color:rgb(55, 65, 84); 
-	border:1px solid white; 
-	border-bottom:1px solid white; 
-	border-right:1px solid white; 
-	*/ 
+
 }
 
 #chmInputTable QHeaderView::section {
@@ -676,7 +670,7 @@ QComboBox{
 }
 
 #chmInputTable QHeaderView::section:horizontal {
-    /* border-bottom: 2px solid #ff0000; */
+   
 	border-right: 1px solid #737373; 	
 	border-bottom:1px solid #737373; 
 }
@@ -691,9 +685,9 @@ QComboBox{
 }
 
 
-/***************************
-** Settings Page     
-***************************/
+/******************************************************************
+/	Settings Page  
+/******************************************************************/
 #SettingTab &gt; QPushButton { 
 	min-width: 100px;
 	max-width: 100px;
@@ -1300,6 +1294,9 @@ color: rgb(255, 255, 255);</string>
              </property>
              <item>
               <widget class="QLineEdit" name="searchLine">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1352,7 +1349,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1719,7 +1716,7 @@ margin: 0;
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_42">
                  <property name="topMargin">
-                  <number>20</number>
+                  <number>12</number>
                  </property>
                  <property name="bottomMargin">
                   <number>12</number>
@@ -2133,7 +2130,7 @@ margin: 0;
            <item>
             <widget class="QTabWidget" name="icpTabWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="icpHistory">
               <attribute name="title">
@@ -2984,7 +2981,7 @@ p, li { white-space: pre-wrap; }
               <enum>QTabWidget::North</enum>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>1</number>
              </property>
              <property name="elideMode">
               <enum>Qt::ElideRight</enum>
@@ -3268,7 +3265,7 @@ QTableWidget QPushButton:hover {
                    </widget>
                   </item>
                   <item row="11" column="1">
-                   <widget class="QPushButton" name="gcmsAddTestsBtn_3">
+                   <widget class="QPushButton" name="gcmsAddTestsBtn_2">
                     <property name="text">
                      <string>Add</string>
                     </property>
@@ -3341,19 +3338,28 @@ QTableWidget QPushButton:hover {
                       <height>200</height>
                      </size>
                     </property>
-                    <widget class="QPushButton" name="pushButton_3">
-                     <property name="geometry">
-                      <rect>
-                       <x>270</x>
-                       <y>10</y>
-                       <width>113</width>
-                       <height>32</height>
-                      </rect>
-                     </property>
-                     <property name="text">
-                      <string>upload Item</string>
-                     </property>
-                    </widget>
+                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                     <item>
+                      <spacer name="horizontalSpacer_3">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_3">
+                       <property name="text">
+                        <string>upload Item</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
@@ -3913,6 +3919,240 @@ p, li { white-space: pre-wrap; }
                </item>
               </layout>
              </widget>
+             <widget class="QWidget" name="tab_3">
+              <attribute name="title">
+               <string>Page</string>
+              </attribute>
+              <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <item>
+                <widget class="QWidget" name="widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <item>
+                   <widget class="QTreeWidget" name="treeWidget">
+                    <column>
+                     <property name="text">
+                      <string>Elements</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Symbol</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Lower Limit </string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Upper limit</string>
+                     </property>
+                    </column>
+                    <column>
+                     <property name="text">
+                      <string>Unit type </string>
+                     </property>
+                    </column>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_12" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_14">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_5">
+                       <property name="minimumSize">
+                        <size>
+                         <width>102</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Add new Element</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_11">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_8" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>400</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <item>
+                   <widget class="QWidget" name="chmTestDisplayWidget_2" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_18">
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_91">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Unit Type </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="gcmsUnitType_3"/>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_90">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Default Standard</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLineEdit" name="gcmsDisplayName_3"/>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_92">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Display Name</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="gcmsRefValue_3"/>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_93">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>TXT Name</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QTextEdit" name="gcmsComment_3">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>200</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="gcmsTxtName_3"/>
+                     </item>
+                     <item row="5" column="0" alignment="Qt::AlignTop">
+                      <widget class="QLabel" name="label_94">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Test Comments </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <spacer name="verticalSpacer_3">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_9" native="true">
+                    <layout class="QHBoxLayout" name="horizontalLayout_16">
+                     <item>
+                      <spacer name="horizontalSpacer_4">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton">
+                       <property name="text">
+                        <string>Save</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_4">
+                       <property name="text">
+                        <string>Delete</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </widget>
            </item>
           </layout>
@@ -3985,7 +4225,7 @@ p, li { white-space: pre-wrap; }
                <number>12</number>
               </property>
               <property name="bottomMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="QTabWidget" name="SettingsTab">
@@ -4576,13 +4816,13 @@ p, li { white-space: pre-wrap; }
                <number>0</number>
               </property>
               <property name="topMargin">
-               <number>0</number>
+               <number>12</number>
               </property>
               <property name="rightMargin">
                <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="QTabWidget" name="reportsTab">
@@ -4599,7 +4839,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -5420,7 +5660,7 @@ QPushButton::hover {
                        </size>
                       </property>
                       <property name="text">
-                       <string>Generate Report 1</string>
+                       <string>Create ICP Report</string>
                       </property>
                      </widget>
                     </item>
@@ -5448,7 +5688,7 @@ QPushButton::hover {
                           </size>
                          </property>
                          <property name="text">
-                          <string>Generate Report 2</string>
+                          <string>Create CHM Report</string>
                          </property>
                         </widget>
                        </item>
@@ -5478,6 +5718,12 @@ QPushButton::hover {
                    <layout class="QHBoxLayout" name="horizontalLayout_4">
                     <item>
                      <widget class="QPushButton" name="pushButton_2">
+                      <property name="minimumSize">
+                       <size>
+                        <width>130</width>
+                        <height>30</height>
+                       </size>
+                      </property>
                       <property name="text">
                        <string>Reload Data</string>
                       </property>
@@ -5519,7 +5765,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1331</width>
+     <width>1200</width>
      <height>22</height>
     </rect>
    </property>
