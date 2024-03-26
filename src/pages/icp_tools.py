@@ -17,6 +17,7 @@ def icpSetup(self):
     
     # load the icp database inital setup 
     # self.updateIcpTable(machine1Data) 
+    loadIcpHistory(self)
     
     # Connect the signals/buttons 
     self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.db))
@@ -63,7 +64,6 @@ def loadDefinedElements(self):
 
     clearElementInfo(self)
     
-
 #******************************************************************
 #    ICP History 
 #****************************************************************** 
@@ -97,13 +97,42 @@ def on_icpSearchBtn_clicked(self):
         else: 
             updateIcpTable(self, machine1Data)
 
+
+def loadIcpHistory(self):
+        columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
+    
+        icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
+        icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
+        
+        machine1Data = list(self.db.query(icpMachine1sql))
+        #machine2Data = list(self.db.query(icpMachine2sql))
+        
+        totalItems = len(machine1Data) 
+        self.ui.icpLabel.setText(f'Total Items in Database: {totalItems}')
+            
+        updateIcpTable(self, machine1Data) 
             
 def updateIcpTable(self, result): 
     textLabelUpdate = 'Total Search Results: ' + str(len(result))
+    
+    TableHeader = ['Sample Number', 'Job Number', 'Machine Type', 'File Location', 'Upload Date', 'Actions']
 
     self.ui.icpLabel.setText(textLabelUpdate)
+    
     self.ui.icpTable.setRowCount(len(result)) 
-    self.ui.icpTable.setColumnWidth(3, 600)
+    self.ui.icpTable.setColumnCount(len(TableHeader))
+    self.ui.icpTable.setHorizontalHeaderLabels(TableHeader)
+
+    smallCol = 140
+    medCol = 300 
+    bigCol = 750 
+    
+    self.ui.icpTable.setColumnWidth(0, smallCol)
+    self.ui.icpTable.setColumnWidth(1, smallCol)
+    self.ui.icpTable.setColumnWidth(2, smallCol)
+
+    self.ui.icpTable.setColumnWidth(3, bigCol)
+    self.ui.icpTable.setColumnWidth(4, smallCol)
     
     for i, data in enumerate(result):
         #loops throught items in the order sql requested 
@@ -391,8 +420,6 @@ def clearFooterReportContent(self):
     self.ui.icpReportNameLabel.setText("")
     self.ui.footerComments.clear()
     
-
-
 #******************************************************************
 #    ICP Classes  
 #****************************************************************** 

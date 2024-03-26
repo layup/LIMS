@@ -144,6 +144,10 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     fileName = 'W' + str(jobNum) + ".001" 
     filePath = os.path.join(exportPath, fileName)
     print('Export Path: ', filePath)
+
+    # Create the directory if it doesn't exist
+    #if not os.path.exists(exportPath):
+    #    os.makedirs(exportPath)
  
     wb.save(filePath)
 

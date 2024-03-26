@@ -1,8 +1,20 @@
+
+
+
 from PyQt5.QtWidgets import (
     QLabel, QVBoxLayout, QDialog, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, QTextEdit, QSpacerItem, QSizePolicy 
 )
+from PyQt5.uic import loadUi
+from PyQt5.QtCore import pyqtSlot
 
+from modules.utilities import openFile, getFileLocation; 
+
+
+
+#******************************************************************
+#    Widgets 
+#****************************************************************** 
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 
         super(SampleNameWidget ,self).__init__(parent)
@@ -10,17 +22,17 @@ class SampleNameWidget(QWidget):
         newName = str(valueName).strip()
     
         self.label = QLabel(labelName)
-        self.label.setMaximumWidth(100)
-        
+        #self.label.setFixedWidth(60)
         self.edit = QLineEdit(valueName)
-        self.button = QPushButton()
         
+        self.button = QPushButton()
         pixmapi = getattr(QStyle, 'SP_TitleBarCloseButton')
         icon = self.style().standardIcon(pixmapi)
         self.button.setIcon(icon)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+        #layout.setSpacing(2)  # Adjust the spacing here
         layout.addWidget(self.label)
         layout.addWidget(self.edit)
         #layout.addWidget(self.button)
@@ -52,9 +64,9 @@ class SaveMessageBoxWidget(QWidget):
             self.removeDuplicate()
 
 
-#check for duplicates 
-    
-
+#******************************************************************
+#    Dialog
+#******************************************************************   
 class ChmTestsDialog(QDialog):
     def __init__(self, parent=None):
         super(ChmTestsDialog, self).__init__(parent)
@@ -127,3 +139,66 @@ class ChmTestsDialog(QDialog):
         else:
             return None
 
+
+#******************************************************************
+#    Dialog
+#****************************************************************** 
+class FileLocationDialog(QDialog): 
+    def __init__(self, preferences, parent=None):
+        super().__init__()
+        # Load the UI of the Dialog
+        filePath = './ui/FileLocationDialog.ui' 
+        loadUi(filePath, self)
+
+        self.preferences = preferences
+         
+        self.tempPaths = self.preferences.values().copy()
+        
+        # set up the intial text Names 
+        self.setupItems('TXTDirLocation', self.line1)
+        self.setupItems('ispDataUploadPath', self.line2)
+        self.setupItems('reportsPath', self.line3)
+        self.setupItems('databasePath', self.line4)
+        self.setupItems('officeDbPath', self.line5)
+
+        # Connect the Buttons 
+        self.closeBtn.clicked.connect(self.close)
+        self.saveBtn.clicked.connect(self.saveButtonClicked)
+        
+        # Connect the basic browse buttns  
+        self.browse1.clicked.connect(lambda: self.browseForFolder('TXTDirLocation', self.line1))
+        self.browse2.clicked.connect(lambda: self.browseForFolder('ispDataUploadPath', self.line2))
+        self.browse3.clicked.connect(lambda: self.browseForFolder('reportsPath', self.line3))
+        self.browse4.clicked.connect(lambda: self.browseForFile('databasePath', self.line4))
+        self.browse5.clicked.connect(lambda: self.browseForFile('officeDbPath', self.line5))
+     
+    def setupItems(self, pathName, lineItem):
+        try: 
+            filePath = self.preferences.get(pathName)
+            lineItem.setText(filePath) 
+        except Exception as error: 
+            print(error)
+
+    @pyqtSlot()
+    def browseForFile(self, pathName, lineItem): 
+        fileLocation = openFile()
+        print(f'file location: {fileLocation}')
+        self.tempPaths[pathName] = fileLocation
+        lineItem.setText(fileLocation)
+
+    @pyqtSlot()  
+    def browseForFolder(self, pathName, lineItem): 
+        folderLocation = getFileLocation()
+        print(f'Folder Location: {folderLocation}')
+        self.tempPaths[pathName] = folderLocation
+        lineItem.setText(folderLocation)
+        
+
+    @pyqtSlot()
+    def saveButtonClicked(self): 
+        
+        for key, value in self.tempPaths.items():
+            print(f'Updating: {key}: {value}')
+            self.preferences.update(key, value)
+
+        self.close()

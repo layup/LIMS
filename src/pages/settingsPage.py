@@ -8,10 +8,11 @@ from modules.dbFunctions import getAuthorInfo
 from modules.utilities import load_pickle, save_pickle, getFileLocation, openFile
 #from widgets.widgets import *
 
+
+#TODO: update the localPrefernece stuff
 def settingsSetup(self): 
     loadSettings(self) 
     self.ui.SettingsTab.setCurrentIndex(0) 
-
 
     # Connect Buttons and Signals  
     self.ui.SettingsTab.currentChanged.connect(lambda index: settingsTab_changes(self, index))
@@ -55,10 +56,11 @@ def settingsTab_changes(self, index):
 
 #TODO: have a path object that will deal with all of the other bs that I have writen here 
 def loadSettings(self): 
-    self.ui.reportPath.setText(self.paths['reportsPath'])
-    self.ui.txtPath.setText(self.paths['TXTDirLocation'])
-    self.ui.convertPath.setText(self.paths['ispDataUploadPath'])
-    self.ui.dbPath.setText(self.paths['databasePath'])
+    self.ui.reportPath.setText(self.preferences.get('reportsPath'))
+    self.ui.txtPath.setText(self.preferences.get('TXTDirLocation'))
+    self.ui.convertPath.setText(self.preferences.get('ispDataUploadPath'))
+    self.ui.dbPath.setText(self.preferences.get('databasePath'))
+    self.ui.frontPath.setText(self.preferences.get('officeDbPath'))
 
 @pyqtSlot() 
 def updateFilePath(widget, pathName): 

@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QSpacerItem, QSizePolicy, QCompleter, QStyleFactory
 )
 
+
 from modules.constants import *
 from modules.createExcel import * 
 from modules.dbManager import *
@@ -24,7 +25,7 @@ from assets import resource_rc
 from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
-from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadDefinedElements
+from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadDefinedElements, loadIcpHistory
 from pages.chm_tools import (chmLoadTestsNames, loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
@@ -106,8 +107,7 @@ class MainWindow(QMainWindow):
        
    #******************************************************************
    #    Menu Buttons 
-   #******************************************************************  
-   
+   #******************************************************************   
     def on_reportsBtn1_toggled(self): 
         self.change_index(0) 
     
@@ -141,7 +141,6 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    Navigatioin Mangament 
    #****************************************************************** 
-   
     def change_index(self, index): 
         self.previous_index = self.ui.stackedWidget.currentIndex() 
         self.ui.stackedWidget.setCurrentIndex(index)
@@ -164,8 +163,12 @@ class MainWindow(QMainWindow):
             loadReportsPage(self)
             
         if(index == 1): # Create Report
+            
+            # Clearing the report page section 
+            self.ui.jobNumInput.setText('')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
+            self.ui.dilutionInput.setText('')
             
         if(index == 2): # ICP Page 
             pass; 
@@ -176,12 +179,10 @@ class MainWindow(QMainWindow):
         if(index == 4): # Settings  
             pass; 
 
-
         if(self.previous_index == 5): # Creating Reports 
             deleteAllSampleWidgets(self) 
         
 
-        
     #FIXME: have a single header that is controlled by the global, instead of each having their own seperate one 
     def on_icpTabWidget_currentChanged(self, index):
         #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
@@ -192,22 +193,11 @@ class MainWindow(QMainWindow):
         
         #TODO: create a single function that loads this all to begin with isntead of having to reload this each time 
         #try lazy loading 
-        if(index == 0): 
+        if(index == 0): #History  
             self.ui.icpPageTitle.setText("ICP History")
+            self.ui.icpLabel.setText("")
         
-            
-            columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
-        
-            icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
-            icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
-            
-            machine1Data = list(self.db.query(icpMachine1sql))
-            #machine2Data = list(self.db.query(icpMachine2sql))
-          
-            totalItems = len(machine1Data) 
-            self.ui.icpLabel.setText(f'Total Items in Database: {totalItems}')
-             
-            updateIcpTable(self, machine1Data) 
+            loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
             total = getTotalElements(self.db)
@@ -254,7 +244,6 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    Setup Loading
    #******************************************************************  
-   
     def loadStartup(self): 
         self.setWindowTitle("Laboratory Information management System") 
         self.setStyle(QStyleFactory.create('Fusion'))
@@ -265,7 +254,6 @@ class MainWindow(QMainWindow):
         self.activeCreation = False; 
         self.ui.reportsBtn1.setChecked(True)
 
-        
         self.previous_index = -1
          
          #FIXME: make this better somehow 
@@ -292,62 +280,51 @@ class MainWindow(QMainWindow):
         self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
         self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal) 
        
-    #TODO: load in the second database 
     def loadDatabase(self): 
-        # Set a global paths variable
-        self.paths = load_pickle('data.pickle')
+        # self.paths = load_pickle('data.pickle')
+        self.preferences = LocalPreferences('data.pickle')
+        preferences = self.preferences.values()
         
-        print('**Paths')
-        for key, value in self.paths.items():
-            print(key, value)
-            
-        #FIXME: insert some try/except blocks up in this mf 
+        print('Preferences Items')
+        for key, value in preferences.items(): 
+            print(f'*{key}: {value}')
+        print('\n')
        
-        if(isValidDatabase(self.paths['databasePath'])): 
-            self.db = Database(self.paths['databasePath'])
-        else: 
-            #TODO: add popup 
-            print('Database not valid')
-            
-            databasePathTemp = openFile()
-            self.db = Database(databasePathTemp)
+        for attempt in range(3):  
+            print(f'Attemp: {attempt}')
+            try: 
+                mainDatabasePath = self.preferences.get('databasePath') 
+                officeDatabasePath = self.preferences.get('officeDbPath')
 
+                # Connect the backend database (Harry Systems)
+                self.db = Database(mainDatabasePath)
+                
+                # Connect the Office database (Front and Histroy Systems)
+                self.officeDB = Database(officeDatabasePath)
+
+                return
+
+            except Exception as error: 
+                print(error)
+
+                if attempt == 2:
+                    print("Max attempts reached. Unable to connect to databases.")
+                    return
+                else:
+                    # Dialog popup to load the necessaary database Information for the user 
+                    dialog = FileLocationDialog(self.preferences)
+                    dialog.exec_()
+                    
+          
     #******************************************************************
-   #   Helper/Other Functions 
-   #******************************************************************         
+    #   Helper/Other Functions 
+    #******************************************************************         
     #TODO: could be moved to the utiles.py 
     #TODO: find out what this does 
     
     def on_tab_pressed1(self): 
         self.ui.gcmsTestsVal.setFocus()
     
-    def loadClientInfo(self): 
-        print('[Function]: loadClientInfo(self)')
-        
-        # Clear the first page 
-        self.ui.jobNumInput.setText('')
-        
-        # Set the header parameter 
-        self.ui.jobNum.setText("W" + self.jobNum)
-        self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
-        self.ui.parameterHeader.setText(self.parameter); 
-        self.ui.reportTypeHeader.setText(self.reportType)
-        self.ui.clientName_1.setText(self.clientInfo['clientName'])
-        self.ui.date_1.setText(self.clientInfo['date'])
-        self.ui.time_1.setText(self.clientInfo['time'])
-        self.ui.attention_1.setText(self.clientInfo['attn'])
-        self.ui.addy1_1.setText(self.clientInfo['addy1'])
-        self.ui.addy2_1.setText(self.clientInfo['addy2'])
-        self.ui.addy3_1.setText(self.clientInfo['addy3'])
-        self.ui.sampleType1_1.setText(self.clientInfo['sampleType1'])
-        self.ui.sampleType2_1.setText(self.clientInfo['sampleType2'])
-        self.ui.totalSamples_1.setText(self.clientInfo['totalSamples'])
-        self.ui.recvTemp_1.setText(self.clientInfo['recvTemp'])
-        self.ui.tel_1.setText(self.clientInfo['tel'])
-        self.ui.email_1.setText(self.clientInfo['email'])
-        self.ui.fax_1.setText(self.clientInfo['fax'])
-        self.ui.payment_1.setText(self.clientInfo['payment'])
-               
     def loadCreatePage(self): 
         print('[FUNCTION]: loadCreatePage(self)')
  
@@ -364,7 +341,7 @@ class MainWindow(QMainWindow):
     def formatTable(self, table): 
         rowHeight = 25; 
         
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
+        #table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
         table.verticalHeader().setVisible(True)
         table.verticalHeader().setDefaultSectionSize(rowHeight)
 
@@ -404,7 +381,42 @@ class MainWindow(QMainWindow):
             print(f"User entered: {user_input}")
         else:
             print("User canceled.")
+            
+#******************************************************************
+#   Classes
+#******************************************************************    
+class LocalPreferences: 
+    def __init__(self, path='preferences.pkl'): 
+        self.path = path
+        self.load()
+    
+    def load(self):
+        try:
+            with open(self.path, 'rb') as file:
+                self.preferences = pickle.load(file)
+        except (FileNotFoundError, EOFError):
+            self.preferences = {}
+            
+    def values(self): 
+        return self.preferences
+    
+    def update(self,name, value): 
+        self.preferences[name] = value
+        self.save()
+        
+    def get(self, value): 
+        return self.preferences[value]
+    
+    def remove(self, value):
+        del self.preferences[value]
+        
+    def save(self): 
+        with open(self.path, 'wb') as file:
+            pickle.dump(self.preferences, file)
 
 
 
     
+
+
+

@@ -138,7 +138,6 @@ def scanForTXTFolders(jobNum):
     return processTXTFolders(jobNum, txtFolderLocations)
   
  
-
 def processTXTFolders(jobNum, locations):
     
     fileName = "W" + jobNum + ".TXT"

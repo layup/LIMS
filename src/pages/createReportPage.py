@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
     QSpacerItem, QSizePolicy
 )
-
+from PyQt5.QtGui import QIntValidator
 
 from modules.excel.chmExcel import createChmReport
 from modules.excel.icpExcel import createIcpReport
@@ -17,16 +17,29 @@ from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
+#TODO: move a lot of these functions to the db fuinctions 
 
 #******************************************************************
 #   Create Report Page Setup 
 #******************************************************************
 
 def reportSetup(self): 
+ 
+    # Create a validator to accept only integer input
+    validator = QIntValidator()
+    # Set the range of valid integer values
+    validator.setBottom(0)  # Minimum value
+    validator.setTop(999999)  # Maximum value
+
+    # Set input limits and Validators
+    self.ui.jobNumInput.setValidator(validator)
+    self.ui.jobNumInput.setMaxLength(6)
+
+    self.ui.dilutionInput.setValidator(validator)
+    self.ui.dilutionInput.setMaxLength(6)
     
     # Connect signals  
     self.ui.NextSection.clicked.connect(lambda: createReportPage(self))
- 
 
 
 #******************************************************************
@@ -55,24 +68,30 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     #TODO: check if it is a valid dilution value 
     #TODO: change the dilution thing into a number only slider lol, so the default would be 1 and otherwise 
     self.dilution = 1 if dilution == '' else dilution       
-    fileExist = scanForTXTFolders(jobNum)
+    textFileExists = scanForTXTFolders(jobNum)
     
     errorCheck = [0, 0, 0, 0]     
     errorCheck[0] = 0 if re.match('^([0-9]{6})$', jobNum) else 1 
     errorCheck[1] = 0 if reportType in REPORTS_TYPE else 1
     errorCheck[2] = 0 if parameter != '' else 1
-    errorCheck[3] = 0 if fileExist != '' else 1    
+    errorCheck[3] = 0 if textFileExists != '' else 1    
     
     if(sum(errorCheck) == 0): 
+        #FIXME: I can adjust the client Info, so I don't need this (do I need global functions, bad pratice)
+
+        self.ui.reportsTab.setCurrentIndex(0)
+        
         self.jobNum = jobNum; 
         self.parameter = parameter 
         self.reportType = reportType
         self.activeCreation = True; 
 
-        #TODO: load the information from database later 
-        tempLocation = scanForTXTFolders(self.jobNum)
+        #TODO: load the information from database later (front house database) 
+        tempLocation = scanForTXTFolders(self.jobNum) #FIXME: can remove this
         clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, tempLocation)
-
+        
+        checkTextFile(self, tempLocation)
+        
         self.clientInfo = clientInfo 
         self.sampleNames = sampleNames
         self.sampleTests = sampleTests
@@ -152,6 +171,35 @@ def populateAuthorNames(self):
     except: 
         print('Error: Could not load the authors for Create Report Page ')
 
+        
+#******************************************************************
+#   reading text file  
+#******************************************************************
+def checkTextFile(self, fileLocation): 
+    print('[FUNCTION]: checkTextFile')
+    
+    # Enable Text File Tab if the file is there
+    if(fileLocation): 
+        try: 
+            self.ui.reportsTab.setTabEnabled(2, True)
+            
+            with open(fileLocation) as file: 
+                content = file.read()
+                 
+            # Clear existing content in the QTextBrowser
+            self.ui.textBrowser.clear()
+            # Append the content of the text file to the QTextBrowser
+            self.ui.textBrowser.append(content)
+    
+        except Exception as error: 
+            print(error)
+            self.ui.reportsTab.setTabEnabled(2, False) 
+        
+    else:
+         self.ui.reportsTab.setTabEnabled(2, False)
+    
+
+
 #******************************************************************
 #   General Functions 
 #******************************************************************
@@ -163,13 +211,56 @@ def formatReportTable(table, rowCount, colCount):
     table.verticalHeader().setVisible(True)
 
     
-def deleteAllSampleWidgets(self): 
+def deleteAllSampleWidgets2(self): 
     for widget in self.ui.samplesContainer.children():
         if isinstance(widget, SampleNameWidget):
             widget.setParent(None)
             widget.deleteLater()
-        
+        else:
+            spacer = widget.spacerItem()
+            if spacer:
+                self.layout.removeItem(spacer) 
+            
+def deleteAllSampleWidgets(self): 
+    for i in reversed(range(self.ui.samplesContainer.layout().count())):
+        item = self.ui.samplesContainer.layout().itemAt(i)
+        if item.widget() is not None:
+            if isinstance(item.widget(), SampleNameWidget):
+                item.widget().deleteLater()
+        elif item.spacerItem():
+            self.ui.samplesContainer.layout().removeItem(item)
+    
 
+def loadClientInfo(self): 
+    print('[Function]: loadClientInfo(self)')
+    
+    # Set the header parameter 
+    self.ui.jobNum.setText("W" + self.jobNum)
+    self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
+    self.ui.parameterHeader.setText(self.parameter); 
+    self.ui.reportTypeHeader.setText(self.reportType);
+    self.ui.factorHeader.setText(self.dilution);
+
+    # Set the client Info 
+    self.ui.clientName_1.setText(self.clientInfo['clientName'])
+    self.ui.date_1.setText(self.clientInfo['date'])
+    self.ui.time_1.setText(self.clientInfo['time'])
+    self.ui.attention_1.setText(self.clientInfo['attn'])
+    self.ui.addy1_1.setText(self.clientInfo['addy1'])
+    self.ui.addy2_1.setText(self.clientInfo['addy2'])
+    self.ui.addy3_1.setText(self.clientInfo['addy3'])
+    self.ui.sampleType1_1.setText(self.clientInfo['sampleType1'])
+    self.ui.sampleType2_1.setText(self.clientInfo['sampleType2'])
+    self.ui.totalSamples_1.setText(self.clientInfo['totalSamples'])
+    self.ui.recvTemp_1.setText(self.clientInfo['recvTemp'])
+    self.ui.tel_1.setText(self.clientInfo['tel'])
+    self.ui.email_1.setText(self.clientInfo['email'])
+    self.ui.fax_1.setText(self.clientInfo['fax'])
+    self.ui.payment_1.setText(self.clientInfo['payment'])
+
+def updateSampleNames(sampleNames, textChange, key):
+    sampleNames[key] = textChange; 
+    print(f'Update Sample Name: {sampleNames}')
 
 #******************************************************************
 #    Chemisty Loader  
@@ -190,22 +281,26 @@ def chmLoader(self):
     
     GSMS_TESTS_LISTS = []
     
-    self.loadClientInfo()
+    loadClientInfo(self)
 
-    # Load the sample names 
+    # Load the sample names in client Info Section 
     for i, (key,value) in enumerate(self.sampleNames.items()):
-        item = SampleNameWidget(key, value)
-        self.ui.formLayout_5.addRow(item)
-        item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
+        sampleItem = SampleNameWidget(key, value)
+        self.ui.samplesContainerLayout.addWidget(sampleItem)
+
+        #self.ui.formLayout_5.addRow(sampleItem)
+        sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames,textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    self.ui.samplesContainerLayout.addItem(spacer)
     
-    # checking CHM test lists  
+    # Checking CHM test lists  
     for (currentJob , testList) in self.sampleTests.items(): 
         for item in testList: 
             temp = removeIllegalCharacters(str(item)) 
             if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):          
                 GSMS_TESTS_LISTS.append(temp)
 
-    
     testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
     testsResults = self.db.query(testsQuery, (self.jobNum,))
     
@@ -235,65 +330,49 @@ def chmLoader(self):
     for i , (key, value) in enumerate(self.sampleNames.items(), start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
         self.ui.dataTable.setHorizontalHeaderItem(i, item)
-        
-    #displayNamesQuery = 'SELECT * gcmsTests'
-    #displayResults = self.db.query(displayNamesQuery) 
-    #print(displayResults)
     
     # List the tests  
-    for i, value in enumerate(GSMS_TESTS_LISTS): 
-        print('Current Test: ', value)
-        item = QtWidgets.QTableWidgetItem()
-        item.setText(value)
-        self.ui.dataTable.setItem(i, 0, item)
+    for i, currentTest in enumerate(GSMS_TESTS_LISTS): 
+        print(f'Current Test {i}: {currentTest}') 
+        testItem = QtWidgets.QTableWidgetItem(currentTest)
+        self.ui.dataTable.setItem(i, 0, testItem)
         
-        #TODO: search for the display name 
+        #TODO: Search for the display name 
         displayQuery = 'SELECT * FROM gcmsTests WHERE testName = ?'
-        
-        self.db.execute(displayQuery, [value,])
+        self.db.execute(displayQuery, [currentTest,])
         result = self.db.fetchone()
         print(f'Query Result: {result}')
         
+        # Set the display Name if exists
         if(result): 
-            displayNameItem  = QtWidgets.QTableWidgetItem() 
-            displayNameItem.setText(result[0])
+            displayNameItem = QtWidgets.QTableWidgetItem(result[0]) 
             self.ui.dataTable.setItem(i, 1, displayNameItem) 
         
-        item2 = QtWidgets.QTableWidgetItem() 
-        item2.setText(str(1))
+        #TODO: Distral Factor 
+        item2 = QtWidgets.QTableWidgetItem(str(1)) 
         self.ui.dataTable.setItem(i, 4, item2) 
     
         #go down each column and determine if there is a match
-        # print(i, value)
         for column in range(len(columnNames), self.ui.dataTable.columnCount()):
             header_item = self.ui.dataTable.horizontalHeaderItem(column)
+            
             if header_item is not None:
                 column_name = header_item.text()
-
-                result = search_list_of_lists(testsResults,[column_name, value] )
+                result = search_list_of_lists(testsResults,[column_name, currentTest] )
                 
                 if result is not None: 
-                    #print(result)
+                    print(f'CHM results: {result}')
+                    valueText = str(result[2])
+                    valueItem = QtWidgets.QTableWidgetItem(valueText) 
+                    self.ui.dataTable.setItem(i, column, valueItem) 
                     
-                    #value
-                    item = QtWidgets.QTableWidgetItem()
-                    item.setText(str(result[2]))
-                    self.ui.dataTable.setItem(i, column, item) 
+                    recoveryText = str(result[3])  
+                    recoveryItem = QtWidgets.QTableWidgetItem(recoveryText) 
+                    self.ui.dataTable.setItem(i, 3, recoveryItem) 
                     
-                    #So 
-                    #item = QtWidgets.QTableWidgetItem()
-                    #item.setText(str(result[3]))
-                    #self.ui.dataTable.setItem(i, 3, item)
-                    
-                    #recovery  
-                    item = QtWidgets.QTableWidgetItem()
-                    item.setText(str(result[3]))
-                    self.ui.dataTable.setItem(i, 3, item)
-                    
-                    #unit 
-                    item = QtWidgets.QTableWidgetItem()
-                    item.setText(result[4])
-                    self.ui.dataTable.setItem(i, 2, item) 
+                    unitText = result[4]
+                    unitItem = QtWidgets.QTableWidgetItem(unitText) 
+                    self.ui.dataTable.setItem(i, 2, unitItem)  
                     
     
     #TODO: add the item changed thing 
@@ -306,7 +385,6 @@ def chmReportHandler(self, columnLength,  tests):
     print('[FUNCTION]: chmReportHandler(self, tests)')
     print('*Tests: ', tests)
     
- 
     totalSamples = len(self.sampleNames)
     totalTests = len(tests)
     
@@ -364,6 +442,27 @@ def chmReportHandler(self, columnLength,  tests):
 #******************************************************************
 #    ICP Loader 
 #******************************************************************
+
+def getIcpMachineData(database, jobNumber): 
+    # Queries 
+    queryMachine1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
+    queryMachine2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
+    
+    # Query and convert into a list form 
+    sampleData = list(database.query(queryMachine1, (jobNumber,)))
+    sampleData2 = list(database.query(queryMachine2, (jobNumber,)))
+
+    return sampleData, sampleData2
+    
+
+def getIcpLimitResults(database, parameters): 
+    queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
+
+    limitResults = database.query(queryUnits, (parameters,))  
+    elementUnitValues = {t[0]: t[1] for t in limitResults} 
+
+    return elementUnitValues 
+
 #TODO: have a helper change the hardness values when cal and mg values change 
 #TODO: combine both the datasets;
 #TODO: does this effect hardness and also what about the new values we enter in 
@@ -379,24 +478,18 @@ def icpLoader(self):
     
     addtionalRows = ['pH', 'Hardness']
      
-    self.loadClientInfo()
-    
-    #check if haas data to load into the file location 
-    sql1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
-    sql2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
-    
-    sampleData = list(self.db.query(sql1, (self.jobNum,)))
-    sampleData2 = list(self.db.query(sql2, (self.jobNum,))); 
-    
-    queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
-    
+    # FIXME: fix the machine getting username Information
+    loadClientInfo(self)
+
     elements = getIcpElementsList(self.db) 
     elementNames = [t[0] for t in elements]
-    print(f'ElmentNames: {elementNames}')
     
-    limitResults = self.db.query(queryUnits, (self.parameter,)) 
-    elementUnitValues = {t[0]: t[1] for t in limitResults} 
-    
+    sampleData, sampleData2 =  getIcpMachineData(self.db, self.jobNum)
+    elementUnitValues = getIcpLimitResults(self.db, self.parameter)
+
+    print(f'Elment Names: {elementNames}')
+    print(f'Element Unit Values: {elementUnitValues}')
+     
     selectedSampleNames = []
     
     for item in sampleData:
@@ -408,14 +501,19 @@ def icpLoader(self):
     
     print('SelectedSampleItems: ', selectedSampleNames)    
     
-    #create the sample names based on that         
+    # Create the sample names in the client info section        
     for i, (key, value) in enumerate(self.sampleNames.items()):
         
         if(key in selectedSampleNames):
             print('active:', key)
-            item = SampleNameWidget(key, value)
-            self.ui.formLayout_5.addRow(item)
-            item.edit.textChanged.connect(lambda textChange, key = key: self.updateSampleNames(textChange, key))
+            sampleItem = SampleNameWidget(key, value)
+            self.ui.samplesContainerLayout.addWidget(sampleItem)
+            
+            #self.ui.formLayout_5.addRow(sampleItem)
+            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    self.ui.samplesContainerLayout.addItem(spacer)
     
     # Format table
     dataTable = self.ui.dataTable
@@ -430,49 +528,63 @@ def icpLoader(self):
         item = QtWidgets.QTableWidgetItem(name)
         self.ui.dataTable.setHorizontalHeaderItem(i, item)
     
-    # Set the sample names after 
+    # Set the sample names in the column (after)
     for i , (key) in enumerate(selectedSampleNames, start=len(columnNames)):
-        item = QtWidgets.QTableWidgetItem(name)
+        item = QtWidgets.QTableWidgetItem(key)
         self.ui.dataTable.setHorizontalHeaderItem(i, item)
     
+    # Set the elemental Information 
     for i, element in enumerate(elements): 
         elementName = element[0]
         elementSymbol = element[1]
         
+        # Set the element Name 
         elementNameCol = QtWidgets.QTableWidgetItem() 
         elementNameCol.setText(elementName.capitalize()) 
-        self.ui.dataTable.setItem(i, 0, elementNameCol)
-            
+        
+        # Set the Elment Symbol Name 
         elementSymbolCol = QtWidgets.QTableWidgetItem()
+        elementSymbolCol.setTextAlignment(Qt.AlignCenter)
         elementSymbolCol.setText(elementSymbol.capitalize())
-        self.ui.dataTable.setItem(i, 1, elementSymbolCol) 
         
-        unitTypeCol = QtWidgets.QTableWidgetItem() 
+        unitTypeItem = QtWidgets.QTableWidgetItem() 
+        unitTypeItem.setTextAlignment(Qt.AlignCenter)
+        
+        distilFactorItem = QtWidgets.QTableWidgetItem()
+        distilFactorItem.setTextAlignment(Qt.AlignCenter)
+        
         if(elementName in elementUnitValues):
-            unitTypeCol.setText(elementUnitValues[elementName])
+            unitTypeItem.setText(elementUnitValues[elementName])
         else: 
-            unitTypeCol.setText('')
+            unitTypeItem.setText('')
             
-        self.ui.dataTable.setItem(i, 2, unitTypeCol)
-        
-        item4 = QtWidgets.QTableWidgetItem()
         if(self.dilution == ''):
             distalFactorDefault = '1'           
-            item4.setText(distalFactorDefault)
+            distilFactorItem.setText(distalFactorDefault)
         else: 
-            item4.setText(str(self.dilution))
-            
-        self.ui.dataTable.setItem(i, 3, item4) 
+            distilFactorItem.setText(str(self.dilution))
+
+        self.ui.dataTable.setItem(i, 0, elementNameCol)
+        self.ui.dataTable.setItem(i, 1, elementSymbolCol) 
+        self.ui.dataTable.setItem(i, 2, unitTypeItem)
+        self.ui.dataTable.setItem(i, 3, distilFactorItem) 
     
     # Add additional Row Information
     for i, value in enumerate(addtionalRows): 
         postion = totalRows - i - 1; 
+        
+        # Assign Table Items 
         elementName = QtWidgets.QTableWidgetItem()  
-        elementName.setText(value)
-        self.ui.dataTable.setItem(postion ,0 , elementName)
-
         symbolName = QtWidgets.QTableWidgetItem()
         unitValue = QtWidgets.QTableWidgetItem()
+        
+        # Center Alignment 
+        symbolName.setTextAlignment(Qt.AlignCenter)
+        unitValue.setTextAlignment(Qt.AlignCenter)
+         
+        elementName.setText(value)
+
+        self.ui.dataTable.setItem(postion, 0, elementName)
         
         if(value == 'Hardness'): 
             symbolName.setText("CaC0₃")
@@ -487,7 +599,7 @@ def icpLoader(self):
             self.ui.dataTable.setItem(postion, 1, symbolName) 
             self.ui.dataTable.setItem(postion, 2, unitValue) 
             
-    
+    # Convert the machine data to lists  
     machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
     machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
     
@@ -500,40 +612,27 @@ def icpLoader(self):
             for j, sample in enumerate(selectedSampleNames): 
                 print(f'*Sample: {sample}')
                 item = QtWidgets.QTableWidgetItem(); 
+                item.setTextAlignment(Qt.AlignCenter)
                 
+                # TODO: fix the logic here somehow 
                 if sample in machine1 and symbol in machine1[sample]: 
-                    machine1Val = machine1[sample][symbol] 
-                    print(f'Machine 1: {symbol} {machine1Val}')
-                    
-                    if(is_float(machine1Val) and self.dilution != 1 ): 
-                        temp = float(machine1Val)
-                        temp = temp * float(self.dilution)
-                        temp = round(temp, 3)
-                        item.setText(str(temp))
-                    else: 
-                        item.setText(machine1Val)
+                    print(f'Machine 1: {symbol} {machine1[sample][symbol]}')
+                    item = dilutionConversion(machine1, sample, symbol, self.dilution)
             
                 if sample in machine2 and symbol in machine2[sample]: 
-                    machine2Val = machine2[sample][symbol] 
-                    print(f'Machine 2: {symbol} {machine2Val}')
-                    
-                    if(is_float(machine2Val) and self.dilution != 1): 
-                        temp = float(machine2Val)
-                        temp = temp * float(self.dilution)
-                        temp = round(temp, 3)
-                        item.setText(str(temp))
-                    else: 
-                        machine2Val = round(machine2Val, 3 )
-                        item.setText(str(machine2Val))
+                    print(f'Machine 2: {symbol} {machine2[sample][symbol]}')
+                    item = dilutionConversion(machine2, sample, symbol, self.dilution)
                 
                 sampleCol = j + len(columnNames)
-                self.ui.dataTable.setItem(i,sampleCol, item)
+                
+                self.ui.dataTable.setItem(i, sampleCol, item)
 
 
     print('***Hardness Calculations')
     for j, sample in enumerate(selectedSampleNames):   
         print(f'*Sample: {sample}')
         item = QtWidgets.QTableWidgetItem();  
+        item.setTextAlignment(Qt.AlignCenter)
         
         if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
             calcium = machine1[sample]['Ca'] 
@@ -557,6 +656,33 @@ def icpLoader(self):
 
     self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
     self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
+
+def dilutionConversion(machineList, sample, symbol, dilutuion ):
+    item = QtWidgets.QTableWidgetItem(); 
+    item.setTextAlignment(Qt.AlignCenter)
+
+    machineValue = machineList[sample][symbol]
+    
+    if(is_float(machineValue) and dilutuion != 1): 
+        newVal = float(machineValue)
+        newVal = newVal * float(dilutuion)
+        newVal = round(newVal, 3)
+        item.setText(str(newVal))
+        
+    else: 
+        # item.setText(machine1Val)
+        # machine2Val = round(machine2Val, 3 )
+        # item.setText(str(machine2Val))
+        
+        try:
+            machineValue = float(machineValue)  # Convert to float first
+            machineValue = round(machineValue, 3)
+            item.setText(str(machineValue))
+        except ValueError:
+            item.setText(machineValue)
+
+    return item 
+
 
 
 def icpReportHander(self, tests, totalSamples): 
