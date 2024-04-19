@@ -5,25 +5,25 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
+    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, QCompleter 
 )
 
 
 from modules.constants import *; 
 #from modules.createExcel import * 
-from modules.dbFunctions import searchJobsList, getAllJobsList  
+from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList 
 from modules.dialogBoxes import openJobDialog
-#from modules.utilities import * 
+from modules.utilities import apply_drop_shadow_effect
 
 from pages.createReportPage import createReportPage
+
 
 def historyPageSetup(self): 
     
     historyTable = self.ui.reportsTable 
-    historySearchWidget = self.ui.searchLine
     
     rowHeight = 25; 
-    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Open Report']
+    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Action']
 
     # Format the basic table
     historyTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -34,8 +34,27 @@ def historyPageSetup(self):
     historyTable.verticalHeader().setVisible(True)
     historyTable.verticalHeader().setDefaultSectionSize(rowHeight)
 
+
+    #historyTable.setAlternatingRowColors(True)
+
     #Disable editing for the entire table 
     historyTable.setEditTriggers(QTableWidget.NoEditTriggers) 
+    
+    #FIXME: make this better somehow 
+    jobList = getAllJobNumbersList(self.db) 
+    jobList_as_strings = [str(item) for item in jobList]
+    
+    # Sets the completers
+    completer = QCompleter(jobList_as_strings)
+    completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
+    completer.setMaxVisibleItems(10)
+    
+    self.ui.reportsSearchLine.setCompleter(completer)
+    self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
+    
+
+    # Apply drop shadow for header item
+    apply_drop_shadow_effect(self.ui.reportsHeaderWidget )
 
     #load the inital table data 
     loadReportsPage(self); 
@@ -44,6 +63,10 @@ def historyPageSetup(self):
     self.ui.reportsTable.doubleClicked.connect(lambda index: on_table_double_clicked(index))
     self.ui.reportsSearchBtn.clicked.connect(lambda: on_reportsSearchBtn_clicked(self)) 
     
+    
+#******************************************************************
+#   Chemistry History 
+#******************************************************************
 
 #TODO: could have a model item that keeps tracks of all the histroy
 def loadReportsPage(self, searchValue=None): 
@@ -135,7 +158,9 @@ def openExistingReport(self, row):
         
         
 
-
+#******************************************************************
+#   Front Desk History
+#******************************************************************
 
 
 

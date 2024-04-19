@@ -86,6 +86,20 @@ def getElementLimits(db):
 
     return temp; 
 
+# Gets all of the machine data and process the data
+def getMachineData(db, jobNum): 
+    pass; 
+
+
+def loadIcpMachineHistory(db, offset, limit=50):
+    # offset is the starting section that I will, so offset 50 will be 51 forward 
+    query = 'SELECT * FROM icpMachineData1 ORDER BY createdDate DESC LIMIT ? OFFSET ?'
+    
+    db.execute(query, (limit, offset))
+    result = db.fetchone()
+    return result
+    
+
 def loadIcpElement(db, elementName): 
     query = 'SELECT * FROM icpElements WHERE element = ?'
     db.execute(query, (elementName,))
@@ -115,8 +129,11 @@ def loadIcpFooterComment(db, reportType):
     result = db.fetchone()
     return result
 
+
+
+
 #******************************************************************
-#    General  Queries/Commands
+#    General Queries/Commands
 #****************************************************************** 
 
 def checkReportExists(db, jobNum, reportType): 
@@ -178,4 +195,96 @@ def getAuthorInfo(db, authorName):
 
 #******************************************************************
 #    Settings Options 
+#****************************************************************** 
+
+def getAllParameters(db): 
+    try: 
+        query = 'SELECT * FROM parameters'  
+        results = list(db.query(query))
+        return results
+        
+    except Exception as e: 
+        print(e)
+        return None 
+    
+def addParameter(db, parameterName):
+    try:
+        query = 'INSERT INTO parameters (parameterName) VALUES (?)'
+        db.execute(query, (parameterName,))
+        db.commit()
+    except Exception as e:
+        print(e)
+
+def deleteParameter(db, parameterNumber):
+    try:
+        query = 'DELETE FROM parameters WHERE parameterNumber = ?'
+        db.execute(query, (parameterNumber,))
+        db.commit()
+    except Exception as e:
+        print(e)
+
+def updateParameter(db, parameterNumber, parameterName):
+    try:
+        query = 'UPDATE parameters SET parameterName = ? WHERE parameterNumber = ?'
+        db.execute(query, (parameterName, parameterNumber))
+        db.commit()
+    except Exception as e:
+        print(e)
+
+
+def getAllAuthors(db): 
+    try: 
+        query = 'SELECT * FROM authors'  
+        results = list(db.query(query))
+        return results
+        
+    except Exception as e: 
+        print(e)
+        return None 
+
+def getAllAuthorNames(db): 
+    try: 
+        query = 'SELECT authorName FROM authors'  
+        results = list(db.query(query))
+        return results
+        
+    except Exception as e: 
+        print(e)
+        return None 
+    
+
+def addAuthor(db, authorName, authorPostion): 
+    try: 
+        query = 'INSERT INTO authors (authorName, authorPostion) VALUES (?, ?)' 
+        db.execute(query, (authorName, authorPostion))
+        db.ecommit()
+            
+    except Exception as e: 
+        print(e) 
+    
+
+def deleteAuthor(db, authorNum): 
+    try: 
+        query = 'DELETE FROM authors WHERE authorNum = ?' 
+        db.execute(query, (authorNum, ))
+        db.ecommit()
+            
+    except Exception as e: 
+        print(e)  
+
+def updateAuthor(db, authorNum, authorName, authorPostion):
+    
+    try: 
+        query = 'UPDATE authors SET authorName = ? , authorRole = ? WHERE authorNum = ?'
+        db.execute(query, (authorName, authorPostion, authorNum))
+        db.commit()
+    
+    except Exception as e: 
+        print(e)
+     
+    
+
+
+#******************************************************************
+#    Client Queries
 #****************************************************************** 

@@ -5,11 +5,12 @@ import pickle
 from PyQt5 import QtWidgets
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy, QCompleter, QStyleFactory
+    QSpacerItem, QSizePolicy, QCompleter, QStyleFactory, QGraphicsDropShadowEffect
 )
 
 
@@ -29,6 +30,7 @@ from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadDefin
 from pages.chm_tools import (chmLoadTestsNames, loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
+
 from widgets.widgets import * 
     
     
@@ -43,10 +45,14 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
 
+
         # Load the setup 
         self.loadDatabase()
         self.loadCreatePage()
         self.loadStartup() 
+
+        #
+        self.dataTransfer()
 
         # Page Setups 
         reportSetup(self) 
@@ -160,6 +166,8 @@ class MainWindow(QMainWindow):
         if(index == 0): # History
             self.ui.reportsHeader.setText('Reports History'); 
             self.ui.totalReportsHeader.setText('Recently created reports')
+            self.ui.historyTabWidget.setCurrentIndex(0)
+            
             loadReportsPage(self)
             
         if(index == 1): # Create Report
@@ -194,7 +202,7 @@ class MainWindow(QMainWindow):
         #TODO: create a single function that loads this all to begin with isntead of having to reload this each time 
         #try lazy loading 
         if(index == 0): #History  
-            self.ui.icpPageTitle.setText("ICP History")
+            self.ui.icpPageTitle.setText("ICP Database")
             self.ui.icpLabel.setText("")
         
             loadIcpHistory(self)
@@ -255,21 +263,7 @@ class MainWindow(QMainWindow):
         self.ui.reportsBtn1.setChecked(True)
 
         self.previous_index = -1
-         
-         #FIXME: make this better somehow 
-        jobList = getAllJobNumbersList(self.db) 
-        jobList_as_strings = [str(item) for item in jobList]
-        
-        # Sets the completers
-        completer = QCompleter(jobList_as_strings)
-        completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
-        completer.setMaxVisibleItems(10)
-        
-        self.ui.reportsSearchLine.setCompleter(completer)
-        self.ui.searchLine.setCompleter(completer)
-        
-        self.ui.searchLine.setPlaceholderText("Enter Job Number...")
-        self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
+
 
         # Sets the stacks to home page 
         self.ui.stackedWidget.setCurrentIndex(0) 
@@ -292,15 +286,24 @@ class MainWindow(QMainWindow):
        
         for attempt in range(3):  
             print(f'Attemp: {attempt}')
+            
+            #TODO: try to connect the each of the databases 
+            #TODO: need to update the widget opening item 
+        
+            
             try: 
                 mainDatabasePath = self.preferences.get('databasePath') 
                 officeDatabasePath = self.preferences.get('officeDbPath')
+                preferencesDatabasePath = self.preferences.get('preferencesPath')
 
                 # Connect the backend database (Harry Systems)
                 self.db = Database(mainDatabasePath)
                 
                 # Connect the Office database (Front and Histroy Systems)
                 self.officeDB = Database(officeDatabasePath)
+            
+                # Connect the preferences database
+                self.preferencesDB = Database(preferencesDatabasePath)
 
                 return
 
@@ -314,7 +317,7 @@ class MainWindow(QMainWindow):
                     # Dialog popup to load the necessaary database Information for the user 
                     dialog = FileLocationDialog(self.preferences)
                     dialog.exec_()
-                    
+        
           
     #******************************************************************
     #   Helper/Other Functions 
@@ -332,9 +335,24 @@ class MainWindow(QMainWindow):
         self.ui.reportType.clear()
         self.ui.reportType.addItems(REPORTS_TYPE)
         
-        paramResults = sorted(getReportTypeList(self.db))
+        #paramResults = sorted(getReportTypeList(self.db))
+        paramResults = sorted(getAllParameters(self.preferencesDB))
+        paramResults =  [sublist[1] for sublist in paramResults]
+        
         paramResults.insert(0, "")
         self.ui.paramType.addItems(paramResults)
+
+    def loadPreferences(self): 
+        
+        #load the settings information
+        
+        #load the create page preferences (Parameter and Report Type)
+        
+        #load the test pages (authors)
+        
+        
+    
+        pass; 
     
     
     # TODO: make this more a general application  
@@ -381,6 +399,11 @@ class MainWindow(QMainWindow):
             print(f"User entered: {user_input}")
         else:
             print("User canceled.")
+            
+
+    def dataTransfer(self): 
+        print('Data Transfer File test')
+        
             
 #******************************************************************
 #   Classes

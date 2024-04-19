@@ -202,3 +202,9 @@ class FileLocationDialog(QDialog):
             self.preferences.update(key, value)
 
         self.close()
+
+class addAuthorDialog(QDialog): 
+    def __init__(self): 
+        super().__init__()
+        
+        pass;

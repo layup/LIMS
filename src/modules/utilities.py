@@ -10,14 +10,29 @@ import openpyxl
 from copy import copy
 from datetime import date
 
+from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QFileDialog, QPushButton, QTableWidgetItem, 
-    QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip 
+    QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip, 
+    QGraphicsDropShadowEffect 
 )
 
 from modules.constants import *
 from modules.dialogBoxes import *
+
+
+
+def apply_drop_shadow_effect(widget):
+    # Create drop shadow effect
+    shadow = QGraphicsDropShadowEffect(widget)
+    shadow.setColor(QColor(0, 0, 0, 150))  # Set shadow color
+    shadow.setBlurRadius(10)  # Set shadow blur radius
+    shadow.setOffset(0, 0)  # Set shadow offset (no offset)
+
+    # Apply drop shadow effect to the widget
+    widget.setGraphicsEffect(shadow)
+
 
 def removeIllegalCharacters(input_string):
     # Define a regular expression pattern to match illegal and escape characters

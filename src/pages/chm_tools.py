@@ -49,17 +49,18 @@ def chemistySetup(self):
 
     self.ui.inputDataTree.clear()
     
+    # Set the column width for Input Tree 
+
     # Connect Signal/Buttons 
     self.ui.gcmsAddTestsBtn.clicked.connect(lambda: on_chmAddTestsBtn_clicked(self))
     self.ui.gcmsSaveTestBtn.clicked.connect(lambda: on_chmSaveTestBtn_clicked(self))
-    self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))
-    self.ui.gcmsDefinedtests.clicked.connect(lambda: on_chmDefinedtests_clicked(self))
-        
+    self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))        
     self.ui.gcmsDefinedtests.currentRowChanged.connect(lambda: on_chmDefinedtests_currentRowChanged(self)) 
     
     # CHM input data signals
     self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
     self.ui.gcmsProceedBtn.clicked.connect(lambda: on_gcmsProceedBtn_clicked(self))
+    
     self.ui.chmAddTestsBtn.clicked.connect(lambda: on_chmSampleDataAdd_clicked(self))
     
 
@@ -79,6 +80,12 @@ def chmLoadTestsData(self):
             self.ui.gcmsUnitType.setText(str(results[1]))
             self.ui.gcmsRefValue.setText(str(results[2]))
             self.ui.gcmsDisplayName.setText(str(results[3]))
+
+            self.ui.chmTxtName.setText(str(results[0]))
+            self.ui.chmUnitName.setText(str(results[1]))
+            self.ui.chmRefValue.setText(str(results[2]))
+            self.ui.chmDisplayName.setText(str(results[3])) 
+            
         except: 
             #item is not in the database yet 
             print('Error: selected Text was None') 
@@ -87,6 +94,7 @@ def chmLoadTestsData(self):
             
             
 def chmLoadTestsNames(self): 
+    print('[FUNCTION]: chmLoadTestsNames')
     chmClearDefinedTestsValues(self); 
     self.ui.gcmsDefinedtests.clear()
     self.ui.testsInputLabel.clear()
@@ -99,12 +107,39 @@ def chmLoadTestsNames(self):
     for test in testNames: 
         self.ui.gcmsDefinedtests.addItem(test[0])
 
+
+    # Clear the section (reloading)
+    self.ui.chmTestTree.clear()
+
+    # Query Results 
+    query = 'SELECT * FROM gcmsTests gcmsTests ORDER BY testName COLLATE NOCASE ASC'
+    testNames = self.db.query(query)        
+    print(f'testsNames: {testNames}')
+     
+    for testInfo in testNames: 
+        item = QTreeWidgetItem(self.ui.chmTestTree) 
+        item.setData(0, 0, testInfo[0])
+        item.setData(1, 0, testInfo[1])
+        item.setData(2, 0, testInfo[2])
+        item.setData(3, 0, testInfo[3])
+
+    
+
+
 def chmClearDefinedTestsValues(self): 
     self.ui.gcmsDisplayName.clear()
     self.ui.gcmsTxtName.clear()
     self.ui.gcmsUnitType.clear()
     self.ui.gcmsRefValue.clear()
     self.ui.gcmsComment.clear() 
+
+  
+    self.ui.chmTestsComment.clear()
+    for child_widget in self.ui.temp1.findChildren(QWidget):
+        # Check if the child widget is a QLineEdit
+        if isinstance(child_widget, QLineEdit):
+            # Clear the text of the QLineEdit
+            child_widget.clear()
         
         
 #******************************************************************
@@ -208,7 +243,8 @@ def on_gcmsProceedBtn_clicked(self):
     
     if(sum(errorCheck) == 0):
     
-        self.ui.gcmsTestsValueWidget.setEnabled(True)
+        self.ui.chmTestsValueWidget.setEnabled(True)
+        self.ui.chmActionWidget.setEnabled(True)
         #TODO: rename the widget thing
         self.ui.widget_29.setEnabled(False)
         self.ui.gcmsStandardValShow.setText(standards)
@@ -353,7 +389,8 @@ def gcmsClearSideData(self):
     self.ui.gcmsTests.clear() 
         
 def chmClearEnteredTestsData(self): 
-    self.ui.gcmsTestsValueWidget.setEnabled(False)
+    self.ui.chmTestsValueWidget.setEnabled(False)
+    self.ui.chmActionWidget.setEnabled(False)
     self.ui.widget_29.setEnabled(True)
         
     self.ui.gcmsStandardVal.clear()
@@ -460,9 +497,6 @@ def on_chmDeleteTestBtn_clicked(self):
         print('Error: could not delete item')
     
 
-@pyqtSlot()
-def on_chmDefinedtests_clicked(self): 
-    chmLoadTestsData(self)
         
 def on_chmDefinedtests_currentRowChanged(self):
     try:
@@ -507,6 +541,31 @@ def getTestsAndUnits(self):
 #    Chemisty Class Definitions
 #****************************************************************** 
 
+class TestsInfoManager(): 
+
+    def __init__(self, treeWidget, database):
+        self.treeWidget = treeWidget
+        self.db = database  
+        
+    def displayTreeData(self): 
+        pass; 
+    
+    
+    
+    def displayWidgetData(self): 
+        pass; 
+    
+        ##External functions maybe? 
+    
+    
+    def updateDatabase(self): 
+        pass; 
+    
+    
+    
+
+class ReportManager(): 
+    pass; 
 
 
 class MacroDialog(QDialog): 

@@ -37,6 +37,19 @@ def reportSetup(self):
 
     self.ui.dilutionInput.setValidator(validator)
     self.ui.dilutionInput.setMaxLength(6)
+
+    #load in the authors 
+    #TODO: have some error checking and deal with the loadiong section 
+    authorsList = [item[0] for item in getAllAuthorNames(self.preferencesDB)]
+    authorsList.insert(0, '')
+    
+    print(authorsList)
+    
+    self.ui.authorOneDropDown.clear()
+    self.ui.authorTwoDropDown.clear()
+    
+    self.ui.authorOneDropDown.addItems(authorsList)
+    self.ui.authorTwoDropDown.addItems(authorsList)
     
     # Connect signals  
     self.ui.NextSection.clicked.connect(lambda: createReportPage(self))
@@ -239,7 +252,9 @@ def loadClientInfo(self):
     self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
     self.ui.parameterHeader.setText(self.parameter); 
     self.ui.reportTypeHeader.setText(self.reportType);
-    self.ui.factorHeader.setText(self.dilution);
+    
+    #FIXME: do something to this
+    #self.ui.factorHeader.setText(self.dilution);
 
     # Set the client Info 
     self.ui.clientName_1.setText(self.clientInfo['clientName'])

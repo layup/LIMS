@@ -1,9 +1,10 @@
 
 import sqlite3
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QTreeWidgetItem, QPushButton
 
 #from modules.dbManager import * 
-from modules.dbFunctions import getAuthorInfo
+from modules.dbFunctions import getAuthorInfo, getAllParameters, getAllAuthors 
 #from modules.constants import *
 from modules.utilities import load_pickle, save_pickle, getFileLocation, openFile
 #from widgets.widgets import *
@@ -11,7 +12,13 @@ from modules.utilities import load_pickle, save_pickle, getFileLocation, openFil
 
 #TODO: update the localPrefernece stuff
 def settingsSetup(self): 
+    
+    #load the intial settings 
     loadSettings(self) 
+    
+    settingsReportSetup(self)
+    
+    
     self.ui.SettingsTab.setCurrentIndex(0) 
 
     # Connect Buttons and Signals  
@@ -21,11 +28,16 @@ def settingsSetup(self):
     textPathWidget = self.ui.txtPath
     fileConvertedPathWidget = self.ui.convertPath
     databasePathWidget = self.ui.dbPath
+    preferenceDbPath = self.ui.prefrenceDbPath
 
+    # File paths button signals 
     self.ui.reportsPathBtn.clicked.connect(lambda: updateFilePath(reportPathWidget, 'reportsPath'))
     self.ui.txtPathBtn.clicked.connect(lambda: updateFilePath(textPathWidget, 'TXTDirLocation'))
     self.ui.convertedPathBtn.clicked.connect(lambda: updateFilePath(fileConvertedPathWidget, 'ispDataUploadPath'))
+    
+    # Database Connections 
     self.ui.dbPathBtn.clicked.connect(lambda: updateFileItem(databasePathWidget, 'databasePath'))
+    self.ui.preferenceDbBtn.clicked.connect(lambda:updateFileItem(preferenceDbPath, 'preferencesPath'))
 
     self.ui.saveAuthorBtn.clicked.connect(lambda: on_saveAuthorBtn_clicked(self)) 
     self.ui.deleteAuthorBtn.clicked.connect(lambda: on_deleteAuthorBtn_clicked(self))
@@ -43,12 +55,20 @@ def settingsTab_changes(self, index):
         loadSettings(self) 
 
     if(index == 1): 
-        #clear the items 
+        # clear the items 
         self.ui.authorList.clear()
         self.ui.authorNameLine.clear()
         self.ui.authorPostionLine.clear()
         
-        loadAuthors(self.db, authorList)
+        #loadAuthors(self.db, authorList)
+        loadReportAuthors(self)
+
+        # Load the report type section 
+        loadReportParameters(self)
+
+        # Load the parameters section 
+        
+        # Load the Authors section 
         
 #******************************************************************
 #    Preference Location Update 
@@ -61,6 +81,7 @@ def loadSettings(self):
     self.ui.convertPath.setText(self.preferences.get('ispDataUploadPath'))
     self.ui.dbPath.setText(self.preferences.get('databasePath'))
     self.ui.frontPath.setText(self.preferences.get('officeDbPath'))
+    self.ui.prefrenceDbPath.setText(self.preferences.get('preferencesPath'))
 
 @pyqtSlot() 
 def updateFilePath(widget, pathName): 
@@ -169,3 +190,74 @@ def on_addAuthor_clicked(self):
         
         new_item_index = self.ui.authorList.count() - 1
         self.ui.authorList.setCurrentRow(new_item_index)
+
+        
+        
+#******************************************************************
+#    Reports Functions 
+#****************************************************************** 
+
+
+def settingsReportSetup(self): 
+    
+    # Parameters setup 
+    
+    
+    # button configuation setup 
+
+    authorLabels = ['Author Name', 'Author Postion', 'Actions']
+    self.ui.authorTreeWidget.setHeaderLabels(authorLabels)
+    
+    
+
+    pass; 
+
+
+#TODO: can lazy load the data 
+def loadReportParameters(self): 
+    
+    paramList = getAllParameters(self.preferencesDB)
+    
+    print(paramList)
+    
+    paramTreeWidget = self.ui.parameterTreeWidget
+    # Clear the tree widget and reload the data 
+    paramTreeWidget.clear()
+    
+    for paramItem in paramList: 
+        paraNum = paramItem[0]
+        paramName = paramItem[1]
+        
+        childTreeItem = QTreeWidgetItem(paramTreeWidget)
+        childTreeItem.setText(0, paramName)
+
+        
+def loadReportAuthors(self): 
+    
+    authorList = getAllAuthors(self.preferencesDB)
+    
+    authorTreeWidget = self.ui.authorTreeWidget 
+    
+    authorTreeWidget.clear()
+    
+    for authorItem in authorList: 
+        authorNum = authorItem[0]
+        authorName = authorItem[1]
+        authorRole = authorItem[2]
+
+        editButton = QPushButton('Edit')
+
+        childTreeItem = QTreeWidgetItem(authorTreeWidget)
+        childTreeItem.setText(0, authorName)
+        childTreeItem.setText(1, authorRole)
+        
+        self.ui.authorTreeWidget.setItemWidget(childTreeItem, 2, editButton)
+        
+        
+
+        
+        
+def on_addAuthor_clicked2(self): 
+    
+    #setup buttons 
+    pass; 

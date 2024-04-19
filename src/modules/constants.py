@@ -1,6 +1,28 @@
 
 REPORTS_TYPE = ['','CHM','ICP']
 
+
+SAMPLETYPES = [ 
+    '1um wound fiter', 
+    'sediment',
+    'agar plates', 
+    'clams', 
+    'compost', 
+    'drinking water', 
+    'effluent', 
+    'filters(s)', 
+    'fish', 
+    'food', 
+    'ore',
+    'other', 
+    'paint', 
+    'saltwater', 
+    'soil',
+    'swab',
+    'water',
+]
+
+
 GSMS_values = {
     "001": ["ALkalinity", "mg/L"], 
     "002": ["NH3-N", "ug/L "], 

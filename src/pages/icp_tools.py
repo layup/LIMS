@@ -3,6 +3,13 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
 
 
+from PyQt5.QtWidgets import (
+    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
+    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
+    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
+    QSpacerItem, QSizePolicy, QWidgetItem, QTreeWidgetItem,  
+)
+
 from modules.dbFunctions import *
 from modules.constants import *
 from modules.utilities import *
@@ -19,6 +26,8 @@ def icpSetup(self):
     # self.updateIcpTable(machine1Data) 
     loadIcpHistory(self)
     
+
+    
     # Connect the signals/buttons 
     self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.db))
     self.ui.icpSearchBtn.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
@@ -28,17 +37,18 @@ def icpSetup(self):
     self.ui.deleteCompBtn.clicked.connect(lambda: on_deleteCompBtn_clicked(self))
 
     self.ui.addReportBtn.clicked.connect(lambda: on_addReportBtn_clicked(self))
-    self.ui.definedElements.clicked.connect(lambda: on_definedElements_clicked(self))
+
     self.ui.definedElements.currentRowChanged.connect(lambda: on_definedElements_currentRowChanged(self))
 
     self.ui.reportsList.clicked.connect(lambda: on_reportsList_clicked(self))
     self.ui.saveFooterBtn.clicked.connect(lambda: on_saveFooterBtn_clicked(self))
     self.ui.deleteFooterBtn.clicked.connect(lambda: on_deleteFooterBtn_clicked(self))
 
-
+ 
     #on_reportlist_doubleClicked
     self.ui.reportsList.doubleClicked.connect(lambda: on_reportlist_doubleClicked())
     self.ui.reportTypeDropdown.activated.connect(lambda: loadElementLimits(self)) 
+
 
 def loadReportList(self): 
     results = loadIcpReportList(self.db)
@@ -99,18 +109,19 @@ def on_icpSearchBtn_clicked(self):
 
 
 def loadIcpHistory(self):
-        columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
+    columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
     
-        icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
-        icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
+    icpMachine1sql = 'SELECT sampleName, jobNumber, machine, fileLocation, createdDate data FROM icpMachineData1 ORDER BY createdDate DESC' 
+    icpMachine2sql = 'SELECT sampleName, jobNumber, fileLocation, createdDate, machine data FROM icpMachineData2'
+    
+    machine1Data = list(self.db.query(icpMachine1sql))
+    #machine2Data = list(self.db.query(icpMachine2sql))
+    
+    totalItems = len(machine1Data) 
+    self.ui.icpLabel.setText(f'Total Items in Database: {totalItems}')
         
-        machine1Data = list(self.db.query(icpMachine1sql))
-        #machine2Data = list(self.db.query(icpMachine2sql))
-        
-        totalItems = len(machine1Data) 
-        self.ui.icpLabel.setText(f'Total Items in Database: {totalItems}')
-            
-        updateIcpTable(self, machine1Data) 
+    updateIcpTable(self, machine1Data) 
+
             
 def updateIcpTable(self, result): 
     textLabelUpdate = 'Total Search Results: ' + str(len(result))
@@ -143,11 +154,13 @@ def updateIcpTable(self, result):
             self.ui.icpTable.setItem(i,j,item) 
     
     self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    
 
 
 #******************************************************************
 #    ICP Defined Elements  
 #****************************************************************** 
+
 
 def loadElementLimits(self): 
     print('[Function]: loadElementLimits')
@@ -156,9 +169,10 @@ def loadElementLimits(self):
     
     try: 
         limitResults = loadIcpLimit(self.db, elementName, reportType)
+        print(f'Query Results: {elementName}, {limitResults}'); 
         
         if(limitResults is None): 
-            self.clearElementLimits()
+            clearElementLimits(self)
         else: 
             #TODO: define what the limit values are equal to 
             self.ui.lowerLimit.setText(str(limitResults[2]))
@@ -166,40 +180,60 @@ def loadElementLimits(self):
             self.ui.unitType.setText(limitResults[5])
             self.ui.RightSideComment.setPlainText(limitResults[4]) 
     except: 
-        print('Error on loadElementLimits: Could not load in limits ')
+        print('Error on loadElementLimits: Could not load in limits')
 
-
+@pyqtSlot()
 def icp_load_element_data(self): 
     print('[FUNCTION]: icp_load_element_data')
     selectedElement = self.ui.definedElements.currentItem()
     
     if selectedElement is not None:
         selectedElementText = selectedElement.text()
-        #TODO: don't I have a global element that can do all of this stuff 
-        reportType = self.ui.reportTypeDropdown.currentText()
-        
         elementResult = loadIcpElement(self.db, selectedElementText)
-        limitResults = loadIcpLimit(self.db, selectedElementText, reportType)
         
         print(f'Selected Element: {selectedElementText}');  
-        print(f'Query Results: {elementResult}, {limitResults}'); 
-        
+     
         if elementResult: 
-            self.ui.elementNameinput.setText(elementResult[0])
-            self.ui.symbolInput.setText(elementResult[1])
+            elementName = elementResult[0]
+            elementSymbol = elementResult[1]
             
-            if(limitResults is None): 
-                clearElementLimits(self)
-            else: 
-                self.ui.lowerLimit.setText(str(limitResults[2]))
-                self.ui.upperLimit.setText(str(limitResults[3]))
-                self.ui.unitType.setText(limitResults[5])
-                self.ui.RightSideComment.setPlainText(limitResults[4]) 
+            # Set the element header name
+            self.ui.icpElementNameHeader.setText(elementName.capitalize())
+            
+            # set the basic element info  
+            self.ui.elementNameinput.setText(elementName)
+            self.ui.symbolInput.setText(elementSymbol)
+
+            # load the limits
+            loadElementLimits(self) 
+            # Load the report type tree 
+            loadElementReportTree(self)
+            
         else: 
             clearElementInfo(self)
             self.ui.elementNameinput.setText(selectedElementText)
     else:
         print("No item selected.") 
+
+@pyqtSlot()
+def loadElementReportTree(self): 
+    print('[Function]: loadElementReportTree')
+    
+    # Clear the table before loading any data 
+    self.ui.icpElementTreeWidget.clear()
+    
+    query = 'SELECT reportType, lowerLimit, maxLimit, units  FROM icpLimits WHERE element = ? ORDER BY reportType ASC'  
+    
+    elementName = self.ui.elementNameinput.text().lower()
+    results = self.db.query(query, (elementName, ))
+
+    # Populate the report table
+    for currentReport in results: 
+        item = QTreeWidgetItem(self.ui.icpElementTreeWidget) 
+        item.setText(0, currentReport[0])  
+        item.setData(1, 0, currentReport[1]) 
+        item.setData(2, 0, currentReport[2])
+        item.setText(3, currentReport[3])
 
 @pyqtSlot()
 def on_addElementBtn_clicked(self): 
@@ -306,25 +340,24 @@ def on_deleteCompBtn_clicked(self):
     except: 
         print('Error: could not delete item')
     
-
-def on_definedElements_clicked(self):
-    try:
-        icp_load_element_data(self);
-    except: 
-        print('Error: Could not loaded the defined element data')
-
-        
+@pyqtSlot()        
 def on_definedElements_currentRowChanged(self):
     try:
         icp_load_element_data(self);
-    except: 
+    except Exception as error: 
         print('Error: Could not loaded the defined element data')
+        print(error)
     
         
 def clearElementInfo(self): 
+    # Clear element info 
     self.ui.symbolInput.clear()
     self.ui.elementNameinput.clear()
+
+    # Clear the Tree Widget
+    self.ui.icpElementTreeWidget.clear()
     
+    # Clear the report type information 
     self.ui.lowerLimit.clear()
     self.ui.upperLimit.clear()
     self.ui.unitType.clear()
