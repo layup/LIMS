@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1619</width>
-    <height>891</height>
+    <width>1321</width>
+    <height>889</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -465,6 +465,12 @@ QComboBox{
 	border-radius: 5px;
 } 
 
+#textBrowser {
+	background-color:white; 
+	color:black; 
+} 
+
+
 /******************************************************************
 /	Reports Section   
 /******************************************************************/
@@ -556,6 +562,11 @@ QComboBox{
 	border-radius:10px; 
 }
 
+#icpFooterCommentWidget {
+	background-color:  #323a47; 
+	border-radius:10px; 
+} 
+
 #icpElementsWidget  {
 	background-color:  #323a47; 
 	border-radius:10px; 
@@ -635,6 +646,9 @@ QComboBox{
 	background-color: #323a47;
 	border-radius: 10px;
 } 
+
+
+
 /******************************************************************
 /	ICP Histroy Page  
 /******************************************************************/
@@ -795,6 +809,14 @@ QComboBox{
 } 
 
 
+#settingHeader {
+	background-color: #323a47;
+} 
+
+#settingHeader QLabel {
+	color:white;
+} 
+
 #SettingTab &gt; QPushButton { 
 	min-width: 100px;
 	max-width: 100px;
@@ -892,7 +914,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/file.png</normaloff>:/icons/icons/file.png</iconset>
          </property>
          <property name="iconSize">
@@ -912,7 +934,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/file-earmark-plus.svg</normaloff>:/icons/icons/file-earmark-plus.svg</iconset>
          </property>
          <property name="iconSize">
@@ -932,7 +954,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/flask.png</normaloff>:/icons/icons/flask.png</iconset>
          </property>
          <property name="iconSize">
@@ -952,7 +974,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/microscope.png</normaloff>:/icons/icons/microscope.png</iconset>
          </property>
          <property name="iconSize">
@@ -972,7 +994,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
          </property>
          <property name="iconSize">
@@ -1005,7 +1027,7 @@ QComboBox{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="assets/resourse.qrc">
+          <iconset resource="../assets/resourse.qrc">
            <normaloff>:/icons/icons/menu-burger.png</normaloff>:/icons/icons/menu-burger.png</iconset>
          </property>
          <property name="iconSize">
@@ -1035,13 +1057,13 @@ QComboBox{
       </property>
       <property name="minimumSize">
        <size>
-        <width>250</width>
+        <width>200</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>200</width>
         <height>16777215</height>
        </size>
       </property>
@@ -1137,7 +1159,7 @@ color: rgb(255, 255, 255);</string>
              <string>Reports </string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/file.png</normaloff>:/icons/icons/file.png</iconset>
             </property>
             <property name="iconSize">
@@ -1166,7 +1188,7 @@ color: rgb(255, 255, 255);</string>
              <string>Create Report</string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/file-earmark-plus.svg</normaloff>:/icons/icons/file-earmark-plus.svg</iconset>
             </property>
             <property name="iconSize">
@@ -1189,7 +1211,7 @@ color: rgb(255, 255, 255);</string>
              <string>ICP Tools</string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/flask.png</normaloff>:/icons/icons/flask.png</iconset>
             </property>
             <property name="iconSize">
@@ -1209,7 +1231,7 @@ color: rgb(255, 255, 255);</string>
              <string>CHM Tools </string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/microscope.png</normaloff>:/icons/icons/microscope.png</iconset>
             </property>
             <property name="iconSize">
@@ -1229,7 +1251,7 @@ color: rgb(255, 255, 255);</string>
              <string>Settings</string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/settings-sliders.png</normaloff>:/icons/icons/settings-sliders.png</iconset>
             </property>
             <property name="iconSize">
@@ -1262,7 +1284,7 @@ color: rgb(255, 255, 255);</string>
              <string>Toggle Side</string>
             </property>
             <property name="icon">
-             <iconset resource="assets/resourse.qrc">
+             <iconset resource="../assets/resourse.qrc">
               <normaloff>:/icons/icons/menu-burger.png</normaloff>:/icons/icons/menu-burger.png</iconset>
             </property>
             <property name="iconSize">
@@ -1315,7 +1337,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>4</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -2338,7 +2360,7 @@ margin: 0;
            <item>
             <widget class="QTabWidget" name="icpTabWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="icpHistory">
               <attribute name="title">
@@ -2650,55 +2672,7 @@ margin: 0;
                   <property name="bottomMargin">
                    <number>0</number>
                   </property>
-                  <item row="4" column="0">
-                   <widget class="QWidget" name="icpReportTypesWidget" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_47">
-                     <item>
-                      <widget class="QLabel" name="label_51">
-                       <property name="font">
-                        <font>
-                         <weight>75</weight>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Report Type</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QTreeWidget" name="icpElementTreeWidget">
-                       <column>
-                        <property name="text">
-                         <string>Report Type</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Lower Limit </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Upper Limit </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Unit Type </string>
-                        </property>
-                       </column>
-                       <item>
-                        <property name="text">
-                         <string>tests</string>
-                        </property>
-                       </item>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item row="8" column="0" colspan="2">
+                  <item row="9" column="0" colspan="2">
                    <widget class="QWidget" name="icpElementsFooter" native="true">
                     <property name="minimumSize">
                      <size>
@@ -2721,6 +2695,13 @@ margin: 0;
                       </spacer>
                      </item>
                      <item>
+                      <widget class="QPushButton" name="icpCancelBtn">
+                       <property name="text">
+                        <string>Cancel</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
                       <widget class="QPushButton" name="saveCompBtn">
                        <property name="text">
                         <string>Save Changes</string>
@@ -2729,165 +2710,6 @@ margin: 0;
                         <bool>true</bool>
                        </property>
                       </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item row="2" column="0" rowspan="2">
-                   <widget class="QWidget" name="icpElementsInfoWidget" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_32">
-                       <property name="text">
-                        <string>Element Symbol</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLineEdit" name="symbolInput"/>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLabel" name="label_33">
-                       <property name="font">
-                        <font>
-                         <weight>75</weight>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Element Info </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="4" column="1">
-                      <spacer name="verticalSpacer_4">
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>20</width>
-                         <height>40</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_36">
-                       <property name="text">
-                        <string>Element Name </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QLineEdit" name="elementNameinput"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QWidget" name="icpReportTypeWidget" native="true">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_38">
-                     <item>
-                      <widget class="QLabel" name="label_41">
-                       <property name="font">
-                        <font>
-                         <weight>75</weight>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Side Limit Comment</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPlainTextEdit" name="RightSideComment">
-                       <property name="minimumSize">
-                        <size>
-                         <width>200</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>50</height>
-                        </size>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_29">
-                       <property name="font">
-                        <font>
-                         <weight>75</weight>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>Footer Comment</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPlainTextEdit" name="icpElementFooterComment">
-                       <property name="minimumSize">
-                        <size>
-                         <width>200</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>150</height>
-                        </size>
-                       </property>
-                       <property name="frameShape">
-                        <enum>QFrame::StyledPanel</enum>
-                       </property>
-                       <property name="frameShadow">
-                        <enum>QFrame::Raised</enum>
-                       </property>
-                       <property name="sizeAdjustPolicy">
-                        <enum>QAbstractScrollArea::AdjustIgnored</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="verticalSpacer_5">
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>20</width>
-                         <height>40</height>
-                        </size>
-                       </property>
-                      </spacer>
                      </item>
                     </layout>
                    </widget>
@@ -2944,6 +2766,50 @@ margin: 0;
                     </layout>
                    </widget>
                   </item>
+                  <item row="4" column="1">
+                   <widget class="QWidget" name="icpReportTypeWidget" native="true">
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>120</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_38">
+                     <item>
+                      <widget class="QLabel" name="label_41">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Side Limit Comment</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPlainTextEdit" name="RightSideComment">
+                       <property name="minimumSize">
+                        <size>
+                         <width>200</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
                   <item row="2" column="1" rowspan="2">
                    <widget class="QWidget" name="icpElementInfoWidget" native="true">
                     <property name="maximumSize">
@@ -2956,40 +2822,10 @@ margin: 0;
                      <string notr="true"/>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_12">
-                     <item row="5" column="0">
-                      <widget class="QLabel" name="label_40">
-                       <property name="text">
-                        <string>Unit Type</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="3" column="1">
-                      <widget class="QLineEdit" name="lowerLimit"/>
-                     </item>
-                     <item row="4" column="0">
-                      <widget class="QLabel" name="label_39">
-                       <property name="text">
-                        <string>upper Limit </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="4" column="1">
-                      <widget class="QLineEdit" name="upperLimit"/>
-                     </item>
-                     <item row="3" column="0">
-                      <widget class="QLabel" name="label_38">
-                       <property name="text">
-                        <string>Lower Limit</string>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="5" column="1">
-                      <widget class="QLineEdit" name="unitType"/>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_37">
-                       <property name="text">
-                        <string>Report Type</string>
+                      <widget class="QLineEdit" name="unitType">
+                       <property name="placeholderText">
+                        <string/>
                        </property>
                       </widget>
                      </item>
@@ -3008,6 +2844,48 @@ margin: 0;
                        </item>
                       </widget>
                      </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_37">
+                       <property name="text">
+                        <string>Report Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QLabel" name="label_40">
+                       <property name="text">
+                        <string>Unit Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QLineEdit" name="upperLimit">
+                       <property name="placeholderText">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QLabel" name="label_39">
+                       <property name="text">
+                        <string>upper Limit </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_38">
+                       <property name="text">
+                        <string>Lower Limit</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lowerLimit">
+                       <property name="placeholderText">
+                        <string> </string>
+                       </property>
+                      </widget>
+                     </item>
                      <item row="0" column="1">
                       <widget class="QLabel" name="label_48">
                        <property name="font">
@@ -3021,6 +2899,205 @@ margin: 0;
                         <string> Defined Limits</string>
                        </property>
                       </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="2" column="0" rowspan="2">
+                   <widget class="QWidget" name="icpElementsInfoWidget" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_3">
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_32">
+                       <property name="text">
+                        <string>Element Symbol</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="symbolInput">
+                       <property name="minimumSize">
+                        <size>
+                         <width>202</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_36">
+                       <property name="text">
+                        <string>Element Name </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="elementNameinput"/>
+                     </item>
+                     <item row="4" column="1">
+                      <spacer name="verticalSpacer_4">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLabel" name="label_33">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Element Info </string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" rowspan="2">
+                   <widget class="QWidget" name="icpReportTypesWidget" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_47">
+                     <item>
+                      <widget class="QLabel" name="label_51">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Report Type</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QTreeWidget" name="icpElementTreeWidget">
+                       <column>
+                        <property name="text">
+                         <string>Report Number</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Report Type</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Lower Limit </string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Upper Limit </string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Unit Type </string>
+                        </property>
+                       </column>
+                       <item>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string>tests</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QWidget" name="icpFooterCommentWidget" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_48">
+                     <item>
+                      <widget class="QLabel" name="label_29">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Footer Comment</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPlainTextEdit" name="icpElementFooterComment">
+                       <property name="minimumSize">
+                        <size>
+                         <width>200</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>150</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::StyledPanel</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                       </property>
+                       <property name="sizeAdjustPolicy">
+                        <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="verticalSpacer_5">
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>20</width>
+                         <height>40</height>
+                        </size>
+                       </property>
+                      </spacer>
                      </item>
                     </layout>
                    </widget>
@@ -3425,7 +3502,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>4</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -4887,8 +4964,7 @@ p, li { white-space: pre-wrap; }
                      </size>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true">
-</string>
+                     <string notr="true"/>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_34">
                      <property name="leftMargin">
@@ -5534,7 +5610,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: rgb(255, 255, 255);</string>
+              <string notr="true"/>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
@@ -5575,7 +5651,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -5588,15 +5664,15 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox_2">
                     <property name="currentIndex">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <widget class="QWidget" name="page_3">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1277</width>
-                       <height>606</height>
+                       <width>628</width>
+                       <height>379</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5861,8 +5937,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1277</width>
-                       <height>606</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5907,8 +5983,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1277</width>
-                       <height>606</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5930,15 +6006,15 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox">
                     <property name="currentIndex">
-                     <number>0</number>
+                     <number>1</number>
                     </property>
                     <widget class="QWidget" name="page_2">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1277</width>
-                       <height>640</height>
+                       <width>1034</width>
+                       <height>149</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6032,8 +6108,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1277</width>
-                       <height>640</height>
+                       <width>1034</width>
+                       <height>623</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6661,7 +6737,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>2</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -7595,7 +7671,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1619</width>
+     <width>1321</width>
      <height>22</height>
     </rect>
    </property>
@@ -7633,7 +7709,7 @@ QPushButton::hover {
   </action>
  </widget>
  <resources>
-  <include location="assets/resourse.qrc"/>
+  <include location="../assets/resourse.qrc"/>
  </resources>
  <connections>
   <connection>

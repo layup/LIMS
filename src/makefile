@@ -6,7 +6,7 @@ create_resourse:
 
 create_ui:
 	echo 'Generating interface UI .py file'
-	pyuic5 -x interface.ui -o interface.py 
+	pyuic5 -x ui/interface.ui -o interface.py 
 
 run: 
 	python3 setup.py

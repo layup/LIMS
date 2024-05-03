@@ -284,7 +284,7 @@ def processClientInfo(jobNum, fileLocation):
                 if("pd" in line.lower()): 
                     clientInfoDict['payment'] = line[51:].strip()
                      
-            
+            #FIXME: error with 172235 ICP, not showing the proper text amount
             if(lineLocation > 35 and len(line) > 0): 
                
                 if(sampleCounter != int(clientInfoDict['totalSamples']) ):

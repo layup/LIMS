@@ -50,7 +50,7 @@ QPushButton {
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -100,36 +100,30 @@ QPushButton {
         </property>
        </widget>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget_4" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
       <item>
-       <widget class="QWidget" name="widget_8" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QWidget" name="widget_4" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="topMargin">
-             <number>5</number>
-            </property>
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Text File Name</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="textNameEdit">
-              <property name="placeholderText">
-               <string>Name that will appear on text file</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Text File Name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="textNameEdit">
+        <property name="placeholderText">
+         <string>Name that will appear on text file</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -190,7 +184,23 @@ QPushButton {
        </widget>
       </item>
       <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit"/>
+       <widget class="QPlainTextEdit" name="plainTextEdit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>150</height>
+         </size>
+        </property>
+        <property name="placeholderText">
+         <string>Comment that will appear next to the tests in final report</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

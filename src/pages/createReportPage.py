@@ -749,7 +749,7 @@ def icpReportHander(self, tests, totalSamples):
 
     footerComments = ''
     
-    if(commentResults[0]):
+    if(commentResults):
         footerComments = pickle.loads(commentResults[0])
         footerList = '\n'.join(footerComments)
         footerComments = footerList.split('\n')

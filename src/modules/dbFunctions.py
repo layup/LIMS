@@ -129,6 +129,69 @@ def loadIcpFooterComment(db, reportType):
     result = db.fetchone()
     return result
 
+#******************************************************************
+#    NEW ICP Database Connections 
+#****************************************************************** 
+
+#TODO: deal with it on the report side of things
+def getIcpElementNum(db, elementName): 
+    pass; 
+
+
+def getIcpElementInfo(db, elementNum): 
+    try: 
+        query = 'SELECT * FROM icpElements WHERE elementNum = ? '
+        results = db.query(query, (elementNum,))
+        return results
+        
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None
+
+def getIcpElementLimits(db, elementNum): 
+    try: 
+        # Selecting all of the limits associated with that elementNum
+        query = 'SELECT * FROM icpLimits WHERE elementNum = ?'  
+        results = db.query(query, (elementNum,))
+        return results
+        
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None
+
+def getIcpElements2(db): 
+
+    try: 
+        query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
+        definedElements = db.query(query)    
+        return definedElements 
+        
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None 
+    
+def addIcpElement(db): 
+    pass; 
+        
+
+def updateIcpElement(db): 
+    pass; 
+
+
+def deleteIcpElement(db): 
+    pass; 
+
+
+def getReportNum(db, reportName): 
+    try: 
+        query = 'Select parameterNum FROM parameters WHERE parameterName = ?'
+        parameterName = db.query(query, (reportName,))
+        if(parameterName): 
+            return parameterName[0][0]
+    
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None
 
 
 
@@ -288,3 +351,17 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
 #******************************************************************
 #    Client Queries
 #****************************************************************** 
+
+
+
+
+#******************************************************************
+#    Front Database Queries 
+#****************************************************************** 
+
+def getFrontHistory(db): 
+    query = 'SELECT jobNumber, companyNamme, creationDate, status FROM history'  
+    db.execute(query)
+
+    jobNumbers = db.fetchall()
+    return  [item[0] for item in jobNumbers]

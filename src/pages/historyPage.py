@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 
 from modules.constants import *; 
 #from modules.createExcel import * 
-from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList 
+from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory 
 from modules.dialogBoxes import openJobDialog
 from modules.utilities import apply_drop_shadow_effect
 
@@ -21,9 +21,11 @@ from pages.createReportPage import createReportPage
 def historyPageSetup(self): 
     
     historyTable = self.ui.reportsTable 
+    frontTable = self.ui.frontDeskTable
     
     rowHeight = 25; 
     historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Action']
+    frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
 
     # Format the basic table
     historyTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -35,6 +37,14 @@ def historyPageSetup(self):
     historyTable.verticalHeader().setDefaultSectionSize(rowHeight)
 
 
+    # Front Desk Table Formating 
+    frontTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
+    frontTable.setHorizontalHeaderLabels(frontHistoryHeaders)
+    
+    frontTable.verticalHeader().setVisible(True)
+    frontTable.verticalHeader().setDefaultSectionSize(rowHeight)
+    
+
     #historyTable.setAlternatingRowColors(True)
 
     #Disable editing for the entire table 
@@ -43,6 +53,9 @@ def historyPageSetup(self):
     #FIXME: make this better somehow 
     jobList = getAllJobNumbersList(self.db) 
     jobList_as_strings = [str(item) for item in jobList]
+
+    #frontList = getFrontHistory(self.officeDB)
+    #frontList_as_strings = [str(item) for item in frontList]
     
     # Sets the completers
     completer = QCompleter(jobList_as_strings)
@@ -69,6 +82,9 @@ def historyPageSetup(self):
 #******************************************************************
 
 #TODO: could have a model item that keeps tracks of all the histroy
+
+
+
 def loadReportsPage(self, searchValue=None): 
     print('[FUNCTION]: historyPageSetup')
     print(f'Search Value: {searchValue}')

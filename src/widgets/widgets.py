@@ -160,6 +160,7 @@ class FileLocationDialog(QDialog):
         self.setupItems('reportsPath', self.line3)
         self.setupItems('databasePath', self.line4)
         self.setupItems('officeDbPath', self.line5)
+        self.setupItems('preferencesPath', self.line6)
 
         # Connect the Buttons 
         self.closeBtn.clicked.connect(self.close)
@@ -171,6 +172,7 @@ class FileLocationDialog(QDialog):
         self.browse3.clicked.connect(lambda: self.browseForFolder('reportsPath', self.line3))
         self.browse4.clicked.connect(lambda: self.browseForFile('databasePath', self.line4))
         self.browse5.clicked.connect(lambda: self.browseForFile('officeDbPath', self.line5))
+        self.browse6.clicked.connect(lambda: self.browseForFile('preferencesPath', self.line6))
      
     def setupItems(self, pathName, lineItem):
         try: 

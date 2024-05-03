@@ -45,6 +45,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
 
+        # Set the current working directory to the directory containing the script
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
         # Load the setup 
         self.loadDatabase()
@@ -208,10 +210,10 @@ class MainWindow(QMainWindow):
             loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
-            total = getTotalElements(self.db)
+            #total = getTotalElements(self.db)
             self.ui.icpPageTitle.setText("ICP Elements Information")
-            self.ui.icpLabel.setText("Total Elements: {}".format(total))
-            loadDefinedElements(self)
+            #self.ui.icpLabel.setText("Total Elements: {}".format(total))
+            #loadDefinedElements(self)
 
         if(index == 2): #  Reports Info 
             self.ui.icpPageTitle.setText("ICP Reports Information")
@@ -284,20 +286,35 @@ class MainWindow(QMainWindow):
             print(f'*{key}: {value}')
         print('\n')
        
+        # Represents the three databases 
+        databaseStatus = [0, 0, 0] 
+
+        
+           
+
+        
+
         for attempt in range(3):  
             print(f'Attemp: {attempt}')
             
             #TODO: try to connect the each of the databases 
             #TODO: need to update the widget opening item 
-        
-            
+
+            # if(databaseStatus.count() != 3): 
+                
             try: 
                 mainDatabasePath = self.preferences.get('databasePath') 
                 officeDatabasePath = self.preferences.get('officeDbPath')
                 preferencesDatabasePath = self.preferences.get('preferencesPath')
+                tempPath = self.preferences.get('temp_backend_path')
+
+                self.tempDB = Database(tempPath)
+                
+
 
                 # Connect the backend database (Harry Systems)
                 self.db = Database(mainDatabasePath)
+
                 
                 # Connect the Office database (Front and Histroy Systems)
                 self.officeDB = Database(officeDatabasePath)

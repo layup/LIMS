@@ -73,7 +73,7 @@ QPushButton {
          </font>
         </property>
         <property name="text">
-         <string>Set File Preferences</string>
+         <string>Set File Paths</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -86,6 +86,9 @@ QPushButton {
    <item>
     <widget class="QWidget" name="container" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
        <number>5</number>
       </property>
@@ -101,6 +104,9 @@ QPushButton {
       <item>
        <widget class="QWidget" name="widget_4" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="topMargin">
           <number>5</number>
          </property>
@@ -117,7 +123,7 @@ QPushButton {
             </font>
            </property>
            <property name="text">
-            <string>Text File Path</string>
+            <string>Text File Folder Path</string>
            </property>
           </widget>
          </item>
@@ -159,6 +165,9 @@ QPushButton {
       <item>
        <widget class="QWidget" name="widget_12" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_8">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="topMargin">
           <number>5</number>
          </property>
@@ -175,7 +184,7 @@ QPushButton {
             </font>
            </property>
            <property name="text">
-            <string>Converted Text File Path</string>
+            <string>Converted Text File Folder Path</string>
            </property>
           </widget>
          </item>
@@ -217,6 +226,9 @@ QPushButton {
       <item>
        <widget class="QWidget" name="widget_5" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="topMargin">
           <number>5</number>
          </property>
@@ -275,6 +287,9 @@ QPushButton {
       <item>
        <widget class="QWidget" name="widget_6" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="topMargin">
           <number>5</number>
          </property>
@@ -333,6 +348,9 @@ QPushButton {
       <item>
        <widget class="QWidget" name="widget_7" native="true">
         <layout class="QVBoxLayout" name="verticalLayout_7">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="topMargin">
           <number>5</number>
          </property>
@@ -377,6 +395,56 @@ QPushButton {
             </item>
             <item>
              <widget class="QPushButton" name="browse5">
+              <property name="text">
+               <string>Browse</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Preferences Database Path</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_14" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLineEdit" name="line6"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="browse6">
               <property name="text">
                <string>Browse</string>
               </property>

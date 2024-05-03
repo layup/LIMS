@@ -1,3 +1,4 @@
+import os 
 from PyQt5.QtWidgets import QSplashScreen, QApplication
 from PyQt5.uic import loadUi 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize 
@@ -7,7 +8,10 @@ from PyQt5.QtGui import QPixmap, QMovie
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
-        loadUi('ui/Splashscreen.ui', self)
+        
+        fileLocatioin = os.path.join('ui', 'Splashscreen.ui')
+        
+        loadUi(fileLocatioin, self)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.centerOnScreen()
 
