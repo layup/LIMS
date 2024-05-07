@@ -134,6 +134,18 @@ def loadIcpFooterComment(db, reportType):
 #****************************************************************** 
 
 #TODO: deal with it on the report side of things
+
+def getIcpElements(db): 
+    try: 
+        query = 'SELECT * FROM icpElements'
+        results = db.query(query)
+        return results
+        
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None
+
+
 def getIcpElementNum(db, elementName): 
     pass; 
 
@@ -192,6 +204,15 @@ def getReportNum(db, reportName):
     except Exception as e: 
         print(f'[ERROR]: {e}')
         return None
+
+        
+
+def getIcpFooterComment(db, reportNum, elementNum): 
+    try: 
+        pass; 
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None; 
 
 
 

@@ -12,10 +12,12 @@ from PyQt5.QtGui import QIntValidator
 
 from modules.excel.chmExcel import createChmReport
 from modules.excel.icpExcel import createIcpReport
+from modules.dialogBoxes import createdReportDialog
 from modules.dbFunctions import *
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
+
 
 #TODO: move a lot of these functions to the db fuinctions 
 
@@ -136,6 +138,10 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             self.ui.icpDataField.show()
             
             icpLoader(self)
+            
+            
+            
+                
         
         if(reportType == 'CHM'):
             print('***CHM Loader')
@@ -482,7 +488,7 @@ def getIcpLimitResults(database, parameters):
 #TODO: combine both the datasets;
 #TODO: does this effect hardness and also what about the new values we enter in 
 def icpLoader(self): 
-    print('[FUNCTION]: icpLoader')
+    print('[FUNCTION]: icpLoader(self)')
     
     columnNames = [
         'Element Name', 
@@ -516,19 +522,7 @@ def icpLoader(self):
     
     print('SelectedSampleItems: ', selectedSampleNames)    
     
-    # Create the sample names in the client info section        
-    for i, (key, value) in enumerate(self.sampleNames.items()):
-        
-        if(key in selectedSampleNames):
-            print('active:', key)
-            sampleItem = SampleNameWidget(key, value)
-            self.ui.samplesContainerLayout.addWidget(sampleItem)
-            
-            #self.ui.formLayout_5.addRow(sampleItem)
-            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
-
-    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-    self.ui.samplesContainerLayout.addItem(spacer)
+    icpPopulateSamples(self, selectedSampleNames)
     
     # Format table
     dataTable = self.ui.dataTable
@@ -672,6 +666,29 @@ def icpLoader(self):
     self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
     self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
 
+def icpInitalize(self): 
+    pass; 
+
+def icpPopulateSamples(self, selectedSampleNames):
+    # Create the sample names in the client info section        
+    for i, (key, value) in enumerate(self.sampleNames.items()):
+        
+        if(key in selectedSampleNames):
+            print('active:', key)
+            sampleItem = SampleNameWidget(key, value)
+            self.ui.samplesContainerLayout.addWidget(sampleItem)
+            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    self.ui.samplesContainerLayout.addItem(spacer) 
+
+def icpFormatTable(): 
+    pass; 
+
+def icpPopulateTables(): 
+    pass; 
+
+
 def dilutionConversion(machineList, sample, symbol, dilutuion ):
     item = QtWidgets.QTableWidgetItem(); 
     item.setTextAlignment(Qt.AlignCenter)
@@ -765,5 +782,6 @@ def icpReportHander(self, tests, totalSamples):
     #load the footer comment 
     #TODO: can just pass the self and remove some of the unessary info 
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
+    
 
     

@@ -26,7 +26,7 @@ from assets import resource_rc
 from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
-from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadDefinedElements, loadIcpHistory
+from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadIcpHistory
 from pages.chm_tools import (chmLoadTestsNames, loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
@@ -210,9 +210,11 @@ class MainWindow(QMainWindow):
             loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
-            #total = getTotalElements(self.db)
             self.ui.icpPageTitle.setText("ICP Elements Information")
-            #self.ui.icpLabel.setText("Total Elements: {}".format(total))
+        
+            totalElements = self.elementManager.getTotalElements()
+            self.ui.icpLabel.setText("Total Elements: {}".format(totalElements))
+            
             #loadDefinedElements(self)
 
         if(index == 2): #  Reports Info 

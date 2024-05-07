@@ -25,38 +25,19 @@ from widgets.widgets import *
 def icpSetup(self): 
     
     # load the icp database inital setup 
-    # self.updateIcpTable(machine1Data) 
     icp_history_setup(self)
-    elements_setup(self)
+    icp_elements_setup(self)
 
-    # 
     self.ui.icpElementTreeWidget.setColumnWidth(1, 200);
     headers = self.ui.icpElementTreeWidget.header()
     headers.setDefaultAlignment(Qt.AlignCenter)
 
-    
-    # Connect the signals/buttons 
-    self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.db))
-    self.ui.icpSearchBtn.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
-    
-    #self.ui.addElementBtn.clicked.connect(lambda: on_addElementBtn_clicked(self))
-    #self.ui.saveCompBtn.clicked.connect(lambda: on_saveCompBtn_clicked(self)) 
-    #self.ui.deleteCompBtn.clicked.connect(lambda: on_deleteCompBtn_clicked(self))
-
     self.ui.addReportBtn.clicked.connect(lambda: on_addReportBtn_clicked(self))
 
-    # When ICP elements list changes, we load up the new information 
-    #self.ui.definedElements.currentRowChanged.connect(lambda: on_definedElements_currentRowChanged(self))
-
+    # Reports Signals
     self.ui.reportsList.clicked.connect(lambda: on_reportsList_clicked(self))
     self.ui.saveFooterBtn.clicked.connect(lambda: on_saveFooterBtn_clicked(self))
     self.ui.deleteFooterBtn.clicked.connect(lambda: on_deleteFooterBtn_clicked(self))
-
- 
-    #on_reportlist_doubleClicked
-    self.ui.reportsList.doubleClicked.connect(lambda: on_reportlist_doubleClicked())
-    
-    #self.ui.reportTypeDropdown.activated.connect(lambda: loadElementLimits(self)) 
 
 # TODO: don't even think I need to have a seperate reports section, can just combine it all into a single ICP page 
 def loadReportList(self): 
@@ -68,32 +49,15 @@ def loadReportList(self):
             self.ui.reportsList.addItem(item[0])    
 
             
-def loadDefinedElements(self): 
-    #self.ui.reportTypeDropdown.clear()
-    self.ui.gcmsDefinedtests.clear()
-    self.ui.definedElements.clear()
-
-    elements = getIcpElements2(self.tempDB)
-    
-    reportType = getReportTypeList(self.db)
-    #self.ui.reportTypeDropdown.addItems(reportType)     
-    
-    for element in elements: 
-        elementNum = element[0]
-        elementName = element[1]
-        elementSymbol = element[2]
-        
-        self.ui.definedElements.addItem(elementName)
-        
-
-    clearElementInfo(self)
-    
 #******************************************************************
 #    ICP History 
 #****************************************************************** 
-
 def icp_history_setup(self): 
     loadIcpHistory(self) 
+
+    # Connect the signals/buttons 
+    self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.db))
+    self.ui.icpSearchBtn.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
 
 @pyqtSlot()
 def on_icpUploadBtn_clicked(database): 
@@ -124,7 +88,6 @@ def on_icpSearchBtn_clicked(self):
         else: 
             updateIcpTable(self, machine1Data)
 
-
 def loadIcpHistory(self):
     columnNames = ['Sample Name', 'Job Number', 'Machine Type', 'File Location', 'Upload Date']
     
@@ -145,16 +108,17 @@ def updateIcpTable(self, result):
     
     TableHeader = ['Sample Number', 'Job Number', 'Machine Type', 'File Location', 'Upload Date', 'Actions']
 
+    smallCol = 140
+    medCol = 300 
+    bigCol = 750 
+
     self.ui.icpLabel.setText(textLabelUpdate)
     
     self.ui.icpTable.setRowCount(len(result)) 
     self.ui.icpTable.setColumnCount(len(TableHeader))
     self.ui.icpTable.setHorizontalHeaderLabels(TableHeader)
 
-    smallCol = 140
-    medCol = 300 
-    bigCol = 750 
-    
+    # Set the width of the tables 
     self.ui.icpTable.setColumnWidth(0, smallCol)
     self.ui.icpTable.setColumnWidth(1, smallCol)
     self.ui.icpTable.setColumnWidth(2, smallCol)
@@ -172,8 +136,6 @@ def updateIcpTable(self, result):
     
     self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
-
-
 #******************************************************************
 #    ICP Defined Elements  
 #****************************************************************** 
@@ -181,215 +143,6 @@ def updateIcpTable(self, result):
 
 
 
-def loadElementLimits(self): 
-    print('[Function]: loadElementLimits')
-    #reportType = self.ui.reportTypeDropdown.currentText()
-    elementName = self.ui.elementNameinput.text().lower()
-    
-    try: 
-        limitResults = loadIcpLimit(self.db, elementName, reportType)
-        print(f'Query Results: {elementName}, {limitResults}'); 
-        
-        if(limitResults is None): 
-            clearElementLimits(self)
-        else: 
-            #TODO: define what the limit values are equal to 
-            self.ui.lowerLimit.setText(str(limitResults[2]))
-            self.ui.upperLimit.setText(str(limitResults[3]))
-            self.ui.unitType.setText(limitResults[5])
-            self.ui.RightSideComment.setPlainText(limitResults[4]) 
-    except: 
-        print('Error on loadElementLimits: Could not load in limits')
-
-@pyqtSlot()
-def icp_load_element_data(self): 
-    print('[FUNCTION]: icp_load_element_data')
-    selectedElement = self.ui.definedElements.currentItem()
-    
-    if selectedElement is not None:
-        selectedElementText = selectedElement.text()
-        elementResult = loadIcpElement(self.db, selectedElementText)
-        
-        print(f'Selected Element: {selectedElementText}');  
-     
-        if elementResult: 
-            elementName = elementResult[0]
-            elementSymbol = elementResult[1]
-            
-            # Set the element header name
-            self.ui.icpElementNameHeader.setText(elementName.capitalize())
-            
-            # set the basic element info  
-            #self.ui.elementNameinput.setText(elementName)
-            #self.ui.symbolInput.setText(elementSymbol)
-
-            # load the limits
-            #loadElementLimits(self) 
-
-            # Load the report type tree 
-            #loadElementReportTree(self)
-            #tests_one(self, elementName)
-
-            
-        else: 
-            clearElementInfo(self)
-            self.ui.elementNameinput.setText(selectedElementText)
-    else:
-        print("No item selected.") 
-
-@pyqtSlot()
-def loadElementReportTree(self): 
-    print('[Function]: loadElementReportTree')
-    
-    # Clear the table before loading any data 
-    self.ui.icpElementTreeWidget.clear()
-    
-    query = 'SELECT reportType, lowerLimit, maxLimit, units  FROM icpLimits WHERE element = ? ORDER BY reportType ASC'  
-    
-    elementName = self.ui.elementNameinput.text().lower()
-    results = self.db.query(query, (elementName, ))
-
-    # Populate the report table
-    for currentReport in results: 
-        item = QTreeWidgetItem(self.ui.icpElementTreeWidget) 
-        item.setText(0, currentReport[0])  
-        item.setData(1, 0, currentReport[1]) 
-        item.setData(2, 0, currentReport[2])
-        item.setText(3, currentReport[3])
-
-@pyqtSlot()
-def on_addElementBtn_clicked(self): 
-    print(f'[EVENT]: on_addElementBtn_clicked')
-    #TODO: makeing sure not inserting duplicates 
-    currentText = self.ui.elementInput.text()
-    if(currentText != ''): 
-        print(currentText)
-        self.ui.definedElements.addItem(currentText)
-        self.ui.elementInput.clear()
-    else: 
-        print('User entered a blank value, please enter a valid value')
-        
-@pyqtSlot()
-def on_saveCompBtn_clicked(self): 
-    #TODO: remove white spaces just in case 
-    #TODO: check if they are valid limits
-    symbolName = self.ui.symbolInput.text().lower().strip()
-    elementName = self.ui.elementNameinput.text().lower().strip()
-    
-    #reportType = self.ui.reportTypeDropdown.currentText()
-    lowerLimit = self.ui.lowerLimit.text()
-    upperLimit = self.ui.upperLimit.text()
-    unitType = self.ui.unitType.text().strip()
-    
-    comment = self.ui.RightSideComment.toPlainText() 
-    
-    print(symbolName, elementName)
-    
-    #TODO: cannot save without a something
-    #TODO: make the thing lowercase 
-    #FIXME: have proper save buttons
-    errorCheck = [0,0,0]
-
-    #errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
-    #errorCheck[1] = 0 if units != '' else 1; 
-    #errorCheck[2] = 0 if tests != '' else 1; 
-    
-    if(sum(errorCheck) == 0):
-        pass; 
-        #self.ui.gcmsTestsValueWidget.setEnabled(True)
-        #self.ui.widget_28.setEnabled(False)
-        #self.ui.gcmsStandardValShow.setText(standards)
-        #self.ui.gcmsUnitValShow.setText(units)
-        #self.ui.gcmsTestsShow.setText(tests)  
-    else: 
-        errorTitle = 'Cannot Proceed with CHM Process'
-        errorMsg = ''
-        
-        if(errorCheck[0] == 1): 
-            errorMsg += 'Please Enter a Valid Standard Number\n'
-        if(errorCheck[1] == 1): 
-            errorMsg += 'Please Select a Unit\n'
-        if(errorCheck[2] == 1): 
-            errorMsg += 'Please Select a Tests\n'
-    
-    #FIXME: move this all to the db function 
-    if(symbolName != "" and elementName != ""):
-        
-        defineElementQuery = 'INSERT OR REPLACE INTO icpElements (element, symbol) VALUES (?,?)'
-        #definedLimitsQuery = 'INSERT OR REPLACE INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)'
-        
-        loadLimits = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'  
-        self.db.execute(loadLimits, (elementName, reportType))
-        limitResults = self.db.fetchone()
-        
-        insertLimit = 'INSERT INTO icpLimits (reportType, element, lowerLimit, maxLimit, comments, units) VALUES (?,?,?,?,?,?)' 
-        updateLimit = 'UPDATE icpLimits SET lowerLimit = ?, maxLimit = ?, comments =?, units =? WHERE reportType=? AND element=?' 
-
-        try:
-            self.db.execute(defineElementQuery, (elementName, symbolName) )
-            
-            if(limitResults): 
-                self.db.execute(updateLimit, (lowerLimit, upperLimit, comment, unitType, reportType, elementName))
-            else: 
-                self.db.execute(insertLimit, (reportType, elementName, lowerLimit, upperLimit, comment, unitType))
-            
-            self.db.commit()
-
-        except sqlite3.IntegrityError as e:
-            print(e)
-
-@pyqtSlot()
-def on_deleteCompBtn_clicked(self):
-    #TODO: are you sure you wanted to delete this time popup
-    #TODO: error when deleting nothing
-    print("Deleting the componenet")
-
-    elementName = self.ui.elementNameinput.text().lower()
-    print(f'Element Name: {elementName}')
-    
-    deleteQuery = 'DELETE FROM icpElements WHERE element = ?'
-    
-    try: 
-        deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
-        self.db.execute(deleteQuery, (elementName,))
-        self.db.commit()
-
-        currentItem = self.ui.definedElements.currentRow()
-        self.ui.definedElements.takeItem(currentItem)
-        self.ui.definedElements.setCurrentItem(None)
-        clearElementInfo(self)
-    
-    except: 
-        print('Error: could not delete item')
-    
-@pyqtSlot()        
-def on_definedElements_currentRowChanged(self):
-    try:
-        icp_load_element_data(self);
-    except Exception as error: 
-        print('Error: Could not loaded the defined element data')
-        print(error)
-    
-        
-def clearElementInfo(self): 
-    # Clear element info 
-    self.ui.symbolInput.clear()
-    self.ui.elementNameinput.clear()
-
-    # Clear the Tree Widget
-    self.ui.icpElementTreeWidget.clear()
-    
-    # Clear the report type information 
-    self.ui.lowerLimit.clear()
-    self.ui.upperLimit.clear()
-    self.ui.unitType.clear()
-    self.ui.RightSideComment.clear()
-    
-def clearElementLimits(self): 
-    self.ui.lowerLimit.clear()
-    self.ui.upperLimit.clear()
-    self.ui.unitType.clear()
-    self.ui.RightSideComment.clear()
 
 #******************************************************************
 #    ICP Defined Reports   
@@ -479,11 +232,6 @@ def clearFooterReportContent(self):
 #    ICP Classes  
 #****************************************************************** 
 
-def on_reportlist_doubleClicked(): 
-    print('Something is being selected')
-    #selected_item = self.ui.reportsList.currentItem()
-
-
 class Element: 
     def __init__(self, elementNum, elementName, elementSymbol, limits): 
         self.num = elementNum
@@ -492,7 +240,7 @@ class Element:
         self.limits = limits         
 
 class ElementsManager(QObject): 
-    elementsChanged = pyqtSignal(int, Element)  # Custom signal to indicate changes in elements
+    elementsChanged = pyqtSignal(str, Element)  # Custom signal to indicate changes in elements
     
     def __init__(self, db):
         super().__init__() 
@@ -524,7 +272,6 @@ class ElementsManager(QObject):
             print('[ERROR]:', error)
             return None
         
-
     def getElements(self): 
         return self.elements
     
@@ -540,7 +287,6 @@ class ElementsManager(QObject):
             if element_value.name == elementName:  
                 return element_value 
             
-            
         return None 
     
     def getTotalElements(self): 
@@ -552,33 +298,136 @@ class ElementsManager(QObject):
         
         #TODO: add element to the database 
         
-        self.elementsChanged.emit(42, element) 
+        self.elementsChanged.emit('ADD', element) 
     
     def removeElement(self, elementNum): 
         self.elements.pop(elementNum, None) 
     
         #TODO: remove element from the database 
+        self.elementsChanged.emit('REMOVE', None)
     
     def updateElement(self, elementNum, element): 
         print(f'[CLASS]: UpdateElement(self, {elementNum}, element)')
         if(elementNum in self.elements): 
             self.elements[elementNum] = element
         
-        self.elementsChanged.emit(1, element)
+        self.elementsChanged.emit('UPDATE', element)
     
 
 def elementManagerSignalHandler(self, value, element): 
     print(f'[SIGNAL FUNCTION]: elementManagerSignalHandler({value}, {element})')
-    print("Received:", value)
     
+    if(value == 'ADD'): 
+        
+        # Update QList, does the order really matter when we do this?
+        pass; 
     
-    if(value == 1):  
+    if(value == 'REMOVE'): 
+        pass; 
+    
+    if(value == 'UPDATE'):  
         loadElementReportTypeInfo(self, element)  
     
     
+class addElementDialog(QDialog):
+
+    addedElement = pyqtSignal(str, Element)  
+    
+    def __init__(self, db, reportTypes):
+        super().__init__()
+
+        #TODO: fix the pathing
+        ui_path = 'ui/elementDialog.ui'
+        loadUi(ui_path, self)
+        
+        self.db = db 
+        self.reportTypes = reportTypes 
+        print(f'Reports Types: {self.reportTypes}')
+        
+        # Conne the buttons 
+        self.cancelBtn.clicked.connect(self.close)
+        self.saveBtn.clicked.connect(self.saveElement)
+
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('Add New Element')
+        self.errorMsg.hide()
+
+        # Setup up headers and columns 
+        header = self.table.horizontalHeader()
+        header.setStretchLastSection(True)
+
+        self.table.verticalHeader().hide()
+        
+        # setting table column width 
+        self.table.setColumnWidth(0, 100)
+        self.table.setColumnWidth(1, 180)
+        self.table.setColumnWidth(2, 80)
+        self.table.setColumnWidth(3, 80)
+        self.table.setColumnWidth(4, 80)
+        
+        # Set Row Count 
+        self.table.setRowCount(len(self.reportTypes))
+
+        if(self.reportTypes):         
+            for row, item in enumerate(self.reportTypes): 
+                
+                self.table.setRowHeight(row, 25)
+                
+                reportNumItem = QTableWidgetItem(str(item[0])) # Convert number into a string  
+                reportNameItem = QTableWidgetItem(item[1])
+
+                # disable editing for the first two tables 
+                reportNumItem.setFlags(reportNumItem.flags() & ~Qt.ItemIsEditable) 
+                reportNameItem.setFlags(reportNameItem.flags() & ~Qt.ItemIsEditable)
+                
+                self.table.setItem(row, 0, reportNumItem)
+                self.table.setItem(row, 1, reportNameItem)
+    
+    #TODO: save the stuff 
+    def saveElement(self): 
+        self.errorMsg.hide()
+        
+        # Error Checking 
+        existing_elements = getIcpElements(self.db)
+        
+        numbers, names, symbols = zip(*existing_elements)
+    
+        print(f'Elements: {existing_elements}')
+        
+        errorCheck = [0,0,0,0,0]
+        
+        if(self.elementNameLineEdit and self.symbolNameLineEdit): 
+            elementName = self.elementNameLineEdit.text().lower()
+            elementSymbol = self.symbolNameLineEdit.text().lower()
+            
+            if(elementName in names): 
+                errorCheck[0] = 1 
+                
+            if(elementSymbol in symbols): 
+                errorCheck[1] = 1
+                
+            
+        print(sum(errorCheck)) 
+        if(sum(errorCheck) == 0): 
+            
+            #TODO: fix the error completeionl 
+            # Save to the database 
+            
+            # Update the Element Manager 
+            
+            pass; 
+        else: 
+            self.errorMsg.show()
+            self.errorMsg.setText('ERROR')
+    
+    def getTableValues(self): 
+        pass; 
+        
     
 #FIXME: has to load in the list each time, so create a function that app.py can access 
-def elements_setup(self): 
+def icp_elements_setup(self): 
 
     # Icp Element Tree Widget Formatting 
     self.ui.icpElementTreeWidget.setColumnWidth(1, 200);
@@ -612,10 +461,8 @@ def elements_setup(self):
     self.ui.lowerLimit.setValidator(validator)
     self.ui.upperLimit.setValidator(validator)
     
-    # Populate QList 
+    # Populate QList and QTree 
     loadElementsList(self)
-    
-    # Populate QTree 
     loadReportsTree(self)
     
     # Drop Down Widget 
@@ -636,58 +483,35 @@ def elements_setup(self):
     # QTree Signs 
     # When selecting a item on the QTree Signal 
     self.ui.icpElementTreeWidget.currentItemChanged.connect(lambda current_report: onIcpTreeWidgetChange(self, current_report))
-
-
-    # Need to create a clone element that get's delete when not in use 
-    
-    # When the limit changes we want to change the report type too 
-    
-    
-    
-
-    # Button Signs 
-    #   Add Button 
-    #   Delete Button  
-    #   Saves Button 
-    #   Cancel Button 
-    
     
     #TODO: can disable the buttons until something is selected 
-    # self.ui.deleteCompBtn()
-    # self.ui.addElementBtn()
-    # self.ui.icpCancelBtn()
+    self.ui.deleteCompBtn.clicked.connect(lambda: print('Delete Element Button Clicked'))
+    self.ui.addElementBtn.clicked.connect(lambda: addIcpElementBtnClicked(self))
     self.ui.saveCompBtn.clicked.connect(lambda: saveIcpBtnClicked(self))
     self.ui.icpCancelBtn.clicked.connect(lambda: cancelIcpBtnClicked(self))
+        
     
+def addIcpElementBtnClicked(self): 
+    print('[DIALOG]: addIcpElementBtnClicked(self)')
+    # Get the report Types 
+
+    # Save the ICP to database 
+    
+    # Update the QList and Element Manager
+    
+    reportType = getAllParameters(self.preferencesDB)
+    reportType = [[report[0], report[1]] for report in reportType]
+    
+    dialog = addElementDialog(self.tempDB, reportType)
+
+    dialog.exec()
+
+
 
 def cancelIcpBtnClicked(self): 
     print('[SIGNAL]: cancelIcpBtnClicked(self)') 
 
-    clearElementLimits(self)
-
-    # Load the previous stuff 
-    selectedElement = self.ui.definedElements.currentItem() 
-    
-    if(selectedElement): 
-        elementName = selectedElement.text()
-        
-        # De-active tree selection and drop down menu 
-        self.ui.icpElementTreeWidget.clearSelection()
-        self.ui.reportTypeDropdown.setCurrentText('')
-
-        #TODO: check if the elemenet exists
-        element = self.elementManager.getElementByName(elementName)
-        
-
-    
-        # Load the basic Element Info 
-        loadElementsInfo(self, element)
-        
-        # Load the element Report Types 
-        loadElementReportTypeInfo(self, element)
-    
-    
-    
+    loadElementData(self)
     
 
 def saveIcpBtnClicked(self): 
@@ -705,6 +529,7 @@ def saveIcpBtnClicked(self):
         elementNum = element.num
         elementLimits = element.limits
         
+        #TODO: allow for element info to be changed instead of just the limits and stuff
         updateElementName = self.ui.elementNameinput.text()
         updateElementSymbol = self.ui.symbolInput.text()
         
@@ -725,7 +550,55 @@ def saveIcpBtnClicked(self):
         newLimitData = [updateUnitType, updateLowerLimit, updateUpperLimit, updateSideComment]
         element.limits[reportNum] = newLimitData
         self.elementManager.updateElement(elementNum, element)
+
+#******************************************************************
+#    ICP Elements Functions
+#******************************************************************  
+
+def clearElementInfo(self): 
+    # Clear element info 
+    self.ui.symbolInput.clear()
+    self.ui.elementNameinput.clear()
+
+    # Clear the Tree Widget
+    self.ui.icpElementTreeWidget.clear()
     
+    # Clear the report type information 
+    self.ui.lowerLimit.clear()
+    self.ui.upperLimit.clear()
+    self.ui.unitType.clear()
+    self.ui.RightSideComment.clear()
+    
+def clearElementLimits(self): 
+    self.ui.lowerLimit.clear()
+    self.ui.upperLimit.clear()
+    self.ui.unitType.clear()
+    self.ui.RightSideComment.clear()
+    
+def loadElementData(self): 
+    print(f'loadElementData(self)')
+
+    # Clear off the limit lineEdits
+    clearElementLimits(self)
+
+    # Load the previous stuff 
+    selectedElement = self.ui.definedElements.currentItem() 
+    
+    if(selectedElement): 
+        elementName = selectedElement.text()
+        
+        # De-active tree selection and drop down menu 
+        self.ui.icpElementTreeWidget.clearSelection()
+        self.ui.reportTypeDropdown.setCurrentText('')
+
+        #TODO: check if the elemenet exists
+        element = self.elementManager.getElementByName(elementName)
+         
+        # Load the basic Element Info 
+        loadElementsInfo(self, element)
+        
+        # Load the element Report Types 
+        loadElementReportTypeInfo(self, element)
 
 
 #TODO: when items are delete and add?, does it matter thought I have an item that keeps track of it all 
@@ -763,6 +636,24 @@ def clearReportsTree(treeWidget):
         # Only clear these columns
         for column in columns:
             item.setData(column, Qt.DisplayRole, None)
+            
+def loadElementsInfo(self, element): 
+    print(f'[FUNCTION]: loadElementsInfo(self, {element})')
+    
+    self.ui.elementNameinput.clear()
+    self.ui.symbolInput.clear()
+   
+    if(element): 
+    
+        elementNum = element.num
+        elementName = element.name
+        elementSymbol = element.symbol 
+        elementLimits = element.limits 
+
+        # Load the basic information into UI 
+        self.ui.elementNameinput.setText(elementName)
+        self.ui.symbolInput.setText(elementSymbol) 
+            
 
 def loadElementReportTypeInfo(self, element):
     print(f'[FUNCTION]: loadElementReportTypeInfo(self, element)')
@@ -793,37 +684,16 @@ def loadElementReportTypeInfo(self, element):
 
                 if(unitType): 
                     item.setText(4, unitType)
-    
+                    item.setData(4, Qt.TextAlignmentRole, Qt.AlignCenter)   
+                    
+#******************************************************************
+#    ICP Elements Tab Signals
+#******************************************************************  
    
 def onIcpListWidgetChange(self): 
     print(f'[SIGNAL]: onIcpListWidgetChange()')
 
-    clearElementLimits(self)
-
-    # Get the Element Name from the QList 
-    selectedElement = self.ui.definedElements.currentItem() 
-
-    
-    #TODO: create a temp element that is the same or we only update it when we change it
-    if selectedElement is not None: 
-        elementName = selectedElement.text()
-        
-        # De-active tree selection and drop down menu 
-        self.ui.icpElementTreeWidget.clearSelection()
-        self.ui.reportTypeDropdown.setCurrentText('')
-
-        #TODO: check if the elemenet exists
-        element = self.elementManager.getElementByName(elementName)
-
-
-    
-        # Load the basic Element Info 
-        loadElementsInfo(self, element)
-        
-        # Load the element Report Types 
-        loadElementReportTypeInfo(self, element)
-
-
+    loadElementData(self)
 
 def onIcpDropDownMenuChange(self, index): 
     print(f'[SIGNAL]: onIcpDropDownMenuChange()')
@@ -885,20 +755,3 @@ def onIcpTreeWidgetChange(self, current_widget):
             self.ui.upperLimit.setText(upperLimit)
             self.ui.unitType.setText(unitType)  
             self.ui.RightSideComment.setPlainText(sideComment) 
-        
-def loadElementsInfo(self, element): 
-    print(f'[FUNCTION]: loadElementsInfo(self, {element})')
-    
-    self.ui.elementNameinput.clear()
-    self.ui.symbolInput.clear()
-   
-    if(element): 
-    
-        elementNum = element.num
-        elementName = element.name
-        elementSymbol = element.symbol 
-        elementLimits = element.limits 
-
-        # Load the basic information into UI 
-        self.ui.elementNameinput.setText(elementName)
-        self.ui.symbolInput.setText(elementSymbol) 

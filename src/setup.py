@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print(f"Using AA_UseHighDpiPixmaps    : {QApplication.testAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)}")
     print()
     
-    QTimer.singleShot(3000, lambda: show_main_window())
+    QTimer.singleShot(1000, lambda: show_main_window())
     
     #TODO: load in all of the settings prior  
     def show_main_window():

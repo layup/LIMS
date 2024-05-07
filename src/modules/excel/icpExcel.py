@@ -2,6 +2,7 @@ from modules.utilities import *
 from modules.constants import *
 from modules.createExcel import *
 
+
 def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, footerComment): 
     
     #TODO: missing the report type that will get called into this thing 
@@ -150,6 +151,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #    os.makedirs(exportPath)
  
     wb.save(filePath)
+    
+
 
 def insertIcpComment(ws, footerComment, pageLocation): 
     for (i, value) in enumerate(footerComment):
@@ -170,6 +173,9 @@ def insertIcpComment(ws, footerComment, pageLocation):
     '''
     pageLocation +=2; 
     insertSignature(ws, pageLocation, [3,6])
+
+    
+    
 
 def insertComments(ws, pageLocation): 
 

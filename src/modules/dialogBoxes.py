@@ -33,6 +33,20 @@ def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
     retval = msg.exec_()
     print("value of pressed message box button:", retval)
 
+def createdReportDialog(fileName): 
+
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Information)
+
+    msg.setText('Success')
+    msg.setInformativeText(f'Report successfully created.')
+        
+    msg.setStandardButtons(QMessageBox.Ok )
+    
+    msg.exec_()
+    
+    
+
 
 ## Change QPushButton Checkable status when stackedWidget index changed
 def messageBox(self):
