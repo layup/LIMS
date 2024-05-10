@@ -26,6 +26,8 @@ from widgets.widgets import *
 #******************************************************************
 
 def reportSetup(self): 
+
+    #TODO: ERROR could not load TEXT_FILE please try again
  
     # Create a validator to accept only integer input
     validator = QIntValidator()
@@ -139,10 +141,6 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             
             icpLoader(self)
             
-            
-            
-                
-        
         if(reportType == 'CHM'):
             print('***CHM Loader')
             
@@ -153,6 +151,10 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             chmLoader(self)
         
     else: 
+        reportErrorHandler(self, errorCheck)
+
+        
+def reportErrorHandler(self, errorCheck): 
         errorTitle = 'Cannot Proceed to Report Creation Screen '
         errorMsg = ''
         
@@ -173,9 +175,9 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             errorMsg += 'TXT File could not be located\n'
             
         showErrorDialog(self, errorTitle, errorMsg)
-
+    
         
-#TODO: this should be in the preference section 
+#TODO: this should be in the preference section, move this into other database  
 def populateAuthorNames(self): 
     authorNamesQuery = 'SELECT * FROM authors'
     
@@ -303,17 +305,6 @@ def chmLoader(self):
     GSMS_TESTS_LISTS = []
     
     loadClientInfo(self)
-
-    # Load the sample names in client Info Section 
-    for i, (key,value) in enumerate(self.sampleNames.items()):
-        sampleItem = SampleNameWidget(key, value)
-        self.ui.samplesContainerLayout.addWidget(sampleItem)
-
-        #self.ui.formLayout_5.addRow(sampleItem)
-        sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames,textChange, key))
-
-    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-    self.ui.samplesContainerLayout.addItem(spacer)
     
     # Checking CHM test lists  
     for (currentJob , testList) in self.sampleTests.items(): 
@@ -339,21 +330,46 @@ def chmLoader(self):
     rowCount = len(GSMS_TESTS_LISTS) 
     colCount = len(columnNames) + int(self.clientInfo['totalSamples'])
 
-    formatReportTable(dataTable, rowCount, colCount) 
-    self.ui.dataTable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    # CHM Signals 
+    #TODO: add the item changed thing 
+    #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
+    self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, len(columnNames), GSMS_TESTS_LISTS)); 
+
+    chmIntalize(dataTable, rowCount, colCount, columnNames)
+
+    chmPopulateTable(self, GSMS_TESTS_LISTS, columnNames, testsResults)
+ 
+   
+def chmIntalize(self, table, rowCount, colCount, columnNames): 
+
+    # Load the sample names in client Info Section 
+    for i, (key,value) in enumerate(self.sampleNames.items()):
+        sampleItem = SampleNameWidget(key, value)
+        self.ui.samplesContainerLayout.addWidget(sampleItem)
+        sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames,textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    self.ui.samplesContainerLayout.addItem(spacer)
+
+    # Format Report Table 
+    formatReportTable(table, rowCount, colCount) 
+    table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     
     # Initalize the columns 
     for i, name in enumerate(columnNames):
         item = QtWidgets.QTableWidgetItem(name)
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
+        table.setHorizontalHeaderItem(i, item)
         
     # Populate with sample names 
     for i , (key, value) in enumerate(self.sampleNames.items(), start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
+        table.setHorizontalHeaderItem(i, item)
+
+
+def chmPopulateTable(self, testLists, columnNames, testsResults): 
     
     # List the tests  
-    for i, currentTest in enumerate(GSMS_TESTS_LISTS): 
+    for i, currentTest in enumerate(testLists): 
         print(f'Current Test {i}: {currentTest}') 
         testItem = QtWidgets.QTableWidgetItem(currentTest)
         self.ui.dataTable.setItem(i, 0, testItem)
@@ -393,12 +409,13 @@ def chmLoader(self):
                     
                     unitText = result[4]
                     unitItem = QtWidgets.QTableWidgetItem(unitText) 
-                    self.ui.dataTable.setItem(i, 2, unitItem)  
-                    
+                    self.ui.dataTable.setItem(i, 2, unitItem)   
+
     
-    #TODO: add the item changed thing 
-    #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
-    self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, len(columnNames), GSMS_TESTS_LISTS)); 
+ 
+#******************************************************************
+#    CHM Report Handler Function  
+#******************************************************************
     
 #FIXME: adjust based on the sample information 
 #FIXME: crashes when doing gcms to icp without closing program 
@@ -459,6 +476,8 @@ def chmReportHandler(self, columnLength,  tests):
             
     createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
 
+    createdReportDialog('test')
+
 
 #******************************************************************
 #    ICP Loader 
@@ -466,16 +485,21 @@ def chmReportHandler(self, columnLength,  tests):
 
 def getIcpMachineData(database, jobNumber): 
     # Queries 
-    queryMachine1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
-    queryMachine2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
+    #queryMachine1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
+    #queryMachine2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
+    
     
     # Query and convert into a list form 
-    sampleData = list(database.query(queryMachine1, (jobNumber,)))
-    sampleData2 = list(database.query(queryMachine2, (jobNumber,)))
+    #sampleData = list(database.query(queryMachine1, (jobNumber,)))
+    #sampleData2 = list(database.query(queryMachine2, (jobNumber,)))
 
-    return sampleData, sampleData2
+    #return sampleData, sampleData2
+
+
+    query = 'SELECT sampleName, jobNum, data FROM icpData WHERE jobNum = ? ORDER BY sampleName ASC'
     
-
+    return list(database.query(query, (jobNumber, )))
+    
 def getIcpLimitResults(database, parameters): 
     queryUnits = 'SELECT element, units, lowerLimit, maxLimit FROM icpLimits WHERE reportType = ?'
 
@@ -489,7 +513,10 @@ def getIcpLimitResults(database, parameters):
 #TODO: does this effect hardness and also what about the new values we enter in 
 def icpLoader(self): 
     print('[FUNCTION]: icpLoader(self)')
-    
+   
+    # FIXME: fix the machine getting username Information, can use a loop instead 
+    loadClientInfo(self)
+ 
     columnNames = [
         'Element Name', 
         'Element symbol',
@@ -499,50 +526,87 @@ def icpLoader(self):
     
     addtionalRows = ['pH', 'Hardness']
      
-    # FIXME: fix the machine getting username Information
-    loadClientInfo(self)
-
     elements = getIcpElementsList(self.db) 
     elementNames = [t[0] for t in elements]
     
-    sampleData, sampleData2 =  getIcpMachineData(self.db, self.jobNum)
+    #sampleData, sampleData2 =  getIcpMachineData(self.db, self.jobNum)
+    sampleData = getIcpMachineData(self.tempDB, self.jobNum)
     elementUnitValues = getIcpLimitResults(self.db, self.parameter)
 
-    print(f'Elment Names: {elementNames}')
-    print(f'Element Unit Values: {elementUnitValues}')
-     
     selectedSampleNames = []
     
     for item in sampleData:
-        selectedSampleNames.append(item[0])
+        sampleName = item[0]
+        if(sampleName not in selectedSampleNames): 
+            selectedSampleNames.append(item[0])
 
-    for item in sampleData2: 
-        if(item[0] not in selectedSampleNames): 
-            selectedSampleNames.append(item[0]) 
-    
+    machineData = {item[0]: json.loads(item[2]) for item in sampleData}
+
+    print(f'Elment Names: {elementNames}')
+    print(f'Element Unit Values: {elementUnitValues}')
     print('SelectedSampleItems: ', selectedSampleNames)    
     
-    icpPopulateSamples(self, selectedSampleNames)
-    
-    # Format table
     dataTable = self.ui.dataTable
     colCount = len(columnNames) + len(selectedSampleNames)
     totalRows = len(elements) + len(addtionalRows)
     totalSamples = len(selectedSampleNames)    
     
-    formatReportTable(dataTable, totalRows, colCount)
+    # Connect Signals 
+    self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
+    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples));     
 
+    # Format and intalize the tables 
+    icpIntalizeTable(self, dataTable, colCount, totalRows, selectedSampleNames, columnNames)
+    
+    # Populate the sample table information 
+    icpPopulateSamplesSection(self, selectedSampleNames)
+    
+    # populate the table with column and smaple info 
+    icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows)
+    
+    # load the tables elemental machine info and  hardness calculations 
+    icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)
+            
+
+def icpIntalizeTable(self, table, colCount, totalRows, selectedSampleNames, columnNames): 
+    print(f'[FUNCTION]: icpIntalizeTable(self, table, colCount, totalRows, selectedSampleNames, columnNames)')
+
+    formatReportTable(table, totalRows, colCount)
+
+    column_width = self.ui.dataTable.columnWidth(2)
+    padding = 10
+    total_width = column_width + padding
+    table.setColumnWidth(2, total_width)    
+    
     # inital column names
     for i, name in enumerate(columnNames): 
         item = QtWidgets.QTableWidgetItem(name)
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
+        table.setHorizontalHeaderItem(i, item)
     
     # Set the sample names in the column (after)
     for i , (key) in enumerate(selectedSampleNames, start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
-        self.ui.dataTable.setHorizontalHeaderItem(i, item)
-    
-    # Set the elemental Information 
+        table.setHorizontalHeaderItem(i, item)
+
+def icpPopulateSamplesSection(self, selectedSampleNames):
+    print(f'[FUNCTION]: icpPopulateSamples(self, selectedSampleNames)')
+        
+    # Create the sample names in the client info section        
+    for i, (key, value) in enumerate(self.sampleNames.items()):
+        
+        if(key in selectedSampleNames):
+            print('active:', key)
+            sampleItem = SampleNameWidget(key, value)
+            self.ui.samplesContainerLayout.addWidget(sampleItem)
+            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    self.ui.samplesContainerLayout.addItem(spacer) 
+
+def icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows): 
+    print(f'[FUNCTION]: icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows)')
+
+    # Set the elemental Information (columns)
     for i, element in enumerate(elements): 
         elementName = element[0]
         elementSymbol = element[1]
@@ -606,11 +670,10 @@ def icpLoader(self):
             unitValue.setText('unit') 
 
             self.ui.dataTable.setItem(postion, 1, symbolName) 
-            self.ui.dataTable.setItem(postion, 2, unitValue) 
-            
-    # Convert the machine data to lists  
-    machine1 = {item[0]: json.loads(item[2]) for item in sampleData}
-    machine2 = {item[0]: json.loads(item[2]) for item in sampleData2} 
+            self.ui.dataTable.setItem(postion, 2, unitValue)
+              
+def icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames): 
+    print('[FUNCTION]: icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)')
     
     print('***Element Values')
     for i in range(len(elements)): 
@@ -624,18 +687,13 @@ def icpLoader(self):
                 item.setTextAlignment(Qt.AlignCenter)
                 
                 # TODO: fix the logic here somehow 
-                if sample in machine1 and symbol in machine1[sample]: 
-                    print(f'Machine 1: {symbol} {machine1[sample][symbol]}')
-                    item = dilutionConversion(machine1, sample, symbol, self.dilution)
-            
-                if sample in machine2 and symbol in machine2[sample]: 
-                    print(f'Machine 2: {symbol} {machine2[sample][symbol]}')
-                    item = dilutionConversion(machine2, sample, symbol, self.dilution)
-                
+                if sample in machineData and symbol in machineData[sample]: 
+                    print(f'Machine 1: {symbol} {machineData[sample][symbol]}')
+                    item = dilutionConversion(machineData, sample, symbol, self.dilution)
+                            
                 sampleCol = j + len(columnNames)
                 
                 self.ui.dataTable.setItem(i, sampleCol, item)
-
 
     print('***Hardness Calculations')
     for j, sample in enumerate(selectedSampleNames):   
@@ -643,9 +701,9 @@ def icpLoader(self):
         item = QtWidgets.QTableWidgetItem();  
         item.setTextAlignment(Qt.AlignCenter)
         
-        if sample in machine1 and ('Ca' in machine1[sample] and 'Mg' in machine1[sample]): 
-            calcium = machine1[sample]['Ca'] 
-            magnesium = machine1[sample]['Mg'] 
+        if sample in machineData and ('Ca' in machineData[sample] and 'Mg' in machineData[sample]): 
+            calcium = machineData[sample]['Ca'] 
+            magnesium = machineData[sample]['Mg'] 
             result = hardnessCalc(calcium, magnesium, self.dilution)
 
             item.setText(str(result))
@@ -656,40 +714,9 @@ def icpLoader(self):
             print('calcium: ', calcium)
             print('magnesium: ', magnesium)
             print('Result: ', result)
-            
     
-    column_width = self.ui.dataTable.columnWidth(2)
-    padding = 10
-    total_width = column_width + padding
-    self.ui.dataTable.setColumnWidth(2, total_width)    
-
-    self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples)); 
-
-def icpInitalize(self): 
-    pass; 
-
-def icpPopulateSamples(self, selectedSampleNames):
-    # Create the sample names in the client info section        
-    for i, (key, value) in enumerate(self.sampleNames.items()):
-        
-        if(key in selectedSampleNames):
-            print('active:', key)
-            sampleItem = SampleNameWidget(key, value)
-            self.ui.samplesContainerLayout.addWidget(sampleItem)
-            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
-
-    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-    self.ui.samplesContainerLayout.addItem(spacer) 
-
-def icpFormatTable(): 
-    pass; 
-
-def icpPopulateTables(): 
-    pass; 
-
-
-def dilutionConversion(machineList, sample, symbol, dilutuion ):
+    
+def dilutionConversion(machineList, sample, symbol, dilutuion):
     item = QtWidgets.QTableWidgetItem(); 
     item.setTextAlignment(Qt.AlignCenter)
 
@@ -701,11 +728,7 @@ def dilutionConversion(machineList, sample, symbol, dilutuion ):
         newVal = round(newVal, 3)
         item.setText(str(newVal))
         
-    else: 
-        # item.setText(machine1Val)
-        # machine2Val = round(machine2Val, 3 )
-        # item.setText(str(machine2Val))
-        
+    else:         
         try:
             machineValue = float(machineValue)  # Convert to float first
             machineValue = round(machineValue, 3)
@@ -716,6 +739,9 @@ def dilutionConversion(machineList, sample, symbol, dilutuion ):
     return item 
 
 
+#******************************************************************
+#    ICP Report Handler Function  
+#******************************************************************
 
 def icpReportHander(self, tests, totalSamples): 
     print('[FUNCTION]: icpReportHander(self, tests, totalSamples)')
@@ -750,7 +776,8 @@ def icpReportHander(self, tests, totalSamples):
         try: 
             currentItem = self.ui.dataTable.item(i, 2).text()
             unitType.append(currentItem)
-        except: 
+        except Exception as e: 
+            print(f'[ERROR]: {e}') 
             unitType.append('')
     
     elementsWithLimits = getElementLimits(self.db); 
@@ -784,4 +811,4 @@ def icpReportHander(self, tests, totalSamples):
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
     
 
-    
+    createdReportDialog('test')

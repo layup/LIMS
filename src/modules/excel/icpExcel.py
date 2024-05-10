@@ -174,8 +174,6 @@ def insertIcpComment(ws, footerComment, pageLocation):
     pageLocation +=2; 
     insertSignature(ws, pageLocation, [3,6])
 
-    
-    
 
 def insertComments(ws, pageLocation): 
 

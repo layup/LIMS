@@ -2,6 +2,10 @@
 REPORTS_TYPE = ['','CHM','ICP']
 
 
+
+ICP_REPORT = 1 
+CHM_REPORT = 2 
+
 SAMPLETYPES = [ 
     '1um wound fiter', 
     'sediment',
@@ -21,6 +25,22 @@ SAMPLETYPES = [
     'swab',
     'water',
 ]
+
+FILTER_BY = [
+    'Sample Number', 
+    'JobNunmber', 
+    'Machine Type', 
+    'File Location', 
+    'Upload Date'
+]
+
+SHOW_ENTITIES = [
+    '50', 
+    '75',
+    '100', 
+    '150'   
+]
+
 
 
 GSMS_values = {

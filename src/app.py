@@ -26,7 +26,7 @@ from assets import resource_rc
 from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
-from pages.icp_tools import  icpSetup, loadReportList, updateIcpTable, loadIcpHistory
+from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
 from pages.chm_tools import (chmLoadTestsNames, loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
@@ -181,6 +181,9 @@ class MainWindow(QMainWindow):
             self.ui.dilutionInput.setText('')
             
         if(index == 2): # ICP Page 
+            # TODO: set the title text to nothing by default or something, keeps loading the wrong thing 
+            # TODO: check what the current item is
+            
             pass; 
         
         if(index == 3): # CHM Page 
@@ -207,6 +210,7 @@ class MainWindow(QMainWindow):
             self.ui.icpPageTitle.setText("ICP Database")
             self.ui.icpLabel.setText("")
         
+            # Load the data again when the 
             loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
@@ -244,10 +248,10 @@ class MainWindow(QMainWindow):
         
         if(index == 2): # Test Info  
             self.ui.chmTitleLabel.setText('Chemisty Tests Information')
-            totalTests = getChmTotalTests(self.db) 
+            #totalTests = getChmTotalTests(self.db) 
             
-            self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
-            chmLoadTestsNames(self)
+            #self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
+            #chmLoadTestsNames(self)
             
         if(index == 3): # Report Info 
             self.ui.chmTitleLabel.setText('Chemisty Reports Information')
@@ -291,10 +295,6 @@ class MainWindow(QMainWindow):
         # Represents the three databases 
         databaseStatus = [0, 0, 0] 
 
-        
-           
-
-        
 
         for attempt in range(3):  
             print(f'Attemp: {attempt}')
@@ -313,11 +313,10 @@ class MainWindow(QMainWindow):
                 self.tempDB = Database(tempPath)
                 
 
-
                 # Connect the backend database (Harry Systems)
                 self.db = Database(mainDatabasePath)
 
-                
+
                 # Connect the Office database (Front and Histroy Systems)
                 self.officeDB = Database(officeDatabasePath)
             

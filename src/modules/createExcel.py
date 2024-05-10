@@ -242,6 +242,7 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, total
 
 
 #will change how we get the tests and unit type, will be saved somewhere 
+#TODO: better ways to pass function instead of a large amount of parameters 
 def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType, recovery): 
     print('test info fam: ', testInfo)
     counter = pageLocation

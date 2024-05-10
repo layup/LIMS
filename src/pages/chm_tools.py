@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 from modules.excel.chmExcel import createChmReport
-from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests 
+from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests, getAllChmTestsInfo 
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
@@ -23,6 +23,11 @@ from widgets.widgets import *
 #****************************************************************** 
 
 def chemistySetup(self): 
+    
+    
+    
+    # All other chemisty section setups 
+    chmTestsInfoSetup(self)
     
     # Load in the inital Database 
     loadChmDatabase(self);   
@@ -52,10 +57,10 @@ def chemistySetup(self):
     # Set the column width for Input Tree 
 
     # Connect Signal/Buttons 
-    self.ui.gcmsAddTestsBtn.clicked.connect(lambda: on_chmAddTestsBtn_clicked(self))
-    self.ui.gcmsSaveTestBtn.clicked.connect(lambda: on_chmSaveTestBtn_clicked(self))
-    self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))        
-    self.ui.gcmsDefinedtests.currentRowChanged.connect(lambda: on_chmDefinedtests_currentRowChanged(self)) 
+    #self.ui.gcmsAddTestsBtn.clicked.connect(lambda: on_chmAddTestsBtn_clicked(self))
+    #self.ui.gcmsSaveTestBtn.clicked.connect(lambda: on_chmSaveTestBtn_clicked(self))
+    #self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))        
+    #self.ui.gcmsDefinedtests.currentRowChanged.connect(lambda: on_chmDefinedtests_currentRowChanged(self)) 
     
     # CHM input data signals
     self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
@@ -146,6 +151,10 @@ def chmClearDefinedTestsValues(self):
 #    Chemisty Database Section 
 #****************************************************************** 
 #TODO: reload the data when we add new information 
+
+
+def chmData(self): 
+    pass; 
 
 
 def loadChmDatabase(self): 
@@ -535,37 +544,231 @@ def getTestsAndUnits(self):
 
 
 
+#******************************************************************
+#    Chemisty Tests Info 2.0 
+#*****************************************************************
+#TODO: integrate everything into one database 
+def chmTestsInfoSetup(self): 
+    treeWidget = self.ui.chmTestTree
+    
+    # Setup the tree headers and columns
+    chmSetupTreeColumns(treeWidget)
+    
+    # Tree Data Manager and Tree UI Handler 
+    self.testsModel = TestsDataModel(self.tempDB) 
+    self.testsViewer = TestsDataView(treeWidget) 
+    
+    # Populate the Tests Model and Update the Tests View 
+    chmLoadTestsData(self.testsModel, self.testsViewer)
+    
+    # TODO: Setup search functionality
+
+    #TODO: Connect other signals
+    self.ui.chmTestTree.itemSelectionChanged.connect(lambda: chmTestTreeItemChanged(self))
+    self.ui.chmTestSaveBtn.clicked.connect(lambda: chmTestSaveBtnClicked(self))
+    self.ui.chmTestCancelBtn.clicked.connect(lambda: chmTestCancelBtnClicked(self))
+
+def chmSetupTreeColumns(treeWidth): 
+    columnHeaders = ['Test #', 'Tests Name', 'Text Name', 'Report Name', 'Recovery Value', 'Unit Type']
+    
+    treeWidth.setHeaderLabels(columnHeaders)
+
+    #TODO: make this a global variable
+    smallCol = 70
+    medCol = 200 
+    bigCol = 300 
+    
+    # Set Tree Width 
+    treeWidth.setColumnWidth(0, smallCol) 
+    treeWidth.setColumnWidth(1, bigCol)
+    treeWidth.setColumnWidth(2, medCol)
+    treeWidth.setColumnWidth(3, bigCol)
+    treeWidth.setColumnWidth(4, 100)
+    treeWidth.setColumnWidth(5, smallCol)
+    
+def chmLoadTestsData(model, view): 
+    print('[FUNCTION]: chmLoadTestsData(model, view)')
+    tests_data = model.loadTestsData()
+    view.populateTree(tests_data)
+
+def chmTestTreeItemChanged(self): 
+    print('[SIGNAL]: chmTestTreeItemChanged(self)')    
+    loadTestDataInfo(self) 
+
+def chmTestCancelBtnClicked(self): 
+    print('[SIGNAL]: chmTestTreeItemChanged(self, testItem)')    
+    loadTestDataInfo(self) 
+
+def loadTestDataInfo(self): 
+    testData = self.testsViewer.getTreeData()
+    
+    if(testData): 
+        print(testData)
+        testNum     = testData[0]
+        testName    = testData[1] 
+        textName    = testData[2]
+        reportName  = testData[3]
+        recoveryVal = testData[4]
+        unitType    = testData[5]
+        
+        # Set the header name 
+        nameString = f'{testName} ({testNum})'
+        self.ui.chmTestsNameHeader.setText(nameString)
+        
+        self.ui.chmDisplayName.setText(testName)
+        self.ui.chmTxtName.setText(textName)
+        self.ui.chmDisplayName.setText(reportName)
+        self.ui.chmRefValue.setText(recoveryVal)
+        self.ui.chmUnitName.setText(unitType)
+
+def chmTestSaveBtnClicked(self): 
+    print('[SIGNAL]: chmSaveTestChanges(self)')
+
+    newData = chmGetTestsLineEditValues(self)
+    print(f'New Tree Data: {newData}')
+    
+    if(newData):  
+        # Update the tests Model 
+        updatedData = self.testsModel.updateTestsData(newData)
+        print(updatedData)
+        # Update the tests viewer to dispplay the updated Data
+        self.testsViewer.updateTreeData(updatedData)
 
 
+def chmGetTestsLineEditValues(self): 
+    print('[FUNCTION]: chmGetTestsLineEditValues(self)')
+    # Get values from the TestsViewer object
+    testsNum    = self.testsViewer.getTreeValue(0)
+    testName    = self.testsViewer.getTreeValue(1)
+
+    # Get values from QLineEdit widgets directly
+    textName    = self.ui.chmTxtName.text()
+    reportName  = self.ui.chmDisplayName.text()
+    recoveryVal = self.ui.chmRefValue.text()
+    unitType    = self.ui.chmUnitName.text()
+    
+    if(testsNum): 
+        return [testsNum, testName, textName, reportName, recoveryVal, unitType]  
+
+def chmClearTestsInfo(self): 
+    print('[FUNCTION]: chmClearTestsInfo(self)')
+    # Reset Title 
+    self.ui.chmTestsNameHeader.setText('Tests Name (#)')
+    
+    # Clear QLineEdits widgets 
+    self.ui.chmDisplayName.clear()
+    self.ui.chmTxtName.clear()
+    self.ui.chmUnitName.clear()
+    self.ui.chmRefValue.clear()
+    self.ui.chmTestsComment.clear()
+        
 #******************************************************************
 #    Chemisty Class Definitions
 #****************************************************************** 
 
-class TestsInfoManager(): 
+# Tests Data Object 
+class TestData(): 
+    def __init__(self, testNum, testName, textName, reportName, recoveryVal, unitType): 
+        self.testNum     = testNum
+        self.testName    = testName
+        self.textName    = textName
+        self.reportName  = reportName       
+        self.recoveryVal = recoveryVal
+        self.unitType    = unitType
 
-    def __init__(self, treeWidget, database):
-        self.treeWidget = treeWidget
-        self.db = database  
+# Handles data logic & Interacts with database   
+class TestsDataModel(): 
+    def __init__(self, database):
+        self.db = database
+        self.tests = {}
         
-    def displayTreeData(self): 
-        pass; 
-    
-    
-    
-    def displayWidgetData(self): 
-        pass; 
-    
-        ##External functions maybe? 
-    
-    
-    def updateDatabase(self): 
-        pass; 
-    
-    
-    
+    def loadTestsData(self):
+        testsList = getAllChmTestsInfo(self.db) 
+ 
+        print('Total Tests: ', len(testsList))
 
-class ReportManager(): 
-    pass; 
+        if(testsList): 
+            for test in testsList: 
+                testNum     = test[0]
+                testName    = test[1]
+                textName    = test[2]
+                displayName = test[3]
+                recoveryVal = test[4]
+                unitType    = test[5]
+
+                self.tests[testNum] = TestData(testNum, testName, textName, displayName, recoveryVal, unitType)
+
+            return testsList 
+
+    def getTestData(self, testNum): 
+        if(testNum in self.tests): 
+            return self.tests[testNum]
+
+    def getsAllTestsData(self): 
+        if(self.tests): 
+            return self.tests 
+        
+        return None 
+
+    def addTestsData(self): 
+        pass; 
+    
+    def updateTestsData(self, newData): 
+        testNum = newData[0]
+
+        if(testNum in self.tests): 
+            self.tests[testNum] = newData 
+            return self.tests[testNum] 
+        
+    def deleteTestsData(self): 
+        pass; 
+   
+# Handles Tree Widget UI data
+class TestsDataView():
+    def __init__(self, tree_widget):
+        self.tree = tree_widget
+
+    def populateTree(self, testsResults): 
+
+        if(testsResults): 
+            for testInfo in testsResults: 
+                item = QTreeWidgetItem(self.tree) 
+                item.setData(0, 0, testInfo[0])
+                item.setData(1, 0, testInfo[1])
+                item.setData(2, 0, testInfo[2])    
+                
+    def getTreeData(self): 
+        testItem = self.tree.currentItem() 
+
+        if testItem:
+            return [testItem.data(i, 0) for i in range(6)]
+        
+
+    def getTreeValue(self, row): 
+        testItem = self.tree.currentItem()
+
+        if(testItem): 
+            return testItem.data(row, 0)
+            #return testItem.text(row)
+
+    def getCurrentRowIndex(self): 
+        testsItem = self.tree.currentItem()
+        if(testsItem):
+            return self.tree.indexOfTopLevelItem(testsItem)
+        else:
+            return -1  # No current item selected
+        
+    def updateTreeData(self, newData): 
+        testsItem = self.tree.currentItem()
+        
+        if(testsItem and newData): 
+            testsItem.setData(0, 0, newData[0])
+            testsItem.setData(1, 0, newData[1])
+            testsItem.setData(2, 0, newData[2])
+            testsItem.setData(3, 0, newData[3])
+            testsItem.setData(4, 0, newData[4])
+            testsItem.setData(5, 0, newData[5])
+
 
 
 class MacroDialog(QDialog): 

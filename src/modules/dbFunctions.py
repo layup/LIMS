@@ -44,6 +44,22 @@ def insertChmTests(db, txtName, unitType, recoveryVal, displayName):
     except Exception as e: 
         print(e)
 
+        
+#******************************************************************
+#    CHM  Queries/Commands 2.0
+#****************************************************************** 
+
+def getAllChmTestsInfo(db): 
+    try: 
+        query = 'SELECT * FROM chemTestsInfo'    
+        tests = db.query(query)    
+        return tests 
+
+    except Exception as e: 
+        print(f'An error occured: {e}')
+        return None 
+        
+    
 
 #******************************************************************
 #    ICP Queries/Commands 

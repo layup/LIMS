@@ -1,5 +1,10 @@
 from PyQt5.QtWidgets import QDialog, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QDesktopWidget 
 
+
+#******************************************************************
+#    General Dialog 
+#******************************************************************
+
 def loadReportDialog(self): 
     msgBox = QMessageBox()  
     msgBox.setText("Report Already Exists");
@@ -36,6 +41,8 @@ def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
 def createdReportDialog(fileName): 
 
     msg = QMessageBox()
+    msg.setFixedWidth(600)
+    
     msg.setIcon(QMessageBox.Information)
 
     msg.setText('Success')
@@ -98,6 +105,22 @@ def replaceError(self,sampleName):
     if(x == QMessageBox.Cancel):
         pass 
     
+    
+#******************************************************************
+#    CHM Dialog 
+#******************************************************************
+    
+    
+
+#******************************************************************
+#    ICP Dialogs  
+#******************************************************************
+
+
+    
+#******************************************************************
+#    Classes  
+#******************************************************************
 class openJobDialog(QDialog):
     def __init__(self, jobNum, parent=None):
         super().__init__(parent)

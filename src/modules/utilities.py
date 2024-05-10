@@ -22,7 +22,9 @@ from modules.constants import *
 from modules.dialogBoxes import *
 
 
-
+#******************************************************************
+#   General Functions  
+#******************************************************************
 def apply_drop_shadow_effect(widget):
     # Create drop shadow effect
     shadow = QGraphicsDropShadowEffect(widget)
@@ -75,13 +77,16 @@ def remove_unicode_characters(text):
 
     return cleaned_text
 
-
 def hardnessCalc(calcium, magnesium, dilution):
     calcium = float(calcium) * float(dilution)
     magnesium = float(magnesium) * float(dilution)
     
     return round(calcium * 2.497 + calcium * 4.11, 1)
 
+
+#******************************************************************
+#    OS Access Functions 
+#******************************************************************
 
 def save_pickle(dictonaryName):
     try:
@@ -174,6 +179,10 @@ def processTXTFolders(jobNum, locations):
     #print("No Job Number Matches")
     return None; 
 
+
+#******************************************************************
+#   TEXT File Processing 
+#******************************************************************
         
 def processClientInfo(jobNum, fileLocation):
     
@@ -348,7 +357,10 @@ def processClientInfo(jobNum, fileLocation):
     #print(sampleNames)
     #print(sampleTests)
     return clientInfoDict, sampleNames, sampleTests; 
-    
+
+#******************************************************************
+#    ICP Uploads Files 
+#******************************************************************
     
 def icp_upload(filePath, db): 
     print('Scanning the file')
@@ -368,8 +380,8 @@ def icp_upload(filePath, db):
 def icpMethod1(filePath, db): 
 
     file1 = open(filePath, 'r')
-    fname = os.path.basename(filePath)
-    fname = fname.split('.txt')[0]
+    baseName = os.path.basename(filePath)
+    fname = baseName.split('.txt')[0]
     #remove extenion 
     
     print('Method 1')
@@ -404,10 +416,10 @@ def icpMethod1(filePath, db):
 
     newName = fname + '.csv'
     loadPath = load_pickle('data.pickle') 
-    print(loadPath)
     newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
      
     print('Writing CSV File: {}'.format(newPath))
+    
     f = open(newPath, 'w')
     writer = csv.writer(f)
     writer.writerow(headers)
@@ -485,25 +497,28 @@ def icpMethod1(filePath, db):
     print('****')
     print(jobData)
    
-    save = viewIcpTable(filePath, sampleNumbers,1 ) 
+    save = viewIcpTable(filePath, sampleNumbers, 1) 
     print('Save Status: ', save)
 
-    
-    #FIXME: uploading same data
 
-    todayDate = date.today()
     #save to database 
     if(save): 
         for (key, value) in jobData.items(): 
-            #print(key, value)
-            sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
+            #
+            #sql = 'INSERT OR REPLACE INTO icpMachineData1 values(?,?,?,?,?, 1)'
+            sql = 'INSERT OR REPLACE INTO icpData values(?, ?, ?, ?, ?, 1)'
+            
             jobNum = key.split('-')[0]
+            todayDate = date.today()
+            
             tempData = json.dumps(value)
-            db.execute(sql, (key,jobNum,newPath, tempData, todayDate))
-            db.commit()
+            if(key): 
+                db.execute(sql, (key,jobNum,baseName, tempData, todayDate))
+                db.commit()
         return jobNumber,jobData
     else: 
         return False; 
+
     
 #scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
 #TODO: insert try catch block 
@@ -511,8 +526,8 @@ def icpMethod2(filePath, db):
     wb = openpyxl.load_workbook(filePath)
     sheets = wb.sheetnames 
     
-    fname = os.path.basename(filePath)
-    fname = fname.split('.xlsx')[0]
+    baseName = os.path.basename(filePath)
+    fname = baseName.split('.xlsx')[0]
     
     print('Method 2')
     print('FileName: ', fname)
@@ -560,15 +575,21 @@ def icpMethod2(filePath, db):
                     
                 sampleInfo[sampleName] = sampleData
                 
-                    
-    todayDate = date.today()
-    
-    for key,value in sampleInfo.items(): 
-        query = 'INSERT OR REPLACE INTO icpMachineData2 values(?,?,?,?,?,2)'
+    for key, value in sampleInfo.items(): 
+        query  = 'INSERT OR REPLACE INTO icpData values(?, ?, ?, ?, ?, 2)'
         jobNum = key[:6]
+        todayDate = date.today()
         tempData = json.dumps(value)
-        db.execute(query, (key, jobNum, newPath, tempData, todayDate))
-        db.commit()
+        if(jobNum): 
+            db.execute(query, (key, jobNum, baseName, tempData, todayDate))
+            db.commit()
+
+    # Format the machine data 
+    formatMachineData(ws, selectedRows, elementColumns, newPath)
+    
+    return; 
+
+def formatMachineData(ws, selectedRows, elementColumns, newPath): 
 
     newWb = openpyxl.Workbook()
     ws2 = newWb.active 
@@ -600,10 +621,7 @@ def icpMethod2(filePath, db):
 
         row_num+=1;      
 
-    
     newWb.save(newPath)
-    
-    return; 
 
 def formatJobSampleString(inputString): 
     sample = inputString.strip()
@@ -615,7 +633,6 @@ def formatJobSampleString(inputString):
         formatted_string = f"{first_part}-{second_part}"
         
         return formatted_string; 
-
 
 def formatStringArray(inputArray): 
     outputArray = []
@@ -634,7 +651,6 @@ def formatStringArray(inputArray):
             # Construct the desired format
             formatted_string = f"{first_part}-{second_part}"
             outputArray.append(formatted_string)
-
     
     return(outputArray)
         
@@ -646,7 +662,6 @@ def createReport(db, jobNum, reportType, parameter, dilution):
     db.commit()
     
     
-
 def viewIcpTable(filePath, data, reportType): 
     print('Viewing ICP Table')
 
@@ -657,7 +672,9 @@ def viewIcpTable(filePath, data, reportType):
     else:
         return False; 
 
-
+#******************************************************************
+#    Classes 
+#******************************************************************
 class icpTableView(QDialog):
     def __init__(self, filePath, data, reportType):
         super().__init__()
