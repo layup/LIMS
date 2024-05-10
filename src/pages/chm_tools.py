@@ -24,14 +24,17 @@ from widgets.widgets import *
 
 def chemistySetup(self): 
     
-    
-    
-    # All other chemisty section setups 
     chmTestsInfoSetup(self)
+    chmInputSectionSetup(self)
+    chmDatabaseSetup(self)
     
-    # Load in the inital Database 
-    loadChmDatabase(self);   
-    
+
+        
+#******************************************************************
+#    Chemisty Database Section 
+#****************************************************************** 
+#TODO: reload the data when we add new information (Create a class that deals with this)
+def chmDatabaseSetup(self): 
     smalllColWidth = 120; 
     mediumColWidth = 200; 
     
@@ -51,110 +54,8 @@ def chemistySetup(self):
     # Disable Editing of the table 
     self.ui.chmInputTable.setEditTriggers(QTableWidget.NoEditTriggers)
     
-
-    self.ui.inputDataTree.clear()
-    
-    # Set the column width for Input Tree 
-
-    # Connect Signal/Buttons 
-    #self.ui.gcmsAddTestsBtn.clicked.connect(lambda: on_chmAddTestsBtn_clicked(self))
-    #self.ui.gcmsSaveTestBtn.clicked.connect(lambda: on_chmSaveTestBtn_clicked(self))
-    #self.ui.gcmsDeleteTestBtn.clicked.connect(lambda: on_chmDeleteTestBtn_clicked(self))        
-    #self.ui.gcmsDefinedtests.currentRowChanged.connect(lambda: on_chmDefinedtests_currentRowChanged(self)) 
-    
-    # CHM input data signals
-    self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
-    self.ui.gcmsProceedBtn.clicked.connect(lambda: on_gcmsProceedBtn_clicked(self))
-    
-    self.ui.chmAddTestsBtn.clicked.connect(lambda: on_chmSampleDataAdd_clicked(self))
-    
-
-
-def chmLoadTestsData(self): 
-    selectedTests = self.ui.gcmsDefinedtests.currentItem()
-            
-    if selectedTests is not None:
-        try: 
-            getTestsData = 'SELECT * FROM gcmsTests WHERE testName = ?'
-            self.db.execute(getTestsData, (selectedTests.text(),))
-            results = self.db.fetchone() 
-            print('Results:') 
-            print(results)
-        
-            self.ui.gcmsTxtName.setText(str(results[0]))
-            self.ui.gcmsUnitType.setText(str(results[1]))
-            self.ui.gcmsRefValue.setText(str(results[2]))
-            self.ui.gcmsDisplayName.setText(str(results[3]))
-
-            self.ui.chmTxtName.setText(str(results[0]))
-            self.ui.chmUnitName.setText(str(results[1]))
-            self.ui.chmRefValue.setText(str(results[2]))
-            self.ui.chmDisplayName.setText(str(results[3])) 
-            
-        except: 
-            #item is not in the database yet 
-            print('Error: selected Text was None') 
-            chmClearDefinedTestsValues(self)
-            self.ui.gcmsTxtName.setText(selectedTests.text())
-            
-            
-def chmLoadTestsNames(self): 
-    print('[FUNCTION]: chmLoadTestsNames')
-    chmClearDefinedTestsValues(self); 
-    self.ui.gcmsDefinedtests.clear()
-    self.ui.testsInputLabel.clear()
-
-    getTestNamesQuery = 'SELECT testName FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
-    testNames = self.db.query(getTestNamesQuery)           
-    
-    print(testNames)
-    
-    for test in testNames: 
-        self.ui.gcmsDefinedtests.addItem(test[0])
-
-
-    # Clear the section (reloading)
-    self.ui.chmTestTree.clear()
-
-    # Query Results 
-    query = 'SELECT * FROM gcmsTests gcmsTests ORDER BY testName COLLATE NOCASE ASC'
-    testNames = self.db.query(query)        
-    print(f'testsNames: {testNames}')
-     
-    for testInfo in testNames: 
-        item = QTreeWidgetItem(self.ui.chmTestTree) 
-        item.setData(0, 0, testInfo[0])
-        item.setData(1, 0, testInfo[1])
-        item.setData(2, 0, testInfo[2])
-        item.setData(3, 0, testInfo[3])
-
-    
-
-
-def chmClearDefinedTestsValues(self): 
-    self.ui.gcmsDisplayName.clear()
-    self.ui.gcmsTxtName.clear()
-    self.ui.gcmsUnitType.clear()
-    self.ui.gcmsRefValue.clear()
-    self.ui.gcmsComment.clear() 
-
-  
-    self.ui.chmTestsComment.clear()
-    for child_widget in self.ui.temp1.findChildren(QWidget):
-        # Check if the child widget is a QLineEdit
-        if isinstance(child_widget, QLineEdit):
-            # Clear the text of the QLineEdit
-            child_widget.clear()
-        
-        
-#******************************************************************
-#    Chemisty Database Section 
-#****************************************************************** 
-#TODO: reload the data when we add new information 
-
-
-def chmData(self): 
-    pass; 
+    # Load in the inital Database 
+    loadChmDatabase(self);    
 
 
 def loadChmDatabase(self): 
@@ -195,8 +96,6 @@ def loadChmDatabase(self):
         chmTable.setCellWidget(i ,6, button_widget)
         
 
-        
-
 def chmTableDeleteRow(self, row): 
     print(f'[FUNCTION]: chmTableDeleteRow, row to delete {row}')
     
@@ -221,6 +120,35 @@ def chmTableEditRow(self, row):
 #TODO: duplication error
 #TODO: set defaults 
 
+def chmInputSectionSetup(self): 
+    print('[FUNCTION]:chmInputSectionSetup(self)')
+    self.ui.inputDataTree.clear()
+    
+    populateNewEntry(self) 
+    
+    #TODO: rename this 
+    # Input Data Page Signals
+    #self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
+    self.ui.chmProceedBtn.clicked.connect(lambda: on_chmProceedBtn_clicked(self))
+    
+def populateNewEntry(self): 
+    print('[FUNCTION]: populateNewEntry(self)')
+    
+    # TODO: move this to another function 
+    query = 'SELECT testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
+    results = self.preferencesDB.query(query)
+
+    chmClearActiveValues(self)
+    
+    #TODO: find out what the others are (add to the settings section)
+    parameterTypes = [item[0] for item in results]
+    parameterTypes.insert(0, '')
+    unitTypes = ['', 'TCU', 'ug/L', 'mg/g']    
+    
+    self.ui.gcmsTests.addItems(parameterTypes)
+    self.ui.gcmsUnitVal.addItems(unitTypes)
+    
+
 def on_gcmsTests_activated(self, index): 
     if(index in self.chmParameters): 
         unitVal = self.chmParameters[index]
@@ -237,9 +165,8 @@ def on_gcmsTests_activated(self, index):
             
             self.ui.gcmsUnitVal.setCurrentIndex(index)
             
-
 @pyqtSlot()    
-def on_gcmsProceedBtn_clicked(self):            
+def on_chmProceedBtn_clicked(self):            
     standards = self.ui.gcmsStandardVal.text().strip()
     units = self.ui.gcmsUnitVal.currentText()
     tests = self.ui.gcmsTests.currentText()
@@ -272,7 +199,6 @@ def on_gcmsProceedBtn_clicked(self):
             
         showErrorDialog(self, errorTitle, errorMsg)
         
-
 @pyqtSlot()   
 def on_chmSampleDataAdd_clicked(self): 
     print('[FUNCTION]: chmAddTestsBtn clicked')
@@ -322,7 +248,6 @@ def on_chmSampleDataAdd_clicked(self):
                 
                 chmClearSampleJob(self) 
 
-                
             if(x == QMessageBox.No):
                 chmClearSampleJob(self) 
                 
@@ -331,12 +256,8 @@ def on_chmSampleDataAdd_clicked(self):
             
         else: 
             addToChmTestsData(self.db, sampleNum, testName, sampleVal, standards, units, testNum)
-            #self.ui.gcmsTestsLists.addItem(sampleNum)
-
             addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards)
-            
             chmClearSampleJob(self) 
-            
             
     else: 
         errorTitle = 'Cannot add Tests '
@@ -354,7 +275,6 @@ def on_chmSampleDataAdd_clicked(self):
         showErrorDialog(self, errorTitle, errorMsg)
         
         
-        
 def checkMatchingTreeItems(treeWidget, targetText):
     # Iterate through the top-level items
     for index in range(treeWidget.topLevelItemCount()):
@@ -364,11 +284,8 @@ def checkMatchingTreeItems(treeWidget, targetText):
 
     return None
 
-
-
-
-
 def addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards): 
+    print('[FUNCTION]: addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards)')
     topItem = QTreeWidgetItem(inputTree)  
     
     topItem.setText(0, sampleNum)           
@@ -377,6 +294,7 @@ def addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards
     topItem.setText(3, units)
     topItem.setText(4, standards)
     
+    #TODO: connect the delete button, maybe add an edit button
     deleteTreeBtn = QPushButton('Delete')
 
     # Create a widget container for the button
@@ -384,15 +302,12 @@ def addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards
     layout = QVBoxLayout(widget_container)
     layout.addWidget(deleteTreeBtn)
 
-    #inputTree.setItemWidget(topItem, 5, widget_container)
-
-        
 def chmClearSampleJob(self): 
     self.ui.gcmsTestsSample.clear()
     self.ui.gcmsTestsVal.clear() 
         
 #FIXME: not used anywhere 
-def gcmsClearSideData(self): 
+def chmClearActiveValues(self): 
     self.ui.gcmsStandardVal.clear()
     self.ui.gcmsUnitVal.clear()
     self.ui.gcmsTests.clear() 
@@ -401,23 +316,16 @@ def chmClearEnteredTestsData(self):
     self.ui.chmTestsValueWidget.setEnabled(False)
     self.ui.chmActionWidget.setEnabled(False)
     self.ui.widget_29.setEnabled(True)
-        
-    self.ui.gcmsStandardVal.clear()
-    self.ui.gcmsUnitVal.clear()
-    self.ui.gcmsTests.clear()
+ 
+    chmClearActiveValues(self)
     
-    self.ui.gcmsStandardValShow.clear()
-    self.ui.gcmsUnitValShow.clear()
-    self.ui.gcmsTestsShow.clear()
-        
+    # Clear Enter values Section 
     self.ui.gcmsTestsJobNum.clear()
-    self.ui.gcmsTestsSample.clear()
-    self.ui.gcmsTestsVal.clear()
-    #self.ui.gcmsTestsLists.clear()
+    chmClearSampleJob(self) 
     
     self.ui.inputDataTree.clear()
 
-
+#TODO: move this function to the other area 
 def addToChmTestsData(database, sampleNum, testName, sampleVal, standards, units, jobNum ): 
     addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
     
@@ -428,124 +336,9 @@ def addToChmTestsData(database, sampleNum, testName, sampleVal, standards, units
     except sqlite3.IntegrityError as e:
         print(e) 
 
-#******************************************************************
-#    Chemisty Tests Info
-#****************************************************************** 
-#TODO: if the txt name changes update the listName 
-#TODO: keep track of the currentIndex when first getting it 
-    
-def chmGetTestsValues(self): 
-    values = []
-    
-    for index in range(self.ui.gcmsDefinedtests.count()):
-        item = self.ui.gcmsDefinedtests.item(index)
-        values.append(item.text())
-        
-    return values; 
-    
-
-@pyqtSlot() 
-def on_chmAddTestsBtn_clicked(self): 
-    existingTests = chmGetTestsValues(self)        
-    currentText = self.ui.testsInputLabel.text()
- 
-    if(currentText != '' and currentText not in existingTests): 
-        #clear values 
-        chmClearDefinedTestsValues(self)
-        self.ui.testsInputLabel.clear()
-        self.ui.gcmsDefinedtests.addItem(currentText)
-
-        totalItems = len(chmGetTestsValues(self))
-        self.ui.gcmsDefinedtests.setCurrentRow(totalItems-1)
-        self.ui.gcmsTxtName.setText(currentText)
-        
-    else: 
-        errorTitle = 'Invald Tests'
-        errorMsg = 'Please enter a valid test'
-        showErrorDialog(self, errorTitle, errorMsg)
-
-
-@pyqtSlot()
-def on_chmSaveTestBtn_clicked(self):
-    print('[SLOT]: on_gcmsSaveTestBtn_clicked')
-    displayName = self.ui.gcmsDisplayName.text().strip()
-    txtName = self.ui.gcmsTxtName.text().strip()
-    unitType = self.ui.gcmsUnitType.text().strip()
-    recoveryVal = self.ui.gcmsRefValue.text()        
-    comment = self.ui.gcmsComment.toPlainText() 
-    
-    #print(txtName, unitType, recoveryVal, displayName)
-
-    if(txtName != ""):
-        insertChmTests(self.db, txtName, unitType, recoveryVal, displayName)
-        
-
-@pyqtSlot()    
-def on_chmDeleteTestBtn_clicked(self): 
-    txtName = self.ui.gcmsTxtName.text().strip()
-    selected_item = self.ui.gcmsDefinedtests.currentItem()
-    
-    deleteQuery = 'DELETE FROM gcmstests WHERE testName = ?'
-    
-    print(f'[QUERY]: {deleteQuery}')
-    print(f'TXT Name: {txtName}, Selected Item: {selected_item}')
-    
-    try: 
-        #TODO: make sure it deletes 
-        deleteBox(self, "DELETE ELEMENT", "ARE YOU SURE YOU WANT TO DELETE THIS ITEM", lambda:print("hello World"))
-        self.db.execute(deleteQuery, (txtName,))
-        self.db.commit()
-
-        currentItem = self.ui.gcmsDefinedtests.currentRow()
-        self.ui.gcmsDefinedtests.takeItem(currentItem)
-        self.ui.gcmsDefinedtests.setCurrentItem(None)
-        
-        chmClearDefinedTestsValues(self)
-    
-    except: 
-        print('Error: could not delete item')
-    
-
-        
-def on_chmDefinedtests_currentRowChanged(self):
-    try:
-        chmLoadTestsData(self)
-    except Exception as e:
-        print("An error occurred:", e)
-
-#TODO: move all the unitType and the basic assortment to the prefence item  
-def getTestsAndUnits(self): 
-    inquery = 'SELECT testName, unitType FROM gcmsTests ORDER BY testName COLLATE NOCASE ASC'
-    results = self.db.query(inquery)
-    
-    self.chmParameters = {}
-    
-    tests = ['']
-    units = ['']
-    
-    for testName, unitType in results: 
-        
-        if(testName != '' ): 
-            tests.append(testName)
-            
-            self.chmParameters[testName] = unitType 
-        
-        if(unitType != '' and unitType not in units):
-            units.append(unitType)
-            
-    print(self.chmParameters)
-    
-    return (tests,units)
-
 
 #******************************************************************
-#    Chemisty Report Info
-#****************************************************************** 
-
-
-
-#******************************************************************
-#    Chemisty Tests Info 2.0 
+#    Chemisty Tests Info 
 #*****************************************************************
 #TODO: integrate everything into one database 
 def chmTestsInfoSetup(self): 
@@ -563,10 +356,13 @@ def chmTestsInfoSetup(self):
     
     # TODO: Setup search functionality
 
-    #TODO: Connect other signals
+    #TODO: Connect other signals 
     self.ui.chmTestTree.itemSelectionChanged.connect(lambda: chmTestTreeItemChanged(self))
     self.ui.chmTestSaveBtn.clicked.connect(lambda: chmTestSaveBtnClicked(self))
     self.ui.chmTestCancelBtn.clicked.connect(lambda: chmTestCancelBtnClicked(self))
+
+    #TODO: wtf is this 
+    self.ui.chmAddTestsBtn.clicked.connect(lambda: on_chmSampleDataAdd_clicked(self))
 
 def chmSetupTreeColumns(treeWidth): 
     columnHeaders = ['Test #', 'Tests Name', 'Text Name', 'Report Name', 'Recovery Value', 'Unit Type']
@@ -661,6 +457,13 @@ def chmClearTestsInfo(self):
     self.ui.chmUnitName.clear()
     self.ui.chmRefValue.clear()
     self.ui.chmTestsComment.clear()
+
+#******************************************************************
+#    Chemisty Report Info
+#****************************************************************** 
+#TODO: implment something here
+
+
         
 #******************************************************************
 #    Chemisty Class Definitions
@@ -743,7 +546,6 @@ class TestsDataView():
         if testItem:
             return [testItem.data(i, 0) for i in range(6)]
         
-
     def getTreeValue(self, row): 
         testItem = self.tree.currentItem()
 
@@ -768,8 +570,6 @@ class TestsDataView():
             testsItem.setData(3, 0, newData[3])
             testsItem.setData(4, 0, newData[4])
             testsItem.setData(5, 0, newData[5])
-
-
 
 class MacroDialog(QDialog): 
     # Define Signals 
@@ -821,9 +621,6 @@ class CreateTestsDialog(QDialog):
     def processRequest(): 
         pass; 
             
-            
-
-        
         
     def handleCancelBtn(self): 
         pass; 

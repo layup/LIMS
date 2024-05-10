@@ -26,7 +26,6 @@ from widgets.widgets import *
 #******************************************************************
 
 def reportSetup(self): 
-
     #TODO: ERROR could not load TEXT_FILE please try again
  
     # Create a validator to accept only integer input

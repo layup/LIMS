@@ -59,7 +59,14 @@ def getAllChmTestsInfo(db):
         print(f'An error occured: {e}')
         return None 
         
-    
+def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
+    try: 
+        query = 'INSERT INTO chemTestsData (sampleNum, testNum, testValue, standardValue, unitValue, jobNum) VALUES (?, ?, ?, ?, ?, ?)'
+        db.execute(query, (sampleNum, testNum, testValue, standardValue, unitValue, jobNum))
+        db.commit()
+    except Exception as e: 
+        print(e)
+
 
 #******************************************************************
 #    ICP Queries/Commands 
@@ -383,8 +390,6 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
         print(e)
      
     
-
-
 #******************************************************************
 #    Client Queries
 #****************************************************************** 

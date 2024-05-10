@@ -27,12 +27,11 @@ from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
 from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
-from pages.chm_tools import (chmLoadTestsNames, loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
+from pages.chm_tools import ( loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
 
 from widgets.widgets import * 
-    
     
     
 #TODO: need to have more class objects that deal with insertion, that way we can have lazy loading isntead of constant 
@@ -227,6 +226,7 @@ class MainWindow(QMainWindow):
             loadReportList(self)
 
     def on_chmTabWidget_currentChanged(self, index): 
+        #TODO: reload in the data for all the sections (new data)? 
         print(f'CHM TAB CHANGE INDEX {index}')
         
         if(index == 0): # Database 
@@ -234,25 +234,17 @@ class MainWindow(QMainWindow):
             self.ui.gcmsSubTitleLabel.setText('')
             loadChmDatabase(self);  
             
+            
         if(index == 1): # Input Data 
             self.ui.chmTitleLabel.setText('Chemisty Data Entry')
             self.ui.gcmsSubTitleLabel.setText('') 
-            chmClearEnteredTestsData(self)
             
-            temp = getTestsAndUnits(self)
-            print('*CHM Tests and Unit Values')
-            print(temp)
-            
-            self.ui.gcmsTests.addItems(temp[0])
-            self.ui.gcmsUnitVal.addItems(temp[1])
         
         if(index == 2): # Test Info  
             self.ui.chmTitleLabel.setText('Chemisty Tests Information')
             #totalTests = getChmTotalTests(self.db) 
-            
             #self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
-            #chmLoadTestsNames(self)
-            
+
         if(index == 3): # Report Info 
             self.ui.chmTitleLabel.setText('Chemisty Reports Information')
             self.ui.gcmsSubTitleLabel.setText('Total Reports: ') 
@@ -272,7 +264,6 @@ class MainWindow(QMainWindow):
 
         self.previous_index = -1
 
-
         # Sets the stacks to home page 
         self.ui.stackedWidget.setCurrentIndex(0) 
         self.ui.icpTabWidget.setCurrentIndex(0)
@@ -283,6 +274,7 @@ class MainWindow(QMainWindow):
         self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal) 
        
     def loadDatabase(self): 
+        #TODO: convert all the database into one data base for the front and backend
         # self.paths = load_pickle('data.pickle')
         self.preferences = LocalPreferences('data.pickle')
         preferences = self.preferences.values()
@@ -294,7 +286,6 @@ class MainWindow(QMainWindow):
        
         # Represents the three databases 
         databaseStatus = [0, 0, 0] 
-
 
         for attempt in range(3):  
             print(f'Attemp: {attempt}')
@@ -312,10 +303,8 @@ class MainWindow(QMainWindow):
 
                 self.tempDB = Database(tempPath)
                 
-
                 # Connect the backend database (Harry Systems)
                 self.db = Database(mainDatabasePath)
-
 
                 # Connect the Office database (Front and Histroy Systems)
                 self.officeDB = Database(officeDatabasePath)
@@ -335,7 +324,6 @@ class MainWindow(QMainWindow):
                     # Dialog popup to load the necessaary database Information for the user 
                     dialog = FileLocationDialog(self.preferences)
                     dialog.exec_()
-        
           
     #******************************************************************
     #   Helper/Other Functions 
@@ -360,18 +348,6 @@ class MainWindow(QMainWindow):
         paramResults.insert(0, "")
         self.ui.paramType.addItems(paramResults)
 
-    def loadPreferences(self): 
-        
-        #load the settings information
-        
-        #load the create page preferences (Parameter and Report Type)
-        
-        #load the test pages (authors)
-        
-        
-    
-        pass; 
-    
     
     # TODO: make this more a general application  
     def formatTable(self, table): 
@@ -400,11 +376,6 @@ class MainWindow(QMainWindow):
         self.sampleNames[key] = textChange; 
         print(f'Update Sample Name: {self.sampleNames}')
  
-    def getElementLimits(self): 
-        elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
-        elementWithLimits = self.db.query(elementsQuery, ('Water',))    
-        
-        return [item[0] for item in elementWithLimits]
 
     @pyqtSlot()
     def on_testBtn_clicked(self): 

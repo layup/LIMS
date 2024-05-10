@@ -253,6 +253,8 @@ QToolBox::tab{
 	color:white; 
 }
 
+
+
 QToolBox &gt; QWidget &gt;QWidget &gt;QWidget {
 	background-color:#363f4d;
 } 
@@ -688,6 +690,7 @@ QComboBox{
 #chmHeader QLabel {
 	color:white; 
 }
+
 
 
 #chmTabWidget QPushButton { 
@@ -3636,11 +3639,14 @@ p, li { white-space: pre-wrap; }
               </property>
               <item>
                <widget class="QTabWidget" name="chmTabWidget">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="tabPosition">
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>3</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -4127,7 +4133,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QWidget" name="widget_29" native="true">
                           <property name="enabled">
-                           <bool>true</bool>
+                           <bool>false</bool>
                           </property>
                           <property name="minimumSize">
                            <size>
@@ -4183,7 +4189,7 @@ p, li { white-space: pre-wrap; }
                          </widget>
                         </item>
                         <item>
-                         <widget class="QPushButton" name="gcmsProceedBtn">
+                         <widget class="QPushButton" name="chmProceedBtn">
                           <property name="text">
                            <string>Next</string>
                           </property>
@@ -4198,7 +4204,7 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QWidget" name="chmActionWidget" native="true">
                        <property name="enabled">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <property name="maximumSize">
                         <size>
@@ -4238,7 +4244,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLabel" name="label_62">
                              <property name="enabled">
-                              <bool>true</bool>
+                              <bool>false</bool>
                              </property>
                              <property name="minimumSize">
                               <size>
@@ -4260,7 +4266,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsTestsShow">
                              <property name="enabled">
-                              <bool>true</bool>
+                              <bool>false</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4316,7 +4322,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsUnitValShow">
                              <property name="enabled">
-                              <bool>true</bool>
+                              <bool>false</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4366,7 +4372,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsStandardValShow">
                              <property name="enabled">
-                              <bool>true</bool>
+                              <bool>false</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4392,7 +4398,7 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QWidget" name="chmTestsValueWidget" native="true">
                        <property name="enabled">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <property name="minimumSize">
                         <size>
@@ -4586,7 +4592,7 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QWidget" name="chmRecentlyAdd" native="true">
                     <property name="enabled">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                     <property name="minimumSize">
                      <size>
@@ -4620,7 +4626,7 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QTreeWidget" name="inputDataTree">
                        <property name="enabled">
-                        <bool>true</bool>
+                        <bool>false</bool>
                        </property>
                        <column>
                         <property name="text">
@@ -4685,7 +4691,7 @@ p, li { white-space: pre-wrap; }
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QWidget" name="widget_66" native="true">
+                      <widget class="QWidget" name="testInfoTopWidget" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_72">
                         <item>
                          <widget class="QLineEdit" name="lineEdit_2"/>

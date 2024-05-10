@@ -183,9 +183,7 @@ def icpOpenbutton(self, sampleNum, machineType):
     
 #******************************************************************
 #    ICP Elements  
-#****************************************************************** 
-
-  
+#******************************************************************   
     
 #FIXME: has to load in the list each time, so create a function that app.py can access 
 def icp_elements_setup(self): 
@@ -252,8 +250,6 @@ def icp_elements_setup(self):
     self.ui.saveCompBtn.clicked.connect(lambda: saveIcpBtnClicked(self))
     self.ui.icpCancelBtn.clicked.connect(lambda: cancelIcpBtnClicked(self))
         
-
-
 
 def clearElementInfo(self): 
     # Clear element info 
@@ -697,6 +693,9 @@ class ElementsManager(QObject):
             self.elements[elementNum] = element
         
         self.elementsChanged.emit('UPDATE', element)
+
+class ElementsView(): 
+    pass; 
     
 
     
