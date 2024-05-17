@@ -10,9 +10,12 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
     QSpacerItem, QSizePolicy, QWidgetItem, QTreeWidgetItem 
 )
+from PyQt5.QtGui import QDoubleValidator, QIntValidator
+
 
 from modules.excel.chmExcel import createChmReport
-from modules.dbFunctions import loadChmTestsData, deleteChmData, insertChmTests, getAllChmTestsInfo 
+from modules.dbFunctions import (loadChmTestsData, deleteChmData, getAllChmTestsData, getAllChmTestsInfo,
+                                getAllChmTestsInfo2, getChmTestData, addChmTestData, getTestsName )
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
@@ -23,78 +26,107 @@ from widgets.widgets import *
 #****************************************************************** 
 
 def chemistySetup(self): 
-    
     chmTestsInfoSetup(self)
     chmInputSectionSetup(self)
     chmDatabaseSetup(self)
     
-
+    database_page = 1; 
         
 #******************************************************************
 #    Chemisty Database Section 
 #****************************************************************** 
-#TODO: reload the data when we add new information (Create a class that deals with this)
+
 def chmDatabaseSetup(self): 
-    smalllColWidth = 120; 
+    print('[FUNCTION]: chmDatabaseSetup(self)')
+    # Column Width
+    smallColWidth = 100; 
     mediumColWidth = 200; 
     
+    TableHeader = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Standard Value', 'Unit Value', 'Actions']    
+
+    tableWidget = self.ui.chmInputTable
+
+    # Set the column Headers 
+    tableWidget.setColumnCount(len(TableHeader))
+    tableWidget.setHorizontalHeaderLabels(TableHeader)
+ 
     # Set the column width 
-    self.ui.chmInputTable.setColumnWidth(0, smalllColWidth)
-    self.ui.chmInputTable.setColumnWidth(1, mediumColWidth)
-    self.ui.chmInputTable.setColumnWidth(2, smalllColWidth)
-    self.ui.chmInputTable.setColumnWidth(3, smalllColWidth)
-    self.ui.chmInputTable.setColumnWidth(4, smalllColWidth)
-    self.ui.chmInputTable.setColumnWidth(5, smalllColWidth)
-    
+    tableWidget.setColumnWidth(0, smallColWidth)
+    tableWidget.setColumnWidth(1, smallColWidth)
+    tableWidget.setColumnWidth(2, mediumColWidth)
+    tableWidget.setColumnWidth(3, smallColWidth)
+    tableWidget.setColumnWidth(4, smallColWidth)
+    tableWidget.setColumnWidth(5, smallColWidth)
+
     # Set the last column to stretch
-    self.ui.chmInputTable.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
+    tableWidget.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
     
-    # Hide the vertical rows 
-    self.ui.chmInputTable.verticalHeader().setVisible(False)
+    # Show the vertical rows 
+    tableWidget.verticalHeader().setVisible(True)
+    
     # Disable Editing of the table 
-    self.ui.chmInputTable.setEditTriggers(QTableWidget.NoEditTriggers)
-    
+    tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
+
+    # Connect basic signals 
+    self.ui.chmAddItemBtn.clicked.connect(lambda: self.ui.chmTabWidget.setCurrentIndex(1))
+     
     # Load in the inital Database 
-    loadChmDatabase(self);    
+    populateChmDatabase(self);  
+    
+   
 
-
-def loadChmDatabase(self): 
+def populateChmDatabase(self): 
     print('[FUNCTION]: loadChmDatabase, Loading Existing Data'); 
     
-    TableHeader = ['Sample Number', 'Tests', 'Test Values', 'Standard Value', 'Unit Value', 'Job Num', 'Actions']
     chmTable = self.ui.chmInputTable 
-
-    results = loadChmTestsData(self.db) 
-    
+    columnCount = chmTable.columnCount()
+    results = getAllChmTestsData(self.tempDB) 
     chmTable.setRowCount(len(results))
-    chmTable.setColumnCount(len(TableHeader))
-    chmTable.setHorizontalHeaderLabels(TableHeader)
-    
-    
+
+
+    # The order for the data is defined in the dbFunction
     for i, result in enumerate(results):
-        for j in range(len(TableHeader)-1):
+
+        for j in range(columnCount-1):
             data = str(result[j]) 
-            item = QTableWidgetItem(data)
-            item.setTextAlignment(Qt.AlignCenter)
             
-            chmTable.setItem(i, j, item)     
+            if(j == 2): 
+                testName = getTestsName(self.preferencesDB, data)
+                print(testName)
+                if(testName): 
+                    item = QTableWidgetItem(testName[0][0])
+                    item.setTextAlignment(Qt.AlignCenter)       
+                
+                    chmTable.setRowHeight(i, 18)
+                    chmTable.setItem(i, j, item)    
+            else: 
+                item = QTableWidgetItem(data)
+                item.setTextAlignment(Qt.AlignCenter)       
+                
+                chmTable.setRowHeight(i, 18)
+                chmTable.setItem(i, j, item)     
 
-        #TODO: add the edit button 
-        deleteBtn = QPushButton("Delete")
-        editbtn = QPushButton('Edit')
-
-        deleteBtn.clicked.connect(lambda _, row=i: chmTableDeleteRow(self, row));
-        editbtn.clicked.connect(lambda _, row=i: chmTableEditRow(self, row))
-
-        button_widget = QWidget()
-        button_layout = QHBoxLayout(button_widget)
-        button_layout.addWidget(editbtn)
-        button_layout.addWidget(deleteBtn)
-        button_layout.setContentsMargins(5, 0, 0, 0)
-        button_layout.setAlignment(Qt.AlignLeft)
-
-        chmTable.setCellWidget(i ,6, button_widget)
+        actionWidget = createActionWidget(self, i)
+        chmTable.setCellWidget(i, 6, actionWidget)
         
+def createActionWidget(self, row): 
+
+    #TODO: add the edit button 
+    deleteBtn = QPushButton("Delete")
+    editbtn = QPushButton('Edit')
+
+    # Connect the signals
+    deleteBtn.clicked.connect(lambda _, row=row: chmTableDeleteRow(self, row));
+    editbtn.clicked.connect(lambda _, row=row: chmTableEditRow(self, row))
+
+    button_widget = QWidget()
+    button_layout = QHBoxLayout(button_widget)
+    button_layout.addWidget(editbtn)
+    button_layout.addWidget(deleteBtn)
+    button_layout.setContentsMargins(5, 0, 0, 0)
+    button_layout.setAlignment(Qt.AlignLeft)
+    
+    return button_widget
 
 def chmTableDeleteRow(self, row): 
     print(f'[FUNCTION]: chmTableDeleteRow, row to delete {row}')
@@ -103,26 +135,39 @@ def chmTableDeleteRow(self, row):
     testsName = self.ui.chmInputTable.item(row, 1).text()
     print(f'Sample Num: {sampleNum}, Tests Name: {testsName}')
     
-    self.ui.chmInputTable.removeRow(row)
+    result = deleteBox(self, 'Delete Item?', 'This will delete this from the database. You cannot undo this action!', 'action')
+    if(result): 
+        print(result)
+        self.ui.chmInputTable.removeRow(row)
     #deleteChmData(self.db, sampleNum, testsName)
+    #TODO: have the delete implmented from the SQL 
+    
 
 def chmTableEditRow(self, row): 
     sampleNum = self.ui.chmInputTable.item(row, 0).text()
     testsName = self.ui.chmInputTable.item(row, 1).text() 
+    
+    print(f'EDIT ROW: {row}')
+    
+    for column in range(self.ui.chmInputTable.columnCount()-1):
+        item = self.ui.chmInputTable.item(row, column)
+        if(item): 
+            print(item) 
+            item.setBackground(QColor(125,125,125))
+        
 
 #******************************************************************
 #    Chemisty Input Data
 #****************************************************************** 
-#TODO: have error handling for duplicates 
+
 #TODO: takes in the values from the 
-#TODO: connect from the defined values in gcms Defined Tests Page
-#TODO: make sure to add a date for the table so we can sort it by the most recent date
 #TODO: duplication error
-#TODO: set defaults 
 
 def chmInputSectionSetup(self): 
     print('[FUNCTION]:chmInputSectionSetup(self)')
-    self.ui.inputDataTree.clear()
+    chmClearEnteredTestsData(self, True)
+    
+    formatQLineEdits(self)
     
     populateNewEntry(self) 
     
@@ -130,150 +175,192 @@ def chmInputSectionSetup(self):
     # Input Data Page Signals
     #self.ui.gcmsTests.activated.connect(lambda index: on_gcmsTests_activated(self, index))
     self.ui.chmProceedBtn.clicked.connect(lambda: on_chmProceedBtn_clicked(self))
+    self.ui.chmInputClearBtn.clicked.connect(lambda: on_chmClearBtn_clicked(self))
+            
+def formatQLineEdits(self): 
+    # allow only float values 
+    float_validator = QDoubleValidator()
+    float_validator.setDecimals(10)
+    # allow only int values 
+    int_validator = QIntValidator()
+    # Set validators 
+    self.ui.gcmsStandardVal.setValidator(float_validator)
+    self.ui.gcmsTestsJobNum.setValidator(int_validator)
+    self.ui.gcmsTestsSample.setValidator(int_validator)
+    self.ui.gcmsTestsVal.setValidator(float_validator)
+    # set the limit to characeters allowed in line edit 
+    self.ui.gcmsStandardVal.setMaxLength(20)
+    self.ui.gcmsTestsJobNum.setMaxLength(6)
+    self.ui.gcmsTestsSample.setMaxLength(6)
     
+
 def populateNewEntry(self): 
     print('[FUNCTION]: populateNewEntry(self)')
     
-    # TODO: move this to another function 
-    query = 'SELECT testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
+    self.ui.gcmsTests.clear() 
+    self.ui.gcmsUnitVal.clear()
+    
+    # TODO: move this to another function
+    # TODO: could also be using the testManager from TestsInfo
+    query = 'SELECT testNum, testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
     results = self.preferencesDB.query(query)
 
     chmClearActiveValues(self)
     
     #TODO: find out what the others are (add to the settings section)
-    parameterTypes = [item[0] for item in results]
+    parameterTypes = [parameterItem(item[0], item[1]) for item in results]
     parameterTypes.insert(0, '')
+    
     unitTypes = ['', 'TCU', 'ug/L', 'mg/g']    
     
-    self.ui.gcmsTests.addItems(parameterTypes)
-    self.ui.gcmsUnitVal.addItems(unitTypes)
-    
-
-def on_gcmsTests_activated(self, index): 
-    if(index in self.chmParameters): 
-        unitVal = self.chmParameters[index]
-        print(unitVal) 
-
-        if(unitVal == ''):
-            print("nothing") 
-            self.ui.gcmsUnitVal.setCurrentIndex(0); 
-            
+    for item in parameterTypes:
+        if isinstance(item, parameterItem):
+            self.ui.gcmsTests.addItem(item.testName, userData=item)
         else: 
-            print("something else")
-            index = self.ui.gcmsUnitVal.findText(unitVal) 
-            print(index)
-            
-            self.ui.gcmsUnitVal.setCurrentIndex(index)
+            self.ui.gcmsTests.addItem('')
+
+    #self.ui.gcmsTests.addItems(parameterTypes)
+    self.ui.gcmsUnitVal.addItems(unitTypes)
+
+def getParameterTypeNum(comboBox): 
+    
+    index = comboBox.currentIndex()
+    if index >= 0:
+        item = comboBox.itemData(index)
+        if isinstance(item, parameterItem):
+            return item.testNum
+    return None
+    
             
 @pyqtSlot()    
 def on_chmProceedBtn_clicked(self):            
-    standards = self.ui.gcmsStandardVal.text().strip()
-    units = self.ui.gcmsUnitVal.currentText()
-    tests = self.ui.gcmsTests.currentText()
+    print('[SIGNAL]: on_chmProceedBtn_clicked(self)')    
+    standards, units, testName = captureNewEntryData(self) 
 
-    errorCheck = [0,0,0]
+    errorCheckList = [0,0,0]
 
-    errorCheck[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
-    errorCheck[1] = 0 if units != '' else 1; 
-    errorCheck[2] = 0 if tests != '' else 1; 
+    errorCheckList[0] = 0 if (standards != '' and is_real_number(standards)) else 1; 
+    errorCheckList[1] = 0 if units != '' else 1; 
+    errorCheckList[2] = 0 if testName != '' else 1; 
     
-    if(sum(errorCheck) == 0):
-    
-        self.ui.chmTestsValueWidget.setEnabled(True)
-        self.ui.chmActionWidget.setEnabled(True)
-        #TODO: rename the widget thing
-        self.ui.widget_29.setEnabled(False)
+    if(sum(errorCheckList) == 0):
+        dataEntryWidgetEnabler(self, True)
         self.ui.gcmsStandardValShow.setText(standards)
         self.ui.gcmsUnitValShow.setText(units)
-        self.ui.gcmsTestsShow.setText(tests)  
+        self.ui.gcmsTestsShow.setText(testName)  
     else: 
-        errorTitle = 'Cannot Proceed with CHM Process'
-        errorMsg = ''
+        NewEntryErrorDisplay(self, errorCheckList)
+
+def on_chmClearBtn_clicked(self): 
+    chmClearEnteredTestsData(self, False)
+
+    populateNewEntry(self)
+     
+
+def NewEntryErrorDisplay(self, errorCheckList): 
+    errorTitle = 'Cannot Proceed with CHM Process'
+    errorMsg = ''
+    
+    if(errorCheckList[0] == 1): 
+        errorMsg += 'Please Enter a Valid Standard Number\n'
+    if(errorCheckList[1] == 1): 
+        errorMsg += 'Please Select a Unit\n'
+    if(errorCheckList[2] == 1): 
+        errorMsg += 'Please Select a Tests\n'
         
-        if(errorCheck[0] == 1): 
-            errorMsg += 'Please Enter a Valid Standard Number\n'
-        if(errorCheck[1] == 1): 
-            errorMsg += 'Please Select a Unit\n'
-        if(errorCheck[2] == 1): 
-            errorMsg += 'Please Select a Tests\n'
-            
-        showErrorDialog(self, errorTitle, errorMsg)
+    showErrorDialog(self, errorTitle, errorMsg)
+
+def captureNewEntryData(self): 
+    standards   = self.ui.gcmsStandardVal.text().strip()
+    units       = self.ui.gcmsUnitVal.currentText()
+    testName    = self.ui.gcmsTests.currentText()
+    
+    return standards, units, testName 
+
+def captureEnteredValues(self): 
+    jobNum     = self.ui.gcmsTestsJobNum.text().strip()
+    sampleNum   = self.ui.gcmsTestsSample.text().strip()
+    sampleVal   = self.ui.gcmsTestsVal.text().strip()
+    
+    return jobNum, sampleNum, sampleVal 
+    
         
 @pyqtSlot()   
 def on_chmSampleDataAdd_clicked(self): 
     print('[FUNCTION]: chmAddTestsBtn clicked')
-    standards = self.ui.gcmsStandardValShow.text().strip()
-    units = self.ui.gcmsUnitValShow.text().strip()
-    testName = self.ui.gcmsTestsShow.text().strip()  
     
-    testNum = self.ui.gcmsTestsJobNum.text().strip()
-    sampleNum = self.ui.gcmsTestsSample.text().strip()
-    sampleVal = self.ui.gcmsTestsVal.text().strip()
+    standards, units, testName = captureNewEntryData(self) 
+    jobNum, sampleNum, sampleVal = captureEnteredValues(self)
+    testNum = getParameterTypeNum(self.ui.gcmsTests) 
     
-    errorCheck = [0,0,0]
+    errorCheckList = [0,0,0]
     
-    errorCheck[0] = 0 if (testNum != '' and is_real_number(testNum)) else 1; 
-    errorCheck[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1; 
-    errorCheck[2] = 0 if sampleVal != '' else 1; 
+    errorCheckList[0] = 0 if (jobNum != '' and is_real_number(jobNum)) else 1; 
+    errorCheckList[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1; 
+    errorCheckList[2] = 0 if sampleVal != '' else 1; 
             
-    print(f'Input Data Info: {testNum} {sampleNum} {sampleVal}')
+    print(f'Input Data Info: {jobNum}-{sampleNum}: {sampleVal}')
             
-    if(sum(errorCheck) == 0): 
-        sampleNum = testNum + '-' + sampleNum; 
+    if(sum(errorCheckList) == 0): 
         inputTree = self.ui.inputDataTree
         
-        #TODO: move to own function 
-        checkInquery = 'SELECT EXISTS(SELECT 1 FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?)'
-        self.db.execute(checkInquery, (sampleNum, testName))
-        result = self.db.fetchone()[0]
+        existingDataCheck = getChmTestData(self.tempDB, sampleNum, jobNum)
+        print('existing_data: ', existingDataCheck)
         
-        if(result == 1): 
-            #TODO: message box in own function 
-            msgBox = QMessageBox()  
-            msgBox.setText("Duplicate Sample");
-            duplicateMsg = "Would you like to overwrite existing sample " + str(sampleNum) + " ?"
-            msgBox.setInformativeText(duplicateMsg);
-            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
-            msgBox.setDefaultButton(QMessageBox.Yes);
-            x = msgBox.exec_()
+        if(existingDataCheck): 
+            response = duplicateSampleOverrideDisplay(sampleNum)
 
-            if(x == QMessageBox.Yes): 
-                addToChmTestsData(self.db, sampleNum, testName, sampleVal, standards, units, testNum)
+            if(response == QMessageBox.Yes): 
+               
+                addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum)
                  
                 matchingItem = checkMatchingTreeItems(inputTree, sampleNum)
                 if not matchingItem: 
-                    addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards)
+                    addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards, jobNum)
                 else: 
                     pass; 
                 
                 chmClearSampleJob(self) 
 
-            if(x == QMessageBox.No):
+            if(response == QMessageBox.No):
                 chmClearSampleJob(self) 
                 
-            if(x == QMessageBox.Cancel):
+            if(response == QMessageBox.Cancel):
                 pass 
             
         else: 
-            addToChmTestsData(self.db, sampleNum, testName, sampleVal, standards, units, testNum)
-            addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards)
-            chmClearSampleJob(self) 
-            
+            addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum)
+            addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards, jobNum)
+            chmClearSampleJob(self)  
     else: 
-        errorTitle = 'Cannot add Tests '
-        errorMsg = ''
-        
-        if(errorCheck[0] == 1): 
-            errorMsg += 'Please Enter a Valid Job Number\n'
+        addingSampleDataErrorDisplay(self, errorCheckList)
 
-        if(errorCheck[1] == 1): 
-            errorMsg += 'Please Enter a Valid Sample Number\n'
-            
-        if(errorCheck[2] == 1): 
-            errorMsg += 'Please Enter a Valid Sample Value \n'
+
+def duplicateSampleOverrideDisplay(sampleNum):
+    print('[DIALOG]: duplicateSampleOverrideDisplay(sampleNum)')
+    msgBox = QMessageBox()  
+    msgBox.setText("Duplicate Sample");
+    duplicateMsg = "Would you like to overwrite existing sample " + str(sampleNum) + " ?"
+    msgBox.setInformativeText(duplicateMsg);
+    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
+    msgBox.setDefaultButton(QMessageBox.Yes);
+    return msgBox.exec_()
+
+def addingSampleDataErrorDisplay(self, errorList): 
+    errorTitle = 'Cannot add Tests '
+    errorMsg = ''
+    
+    if(errorList[0] == 1): 
+        errorMsg += 'Please Enter a Valid Job Number\n'
+
+    if(errorList[1] == 1): 
+        errorMsg += 'Please Enter a Valid Sample Number\n'
         
-        showErrorDialog(self, errorTitle, errorMsg)
-        
+    if(errorList[2] == 1): 
+        errorMsg += 'Please Enter a Valid Sample Value \n'
+    
+    showErrorDialog(self, errorTitle, errorMsg)
+    
         
 def checkMatchingTreeItems(treeWidget, targetText):
     # Iterate through the top-level items
@@ -284,58 +371,106 @@ def checkMatchingTreeItems(treeWidget, targetText):
 
     return None
 
-def addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards): 
+def addInputTreeItem(treeWidget, sampleNum, testName, sampleVal, units, standards, jobNum): 
     print('[FUNCTION]: addInputTreeItem(inputTree, sampleNum, testName, sampleVal, units, standards)')
-    topItem = QTreeWidgetItem(inputTree)  
+    topItem = QTreeWidgetItem(treeWidget)  
     
-    topItem.setText(0, sampleNum)           
-    topItem.setText(1, testName)
-    topItem.setText(2, sampleVal)
-    topItem.setText(3, units)
-    topItem.setText(4, standards)
+    topItem.setText(0, jobNum)
+    topItem.setText(1, sampleNum)           
+    topItem.setText(2, testName)
+    topItem.setText(3, sampleVal)
+    topItem.setText(4, units)
+    topItem.setText(5, standards)
     
-    #TODO: connect the delete button, maybe add an edit button
-    deleteTreeBtn = QPushButton('Delete')
+    row_index = treeWidget.indexOfTopLevelItem(topItem)
+    actionWidget = createTreeActionWidget(treeWidget, row_index)
+    treeWidget.setItemWidget(topItem, 6, actionWidget)
+    
+def createTreeActionWidget(treeWidget, row): 
 
-    # Create a widget container for the button
-    widget_container = QWidget()
-    layout = QVBoxLayout(widget_container)
-    layout.addWidget(deleteTreeBtn)
+    #TODO: add the edit button 
+    deleteBtn = QPushButton("Delete")
+    editbtn = QPushButton('Edit')
+
+    # Connect the signals
+    deleteBtn.clicked.connect(lambda _, tree=treeWidget, row=row: chmTreeDeleteRow(tree, row));
+    editbtn.clicked.connect(lambda _, tree=treeWidget, row=row: chmTreeEditRow(tree, row))
+
+    button_widget = QWidget()
+    button_layout = QHBoxLayout(button_widget)
+    button_layout.addWidget(editbtn)
+    button_layout.addWidget(deleteBtn)
+    button_layout.setContentsMargins(5, 0, 0, 0)
+    button_layout.setAlignment(Qt.AlignLeft)
+    
+    return button_widget
+
+def chmTreeDeleteRow(treeWidget, row): 
+    print(f'Delete Row: ', row)
+    
+    parent_item = treeWidget.invisibleRootItem()  # Assuming top-level items
+    parent_item.takeChild(row)
+
+def chmTreeEditRow(treeWidget, row): 
+    print(f'Edit Row: ', row)
+     
+    item = treeWidget.topLevelItem(row)
+    if item:
+        item.setFlags(item.flags() | Qt.ItemIsEditable)
+
+    
+def dataEntryWidgetEnabler(self, status): 
+    print('[FUNCTION]: dataEntryWidgetEnabler(self, status)')
+    if(status): 
+        self.ui.newEntryWidget.setEnabled(False)
+        self.ui.chmActionWidget.setEnabled(True)
+        self.ui.chmTestsValueWidget.setEnabled(True)
+    else: 
+        self.ui.newEntryWidget.setEnabled(True)
+        self.ui.chmActionWidget.setEnabled(False)
+        self.ui.chmTestsValueWidget.setEnabled(False)
+
 
 def chmClearSampleJob(self): 
     self.ui.gcmsTestsSample.clear()
     self.ui.gcmsTestsVal.clear() 
+
         
-#FIXME: not used anywhere 
 def chmClearActiveValues(self): 
+    self.ui.gcmsTestsShow.clear()
+    self.ui.gcmsUnitValShow.clear()
+    self.ui.gcmsStandardValShow.clear()
+    
+def chmClearNewEntry(self): 
+
+    self.ui.gcmsTests.setCurrentIndex(1)
+    self.ui.gcmsUnitVal.setCurrentIndex(1)
+    
+
+    # Clear the standards
     self.ui.gcmsStandardVal.clear()
-    self.ui.gcmsUnitVal.clear()
-    self.ui.gcmsTests.clear() 
-        
-def chmClearEnteredTestsData(self): 
-    self.ui.chmTestsValueWidget.setEnabled(False)
-    self.ui.chmActionWidget.setEnabled(False)
-    self.ui.widget_29.setEnabled(True)
- 
-    chmClearActiveValues(self)
+       
+def chmClearEnteredTestsData(self, clearTable=False): 
+    dataEntryWidgetEnabler(self, False) 
+    
+    chmClearNewEntry(self) 
+    chmClearActiveValues(self) 
     
     # Clear Enter values Section 
     self.ui.gcmsTestsJobNum.clear()
     chmClearSampleJob(self) 
     
-    self.ui.inputDataTree.clear()
+    if(clearTable):  
+        self.ui.inputDataTree.clear()
 
-#TODO: move this function to the other area 
-def addToChmTestsData(database, sampleNum, testName, sampleVal, standards, units, jobNum ): 
-    addInquery = 'INSERT OR REPLACE INTO gcmsTestsData (sampleNum, testsName, testsValue, StandardValue, unitValue, jobNum) VALUES (?,?,?,?,?, ?)'
-    
-    try:
-        database.execute(addInquery, (sampleNum, testName, sampleVal, standards, units, jobNum,) )
-        database.commit()
+#******************************************************************
+#    Chemisty Input Data Classes 
+#*****************************************************************
 
-    except sqlite3.IntegrityError as e:
-        print(e) 
-
+class parameterItem: 
+    def __init__(self,testNum, testName): 
+        self.testNum = testNum
+        self.testName = testName 
 
 #******************************************************************
 #    Chemisty Tests Info 
@@ -486,7 +621,8 @@ class TestsDataModel():
         self.tests = {}
         
     def loadTestsData(self):
-        testsList = getAllChmTestsInfo(self.db) 
+        # special to get ride of the all the ICP names 
+        testsList = getAllChmTestsInfo2(self.db) 
  
         print('Total Tests: ', len(testsList))
 

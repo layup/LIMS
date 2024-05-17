@@ -21,88 +21,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">/******************************************************************
-/	Side Bar Menu  
-/******************************************************************/
-
-#LeftMenuContainer {
-	background-color: #323a47; 
-	box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.5);
-	border-right:2px solid #30333b;
-} 
-
-#LeftMenuContainer QPushButton {
-	padding: 5px;
-	margin-left: 10px;
-	margin-right:10px;  
-	border:none; 
-	width: 30px;
-	height:30px;
-	color: #788596;
-	text-align:left;
-	font: 15px;
-}
-
-#LeftMenuContainer  QPushButton::hover {
-	background-color: rgba(86,101,115,0.5);
-	border-radius: 5px;
-}
-
-/*
-#LeftMenuSubContainer &gt; QPushButton::checked {
-	color: white; 
-	background-color: rgb(58, 69, 88); 
-	border-radius: 5px; 
-}
-*/
-
-#LeftMenuSubContainer &gt; QLineEdit {
-	background-color:white; 
-}
-
-
-#LeftMenuContainerMini {
-	background-color: #323a47;
-	box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.2);
-} 
-
-#LeftMenuContainerMini &gt; QWidget {
-	background-color: #323a47
-} 
-
-#LeftMenuContainerMini &gt; QFrame {
-	border: none; 
-}
-
-#LeftMenuContainerMini &gt; QPushButton {
-	padding: 5px;
-	border:none; 
-	width: 30px;
-	height:30px;
-	color: #788596;
-	font: 14px;
-}
-
-
-#LeftMenuContainerMini &gt; QPushButton::hover {
-	background-color: rgba(86,101,115,0.5);
-	border-radius: 5px; 
-}
-
-/*
-#LeftMenuContainerMini &gt; QPushButton::checked {
-	color: white; 
-	background-color: rgb(58, 69, 88); 
-	border-radius: 5px;
-}
-*/ 
-
-
-
-/******************************************************************
 /	Global QComboBox Style 
 /******************************************************************/
-
-
 #QComboBox {
 	padding:2px;
 	padding-left: 5px; 
@@ -110,8 +30,8 @@
 	border: 1px solid #30333b; 
 	background-color: #363f4d; 
 	selection-background-color: blue; /* Background color of the selected item */
+	min-height:25px; 
 }
-
 
 #QComboBox::drop-down {
 	border: 1px solid black; /* Border around the dropdown arrow */
@@ -138,9 +58,6 @@
 #QComboBox::item:selected {
 	background-color:rgb(66, 78, 101)
 }
-
-
-
 
 
 /******************************************************************
@@ -193,7 +110,6 @@ QTableWidget QTableCornerButton::section {
 /******************************************************************
 /	Global Tabs Style  
 /******************************************************************/
-
 QTabWidget {
 	border:none; 
 }
@@ -245,6 +161,30 @@ QTreeWidget QHeaderView::section {
 
 
 /******************************************************************
+/	Global Buttons  
+/******************************************************************/
+
+QPushButton { 
+	padding: 4px;
+	border: 1px solid #30333b; 
+	border-radius: 5px;
+	color:white; 
+	background-color: #555555; 
+	min-height:20px; 
+	min-width: 100px; 
+} 
+
+QPushButton::hover {
+	background-color: rgb(107, 108, 108);
+}
+
+QPushButton::disabled {
+	color: grey 
+}
+
+
+
+/******************************************************************
 /	Global ToolBox Style 
 /******************************************************************/
 
@@ -252,8 +192,6 @@ QToolBox::tab{
 	background-color: #323a47; 
 	color:white; 
 }
-
-
 
 QToolBox &gt; QWidget &gt;QWidget &gt;QWidget {
 	background-color:#363f4d;
@@ -271,12 +209,8 @@ QLineEdit {
 	padding: 4px; 
 	padding-left: 5px; 
 	min-width: 200px; 
+	min-height:20px; 
 }
-
-
-
-
-
 
 /******************************************************************
 /	Lists 
@@ -293,7 +227,6 @@ QListWidget {
 /	Textbox  
 /******************************************************************/
 
-
 QPlainTextEdit {
 	background-color: #363f4d; 
 	border: 1px solid #30333b; 
@@ -308,6 +241,83 @@ QTextEdit {
 	padding: 5px; 
 } 
 
+
+/******************************************************************
+/	Side Bar Menu  
+/******************************************************************/
+
+#LeftMenuContainer {
+	background-color: #323a47; 
+	box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.5);
+	border-right:2px solid #30333b;
+} 
+
+#LeftMenuSubContainer QPushButton {
+	padding: 5px;
+	margin-left: 10px;
+	margin-right:10px;  
+	border:none; 
+	width: 30px;
+	height:30px;
+	color: #788596;
+	text-align:left;
+	font: 15px;
+	background-color: #323a47; 
+}
+
+#LeftMenuSubContainer  QPushButton::hover {
+	background-color: rgba(86,101,115,0.5);
+	border-radius: 5px;
+}
+
+/*
+#LeftMenuSubContainer &gt; QPushButton::checked {
+	color: white; 
+	background-color: rgb(58, 69, 88); 
+	border-radius: 5px; 
+}
+*/
+
+#LeftMenuSubContainer &gt; QLineEdit {
+	background-color:white; 
+}
+
+#LeftMenuContainerMini {
+	background-color: #323a47;
+	box-shadow: 5px 0px 5px rgba(0, 0, 0, 0.2);
+	max-width:60px;
+} 
+
+#LeftMenuContainerMini &gt; QWidget {
+	background-color: #323a47
+} 
+
+#LeftMenuContainerMini &gt; QFrame {
+	border: none; 
+}
+
+#LeftMenuContainerMini  QPushButton {
+	padding: 5px;
+	border:none; 
+	height:30px;
+	color: #788596;
+	font: 14px;
+	min-width:0px;
+}
+
+#LeftMenuContainerMini &gt; QPushButton::hover {
+	background-color: rgba(86,101,115,0.5);
+	border-radius: 5px; 
+}
+
+/*
+#LeftMenuContainerMini &gt; QPushButton::checked {
+	color: white; 
+	background-color: rgb(58, 69, 88); 
+	border-radius: 5px;
+}
+*/ 
+
 /******************************************************************
 First Instacnce of QWidget within the stack 
 /******************************************************************/
@@ -316,16 +326,43 @@ First Instacnce of QWidget within the stack
 	background-color:#363f4d;
 }
 
+/******************************************************************
+/	Header  
+/******************************************************************/
+
+#headerWidget {
+	background-color:#363f4d;
+	min-height: 80px; 
+} 
+
+#headerWidget QLabel {
+	color:white; 
+} 
+
+#headerTitle {
+	font-size: 20px; 
+	font-weight: bold; 
+}
+
+#headerDesc {
+
+} 
+
+
+
+/******************************************************************
+/	Body
+/******************************************************************/
+
+#MainBodyContainer {
+	background-color:#363f4d;
+} 
+
 
 /******************************************************************
 /	Reports History Page 
 /******************************************************************/
 
-
-#reportsHeaderWidget {
-	background-color:#363f4d;
-	color:white;  
-}
 
 #reportsHeaderWidget QLabel {
 	color:white; 
@@ -388,8 +425,6 @@ First Instacnce of QWidget within the stack
 }
 
 
-
-
 /******************************************************************
 /	Create Report Page  
 /******************************************************************/
@@ -399,11 +434,11 @@ First Instacnce of QWidget within the stack
 }
 
 #createReportHeader {
-	background-color:#323a47;
-	color:white;  
-}
-#createReportHeader QLabel {
-	color:white; 
+	background-color:#363f4d;
+} 
+
+#createReportHeader QLabel{
+	color:white;
 } 
 
 #createReportWidget {
@@ -447,19 +482,6 @@ QComboBox{
 	min-width: 190px; 
 }
 
-#createReportWidget &gt; QPushButton { 
-	min-height:20px; 
-	min-width:100px; 
-	padding: 4px;
-	border: 1px solid gray; 
-	border-radius: 5px;
-	color:white; 
-	background-color: #555555
-} 
-
-#createReportWidget QPushButton::hover {
-	background-color: rgb(107, 108, 108);
-}
 
 
 #reportsUserInfoWidget {
@@ -499,10 +521,6 @@ QComboBox{
 } 
 
 
-
-
-
-
 #authorWidget QListView {
     background-color: rgb(55, 65, 84);
 }
@@ -512,37 +530,12 @@ QComboBox{
 } 
 
 /******************************************************************
-/	ICP Overview CSS  
+/	ICP Tab Widget   
 /******************************************************************/
-
-#icpHeaderWidget {
-	background-color:#323a47;
-	color:white;  
-}
-
-#icpHeaderWidget QLabel {
-	color:white; 
-} 
-
-#icpTabWidget QPushButton { 
-	min-height: 20px; 
-	min-width:120px; 
-	padding: 4px;
-	border: 1px solid gray; 
-	border-radius: 5px;
-	color:white; 
-	background-color: #555555
-} 
-
-#icpTabWidget QPushButton::hover {
-	background-color: rgb(107, 108, 108);
-}
-
 
 #icpTabWidget QLabel {
 	color:white; 
-}
-
+} 
 
 
 /******************************************************************
@@ -553,7 +546,6 @@ QComboBox{
 	background-color:  #323a47; 
 	border-radius:10px; 
 } 
-
 
 #icpElementsInfoWidget {
 	background-color:  #323a47; 
@@ -617,7 +609,6 @@ QComboBox{
 	background-color: rgb(180, 180, 180)
 }
 
-
 #icpElementContent QComboBox {
     border: 1px solid gray;
     border-radius: 3px;
@@ -635,11 +626,6 @@ QComboBox{
 /	ICP Reports Info Page  
 /******************************************************************/
 
-#icpReportHeader {
-	background-color: #323a47;
-	border-radius: 10px;
-}
-
 #icpReportTypeWidget { 
 	background-color: #323a47;
 	border-radius: 10px;	
@@ -656,14 +642,25 @@ QComboBox{
 } 
 
 
-
 /******************************************************************
 /	ICP Histroy Page  
 /******************************************************************/
 
 
+#icpSearchBtn1 {
+	background: #555555;
+	border-top-right-radius: 0px; 
+	border-bottom-right-radius: 0px; 
+	border:none; 
+	border-left: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	height:20px;
+} 
+
+
 #icpUploadBtn  {
-	background-color:red; 
+	min-height:20px; 
 } 
 
 #icpSearchBar QComboBox{
@@ -672,39 +669,24 @@ QComboBox{
 } 
 
 
-#icpSearchBar QLineEdit {
-	border: none; 
-	padding: 5px; 
- 	background-color: grey; 
-	margin-left: 10px; 
+#icpSearchLine1 {
+	border:none;
+	background-color:  #555555;
+	border-right: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	border-top-right-radius: 5px; 
+	border-bottom-right-radius: 5px; 
+	color:white; 
+	height:20px;
+	min-height:20px; 
 }
+
 
 /******************************************************************
 /	CHM Tab 
 /******************************************************************/
 
-#chmHeader  {
-	background-color:#323a47;
-	color:white; 
-}
-#chmHeader QLabel {
-	color:white; 
-}
-
-
-
-#chmTabWidget QPushButton { 
-	padding: 4px;
-	border: 1px solid gray; 
-	border-radius: 5px;
-	color:white; 
-	background-color: #555555; 
-	min-width: 100px; 
-} 
-
-#chmTabWidget QPushButton::hover {
-	background-color: rgb(107, 108, 108);
-}
 
  #chmTabWidget QLabel {
 	color:white; 
@@ -766,6 +748,32 @@ QComboBox{
 	border-radius: 10px;
 }
 
+#testInfoTopWidget {
+	background-color: #323a47;
+	border-radius: 10px;
+} 
+
+#chmSearchLine3 {
+	background-color:  #555555;
+	border:none;
+	border-right: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	border-top-right-radius: 5px; 
+	border-bottom-right-radius: 5px; 
+	color:white; 
+	height:20px;
+}
+
+#chmSearchBtn3 {
+	border-top-right-radius: 0px; 
+	border-bottom-right-radius: 0px; 
+	border-left: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	background: #555555;
+	height:20px;
+} 
 
 /******************************************************************
 /	CHM Reports Info Tab   
@@ -793,6 +801,45 @@ QComboBox{
 /	CHM Database Tab  
 /******************************************************************/
 
+#chmTopMenu1 {
+
+} 
+
+#chmTopMenu1 QPushButton {
+	height:20px; 
+} 
+
+#chmSearchWidget {
+
+} 
+
+#chmSearchLine1 {
+	background-color:  #555555;
+	border:none;
+	border-right: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	border-top-right-radius: 5px; 
+	border-bottom-right-radius: 5px; 
+	color:white; 
+	height:20px;
+} 
+
+#chmSearchBtn1 {
+	border-top-right-radius: 0px; 
+	border-bottom-right-radius: 0px; 
+	border-left: 1px solid #30333b; 
+	border-top: 1px solid #30333b; 
+	border-bottom: 1px solid #30333b; 
+	background: #555555;
+	height:20px;
+} 
+
+#chmSearchBtn1::hover {
+	background-color: rgb(107, 108, 108);
+}
+
+
 #temp2 {
 	background-color: #323a47;
 	border-radius: 10px; 
@@ -816,14 +863,6 @@ QComboBox{
 	color:white; 
 } 
 
-
-#settingHeader {
-	background-color: #323a47;
-} 
-
-#settingHeader QLabel {
-	color:white;
-} 
 
 #SettingTab &gt; QPushButton { 
 	min-width: 100px;
@@ -874,7 +913,7 @@ QComboBox{
      <widget class="QWidget" name="LeftMenuContainerMini" native="true">
       <property name="minimumSize">
        <size>
-        <width>60</width>
+        <width>0</width>
         <height>0</height>
        </size>
       </property>
@@ -918,6 +957,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="reportsBtn2">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -938,6 +983,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="createReportBtn2">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -958,6 +1009,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="icpBtn2">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -978,6 +1035,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="gsmsBtn2">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -998,6 +1061,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="settingsBtn2">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -1031,6 +1100,12 @@ QComboBox{
        </item>
        <item>
         <widget class="QPushButton" name="toggleMenuSmall">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -1320,9 +1395,9 @@ color: rgb(255, 255, 255);</string>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0">
+      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0">
        <property name="spacing">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -1337,6 +1412,29 @@ color: rgb(255, 255, 255);</string>
         <number>0</number>
        </property>
        <item>
+        <widget class="QWidget" name="headerWidget" native="true">
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_44">
+          <item>
+           <widget class="QLabel" name="headerTitle">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="headerDesc">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="styleSheet">
           <string notr="true">* {
@@ -1345,7 +1443,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1364,69 +1462,6 @@ margin: 0;
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
-            <widget class="QWidget" name="reportsHeaderWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_16">
-              <property name="spacing">
-               <number>-1</number>
-              </property>
-              <property name="leftMargin">
-               <number>14</number>
-              </property>
-              <property name="topMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>14</number>
-              </property>
-              <property name="bottomMargin">
-               <number>5</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="reportsHeader">
-                <property name="font">
-                 <font>
-                  <pointsize>20</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Reports</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="totalReportsHeader">
-                <property name="text">
-                 <string>Total Reports </string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item>
             <widget class="QWidget" name="widget_45" native="true">
              <property name="minimumSize">
@@ -1508,7 +1543,7 @@ margin: 0;
                        <property name="minimumSize">
                         <size>
                          <width>204</width>
-                         <height>22</height>
+                         <height>24</height>
                         </size>
                        </property>
                        <property name="text">
@@ -1854,63 +1889,6 @@ margin: 0;
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QWidget" name="createReportHeader" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_7">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="leftMargin">
-               <number>12</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="createReportTitle">
-                <property name="font">
-                 <font>
-                  <pointsize>20</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Create Report</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="createReportDesc">
-                <property name="text">
-                 <string>ICP and CHM Reports </string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="1" column="0">
             <widget class="QWidget" name="createPageBody" native="true">
              <property name="styleSheet">
               <string notr="true"/>
@@ -2226,7 +2204,7 @@ margin: 0;
                       <property name="minimumSize">
                        <size>
                         <width>192</width>
-                        <height>0</height>
+                        <height>22</height>
                        </size>
                       </property>
                       <property name="maximumSize">
@@ -2294,7 +2272,7 @@ margin: 0;
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_15">
            <property name="spacing">
-            <number>-1</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -2308,63 +2286,6 @@ margin: 0;
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
-            <widget class="QWidget" name="icpHeaderWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_10">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="icpPageTitle">
-                <property name="font">
-                 <font>
-                  <pointsize>20</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>ICP Page</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="icpLabel">
-                <property name="text">
-                 <string>TextLabel</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item>
             <widget class="QTabWidget" name="icpTabWidget">
              <property name="currentIndex">
@@ -2400,59 +2321,17 @@ margin: 0;
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_28">
                   <property name="leftMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
-                  <item>
-                   <widget class="QWidget" name="widget_47" native="true">
-                    <layout class="QHBoxLayout" name="horizontalLayout_11">
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>5</number>
-                     </property>
-                     <item>
-                      <widget class="QLabel" name="label_47">
-                       <property name="font">
-                        <font>
-                         <weight>75</weight>
-                         <bold>true</bold>
-                        </font>
-                       </property>
-                       <property name="text">
-                        <string>ICP MACHINE DATA</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_10">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="icpUploadBtn">
-                       <property name="text">
-                        <string>Upload</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QWidget" name="icpSearchBar" native="true">
                     <property name="minimumSize">
@@ -2466,55 +2345,76 @@ margin: 0;
                     </property>
                     <layout class="QHBoxLayout" name="horizontalLayout_24">
                      <property name="leftMargin">
-                      <number>0</number>
+                      <number>5</number>
                      </property>
                      <property name="topMargin">
-                      <number>12</number>
+                      <number>5</number>
                      </property>
                      <property name="rightMargin">
-                      <number>12</number>
+                      <number>5</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>12</number>
+                      <number>5</number>
                      </property>
                      <item>
-                      <widget class="QLineEdit" name="icpSearchInput">
+                      <widget class="QPushButton" name="icpUploadBtn">
+                       <property name="text">
+                        <string>Upload</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_39" native="true">
                        <property name="minimumSize">
                         <size>
-                         <width>200</width>
+                         <width>400</width>
                          <height>0</height>
                         </size>
                        </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>400</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="placeholderText">
-                        <string>Search Job Number</string>
-                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_55">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>20</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>20</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QPushButton" name="icpSearchBtn1">
+                          <property name="text">
+                           <string>Search</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="icpSearchLine1">
+                          <property name="minimumSize">
+                           <size>
+                            <width>201</width>
+                            <height>22</height>
+                           </size>
+                          </property>
+                          <property name="maximumSize">
+                           <size>
+                            <width>16777215</width>
+                            <height>16777215</height>
+                           </size>
+                          </property>
+                          <property name="placeholderText">
+                           <string>Search Job Number</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
                       </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="icpSearchBtn">
-                       <property name="text">
-                        <string>Search</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_23">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
                      </item>
                      <item>
                       <widget class="QLabel" name="label_60">
@@ -2550,18 +2450,17 @@ margin: 0;
                      </item>
                      <item>
                       <widget class="QComboBox" name="ShowComboBox">
+                       <property name="minimumSize">
+                        <size>
+                         <width>122</width>
+                         <height>26</height>
+                        </size>
+                       </property>
                        <item>
                         <property name="text">
                          <string>Show </string>
                         </property>
                        </item>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_57">
-                       <property name="text">
-                        <string>Entities</string>
-                       </property>
                       </widget>
                      </item>
                     </layout>
@@ -2722,13 +2621,13 @@ margin: 0;
                     </property>
                     <layout class="QHBoxLayout" name="horizontalLayout_18">
                      <property name="leftMargin">
-                      <number>12</number>
+                      <number>6</number>
                      </property>
                      <property name="topMargin">
                       <number>12</number>
                      </property>
                      <property name="rightMargin">
-                      <number>12</number>
+                      <number>6</number>
                      </property>
                      <property name="bottomMargin">
                       <number>12</number>
@@ -3071,7 +2970,7 @@ margin: 0;
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -3321,7 +3220,7 @@ margin: 0;
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -3536,7 +3435,7 @@ p, li { white-space: pre-wrap; }
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_19">
            <property name="spacing">
-            <number>-1</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -3551,72 +3450,6 @@ p, li { white-space: pre-wrap; }
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="chmHeader" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_13">
-              <property name="leftMargin">
-               <number>12</number>
-              </property>
-              <property name="topMargin">
-               <number>5</number>
-              </property>
-              <property name="bottomMargin">
-               <number>12</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="chmTitleLabel">
-                <property name="font">
-                 <font>
-                  <pointsize>20</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>Chm Page</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="gcmsSubTitleLabel">
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>TextLabel</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <widget class="QWidget" name="widget_15" native="true">
              <property name="minimumSize">
               <size>
@@ -3625,6 +3458,9 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_21">
+              <property name="spacing">
+               <number>-1</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -3640,13 +3476,13 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="chmTabWidget">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="tabPosition">
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -3662,68 +3498,21 @@ p, li { white-space: pre-wrap; }
                   <string>Database</string>
                  </attribute>
                  <layout class="QVBoxLayout" name="verticalLayout_29">
-                  <item>
-                   <widget class="QWidget" name="reportsSearchWidget_2" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>50</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_13">
-                     <property name="spacing">
-                      <number>12</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>12</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>12</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>12</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>12</number>
-                     </property>
-                     <item>
-                      <widget class="QLineEdit" name="reportsSearchLine_2">
-                       <property name="minimumSize">
-                        <size>
-                         <width>202</width>
-                         <height>22</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="reportsSearchBtn_2">
-                       <property name="minimumSize">
-                        <size>
-                         <width>102</width>
-                         <height>22</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Search</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
+                  <property name="spacing">
+                   <number>-1</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>12</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>12</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>12</number>
+                  </property>
                   <item>
                    <widget class="QWidget" name="chmDatabaseWidget" native="true">
                     <property name="minimumSize">
@@ -3733,20 +3522,41 @@ p, li { white-space: pre-wrap; }
                      </size>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_33">
+                     <property name="spacing">
+                      <number>-1</number>
+                     </property>
                      <property name="leftMargin">
-                      <number>12</number>
+                      <number>0</number>
                      </property>
                      <property name="topMargin">
-                      <number>12</number>
+                      <number>0</number>
                      </property>
                      <property name="rightMargin">
-                      <number>12</number>
+                      <number>0</number>
                      </property>
                      <property name="bottomMargin">
-                      <number>12</number>
+                      <number>0</number>
                      </property>
                      <item>
-                      <widget class="QWidget" name="widget_39" native="true">
+                      <widget class="QWidget" name="widget_11" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_54">
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="chmTopMenu1" native="true">
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
@@ -3754,37 +3564,74 @@ p, li { white-space: pre-wrap; }
                         </size>
                        </property>
                        <layout class="QHBoxLayout" name="horizontalLayout_56">
+                        <property name="spacing">
+                         <number>-1</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>5</number>
+                        </property>
                         <property name="topMargin">
                          <number>5</number>
                         </property>
+                        <property name="rightMargin">
+                         <number>5</number>
+                        </property>
                         <property name="bottomMargin">
-                         <number>0</number>
+                         <number>5</number>
                         </property>
                         <item>
-                         <widget class="QLabel" name="label_50">
-                          <property name="text">
-                           <string>Table Name</string>
-                          </property>
+                         <widget class="QWidget" name="widget_32" native="true">
+                          <layout class="QHBoxLayout" name="horizontalLayout_13">
+                           <property name="spacing">
+                            <number>8</number>
+                           </property>
+                           <property name="leftMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="topMargin">
+                            <number>2</number>
+                           </property>
+                           <property name="rightMargin">
+                            <number>0</number>
+                           </property>
+                           <property name="bottomMargin">
+                            <number>2</number>
+                           </property>
+                           <item>
+                            <widget class="QPushButton" name="chmAddItemBtn">
+                             <property name="text">
+                              <string>Add Item</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="chmImportBtn">
+                             <property name="enabled">
+                              <bool>false</bool>
+                             </property>
+                             <property name="text">
+                              <string>Import</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QPushButton" name="chmExportBtn">
+                             <property name="enabled">
+                              <bool>false</bool>
+                             </property>
+                             <property name="text">
+                              <string>Export</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
                          </widget>
                         </item>
                         <item>
-                         <spacer name="horizontalSpacer_22">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QWidget" name="widget_51" native="true">
+                         <widget class="QWidget" name="chmSearchWidget" native="true">
                           <property name="minimumSize">
                            <size>
-                            <width>50</width>
+                            <width>0</width>
                             <height>30</height>
                            </size>
                           </property>
@@ -3792,46 +3639,75 @@ p, li { white-space: pre-wrap; }
                            <property name="spacing">
                             <number>0</number>
                            </property>
+                           <property name="leftMargin">
+                            <number>20</number>
+                           </property>
                            <property name="topMargin">
                             <number>0</number>
                            </property>
                            <property name="rightMargin">
-                            <number>0</number>
+                            <number>20</number>
                            </property>
                            <property name="bottomMargin">
                             <number>0</number>
                            </property>
                            <item>
-                            <widget class="QPushButton" name="pushButton_5">
+                            <widget class="QPushButton" name="chmSearchBtn1">
+                             <property name="enabled">
+                              <bool>false</bool>
+                             </property>
                              <property name="text">
                               <string>Search </string>
                              </property>
                             </widget>
                            </item>
                            <item>
-                            <widget class="QLineEdit" name="lineEdit"/>
+                            <widget class="QLineEdit" name="chmSearchLine1">
+                             <property name="minimumSize">
+                              <size>
+                               <width>201</width>
+                               <height>22</height>
+                              </size>
+                             </property>
+                             <property name="placeholderText">
+                              <string>Search CHM database</string>
+                             </property>
+                            </widget>
                            </item>
                           </layout>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QPushButton" name="pushButton_3">
+                         <widget class="QLabel" name="label_50">
                           <property name="text">
-                           <string>Add Item</string>
+                           <string>Filter By</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QPushButton" name="pushButton_7">
-                          <property name="text">
-                           <string>Import</string>
+                         <widget class="QComboBox" name="comboBox_2">
+                          <property name="minimumSize">
+                           <size>
+                            <width>122</width>
+                            <height>22</height>
+                           </size>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QPushButton" name="pushButton_8">
+                         <widget class="QLabel" name="label_57">
                           <property name="text">
-                           <string>Export</string>
+                           <string>Show</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="comboBox">
+                          <property name="minimumSize">
+                           <size>
+                            <width>122</width>
+                            <height>22</height>
+                           </size>
                           </property>
                          </widget>
                         </item>
@@ -3953,7 +3829,7 @@ p, li { white-space: pre-wrap; }
                              <property name="minimumSize">
                               <size>
                                <width>102</width>
-                               <height>0</height>
+                               <height>22</height>
                               </size>
                              </property>
                              <property name="text">
@@ -3966,7 +3842,7 @@ p, li { white-space: pre-wrap; }
                              <property name="minimumSize">
                               <size>
                                <width>102</width>
-                               <height>0</height>
+                               <height>22</height>
                               </size>
                              </property>
                              <property name="text">
@@ -4012,7 +3888,7 @@ p, li { white-space: pre-wrap; }
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QWidget" name="widget_11" native="true">
+                      <widget class="QWidget" name="newEntryWidget" native="true">
                        <property name="minimumSize">
                         <size>
                          <width>200</width>
@@ -4133,7 +4009,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QWidget" name="widget_29" native="true">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="minimumSize">
                            <size>
@@ -4204,7 +4080,7 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QWidget" name="chmActionWidget" native="true">
                        <property name="enabled">
-                        <bool>false</bool>
+                        <bool>true</bool>
                        </property>
                        <property name="maximumSize">
                         <size>
@@ -4244,7 +4120,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLabel" name="label_62">
                              <property name="enabled">
-                              <bool>false</bool>
+                              <bool>true</bool>
                              </property>
                              <property name="minimumSize">
                               <size>
@@ -4266,7 +4142,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsTestsShow">
                              <property name="enabled">
-                              <bool>false</bool>
+                              <bool>true</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4322,7 +4198,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsUnitValShow">
                              <property name="enabled">
-                              <bool>false</bool>
+                              <bool>true</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4372,7 +4248,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLineEdit" name="gcmsStandardValShow">
                              <property name="enabled">
-                              <bool>false</bool>
+                              <bool>true</bool>
                              </property>
                              <property name="text">
                               <string>Test</string>
@@ -4398,7 +4274,7 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QWidget" name="chmTestsValueWidget" native="true">
                        <property name="enabled">
-                        <bool>false</bool>
+                        <bool>true</bool>
                        </property>
                        <property name="minimumSize">
                         <size>
@@ -4592,7 +4468,7 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QWidget" name="chmRecentlyAdd" native="true">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="minimumSize">
                      <size>
@@ -4626,8 +4502,13 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QTreeWidget" name="inputDataTree">
                        <property name="enabled">
-                        <bool>false</bool>
+                        <bool>true</bool>
                        </property>
+                       <column>
+                        <property name="text">
+                         <string>Job Number</string>
+                        </property>
+                       </column>
                        <column>
                         <property name="text">
                          <string>Sample Number</string>
@@ -4660,7 +4541,25 @@ p, li { white-space: pre-wrap; }
                        </column>
                        <item>
                         <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
                          <string>test</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="text">
+                         <string/>
                         </property>
                        </item>
                       </widget>
@@ -4693,11 +4592,17 @@ p, li { white-space: pre-wrap; }
                      <item>
                       <widget class="QWidget" name="testInfoTopWidget" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_72">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>5</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>5</number>
+                        </property>
                         <item>
-                         <widget class="QLineEdit" name="lineEdit_2"/>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_11">
+                         <widget class="QPushButton" name="chmSearchBtn3">
                           <property name="enabled">
                            <bool>false</bool>
                           </property>
@@ -4705,6 +4610,9 @@ p, li { white-space: pre-wrap; }
                            <string>Search</string>
                           </property>
                          </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="chmSearchLine3"/>
                         </item>
                        </layout>
                       </widget>
@@ -4760,7 +4668,7 @@ p, li { white-space: pre-wrap; }
                              <property name="minimumSize">
                               <size>
                                <width>102</width>
-                               <height>0</height>
+                               <height>22</height>
                               </size>
                              </property>
                              <property name="text">
@@ -4874,7 +4782,7 @@ p, li { white-space: pre-wrap; }
                           <property name="minimumSize">
                            <size>
                             <width>102</width>
-                            <height>0</height>
+                            <height>22</height>
                            </size>
                           </property>
                           <property name="maximumSize">
@@ -5232,7 +5140,7 @@ p, li { white-space: pre-wrap; }
                              <property name="minimumSize">
                               <size>
                                <width>102</width>
-                               <height>0</height>
+                               <height>22</height>
                               </size>
                              </property>
                              <property name="text">
@@ -5322,7 +5230,7 @@ p, li { white-space: pre-wrap; }
                           <property name="minimumSize">
                            <size>
                             <width>102</width>
-                            <height>0</height>
+                            <height>22</height>
                            </size>
                           </property>
                           <property name="maximumSize">
@@ -5461,7 +5369,7 @@ p, li { white-space: pre-wrap; }
                              <property name="minimumSize">
                               <size>
                                <width>102</width>
-                               <height>0</height>
+                               <height>22</height>
                               </size>
                              </property>
                              <property name="maximumSize">
@@ -5511,41 +5419,6 @@ p, li { white-space: pre-wrap; }
             <number>0</number>
            </property>
            <item>
-            <widget class="QWidget" name="settingHeader" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>80</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
-              <item>
-               <widget class="QLabel" name="label_11">
-                <property name="font">
-                 <font>
-                  <pointsize>20</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Settings</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <widget class="QWidget" name="settingBody" native="true">
              <property name="styleSheet">
               <string notr="true"/>
@@ -5566,7 +5439,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -5586,8 +5459,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>628</width>
-                       <height>379</height>
+                       <width>1329</width>
+                       <height>602</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5852,8 +5725,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>1329</width>
+                       <height>602</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5898,8 +5771,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>1329</width>
+                       <height>602</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5928,8 +5801,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>924</width>
-                       <height>167</height>
+                       <width>1329</width>
+                       <height>636</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6064,7 +5937,7 @@ p, li { white-space: pre-wrap; }
                        <x>0</x>
                        <y>0</y>
                        <width>1034</width>
-                       <height>173</height>
+                       <height>175</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6139,8 +6012,8 @@ p, li { white-space: pre-wrap; }
                              <widget class="QPushButton" name="addAuthorBtn">
                               <property name="minimumSize">
                                <size>
-                                <width>80</width>
-                                <height>0</height>
+                                <width>102</width>
+                                <height>22</height>
                                </size>
                               </property>
                               <property name="text">
@@ -6172,6 +6045,11 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                  </layout>
+                </widget>
+                <widget class="QWidget" name="testsTab">
+                 <attribute name="title">
+                  <string>Tests</string>
+                 </attribute>
                 </widget>
                 <widget class="QWidget" name="icpTab">
                  <attribute name="title">
@@ -6352,7 +6230,7 @@ p, li { white-space: pre-wrap; }
             <number>5</number>
            </property>
            <item>
-            <widget class="QWidget" name="Header_2" native="true">
+            <widget class="QWidget" name="createReportHeader" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -6366,11 +6244,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">QWidget {
-	background-color: #323a47; 
-	color: white; 
-} 
-</string>
+              <string notr="true"/>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_7">
               <property name="leftMargin">
@@ -6669,13 +6543,13 @@ p, li { white-space: pre-wrap; }
                <number>0</number>
               </property>
               <property name="topMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <property name="rightMargin">
                <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>0</number>
+               <number>12</number>
               </property>
               <item>
                <widget class="QTabWidget" name="reportsTab">
@@ -6692,7 +6566,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -6732,6 +6606,9 @@ p, li { white-space: pre-wrap; }
                      <string notr="true"/>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_9">
+                     <property name="bottomMargin">
+                      <number>12</number>
+                     </property>
                      <item row="17" column="0">
                       <widget class="QWidget" name="widget_5" native="true"/>
                      </item>
@@ -6753,7 +6630,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6763,7 +6640,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6812,7 +6689,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6822,7 +6699,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6832,7 +6709,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6855,7 +6732,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6865,7 +6742,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6904,7 +6781,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6914,7 +6791,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6969,7 +6846,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -6992,7 +6869,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -7002,7 +6879,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -7025,7 +6902,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -7035,7 +6912,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -7045,7 +6922,7 @@ p, li { white-space: pre-wrap; }
                        <property name="minimumSize">
                         <size>
                          <width>202</width>
-                         <height>0</height>
+                         <height>22</height>
                         </size>
                        </property>
                       </widget>
@@ -7515,7 +7392,7 @@ QWidget#dataEntryBody {
                     <string notr="true">QWidget#tabSectionWidget {
 	border-bottom: 1px solid; 
 	border-bottom-color: rgba(0, 0, 0, 76);
-	border-radius: 10px;
+	border-radius: 5px;
 }
 QWidget { 
 	background-color: #323a47;
@@ -7523,10 +7400,10 @@ QWidget {
 }
 
 QWidget QPushButton { 
-	min-height: 20px; 
+	min-height: 15px; 
 	min-width:120px; 
-	max-width:120px; 
-	padding: 4px;
+	max-width:160px; 
+	padding: 3px;
 	border: 1px solid gray; 
 	border-radius: 5px;
 	color:white; 
@@ -7555,8 +7432,8 @@ QPushButton::hover {
                      <widget class="QPushButton" name="pushButton_2">
                       <property name="minimumSize">
                        <size>
-                        <width>130</width>
-                        <height>30</height>
+                        <width>128</width>
+                        <height>23</height>
                        </size>
                       </property>
                       <property name="text">
@@ -7581,8 +7458,8 @@ QPushButton::hover {
                      <widget class="QPushButton" name="createIcpReportBtn">
                       <property name="minimumSize">
                        <size>
-                        <width>130</width>
-                        <height>30</height>
+                        <width>128</width>
+                        <height>23</height>
                        </size>
                       </property>
                       <property name="text">
@@ -7594,8 +7471,8 @@ QPushButton::hover {
                      <widget class="QPushButton" name="createGcmsReportBtn">
                       <property name="minimumSize">
                        <size>
-                        <width>130</width>
-                        <height>30</height>
+                        <width>128</width>
+                        <height>23</height>
                        </size>
                       </property>
                       <property name="text">

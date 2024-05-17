@@ -6,6 +6,10 @@ REPORTS_TYPE = ['','CHM','ICP']
 ICP_REPORT = 1 
 CHM_REPORT = 2 
 
+
+TABLE_ROW_HEIGHT    = 20 
+TREE_ROW_HEIGHT     = 20 
+
 SAMPLETYPES = [ 
     '1um wound fiter', 
     'sediment',

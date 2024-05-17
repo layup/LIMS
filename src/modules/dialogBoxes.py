@@ -41,7 +41,7 @@ def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
 def createdReportDialog(fileName): 
 
     msg = QMessageBox()
-    msg.setFixedWidth(600)
+    msg.setFixedWidth(8000)
     
     msg.setIcon(QMessageBox.Information)
 
@@ -84,9 +84,9 @@ def deleteBox(self, title, message, action):
     x = msgBox.exec_() 
     
     if(x == QMessageBox.Yes): 
-        pass
+        return True
     if(x == QMessageBox.No):
-        pass 
+        return False 
 
 def replaceError(self,sampleName):
     msgBox = QMessageBox()  

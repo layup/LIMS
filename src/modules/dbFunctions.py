@@ -58,15 +58,87 @@ def getAllChmTestsInfo(db):
     except Exception as e: 
         print(f'An error occured: {e}')
         return None 
+
+def getAllChmTestsInfo2(db): 
+    try: 
+        query = 'SELECT * FROM chemTestsInfo WHERE testName NOT LIKE "%ICP%"'    
+        tests = db.query(query)    
+        return tests 
+
+    except Exception as e: 
+        print(f'An error occured: {e}')
+        return None 
         
 def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
     try: 
         query = 'INSERT INTO chemTestsData (sampleNum, testNum, testValue, standardValue, unitValue, jobNum) VALUES (?, ?, ?, ?, ?, ?)'
-        db.execute(query, (sampleNum, testNum, testValue, standardValue, unitValue, jobNum))
+        db.execute(query, (sampleNum, testNum, testValue, standardValue, unitValue, jobNum, ))
         db.commit()
+
+    except sqlite3.IntegrityError as e:
+        print(e) 
     except Exception as e: 
         print(e)
 
+def deleteChmTestData(db, sampleNum, testNum, jobNum): 
+    pass; 
+
+def editChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
+    pass; 
+        
+def getChmTestData(db, sampleNum, testNum): 
+    try: 
+        query = 'SELECT * FROM chemTestsData WHERE sampleNum = ? and testNum = ?'
+        result = db.query(query, (sampleNum, testNum))
+        return result 
+    
+    except Exception as e: 
+        print(e)
+        return None 
+
+def getAllChmTestsData(db):
+    try: 
+        query = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData'
+        results = db.query(query)
+        return results
+
+    except Exception as e: 
+        print(e)
+
+        
+def getTestsName(db, testNum): 
+    try: 
+        query = 'SELECT testName FROM Tests WHERE testNum = ?'
+        result = db.query(query, (testNum, ))
+        return result 
+        
+    except Exception as e: 
+        print(e)
+        return None;
+
+def getTestsTextName(db, testNum): 
+    try: 
+        query = 'SELECT benchChemName FROM Tests WHERE testNum = ?'
+        result = db.query(query, (testNum, ))
+        return result[0][0] 
+        
+    except Exception as e: 
+        print(e)
+        return None; 
+
+
+
+def getTestsInfo(db, textName): 
+    try: 
+        query = 'SELECT * FROM chemTestsInfo WHERE textName = ?'
+        result = db.query(query, (textName, ))
+        return result[0]
+        
+    except Exception as e: 
+        print(e)
+        return None; 
+
+        
 
 #******************************************************************
 #    ICP Queries/Commands 
@@ -233,6 +305,16 @@ def getReportNum(db, reportName):
 def getIcpFooterComment(db, reportNum, elementNum): 
     try: 
         pass; 
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None; 
+
+    
+def getReportNum(db, reportName): 
+    try: 
+        query = 'SELECT * FROM parameters WHERE parameterName = ?'
+        result = db.query(query, (reportName, ))
+        return result; 
     except Exception as e: 
         print(f'[ERROR]: {e}')
         return None; 

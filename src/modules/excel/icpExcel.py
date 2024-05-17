@@ -152,7 +152,11 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
  
     wb.save(filePath)
     
-
+def createIcpReport2(clientInfo, samplenames, jobNum, sampleData, elements, limitsInfo, footer): 
+    
+    # convert elements 
+    
+    pass; 
 
 def insertIcpComment(ws, footerComment, pageLocation): 
     for (i, value) in enumerate(footerComment):

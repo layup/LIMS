@@ -69,7 +69,8 @@ def icp_history_setup(self):
     
     self.ui.icpTable.setHorizontalHeaderLabels(columnNames)
     self.ui.icpTable.horizontalHeader().setStretchLastSection(True)
-    
+
+    self.ui.icpTable.verticalHeader().setVisible(True)
 
     # Set the width of the tables 
     self.ui.icpTable.setColumnWidth(0, smallCol)
@@ -86,12 +87,10 @@ def icp_history_setup(self):
     self.ui.ShowComboBox.clear()
     self.ui.filterComboBox.addItems(FILTER_BY)
     self.ui.ShowComboBox.addItems(SHOW_ENTITIES)
-
-
-    
+ 
     # Connect the signals/buttons and change the database 
     self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.tempDB))
-    self.ui.icpSearchBtn.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
+    self.ui.icpSearchBtn1.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
 
     loadIcpHistory(self) 
 
@@ -133,7 +132,7 @@ def loadIcpHistory(self):
     machineDataQuery = 'SELECT sampleName, jobNum, machineNum, batchName, creationDate FROM icpData ORDER BY creationDate DESC'
     machineData = list(self.tempDB.query(machineDataQuery))
     totalItem = len(machineData) 
-    self.ui.icpLabel.setText(f'Total Items in Database: {totalItem}')
+    #self.ui.headerDesc.setText(f'Total Items in Database: {totalItem}')
         
     populateIcpHistoryTable(self, machineData) 
             
@@ -144,7 +143,7 @@ def populateIcpHistoryTable(self, result):
     
     TableHeader = ['Sample Number', 'Job Number', 'Machine Type', 'File Location', 'Upload Date', 'Actions']
 
-    self.ui.icpLabel.setText(textLabelUpdate)    
+    self.ui.headerDesc.setText(textLabelUpdate)    
     self.ui.icpTable.setRowCount(len(result)) 
     self.ui.icpTable.setColumnCount(len(TableHeader))
     self.ui.icpTable.setHorizontalHeaderLabels(TableHeader)
@@ -208,7 +207,7 @@ def icp_elements_setup(self):
     
     #TODO: Trigger to change this when item is added or removed 
     totalElements = self.elementManager.getTotalElements()
-    self.ui.icpLabel.setText("Total Elements: {}".format(totalElements))
+    self.ui.headerDesc.setText("Total Elements: {}".format(totalElements))
     
     # Create a QDoubleValidator
     validator = QDoubleValidator()
@@ -428,8 +427,7 @@ def saveIcpBtnClicked(self):
     if(selectedElement): 
        
         elementName = selectedElement.text() 
-
-        
+ 
         # Save the element Info (name, symbol)
         element = self.elementManager.getElementByName(elementName) 
         elementNum = element.num

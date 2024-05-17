@@ -33,6 +33,9 @@ def apply_drop_shadow_effect(widget):
     shadow.setOffset(0, 0)  # Set shadow offset (no offset)
 
     # Apply drop shadow effect to the widget
+    widget.raise_()
+
+    widget.setAutoFillBackground(True) 
     widget.setGraphicsEffect(shadow)
 
 

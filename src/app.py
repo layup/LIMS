@@ -27,7 +27,7 @@ from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
 from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
-from pages.chm_tools import ( loadChmDatabase, chemistySetup, getTestsAndUnits, chmClearEnteredTestsData, ) 
+from pages.chm_tools import ( populateChmDatabase, chemistySetup, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
 
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 
         # Set the current working directory to the directory containing the script
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
+        
         # Load the setup 
         self.loadDatabase()
         self.loadCreatePage()
@@ -61,6 +61,9 @@ class MainWindow(QMainWindow):
         historyPageSetup(self)
         icpSetup(self)
         chemistySetup(self)
+
+        apply_drop_shadow_effect(self.ui.headerWidget)
+        
 
    #******************************************************************
    #    inline Slot Function Calls 
@@ -153,7 +156,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setCurrentIndex(index)
     
     def on_stackedWidget_currentChanged(self, index):
-        print(f'Current Index: {index}')
+        print(f'Stack Index: {index}')
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
@@ -163,66 +166,67 @@ class MainWindow(QMainWindow):
             #    btn.setAutoExclusive(False)
             #    btn.setChecked(False)
             btn.setAutoExclusive(True)
+
+        
+        self.ui.headerWidget.show()
                    
         if(index == 0): # History
-            self.ui.reportsHeader.setText('Reports History'); 
-            self.ui.totalReportsHeader.setText('Recently created reports')
+            self.ui.headerTitle.setText('Reports History'); 
+            self.ui.headerDesc.setText('Recently created reports'); 
+            
             self.ui.historyTabWidget.setCurrentIndex(0)
             
             loadReportsPage(self)
             
         if(index == 1): # Create Report
-            
+            self.ui.headerTitle.setText('Create Reports'); 
+            self.ui.headerDesc.setText(''); 
+
             # Clearing the report page section 
             self.ui.jobNumInput.setText('')
             self.ui.reportType.setCurrentIndex(0)
             self.ui.paramType.setCurrentIndex(0)
             self.ui.dilutionInput.setText('')
+
             
         if(index == 2): # ICP Page 
-            # TODO: set the title text to nothing by default or something, keeps loading the wrong thing 
-            # TODO: check what the current item is
-            
-            pass; 
+            self.ui.icpTabWidget.setCurrentIndex(1)
+            self.ui.icpTabWidget.setCurrentIndex(0)
         
         if(index == 3): # CHM Page 
-            pass; 
+            self.ui.chmTabWidget.setCurrentIndex(1) 
+            self.ui.chmTabWidget.setCurrentIndex(0) 
             
         if(index == 4): # Settings  
-            pass; 
-
-        if(self.previous_index == 5): # Creating Reports 
+            self.ui.headerTitle.setText('Settings'); 
+            self.ui.headerDesc.setText('');  
+                
+        #if(self.previous_index == 5): # Creating Reports 
+        if(index == 5): 
+            self.ui.headerWidget.hide()
             deleteAllSampleWidgets(self) 
-        
 
-    #FIXME: have a single header that is controlled by the global, instead of each having their own seperate one 
     def on_icpTabWidget_currentChanged(self, index):
-        #TODO: set the machine values for both of theses, create a single inqury that fetches based on date
-        
-        if(index == 0): #History 
-            self.ui.icpPageTitle.setText("ICP Page")
-            self.ui.icpLabel.setText("")
-        
-        #TODO: create a single function that loads this all to begin with isntead of having to reload this each time 
-        #try lazy loading 
+        print(f'ICP TAB INDEX: {index}')
         if(index == 0): #History  
-            self.ui.icpPageTitle.setText("ICP Database")
-            self.ui.icpLabel.setText("")
+            self.ui.headerTitle.setText('ICP Database'); 
+            self.ui.headerDesc.setText(''); 
         
             # Load the data again when the 
             loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
-            self.ui.icpPageTitle.setText("ICP Elements Information")
-        
+            self.ui.headerTitle.setText('ICP Elements Information'); 
+
             totalElements = self.elementManager.getTotalElements()
-            self.ui.icpLabel.setText("Total Elements: {}".format(totalElements))
+            self.ui.headerDesc.setText("Total Elements: {}".format(totalElements))
             
             #loadDefinedElements(self)
 
         if(index == 2): #  Reports Info 
-            self.ui.icpPageTitle.setText("ICP Reports Information")
-            self.ui.icpLabel.setText("Total Reports:") 
+            self.ui.headerTitle.setText('ICP Reports Information'); 
+            self.ui.headerDesc.setText(''); 
+            
             loadReportList(self)
 
     def on_chmTabWidget_currentChanged(self, index): 
@@ -230,24 +234,27 @@ class MainWindow(QMainWindow):
         print(f'CHM TAB CHANGE INDEX {index}')
         
         if(index == 0): # Database 
-            self.ui.chmTitleLabel.setText('Chemisty Tests Database') 
-            self.ui.gcmsSubTitleLabel.setText('')
-            loadChmDatabase(self);  
+            self.ui.headerTitle.setText('Chemisty Tests Database'); 
+            self.ui.headerDesc.setText(''); 
+            populateChmDatabase(self);  
             
             
         if(index == 1): # Input Data 
-            self.ui.chmTitleLabel.setText('Chemisty Data Entry')
-            self.ui.gcmsSubTitleLabel.setText('') 
-            
+
+            self.ui.headerTitle.setText('Chemisty Data Entry'); 
+            self.ui.headerDesc.setText(''); 
+           
         
         if(index == 2): # Test Info  
-            self.ui.chmTitleLabel.setText('Chemisty Tests Information')
+
+            self.ui.headerTitle.setText('Chemisty Tests Information'); 
+            self.ui.headerDesc.setText(''); 
             #totalTests = getChmTotalTests(self.db) 
             #self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
 
         if(index == 3): # Report Info 
-            self.ui.chmTitleLabel.setText('Chemisty Reports Information')
-            self.ui.gcmsSubTitleLabel.setText('Total Reports: ') 
+            self.ui.headerTitle.setText('Chemisty Reports Information')
+            self.ui.headerDesc.setText('Total Reports: ') 
 
    #******************************************************************
    #    Setup Loading
@@ -264,10 +271,10 @@ class MainWindow(QMainWindow):
 
         self.previous_index = -1
 
-        # Sets the stacks to home page 
+        # Set the home stack 
         self.ui.stackedWidget.setCurrentIndex(0) 
-        self.ui.icpTabWidget.setCurrentIndex(0)
-        self.ui.chmTabWidget.setCurrentIndex(0)
+        self.ui.headerTitle.setText('Reports History'); 
+        self.ui.headerDesc.setText('Recently created reports'); 
 
         # Sets the tab order for three widgets
         self.setTabOrder(self.ui.gcmsTestsJobNum, self.ui.gcmsTestsSample)
@@ -428,6 +435,10 @@ class LocalPreferences:
 
 
 
+#TODO: global tests class that contains the testNum and the testnNames 
+
+class Tests(): 
+    pass; 
     
 
 

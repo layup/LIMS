@@ -67,7 +67,7 @@ def historyPageSetup(self):
     
 
     # Apply drop shadow for header item
-    apply_drop_shadow_effect(self.ui.reportsHeaderWidget )
+    #apply_drop_shadow_effect(self.ui.reportsHeaderWidget )
 
     #load the inital table data 
     loadReportsPage(self); 

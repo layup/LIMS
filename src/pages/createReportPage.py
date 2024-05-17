@@ -30,9 +30,8 @@ def reportSetup(self):
  
     # Create a validator to accept only integer input
     validator = QIntValidator()
-    # Set the range of valid integer values
-    validator.setBottom(0)  # Minimum value
-    validator.setTop(999999)  # Maximum value
+    validator.setBottom(0)  
+    validator.setTop(999999)  
 
     # Set input limits and Validators
     self.ui.jobNumInput.setValidator(validator)
@@ -40,9 +39,12 @@ def reportSetup(self):
 
     self.ui.dilutionInput.setValidator(validator)
     self.ui.dilutionInput.setMaxLength(6)
+    
+    apply_drop_shadow_effect(self.ui.createReportHeader)
 
     #load in the authors 
     #TODO: have some error checking and deal with the loadiong section 
+    # FIXME: load in the other authors to the section
     authorsList = [item[0] for item in getAllAuthorNames(self.preferencesDB)]
     authorsList.insert(0, '')
     
@@ -62,9 +64,6 @@ def reportSetup(self):
 #   Creating Report 
 #******************************************************************
 
-def editReport(): 
-    pass; 
-
 @pyqtSlot()
 def createReportPage(self, jobNum = None, reportType = None, parameter = None, dilution =None, method2= None):
     print('[FUNCTION]: createReportPage')
@@ -80,7 +79,6 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     print('*Parameter: ', parameter)
     print('*Dilution: ', dilution )
     
-        
     #TODO: check if it is a valid dilution value 
     #TODO: change the dilution thing into a number only slider lol, so the default would be 1 and otherwise 
     self.dilution = 1 if dilution == '' else dilution       
@@ -128,26 +126,11 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         self.clearDataTable()
         self.ui.jobNum.setText(jobNum)
         
-        #TODO: populate the author section
-        #self.populateAuthorNames() 
-
-        if('ICP' in reportType):
-            print('***ICP Loader')
+        if(reportType == 'ICP'):            
+            icpReportLoader(self)
             
-            self.ui.createIcpReportBtn.setVisible(True)
-            self.ui.createGcmsReportBtn.setVisible(False)
-            self.ui.icpDataField.show()
-            
-            icpLoader(self)
-            
-        if(reportType == 'CHM'):
-            print('***CHM Loader')
-            
-            self.ui.createIcpReportBtn.setVisible(False)
-            self.ui.createGcmsReportBtn.setVisible(True)
-            self.ui.icpDataField.hide() 
-            
-            chmLoader(self)
+        if(reportType == 'CHM'):            
+            chmReportLoader(self)
         
     else: 
         reportErrorHandler(self, errorCheck)
@@ -174,7 +157,6 @@ def reportErrorHandler(self, errorCheck):
             errorMsg += 'TXT File could not be located\n'
             
         showErrorDialog(self, errorTitle, errorMsg)
-    
         
 #TODO: this should be in the preference section, move this into other database  
 def populateAuthorNames(self): 
@@ -190,7 +172,6 @@ def populateAuthorNames(self):
         
     except: 
         print('Error: Could not load the authors for Create Report Page ')
-
         
 #******************************************************************
 #   reading text file  
@@ -217,7 +198,6 @@ def checkTextFile(self, fileLocation):
         
     else:
          self.ui.reportsTab.setTabEnabled(2, False)
-    
 
 
 #******************************************************************
@@ -229,7 +209,6 @@ def formatReportTable(table, rowCount, colCount):
     table.setColumnCount(colCount)
     table.horizontalHeader().setVisible(True)
     table.verticalHeader().setVisible(True)
-
     
 def deleteAllSampleWidgets2(self): 
     for widget in self.ui.samplesContainer.children():
@@ -284,62 +263,175 @@ def updateSampleNames(sampleNames, textChange, key):
     sampleNames[key] = textChange; 
     print(f'Update Sample Name: {sampleNames}')
 
+    
+def populateTableRow(tableWidget, row, col, alignment, value): 
+    item = QtWidgets.QTableWidgetItem()  
+    if(alignment == 1):   
+        item.setTextAlignment(Qt.AlignCenter)
+    
+        # Check data type and convert if necessary
+    if isinstance(value, (int, float)):
+        value = str(value)  # Prevent spinbox for numeric data
+     
+    item.setData(Qt.DisplayRole, value)
+    tableWidget.setItem(row, col, item)
+        
+    return 
+
+
 #******************************************************************
 #    Chemisty Loader  
 #****************************************************************** 
 
+class chemReportTestData: 
+    def __init__(self, testNum, testName, textName, displayName, unitType):  
+        self.testNum = testNum 
+        self.testName = testName 
+        self.textName = textName 
+        self.displayName = displayName 
+        
+        # NOTE: there are many different types of unitTypes that come along so will i be taking the first one 
+        self.unitType = unitType 
+
+class chemReportSampleData: 
+    def __init__(self, sampleNum, jobNum): 
+        self.sampleNum = sampleNum 
+        self.jobNum = jobNum 
+        
+        self.data = {}
+        
+        
+class chemReportManager: 
+    def __init__(self, db): 
+        self.db = db 
+
+        self.samples = {}
+        self.test = {}
+        
+    def init_samples(self): 
+        pass; 
+    
+    def init_test(self, test_list): 
+        print(f'init_test: {test_list}')
+        pass; 
+    
+    
+    def getSamples(self): 
+        return self.samples
+    
+    def getTest(self): 
+        return self.test 
+
+
+
+        
+class chemReportView: 
+    def __init__(self, table): 
+        self.table = table
+        
+    def populateTree(self): 
+        pass; 
+    
+    def populateSamples(self, samples): 
+        pass; 
+    
+
 #TODO: scan in the TXT Tests, scan in from Defined Tests too 
 #TODO: fix the error checking 
-def chmLoader(self): 
+def chmReportLoader(self): 
     print('[FUNCTION]: chmLoader(self)')
+    
+    self.ui.createIcpReportBtn.setVisible(False)
+    self.ui.createGcmsReportBtn.setVisible(True)
+    self.ui.icpDataField.hide() 
   
     columnNames = [
-        'Tests', 
+        'Tests Name', 
+        'Text Name',
         'Display Name',
         'Unit', 
-        'Standard Recovery', 
-        'Distal factor'
+        'Distal factor',
+        'Standard Recovery',
     ]
-    
-    GSMS_TESTS_LISTS = []
-    
+        
     loadClientInfo(self)
     
-    # Checking CHM test lists  
-    for (currentJob , testList) in self.sampleTests.items(): 
-        for item in testList: 
-            temp = removeIllegalCharacters(str(item)) 
-            if(temp not in GSMS_TESTS_LISTS and 'ICP' not in temp):          
-                GSMS_TESTS_LISTS.append(temp)
-
-    testsQuery = 'SELECT * FROM gcmsTestsData WHERE jobNum = ?'
-    testsResults = self.db.query(testsQuery, (self.jobNum,))
-    
-    #TODO: can create a list and combine unique values
-    if(testsResults): 
-        for item in testsResults: 
-            if(item[1] not in GSMS_TESTS_LISTS):
-                GSMS_TESTS_LISTS.append(item[1])
-                    
-    GSMS_TESTS_LISTS = sorted(GSMS_TESTS_LISTS)
-    print('**FOUND CHM TESTS')
-    print(GSMS_TESTS_LISTS) 
+    chmTestsLists, testResults = chmGetTestsList(self) 
 
     dataTable = self.ui.dataTable
-    rowCount = len(GSMS_TESTS_LISTS) 
+    rowCount = len(chmTestsLists) 
     colCount = len(columnNames) + int(self.clientInfo['totalSamples'])
 
     # CHM Signals 
     #TODO: add the item changed thing 
     #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
-    self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, len(columnNames), GSMS_TESTS_LISTS)); 
+    #self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, len(columnNames), chmTestsLists)); 
+    
+    testData = {}
+    for test in testResults: 
+        testName = f'{test[5]}-{test[0]}'
+        testNum = test[1] #how to add the testNum for selection 
+        testValue = test[2]
+        recovery = test[3]
+        unitType = test[4]
+        
+        testData[testName] = {testNum:[testValue, recovery, unitType]}
+        
+    print(testData)
+    
+    # Prepare the objects 
+    self.reportManager = chemReportManager(self.tempDB)
+    self.reportView = chemReportView(self.ui.dataTable)
+    
+    # prepare the manager
+    # update data object and pass the thing  
+    
+    # Display the data (update the object) 
+    
 
-    chmIntalize(dataTable, rowCount, colCount, columnNames)
+    # Populate the Chm Table with stuff 
+    chmIntalize(self, dataTable, rowCount, colCount, columnNames)
 
-    chmPopulateTable(self, GSMS_TESTS_LISTS, columnNames, testsResults)
- 
+    # Populate the CHM Table with data 
+    chmPopulateTable2(self, chmTestsLists, columnNames, testResults)
+
+
+def chmGetTestsList(self): 
+    print('[FUNCTION]: chmGetTestsList(self)')
+    print(self.sampleTests)
+    CHM_TESTS_LISTS = []
+
+    unitTypeRow = 4
+
+    testsQuery = 'SELECT * FROM chemTestsData WHERE JobNum = ?' 
+    testResults = self.tempDB.query(testsQuery, (self.jobNum,)) 
+
+    # Checking CHM test lists  
+    for (currentJob , testList) in self.sampleTests.items(): 
+        for item in testList: 
+            temp = removeIllegalCharacters(str(item)) 
+            if(temp not in CHM_TESTS_LISTS and 'ICP' not in temp):          
+                CHM_TESTS_LISTS.append(temp)
+     
+    # loop through the tests that ussers have manually added to the thing 
+    if(testResults):
+        for item in testResults:
+            testTextName = getTestsTextName(self.tempDB, item[1])
+            print(f'Test Name: {testTextName}')
+            if testTextName not in CHM_TESTS_LISTS:
+                CHM_TESTS_LISTS.append(testTextName)
+                    
+    
+    #print('****UNSORTED CHM TESTS ')
+    #print(CHM_TESTS_LISTS)  
+    #CHM_TESTS_LISTS = sorted(CHM_TESTS_LISTS)
+    print('***SORTED CHM TESTS')
+    print(CHM_TESTS_LISTS) 
+    
+    return CHM_TESTS_LISTS, testResults 
    
 def chmIntalize(self, table, rowCount, colCount, columnNames): 
+    print('[FUNCTION]: chmIntalize(self, table, rowCount, colCount, columnNames)')
 
     # Load the sample names in client Info Section 
     for i, (key,value) in enumerate(self.sampleNames.items()):
@@ -363,55 +455,125 @@ def chmIntalize(self, table, rowCount, colCount, columnNames):
     for i , (key, value) in enumerate(self.sampleNames.items(), start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
         table.setHorizontalHeaderItem(i, item)
-
+        
 
 def chmPopulateTable(self, testLists, columnNames, testsResults): 
+    print('[FUNCTION]:chmPopulateTable(self, testLists, columnNames, testsResults)') 
+    # ex. testsList = ['Turb', 'BTEX', 'THM', 'Pb', 'Sb', 'Turbidity']
+    tableWidget = self.ui.dataTable
     
     # List the tests  
     for i, currentTest in enumerate(testLists): 
         print(f'Current Test {i}: {currentTest}') 
         testItem = QtWidgets.QTableWidgetItem(currentTest)
-        self.ui.dataTable.setItem(i, 0, testItem)
+        self.ui.dataTable.setItem(i, 1, testItem)
         
         #TODO: Search for the display name 
-        displayQuery = 'SELECT * FROM gcmsTests WHERE testName = ?'
-        self.db.execute(displayQuery, [currentTest,])
-        result = self.db.fetchone()
-        print(f'Query Result: {result}')
+        #displayQuery = 'SELECT testNum,  FROM gcmsTests WHERE testName = ?'
+        #self.db.execute(displayQuery, [currentTest,])
+        #result = self.db.fetchone()
+        #print(f'Query Result: {result}')
+        
+        
+        #displayNameQuery = 'SELECT testNum FROM chemTestsInfo where testNum = ?'
         
         # Set the display Name if exists
-        if(result): 
-            displayNameItem = QtWidgets.QTableWidgetItem(result[0]) 
-            self.ui.dataTable.setItem(i, 1, displayNameItem) 
+        #if(result): 
+        #    displayNameItem = QtWidgets.QTableWidgetItem(result[0]) 
+        #    self.ui.dataTable.setItem(i, 1, displayNameItem) 
         
-        #TODO: Distral Factor 
-        item2 = QtWidgets.QTableWidgetItem(str(1)) 
-        self.ui.dataTable.setItem(i, 4, item2) 
+        #TODO: Add in the Distral Factor 
+        distilFactor = 1 
+        populateTableRow(tableWidget, i, 4, 1, distilFactor)
     
         #go down each column and determine if there is a match
         for column in range(len(columnNames), self.ui.dataTable.columnCount()):
             header_item = self.ui.dataTable.horizontalHeaderItem(column)
-            
+
             if header_item is not None:
+
                 column_name = header_item.text()
                 result = search_list_of_lists(testsResults,[column_name, currentTest] )
                 
+                print(f'col: {column}, col name: {column_name}, result: {result}')
+                
                 if result is not None: 
-                    print(f'CHM results: {result}')
-                    valueText = str(result[2])
-                    valueItem = QtWidgets.QTableWidgetItem(valueText) 
-                    self.ui.dataTable.setItem(i, column, valueItem) 
-                    
-                    recoveryText = str(result[3])  
-                    recoveryItem = QtWidgets.QTableWidgetItem(recoveryText) 
-                    self.ui.dataTable.setItem(i, 3, recoveryItem) 
-                    
-                    unitText = result[4]
-                    unitItem = QtWidgets.QTableWidgetItem(unitText) 
-                    self.ui.dataTable.setItem(i, 2, unitItem)   
+                                                            
+                    valueText = result[2]
+                    unitType = result[3]
+                    recovertVal = result[4]
+
+                    populateTableRow(tableWidget, i, column, valueText) 
+                    populateTableRow(tableWidget, i, 3, unitType)
+                    populateTableRow(tableWidget, i, 2, recovertVal)
+
+#FIXME: have the query select the correct order for things to come in so we can control that more 
+def chmPopulateTable2(self, testLists, columnNames, testsResults): 
+    print(f'[FUNCTION]:chmPopulateTable2()')
+    print(testLists)
+    print(columnNames)
+    print(testsResults)
+    
+    sampleNames = list(self.sampleNames.keys())
+    print(sampleNames)
+
+    tableWidget = self.ui.dataTable
+    
+    textNameCol = 1;
+    distilCol = 4 
+    
+    testsInfo = {}
+    testNums = []
+    
+    # convertTestsList into other info 
+    for textName in testLists: 
+        testData = getTestsInfo(self.tempDB, textName)
+        if(testData): 
+            #TODO: define all of these things 
+            testNum = testData[0]
+            testsName = testData[1]
+            
+            if(testNum not in testNums): 
+                testNums.append(testNum);
+            
+            # need to convert this to do something  
+            testsInfo[textName] = [testData[0], testData[1], testData[2], testData[3], testData[4], testData[5]]  
+        
+    # List the tests  
+    for row, textName in enumerate(testLists): 
+        print(f'Current Test {row}: {textName}') 
+        
+        # populate the text col names 
+        testItem = QtWidgets.QTableWidgetItem(textName)
+        tableWidget.setItem(row, textNameCol, testItem)
+
+        # populate the test name and display name  
+        if(textName in testsInfo): 
+            testName = testsInfo[textName][1]
+            displayName = testsInfo[textName][3]
+
+            testNameWidget = QtWidgets.QTableWidgetItem(testName)
+            tableWidget.setItem(row, 0, testNameWidget) 
+            
+            if(displayName): 
+                displayNameWidget = QtWidgets.QTableWidgetItem(testName)
+                tableWidget.setItem(row, 2, displayNameWidget) 
 
     
- 
+                        
+        #TODO: Add in the Distral Factor 
+        distilFactor = 1 
+        populateTableRow(tableWidget, row, distilCol, 1, distilFactor)
+        
+        
+        # need to know what column sample we are on 
+    
+        # the find the row and insert into 
+   
+
+   
+    
+                     
 #******************************************************************
 #    CHM Report Handler Function  
 #******************************************************************
@@ -473,7 +635,7 @@ def chmReportHandler(self, columnLength,  tests):
         except: 
             recovery.append('')       
             
-    createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
+    #createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
 
     createdReportDialog('test')
 
@@ -483,18 +645,6 @@ def chmReportHandler(self, columnLength,  tests):
 #******************************************************************
 
 def getIcpMachineData(database, jobNumber): 
-    # Queries 
-    #queryMachine1 = 'SELECT sampleName, jobNumber, data FROM icpMachineData1 where jobNumber = ? ORDER BY sampleName ASC'
-    #queryMachine2 = 'SELECT sampleName, jobNumber, data FROM icpMachineData2 where jobNumber = ? ORDER By sampleName ASC' 
-    
-    
-    # Query and convert into a list form 
-    #sampleData = list(database.query(queryMachine1, (jobNumber,)))
-    #sampleData2 = list(database.query(queryMachine2, (jobNumber,)))
-
-    #return sampleData, sampleData2
-
-
     query = 'SELECT sampleName, jobNum, data FROM icpData WHERE jobNum = ? ORDER BY sampleName ASC'
     
     return list(database.query(query, (jobNumber, )))
@@ -507,11 +657,36 @@ def getIcpLimitResults(database, parameters):
 
     return elementUnitValues 
 
+def getIcpElementsList2(db): 
+    try: 
+        query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
+        results = db.query(query)
+        return results
+    except Exception as error: 
+        print(f'[ERROR]: {error}')
+        return None
+
+def getIcpLimitResults2(database, parameters):
+    print('[FUNCTION]: getIcpLimitResults2(database, parameters)')
+    print(parameters)
+    
+    try: 
+        query = 'SELECT elementNum, unitType, lowerLimit, upperLimit, sideComment FROM icpLimits WHERE parameterNum = ?'
+        result = database.query(query, (parameters, ))
+        return {item[0]: [item[1], item[2], item[3], item[4]] for item in result}
+        
+    except Exception as e: 
+        print(e)  
+        return None 
+
 #TODO: have a helper change the hardness values when cal and mg values change 
-#TODO: combine both the datasets;
 #TODO: does this effect hardness and also what about the new values we enter in 
-def icpLoader(self): 
+def icpReportLoader(self): 
     print('[FUNCTION]: icpLoader(self)')
+   
+    self.ui.createIcpReportBtn.setVisible(True)
+    self.ui.createGcmsReportBtn.setVisible(False)
+    self.ui.icpDataField.show()
    
     # FIXME: fix the machine getting username Information, can use a loop instead 
     loadClientInfo(self)
@@ -519,18 +694,31 @@ def icpLoader(self):
     columnNames = [
         'Element Name', 
         'Element symbol',
-        'Unit Value', 
+        'Unit Type', 
+        'Lower Limit', 
+        'Upper Limit', 
         'distal factor'
     ]
     
     addtionalRows = ['pH', 'Hardness']
      
-    elements = getIcpElementsList(self.db) 
-    elementNames = [t[0] for t in elements]
+    # FIXME: need to get redo this as well 
+    #elements = getIcpElementsList(self.db) 
+    elements = getIcpElementsList2(self.tempDB)
+    elementNames = [t[1] for t in elements]
     
-    #sampleData, sampleData2 =  getIcpMachineData(self.db, self.jobNum)
+    print(f'Elements: {elements}')
+    
     sampleData = getIcpMachineData(self.tempDB, self.jobNum)
-    elementUnitValues = getIcpLimitResults(self.db, self.parameter)
+
+    #TODO: change database later so we have just one database 
+    reportNum = getReportNum(self.preferencesDB, self.parameter)[0][0]
+    print(f'Parameter: {reportNum}')
+    
+    #TODO: add a try-except block here 
+    
+    #elementUnitValues = getIcpLimitResults(self.db, self.parameter); 
+    elementUnitValues = getIcpLimitResults2(self.tempDB, reportNum)
 
     selectedSampleNames = []
     
@@ -541,7 +729,7 @@ def icpLoader(self):
 
     machineData = {item[0]: json.loads(item[2]) for item in sampleData}
 
-    print(f'Elment Names: {elementNames}')
+    #print(f'Elment Names: {elementNames}')
     print(f'Element Unit Values: {elementUnitValues}')
     print('SelectedSampleItems: ', selectedSampleNames)    
     
@@ -551,8 +739,10 @@ def icpLoader(self):
     totalSamples = len(selectedSampleNames)    
     
     # Connect Signals 
-    self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
-    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples));     
+    dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
+    #TODO: fix this 
+    #self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elementNames, totalSamples));     
+    self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander2(self, elements, elementUnitValues, totalSamples, reportNum));     
 
     # Format and intalize the tables 
     icpIntalizeTable(self, dataTable, colCount, totalRows, selectedSampleNames, columnNames)
@@ -560,8 +750,11 @@ def icpLoader(self):
     # Populate the sample table information 
     icpPopulateSamplesSection(self, selectedSampleNames)
     
+    # Populate Hardness and pH 
+    icpPopulateAdditonalRows(self, totalRows, addtionalRows)
+    
     # populate the table with column and smaple info 
-    icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows)
+    icpPopulateTable(self, elements, elementUnitValues)
     
     # load the tables elemental machine info and  hardness calculations 
     icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)
@@ -602,141 +795,130 @@ def icpPopulateSamplesSection(self, selectedSampleNames):
     spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     self.ui.samplesContainerLayout.addItem(spacer) 
 
-def icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows): 
-    print(f'[FUNCTION]: icpPopulateTable(self, elements, elementUnitValues, addtionalRows, totalRows)')
+def icpPopulateTable(self, elements, elementUnitValues): 
+    print('[FUNCTION]:icpPopulateTable(self, elements, elementUnitValues)')
+    
+    tableWidget = self.ui.dataTable
 
-    # Set the elemental Information (columns)
     for i, element in enumerate(elements): 
-        elementName = element[0]
-        elementSymbol = element[1]
+        elementNum    = element[0]
+        elementName   = element[1].capitalize()
+        elementSymbol = element[2].capitalize()
         
-        # Set the element Name 
-        elementNameCol = QtWidgets.QTableWidgetItem() 
-        elementNameCol.setText(elementName.capitalize()) 
-        
-        # Set the Elment Symbol Name 
-        elementSymbolCol = QtWidgets.QTableWidgetItem()
-        elementSymbolCol.setTextAlignment(Qt.AlignCenter)
-        elementSymbolCol.setText(elementSymbol.capitalize())
-        
-        unitTypeItem = QtWidgets.QTableWidgetItem() 
-        unitTypeItem.setTextAlignment(Qt.AlignCenter)
-        
-        distilFactorItem = QtWidgets.QTableWidgetItem()
-        distilFactorItem.setTextAlignment(Qt.AlignCenter)
-        
-        if(elementName in elementUnitValues):
-            unitTypeItem.setText(elementUnitValues[elementName])
-        else: 
-            unitTypeItem.setText('')
-            
         if(self.dilution == ''):
-            distalFactorDefault = '1'           
-            distilFactorItem.setText(distalFactorDefault)
-        else: 
-            distilFactorItem.setText(str(self.dilution))
+            distalFactorDefault = 1        
+        else:
+            distalFactorDefault = self.dilution 
+           
+        icpPopulateRow(tableWidget, i, 0, 0, elementName)
+        icpPopulateRow(tableWidget, i, 1, 1, elementSymbol)
+        icpPopulateRow(tableWidget, i, 5, 1, distalFactorDefault)
 
-        self.ui.dataTable.setItem(i, 0, elementNameCol)
-        self.ui.dataTable.setItem(i, 1, elementSymbolCol) 
-        self.ui.dataTable.setItem(i, 2, unitTypeItem)
-        self.ui.dataTable.setItem(i, 3, distilFactorItem) 
-    
-    # Add additional Row Information
-    for i, value in enumerate(addtionalRows): 
-        postion = totalRows - i - 1; 
-        
-        # Assign Table Items 
-        elementName = QtWidgets.QTableWidgetItem()  
-        symbolName = QtWidgets.QTableWidgetItem()
-        unitValue = QtWidgets.QTableWidgetItem()
-        
-        # Center Alignment 
-        symbolName.setTextAlignment(Qt.AlignCenter)
-        unitValue.setTextAlignment(Qt.AlignCenter)
-         
-        elementName.setText(value)
-
-        self.ui.dataTable.setItem(postion, 0, elementName)
-        
-        if(value == 'Hardness'): 
-            symbolName.setText("CaC0₃")
-            unitValue.setText('ug/L')
+        # Set the limits
+        if(elementNum in elementUnitValues): 
+            unitType   = elementUnitValues[elementNum][0]
+            lowerLimit = elementUnitValues[elementNum][1]
+            upperlimit = elementUnitValues[elementNum][2]
             
-            self.ui.dataTable.setItem(postion, 1, symbolName) 
-            self.ui.dataTable.setItem(postion, 2, unitValue) 
-        else: 
-            symbolName.setText("")
-            unitValue.setText('unit') 
-
-            self.ui.dataTable.setItem(postion, 1, symbolName) 
-            self.ui.dataTable.setItem(postion, 2, unitValue)
-              
-def icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames): 
-    print('[FUNCTION]: icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)')
+            icpPopulateRow(tableWidget, i, 2, 1, unitType)
+            icpPopulateRow(tableWidget, i, 3, 1,  lowerLimit)
+            icpPopulateRow(tableWidget, i, 4, 1, upperlimit)
+           
+def icpPopulateRow(tableWidget, row, col, alignment, value): 
+    item = QtWidgets.QTableWidgetItem()  
+    if(alignment == 1):   
+        item.setTextAlignment(Qt.AlignCenter)
     
-    print('***Element Values')
-    for i in range(len(elements)): 
-        item = self.ui.dataTable.item(i, 1)
+    if(value):
+        item.setData(Qt.DisplayRole, value)
+        tableWidget.setItem(row, col, item)
         
+    return 
+
+def icpPopulateAdditonalRows(self, totalRows, addtionalRows ): 
+    print('[FUNCTION]:icpPopulateAdditonalRows(self, totalRows, addtionalRows)')
+    
+    unitCol = 2
+    tableWidget = self.ui.dataTable
+    
+    for i, elementName in enumerate(addtionalRows): 
+        postion = totalRows - i - 1; 
+        icpPopulateRow(tableWidget, postion, 0, 0, elementName)
+        
+        if(elementName == 'Hardness'): 
+            symbolName = "CaC0₃"
+            unitType = "ug/L"
+            
+            icpPopulateRow(tableWidget, postion, 1, 1, symbolName) 
+            icpPopulateRow(tableWidget, postion, unitCol, 1, unitType) 
+        else: 
+            symbolName = ""
+            unitType = "unit"
+        
+            icpPopulateRow(tableWidget, postion, 1, 1, symbolName) 
+            icpPopulateRow(tableWidget, postion, unitCol, 1, unitType) 
+
+def icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames): 
+    #print('[FUNCTION]: icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)')
+    
+    tableWidget = self.ui.dataTable 
+    hardnessRow = 33
+     
+    #print('***Element Values')
+    for i in range(len(elements)): 
+        item = self.ui.dataTable.item(i, 1) 
         if(item != None): 
             symbol = item.text()
             for j, sample in enumerate(selectedSampleNames): 
-                print(f'*Sample: {sample}')
-                item = QtWidgets.QTableWidgetItem(); 
-                item.setTextAlignment(Qt.AlignCenter)
-                
-                # TODO: fix the logic here somehow 
-                if sample in machineData and symbol in machineData[sample]: 
-                    print(f'Machine 1: {symbol} {machineData[sample][symbol]}')
-                    item = dilutionConversion(machineData, sample, symbol, self.dilution)
-                            
-                sampleCol = j + len(columnNames)
-                
-                self.ui.dataTable.setItem(i, sampleCol, item)
 
-    print('***Hardness Calculations')
+                if sample in machineData and symbol in machineData[sample]: 
+                    dilutionValue = dilutionConversion(machineData, sample, symbol, self.dilution)
+                    
+                    #print(f'Sample        : {sample} {symbol}')  
+                    #print(f'Machine  Value: {machineData[sample][symbol]}')
+                    #print(f'Dilution Value: {dilutionValue}');
+                            
+                    sampleCol = j + len(columnNames)
+                    icpPopulateRow(tableWidget, i, sampleCol, 1, dilutionValue)
+                else:
+                    pass;  
+                    #print(f'Sample        : {sample} {symbol}')  
+
+    #print('***Hardness Calculations')
     for j, sample in enumerate(selectedSampleNames):   
-        print(f'*Sample: {sample}')
-        item = QtWidgets.QTableWidgetItem();  
-        item.setTextAlignment(Qt.AlignCenter)
-        
         if sample in machineData and ('Ca' in machineData[sample] and 'Mg' in machineData[sample]): 
             calcium = machineData[sample]['Ca'] 
             magnesium = machineData[sample]['Mg'] 
             result = hardnessCalc(calcium, magnesium, self.dilution)
 
-            item.setText(str(result))
             sampleCol = j + len(columnNames)
             
-            self.ui.dataTable.setItem(33, sampleCol, item)
+            #print(f'*Sample: {sample}')
+            #print('calcium: ', calcium)
+            #print('magnesium: ', magnesium)
+            #print('Result: ', result)
 
-            print('calcium: ', calcium)
-            print('magnesium: ', magnesium)
-            print('Result: ', result)
-    
-    
+            icpPopulateRow(tableWidget, hardnessRow, sampleCol, 1, result)
+
 def dilutionConversion(machineList, sample, symbol, dilutuion):
-    item = QtWidgets.QTableWidgetItem(); 
-    item.setTextAlignment(Qt.AlignCenter)
-
+    print(f'[FUNCTION]: dilutionConversion(machineList, {sample}, {symbol}, {dilutuion})')
+   
     machineValue = machineList[sample][symbol]
     
     if(is_float(machineValue) and dilutuion != 1): 
         newVal = float(machineValue)
         newVal = newVal * float(dilutuion)
         newVal = round(newVal, 3)
-        item.setText(str(newVal))
+        return newVal
         
     else:         
         try:
             machineValue = float(machineValue)  # Convert to float first
             machineValue = round(machineValue, 3)
-            item.setText(str(machineValue))
+            return machineValue
         except ValueError:
-            item.setText(machineValue)
-
-    return item 
-
+            print('[ERROR]: VALUE ERROR')
+            return machineValue
 
 #******************************************************************
 #    ICP Report Handler Function  
@@ -750,7 +932,7 @@ def icpReportHander(self, tests, totalSamples):
     #FIXME: adjust the limits 
     #FIXME: adjust the unit amount  
     
-    initalColumns = 4; 
+    initalColumns = 6; 
     totalTests = len(tests)
     additonalRows = 2 
     sampleData = {}
@@ -783,9 +965,11 @@ def icpReportHander(self, tests, totalSamples):
     #print(elementsWithLimits)    
 
     #TODO: have in own function 
-    limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = ? ORDER BY element ASC' 
+    limitQuery = 'SELECT element, lowerLimit, maxLimit, comments, units FROM icpLimits WHERE reportType = "Water" ORDER BY element ASC' 
+    limitQuery2 = 'SELECT elementNum, lowerLimit, upperLimit, sideComment FROM icpLimits WHERE parameterNum = ?'
     commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
-    limits = self.db.query(limitQuery, (self.parameter,))
+    limits = self.db.query(limitQuery)
+    print('LIMITS')
     
     self.db.execute(commentQuery, (self.parameter,))
     commentResults = self.db.fetchone()
@@ -797,17 +981,117 @@ def icpReportHander(self, tests, totalSamples):
         footerList = '\n'.join(footerComments)
         footerComments = footerList.split('\n')
 
-
     print('ICP HANDLER')
     print(sampleData)
     print(limits)
-    #print(self.reportType)
-    #print(footerComment)
-    print('--------')
+    print(self.reportType)
+    print(footerComments)
+    print('------------------------------------------------------')
 
     #load the footer comment 
     #TODO: can just pass the self and remove some of the unessary info 
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, tests, unitType, elementsWithLimits, limits, footerComments)
     
+    createdReportDialog('test')
+
+    
+def icpReportHander2(self, elements, limits, totalSamples, reportNum): 
+    print('[FUNCTION]: icpReportHander(self, tests, totalSamples)')
+    print(f'Total Samples: {totalSamples}') 
+    
+    elements = {item[0]: [item[1], item[2]]for item in elements}
+    print('*Elements')
+    for key, value in elements.items():
+        print(key, value) 
+        
+    #FIXME: adjust based on the sample information
+    #FIXME: adjust the limits 
+    #FIXME: adjust the unit amount  
+    
+    initalColumns = 6; 
+    totalTests = len(elements)
+    additonalRows = 2 
+    sampleData = {}
+    unitType = []
+    elementNames =  [item[0] for item in elements.values()]
+    
+    #FIXME: have something determine the lower values of the things 
+    for col in range(initalColumns, totalSamples + initalColumns): 
+        #print(col)
+        currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
+        jobValues = []
+        for row in range(totalTests + additonalRows): 
+            try: 
+                currentItem = self.ui.dataTable.item(row, col).text()
+                jobValues.append(currentItem)
+            except: 
+                jobValues.append('ND')
+                
+                
+        sampleData[currentJob] = jobValues
+        #print(currentJob, sampleData[currentJob])
+        
+    for i in range(totalTests): 
+        try: 
+            currentUnitType = self.ui.dataTable.item(i, 2)
+            if(currentUnitType): 
+                unitType.append(currentUnitType.text())
+            
+        except Exception as e: 
+            print(f'[ERROR]: {e}') 
+            unitType.append('')
+        
+    footerComments = icpGenerateFooter(self)
+
+    #print(f'Sample Data: {sampleData}')
+    print('*Limits')
+    for key, value in limits.items(): 
+        print(key, value)
+        
+    print('*Sample Data')
+    for key, value in sampleData.items(): 
+        print(key, value)
+    
+    print(f'Unit Type: {unitType}')
+    print(f'Footer: {footerComments}')
+    print()
+    print('------------------------------------------------------')
+
+    
+    #LAZY FIX 
+    limitQuery2 = 'SELECT elementNum, lowerLimit, upperLimit, sideComment, unitType FROM icpLimits WHERE parameterNum = ?'
+    limits = self.tempDB.query(limitQuery2, (reportNum,))  
+    limits = [[elements[item[0]][0], item[1], item[2],item[3], item[4]] for item in limits]
+    
+    
+    #elementNames = elementsWithLimits 
+    
+    #load the footer comment 
+    #TODO: can just pass the self and remove some of the unessary info 
+    createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, elementNames, unitType, elementNames, limits, footerComments)
+    #createIcpReport2(self.clientInfo, self.samplenames, self.jobNum, sampleData, elements, limitsInfo, footer)
 
     createdReportDialog('test')
+    
+def icpGenerateFooter(self): 
+    try: 
+        commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
+        self.db.execute(commentQuery, (self.parameter,))
+        commentResults = self.db.fetchone()
+    except Exception as error: 
+        print(f'[ERROR]: {error}')
+
+    footerComments = ''
+    
+    if(commentResults):
+        footerComments = pickle.loads(commentResults[0])
+        footerList = '\n'.join(footerComments)
+        footerComments = footerList.split('\n') 
+        
+    return footerComments
+
+    
+    
+
+class icpManager: 
+    pass; 
