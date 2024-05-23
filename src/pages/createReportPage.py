@@ -258,6 +258,8 @@ def loadClientInfo(self):
     self.ui.email_1.setText(self.clientInfo['email'])
     self.ui.fax_1.setText(self.clientInfo['fax'])
     self.ui.payment_1.setText(self.clientInfo['payment'])
+    
+    
 
 def updateSampleNames(sampleNames, textChange, key):
     sampleNames[key] = textChange; 
@@ -294,47 +296,259 @@ class chemReportTestData:
         self.unitType = unitType 
 
 class chemReportSampleData: 
-    def __init__(self, sampleNum, jobNum): 
+    def __init__(self, sampleNum, jobNum, sampleName): 
         self.sampleNum = sampleNum 
         self.jobNum = jobNum 
+        self.sampleName = sampleName 
         
         self.data = {}
-        
+            
+    def add_data(self, testNum, testValue, recovery, unitType): 
+        self.data[testNum] = [testValue, recovery, unitType]
+        print(f'{self.sampleName} ADDED {testNum}: {self.data[testNum]}')
+
+        print(self.data)
+    
+    def get_data(self): 
+        return self.data; 
+
         
 class chemReportManager: 
     def __init__(self, db): 
         self.db = db 
 
+        # chemReportSampleData Info
         self.samples = {}
+
+        # chemReportTestData Info 
         self.test = {}
         
-    def init_samples(self): 
-        pass; 
-    
+    def init_samples(self, sample_list):
+        print(f'init_test: {sample_list}')
+
+        testData = {}
+        for test in sample_list: 
+
+            sampleNum = test[0]
+            testNum = test[1] #how to add the testNum for selection 
+            testValue = test[2]
+            recovery = test[3]
+            unitType = test[4]
+            jobNum = test[5]
+            sampleName = f'{test[5]}-{test[0]}'
+            
+            if(sampleName in self.samples): 
+
+                self.samples[sampleName].add_data(testNum, testValue, recovery, unitType)
+                
+            else:  
+                testData = chemReportSampleData(sampleNum, jobNum, sampleName)    
+                testData.add_data(testNum, testValue, recovery, unitType)
+                self.samples[sampleName] = testData
+             
+        print(self.samples)
+
+            
     def init_test(self, test_list): 
-        print(f'init_test: {test_list}')
-        pass; 
+        print(f'init_samples: {test_list}') 
+        
+        testsInfo = {}
+        testNums = []
+        
+        # convertTestsList into other info 
+        for textName in test_list: 
+            print(textName)
+            testData = getTestsInfo(self.db, textName)
+    
+            if(testData): 
+                #TODO: define all of these things 
+                testNum = testData[0]
+                testsName = testData[1]
+                textName = testData[2]
+                displayName = testData[3]
+                recovery = testData[4]
+                unitType = testData[5]
+                
+            
+                if(testNum not in testNums): 
+                    testNums.append(testNum);
+                
+                # need to convert this to do something  
+                testsInfo = chemReportTestData(testNum, testsName, textName, displayName, unitType) 
+                self.test[textName] = testsInfo 
+            else: 
+                #TODO: if we cannot find the item 
+                self.test[textName] = textName
+                
+        #self.samples = testsInfo
+        print(f'self.samples: {self.test}')
     
     
     def getSamples(self): 
         return self.samples
     
-    def getTest(self): 
+    def getTests(self): 
         return self.test 
-
-
-
+    
+    def print_samples(self): 
+        
+        for sampleName, sampleData in self.samples.items(): 
+            print(sampleName)
+            print(sampleData.data)
+    
+    
         
 class chemReportView: 
     def __init__(self, table): 
         self.table = table
+   
+   
+    def populateTableRow(self, row, col, alignment, value): 
+        item = QtWidgets.QTableWidgetItem()  
+        if(alignment == 1):   
+            item.setTextAlignment(Qt.AlignCenter)
         
-    def populateTree(self): 
-        pass; 
+            # Check data type and convert if necessary
+        if isinstance(value, (int, float)):
+            value = str(value)  # Prevent spinbox for numeric data
+        
+        item.setData(Qt.DisplayRole, value)
+        self.table.setItem(row, col, item)     
+   
     
-    def populateSamples(self, samples): 
-        pass; 
+    def populateTreeTests(self, testLists): 
+        textNameCol = 1;
+        distilCol = 4 
+        
+        testsInfo = {}
+        testNums = []
+        
+        # convertTestsList into other info 
+        for textName in testLists: 
+            testData = getTestsInfo(self.tempDB, textName)
+            if(testData): 
+                #TODO: define all of these things 
+                testNum = testData[0]
+                testsName = testData[1]
+                
+                if(testNum not in testNums): 
+                    testNums.append(testNum);
+                
+                # need to convert this to do something  
+                testsInfo[textName] = [testData[0], testData[1], testData[2], testData[3], testData[4], testData[5]]  
+            
+        # List the tests  
+        for row, textName in enumerate(testLists): 
+            print(f'Current Test {row}: {textName}') 
+            
+            # populate the text col names 
+            testItem = QtWidgets.QTableWidgetItem(textName)
+            self.table.setItem(row, textNameCol, testItem)
+
+            # populate the test name and display name  
+            if(textName in testsInfo): 
+                testName = testsInfo[textName][1]
+                displayName = testsInfo[textName][3]
+
+                testNameWidget = QtWidgets.QTableWidgetItem(testName)
+                self.table.setItem(row, 0, testNameWidget) 
+                
+                if(displayName): 
+                    displayNameWidget = QtWidgets.QTableWidgetItem(testName)
+                    self.table.setItem(row, 2, displayNameWidget) 
+
+        
+                            
+            #TODO: Add in the Distral Factor 
+            distilFactor = 1 
+            self.populateTableRow(row, distilCol, 1, distilFactor)
+            
+            
+            # need to know what column sample we are on 
+        
+            # the find the row and insert into  
+
+            
+    def populateTreeTests2(self, testLists): 
+
+        testNameCol = 0; 
+        textNameCol = 1;
+        displayNameCol = 2; 
+        unitTypeCol = 3; 
+        distilCol = 4; 
+        recoveryValCol = 5; 
+        
+        self.rowNums = {}
+
+        #TODO: should i sort this in alph order? 
+        for row, (key, value) in enumerate(testLists.items()): 
+            if(isinstance(value, chemReportTestData)): 
+                
+                self.populateTableRow(row, testNameCol, 0, value.testName)
+                self.populateTableRow(row, textNameCol, 0, value.textName)
+                self.populateTableRow(row, displayNameCol, 0, value.displayName)
+
+                if(row not in self.rowNums): 
+                    self.rowNums[value.testNum ] = row;  
+                
+            else: 
+                self.populateTableRow(row, textNameCol, 0, value)
+
+                self.rowNums[row] = None; 
+                
+
+        print(f'rowNums: {self.rowNums}')
+
     
+    def populateTreeSamples(self, samples_info): 
+        print('[FUNCTION]: populateTreeSamples(self, samples_info)')
+        print(samples_info)
+
+        unitTypeCol = 3; 
+        recoveryCol  = 5; 
+
+        startCol = 5
+        stopCol =  self.table.columnCount()
+
+        # Determine which call we are in for the sample 
+        for col_index in range(5, stopCol): 
+            col_name = self.table.horizontalHeaderItem(col_index).text()
+            
+            if(col_name in samples_info): 
+                print(f'Col Name: {col_name}')
+            
+                sampleInfo = samples_info[col_name]
+                sampleData = sampleInfo.get_data()
+                #print(f'Col: {col_index}')
+                
+                for key, value in sampleData.items(): 
+                    print(f'Col: {col_index}, key: {key}, value: {value}') 
+                    if(key in self.rowNums):
+                        row_index = self.rowNums[key] 
+                        testVal = value[0]
+                        recoveryVal = value[1]
+                        unitTypeVal = value[2]
+                        
+                        self.populateTableRow(row_index, unitTypeCol, 1, unitTypeVal) 
+                        self.populateTableRow(row_index, recoveryCol, 1, recoveryVal)
+                        self.populateTableRow(row_index, col_index, 1, testVal)
+    
+    
+
+def handleTableChange(self, item):
+    row = item.row()
+    column = item.column()
+    value = item.text()
+    
+    table = self.ui.dataTable 
+    
+    if(column >= 5):
+        updatedValue = table.item(row,column).text()
+        column_name = table.horizontalHeaderItem(column).text()
+        print(f'Row: {row}, Col: {column}, Col Name: {column_name}, Value: {value}, New: {updatedValue}')
+        
+    # get the column name
+
 
 #TODO: scan in the TXT Tests, scan in from Defined Tests too 
 #TODO: fix the error checking 
@@ -345,55 +559,38 @@ def chmReportLoader(self):
     self.ui.createGcmsReportBtn.setVisible(True)
     self.ui.icpDataField.hide() 
   
-    columnNames = [
-        'Tests Name', 
-        'Text Name',
-        'Display Name',
-        'Unit', 
-        'Distal factor',
-        'Standard Recovery',
-    ]
-        
     loadClientInfo(self)
     
     chmTestsLists, testResults = chmGetTestsList(self) 
 
     dataTable = self.ui.dataTable
     rowCount = len(chmTestsLists) 
-    colCount = len(columnNames) + int(self.clientInfo['totalSamples'])
 
     # CHM Signals 
     #TODO: add the item changed thing 
-    #self.ui.dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test'))
+    self.ui.dataTable.itemChanged.connect(lambda item: handleTableChange(self, item))
     #self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, len(columnNames), chmTestsLists)); 
     
-    testData = {}
-    for test in testResults: 
-        testName = f'{test[5]}-{test[0]}'
-        testNum = test[1] #how to add the testNum for selection 
-        testValue = test[2]
-        recovery = test[3]
-        unitType = test[4]
-        
-        testData[testName] = {testNum:[testValue, recovery, unitType]}
-        
-    print(testData)
-    
+    # Populate the Chm Table with stuff 
+    chmIntalize(self, dataTable, rowCount)    
+
     # Prepare the objects 
     self.reportManager = chemReportManager(self.tempDB)
     self.reportView = chemReportView(self.ui.dataTable)
-    
-    # prepare the manager
-    # update data object and pass the thing  
-    
-    # Display the data (update the object) 
-    
 
-    # Populate the Chm Table with stuff 
-    chmIntalize(self, dataTable, rowCount, colCount, columnNames)
+    self.reportManager.init_test(chmTestsLists)
+    self.reportManager.init_samples(testResults)
+    
+    testsData = self.reportManager.getTests()
+    self.reportView.populateTreeTests2(testsData) 
+
+    sampleData = self.reportManager.getSamples()
+    self.reportManager.print_samples()
+    self.reportView.populateTreeSamples(sampleData)
+    
 
     # Populate the CHM Table with data 
-    chmPopulateTable2(self, chmTestsLists, columnNames, testResults)
+    #chmPopulateTable2(self, chmTestsLists, testResults)
 
 
 def chmGetTestsList(self): 
@@ -430,14 +627,26 @@ def chmGetTestsList(self):
     
     return CHM_TESTS_LISTS, testResults 
    
-def chmIntalize(self, table, rowCount, colCount, columnNames): 
+def chmIntalize(self, table, rowCount): 
     print('[FUNCTION]: chmIntalize(self, table, rowCount, colCount, columnNames)')
 
+    columnNames = [
+        'Tests Name', 
+        'Text Name',
+        'Display Name',
+        'Unit', 
+        'Distal factor',
+        'Standard Recovery',
+    ]
+    
+    colCount = len(columnNames) + int(self.clientInfo['totalSamples'])
+    
     # Load the sample names in client Info Section 
     for i, (key,value) in enumerate(self.sampleNames.items()):
         sampleItem = SampleNameWidget(key, value)
         self.ui.samplesContainerLayout.addWidget(sampleItem)
         sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames,textChange, key))
+
 
     spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     self.ui.samplesContainerLayout.addItem(spacer)
@@ -455,12 +664,14 @@ def chmIntalize(self, table, rowCount, colCount, columnNames):
     for i , (key, value) in enumerate(self.sampleNames.items(), start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
         table.setHorizontalHeaderItem(i, item)
-        
+
 
 def chmPopulateTable(self, testLists, columnNames, testsResults): 
     print('[FUNCTION]:chmPopulateTable(self, testLists, columnNames, testsResults)') 
     # ex. testsList = ['Turb', 'BTEX', 'THM', 'Pb', 'Sb', 'Turbidity']
     tableWidget = self.ui.dataTable
+
+    columnNamesCount = tableWidget.columnCount() - int(self.clientInfo['totalSamples']) 
     
     # List the tests  
     for i, currentTest in enumerate(testLists): 
@@ -487,7 +698,7 @@ def chmPopulateTable(self, testLists, columnNames, testsResults):
         populateTableRow(tableWidget, i, 4, 1, distilFactor)
     
         #go down each column and determine if there is a match
-        for column in range(len(columnNames), self.ui.dataTable.columnCount()):
+        for column in range(columnNamesCount, self.ui.dataTable.columnCount()):
             header_item = self.ui.dataTable.horizontalHeaderItem(column)
 
             if header_item is not None:
@@ -508,10 +719,10 @@ def chmPopulateTable(self, testLists, columnNames, testsResults):
                     populateTableRow(tableWidget, i, 2, recovertVal)
 
 #FIXME: have the query select the correct order for things to come in so we can control that more 
-def chmPopulateTable2(self, testLists, columnNames, testsResults): 
+def chmPopulateTable2(self, testLists, testsResults): 
     print(f'[FUNCTION]:chmPopulateTable2()')
     print(testLists)
-    print(columnNames)
+    #print(columnNames)
     print(testsResults)
     
     sampleNames = list(self.sampleNames.keys())
