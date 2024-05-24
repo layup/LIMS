@@ -306,6 +306,8 @@ class MainWindow(QMainWindow):
                 mainDatabasePath = self.preferences.get('databasePath') 
                 officeDatabasePath = self.preferences.get('officeDbPath')
                 preferencesDatabasePath = self.preferences.get('preferencesPath')
+                
+
                 tempPath = self.preferences.get('temp_backend_path')
 
                 self.tempDB = Database(tempPath)
@@ -328,6 +330,11 @@ class MainWindow(QMainWindow):
                     print("Max attempts reached. Unable to connect to databases.")
                     return
                 else:
+                    
+                    tempLocation = openFile()
+                    print(f'Temp Location: {tempLocation}')
+                    self.preferences.update('temp_backend_path', tempLocation)
+                    
                     # Dialog popup to load the necessaary database Information for the user 
                     dialog = FileLocationDialog(self.preferences)
                     dialog.exec_()

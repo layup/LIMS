@@ -31,7 +31,7 @@ def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitT
     ws = createHeader(ws, clientInfo, 'D')
     ws.column_dimensions['A'].width = 20 #120px 
     ws.column_dimensions['H'].width = 19
-    ws.print_title_rows = '1:8' # the first two rows
+    ws.print_title_rows = '1:8' # the first two row
     
     totalCols = 8 
     pageSize = 61 
