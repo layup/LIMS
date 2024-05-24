@@ -174,6 +174,10 @@ class Ui_MainWindow(object):
 "    background-color: rgb(107, 108, 108);\n"
 "}\n"
 "\n"
+"QPushButton::disabled {\n"
+"    color: grey \n"
+"}\n"
+"\n"
 "\n"
 "\n"
 "/******************************************************************\n"
@@ -339,7 +343,6 @@ class Ui_MainWindow(object):
 "#headerDesc {\n"
 "\n"
 "} \n"
-"\n"
 "\n"
 "\n"
 "\n"
@@ -2623,7 +2626,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtWidgets.QToolBox(self.tab_6)
         self.toolBox.setObjectName("toolBox")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 1329, 636))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 924, 167))
         self.page_2.setObjectName("page_2")
         self.horizontalLayout_70 = QtWidgets.QHBoxLayout(self.page_2)
         self.horizontalLayout_70.setContentsMargins(12, -1, -1, -1)
@@ -2796,7 +2799,7 @@ class Ui_MainWindow(object):
         self.createReportHeader.setStyleSheet("")
         self.createReportHeader.setObjectName("createReportHeader")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.createReportHeader)
-        self.horizontalLayout_7.setContentsMargins(5, -1, -1, -1)
+        self.horizontalLayout_7.setContentsMargins(5, 20, -1, -1)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.widget_3 = QtWidgets.QWidget(self.createReportHeader)
         self.widget_3.setObjectName("widget_3")
@@ -2910,7 +2913,7 @@ class Ui_MainWindow(object):
         self.Main.setStyleSheet("")
         self.Main.setObjectName("Main")
         self.verticalLayout_11 = QtWidgets.QVBoxLayout(self.Main)
-        self.verticalLayout_11.setContentsMargins(0, 0, 0, 12)
+        self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_11.setObjectName("verticalLayout_11")
         self.reportsTab = QtWidgets.QTabWidget(self.Main)
         self.reportsTab.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -2922,7 +2925,7 @@ class Ui_MainWindow(object):
         self.clientInfoTab = QtWidgets.QWidget()
         self.clientInfoTab.setObjectName("clientInfoTab")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.clientInfoTab)
-        self.horizontalLayout_2.setContentsMargins(12, -1, 12, 12)
+        self.horizontalLayout_2.setContentsMargins(12, 5, 12, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.reportsUserInfoWidget = QtWidgets.QWidget(self.clientInfoTab)
         self.reportsUserInfoWidget.setEnabled(True)
@@ -3322,10 +3325,10 @@ class Ui_MainWindow(object):
         self.actionUpload_ISP_Files.setObjectName("actionUpload_ISP_Files")
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(4)
+        self.stackedWidget.setCurrentIndex(5)
         self.historyTabWidget.setCurrentIndex(0)
         self.icpTabWidget.setCurrentIndex(0)
-        self.chmTabWidget.setCurrentIndex(3)
+        self.chmTabWidget.setCurrentIndex(1)
         self.SettingsTab.setCurrentIndex(0)
         self.toolBox_2.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)

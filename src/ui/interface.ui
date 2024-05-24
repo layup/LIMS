@@ -3482,7 +3482,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -5725,8 +5725,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>602</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5771,8 +5771,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>602</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5801,8 +5801,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>636</height>
+                       <width>924</width>
+                       <height>167</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6250,6 +6250,9 @@ p, li { white-space: pre-wrap; }
               <property name="leftMargin">
                <number>5</number>
               </property>
+              <property name="topMargin">
+               <number>20</number>
+              </property>
               <item alignment="Qt::AlignLeft">
                <widget class="QWidget" name="widget_3" native="true">
                 <layout class="QFormLayout" name="formLayout_4">
@@ -6549,7 +6552,7 @@ p, li { white-space: pre-wrap; }
                <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="QTabWidget" name="reportsTab">
@@ -6566,7 +6569,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -6579,11 +6582,14 @@ p, li { white-space: pre-wrap; }
                   <property name="leftMargin">
                    <number>12</number>
                   </property>
+                  <property name="topMargin">
+                   <number>5</number>
+                  </property>
                   <property name="rightMargin">
                    <number>12</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>12</number>
+                   <number>0</number>
                   </property>
                   <item>
                    <widget class="QWidget" name="reportsUserInfoWidget" native="true">

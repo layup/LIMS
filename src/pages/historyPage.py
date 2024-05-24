@@ -20,43 +20,16 @@ from pages.createReportPage import createReportPage
 
 def historyPageSetup(self): 
     
-    historyTable = self.ui.reportsTable 
-    frontTable = self.ui.frontDeskTable
-    
-    rowHeight = 25; 
     historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Action']
     frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
 
-    # Format the basic table
-    historyTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
-    
-    historyTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
-    historyTable.setHorizontalHeaderLabels(historyHeaders)
-    
-    historyTable.verticalHeader().setVisible(True)
-    historyTable.verticalHeader().setDefaultSectionSize(rowHeight)
+    formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
+    formatHistoryDatabaseTable(self.ui.frontDeskTable, frontHistoryHeaders)
 
-
-    # Front Desk Table Formating 
-    frontTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
-    frontTable.setHorizontalHeaderLabels(frontHistoryHeaders)
-    
-    frontTable.verticalHeader().setVisible(True)
-    frontTable.verticalHeader().setDefaultSectionSize(rowHeight)
-    
-
-    #historyTable.setAlternatingRowColors(True)
-
-    #Disable editing for the entire table 
-    historyTable.setEditTriggers(QTableWidget.NoEditTriggers) 
-    
     #FIXME: make this better somehow 
     jobList = getAllJobNumbersList(self.db) 
     jobList_as_strings = [str(item) for item in jobList]
 
-    #frontList = getFrontHistory(self.officeDB)
-    #frontList_as_strings = [str(item) for item in frontList]
-    
     # Sets the completers
     completer = QCompleter(jobList_as_strings)
     completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
@@ -64,10 +37,6 @@ def historyPageSetup(self):
     
     self.ui.reportsSearchLine.setCompleter(completer)
     self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
-    
-
-    # Apply drop shadow for header item
-    #apply_drop_shadow_effect(self.ui.reportsHeaderWidget )
 
     #load the inital table data 
     loadReportsPage(self); 
@@ -76,14 +45,31 @@ def historyPageSetup(self):
     self.ui.reportsTable.doubleClicked.connect(lambda index: on_table_double_clicked(index))
     self.ui.reportsSearchBtn.clicked.connect(lambda: on_reportsSearchBtn_clicked(self)) 
     
+
+def formatHistoryDatabaseTable(table, columns): 
+    rowHeight = 25
+    
+    # Disable editing for the entire table 
+    table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    
+    # Set the column names and info 
+    table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
+    table.setHorizontalHeaderLabels(columns)
+    
+    # Set the column widget 
+    
+    
+    table.verticalHeader().setVisible(True)
+    table.verticalHeader().setDefaultSectionSize(rowHeight)
+    
+
+    
     
 #******************************************************************
 #   Chemistry History 
 #******************************************************************
 
 #TODO: could have a model item that keeps tracks of all the histroy
-
-
 
 def loadReportsPage(self, searchValue=None): 
     print('[FUNCTION]: historyPageSetup')
