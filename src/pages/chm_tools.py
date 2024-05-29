@@ -8,14 +8,15 @@ from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy, QWidgetItem, QTreeWidgetItem 
+    QSpacerItem, QSizePolicy, QWidgetItem, QTreeWidgetItem
 )
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 
 from modules.excel.chmExcel import createChmReport
 from modules.dbFunctions import (loadChmTestsData, deleteChmData, getAllChmTestsData, getAllChmTestsInfo,
-                                getAllChmTestsInfo2, getChmTestData, addChmTestData, getTestsName )
+                                getAllChmTestsInfo2, getChmTestData, addChmTestData, getTestsName, getAllChmTestsInfo3
+                                )
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
@@ -69,6 +70,11 @@ def chmDatabaseSetup(self):
 
     # Connect basic signals 
     self.ui.chmAddItemBtn.clicked.connect(lambda: self.ui.chmTabWidget.setCurrentIndex(1))
+         
+    footer_widget = TableFooterWidget(10)
+    footer_widget.next_button_clicked.connect(lambda value: print(value))
+         
+    self.ui.chmDatabaseLayout.addWidget(footer_widget)
      
     # Load in the inital Database 
     populateChmDatabase(self);  
@@ -91,7 +97,7 @@ def populateChmDatabase(self):
             data = str(result[j]) 
             
             if(j == 2): 
-                testName = getTestsName(self.preferencesDB, data)
+                testName = getTestsName(self.tempDB, data)
                 print(testName)
                 if(testName): 
                     item = QTableWidgetItem(testName[0][0])
@@ -203,7 +209,7 @@ def populateNewEntry(self):
     # TODO: move this to another function
     # TODO: could also be using the testManager from TestsInfo
     query = 'SELECT testNum, testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
-    results = self.preferencesDB.query(query)
+    results = self.tempDB.query(query)
 
     chmClearActiveValues(self)
     
@@ -622,22 +628,25 @@ class TestsDataModel():
         
     def loadTestsData(self):
         # special to get ride of the all the ICP names 
-        testsList = getAllChmTestsInfo2(self.db) 
+        #testsList = getAllChmTestsInfo2(self.db) 
+        testsList = getAllChmTestsInfo3(self.db) 
  
         print('Total Tests: ', len(testsList))
+        print(testsList[0])
+
 
         if(testsList): 
             for test in testsList: 
                 testNum     = test[0]
                 testName    = test[1]
-                textName    = test[2]
-                displayName = test[3]
-                recoveryVal = test[4]
-                unitType    = test[5]
+                textName    = test[4]
+                displayName = test[5]
+                recoveryVal = test[6]
+                unitType    = test[6]
 
                 self.tests[testNum] = TestData(testNum, testName, textName, displayName, recoveryVal, unitType)
 
-            return testsList 
+            return self.tests 
 
     def getTestData(self, testNum): 
         if(testNum in self.tests): 
@@ -669,12 +678,20 @@ class TestsDataView():
 
     def populateTree(self, testsResults): 
 
+        #if(testsResults): 
+        #    for testInfo in testsResults: 
+        #        item = QTreeWidgetItem(self.tree) 
+        #        item.setData(0, 0, testInfo[0])
+        #        item.setData(1, 0, testInfo[1])
+        #        item.setData(2, 0, testInfo[2])    
+        
         if(testsResults): 
-            for testInfo in testsResults: 
+            for test in testsResults.values(): 
                 item = QTreeWidgetItem(self.tree) 
-                item.setData(0, 0, testInfo[0])
-                item.setData(1, 0, testInfo[1])
-                item.setData(2, 0, testInfo[2])    
+                item.setData(0, 0, test.testNum)
+                item.setData(1, 0, test.testName)
+                item.setData(2, 0, test.textName)
+                item.setData(3, 0, test.reportName)
                 
     def getTreeData(self): 
         testItem = self.tree.currentItem() 

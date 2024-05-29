@@ -3,10 +3,11 @@
 
 from PyQt5.QtWidgets import (
     QLabel, QVBoxLayout, QDialog, QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, QTextEdit, QSpacerItem, QSizePolicy 
+    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, QTextEdit, QSpacerItem, 
+    QSizePolicy 
 )
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 from modules.utilities import openFile, getFileLocation; 
 
@@ -15,6 +16,34 @@ from modules.utilities import openFile, getFileLocation;
 #******************************************************************
 #    Widgets 
 #****************************************************************** 
+
+class TableFooterWidget(QWidget): 
+    
+    next_button_clicked = pyqtSignal(str)
+    prev_button_clicked = pyqtSignal(str)
+    combobox_edited = pyqtSignal(int)
+    page_changed = pyqtSignal(int)
+    
+    #TODO: pass in the total pages and preferences
+    #showRows 1 = 100, 2 = 200, 3 = 300 
+    def __init__(self, totalPages, showRows=1, parent=None):
+        super().__init__(parent)
+
+        path = './ui/tableFooterWidget.ui'
+        self.ui = loadUi(path, self)  # Pass 'self' as parent
+        
+        self.QSpinBox.setMaximum(totalPages)
+        self.pageLabel.setText(f'of {totalPages}')
+            
+        # Connect the signals 
+        self.nextBtn.clicked.connect(lambda:self.next_button_clicked.emit('Next'))
+        self.prevBtn.clicked.connect(lambda:print('Prev Button'))
+        self.QSpinBox.valueChanged.connect(lambda value: print(f'New Value: {value}'))
+        self.QComboBox.currentIndexChanged.connect(lambda index: print(f'New Index: {index}'))
+
+     
+
+
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 
         super(SampleNameWidget ,self).__init__(parent)

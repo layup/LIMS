@@ -306,8 +306,6 @@ class MainWindow(QMainWindow):
                 mainDatabasePath = self.preferences.get('databasePath') 
                 officeDatabasePath = self.preferences.get('officeDbPath')
                 preferencesDatabasePath = self.preferences.get('preferencesPath')
-                
-
                 tempPath = self.preferences.get('temp_backend_path')
 
                 self.tempDB = Database(tempPath)
@@ -319,7 +317,7 @@ class MainWindow(QMainWindow):
                 self.officeDB = Database(officeDatabasePath)
             
                 # Connect the preferences database
-                self.preferencesDB = Database(preferencesDatabasePath)
+                #self.preferencesDB = Database(preferencesDatabasePath)
 
                 return
 
@@ -331,6 +329,7 @@ class MainWindow(QMainWindow):
                     return
                 else:
                     
+                    # TODO: remove this later 
                     tempLocation = openFile()
                     print(f'Temp Location: {tempLocation}')
                     self.preferences.update('temp_backend_path', tempLocation)
@@ -345,6 +344,16 @@ class MainWindow(QMainWindow):
     #TODO: could be moved to the utiles.py 
     #TODO: find out what this does 
     
+    def connect_to_database(path): 
+        try: 
+            connection = Database(path);
+            return connection
+            
+        except Exception as error: 
+            print(f'Could not connect to database {path}')
+            print(error)
+            
+    
     def on_tab_pressed1(self): 
         self.ui.gcmsTestsVal.setFocus()
     
@@ -356,7 +365,8 @@ class MainWindow(QMainWindow):
         self.ui.reportType.addItems(REPORTS_TYPE)
         
         #paramResults = sorted(getReportTypeList(self.db))
-        paramResults = sorted(getAllParameters(self.preferencesDB))
+        
+        paramResults = sorted(getAllParameters(self.tempDB))
         paramResults =  [sublist[1] for sublist in paramResults]
         
         paramResults.insert(0, "")

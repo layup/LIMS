@@ -38,6 +38,8 @@ def historyPageSetup(self):
     self.ui.reportsSearchLine.setCompleter(completer)
     self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
 
+
+
     #load the inital table data 
     loadReportsPage(self); 
 
@@ -58,11 +60,8 @@ def formatHistoryDatabaseTable(table, columns):
     
     # Set the column widget 
     
-    
     table.verticalHeader().setVisible(True)
     table.verticalHeader().setDefaultSectionSize(rowHeight)
-    
-
     
     
 #******************************************************************

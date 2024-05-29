@@ -38,6 +38,10 @@ def icpSetup(self):
     self.ui.reportsList.clicked.connect(lambda: on_reportsList_clicked(self))
     self.ui.saveFooterBtn.clicked.connect(lambda: on_saveFooterBtn_clicked(self))
     self.ui.deleteFooterBtn.clicked.connect(lambda: on_deleteFooterBtn_clicked(self))
+    
+    footer_widget = TableFooterWidget(20)
+    
+    self.ui.icpHistoryLayout.addWidget(footer_widget)
 
 # TODO: don't even think I need to have a seperate reports section, can just combine it all into a single ICP page 
 
@@ -179,10 +183,11 @@ def icpOpenbutton(self, sampleNum, machineType):
     
     
 # TODO: have a view, edit on the table 
-    
+# TODO: create a clone that holds data until user presses the save button (kind of a pain in the ass)
 #******************************************************************
 #    ICP Elements  
 #******************************************************************   
+    
     
 #FIXME: has to load in the list each time, so create a function that app.py can access 
 def icp_elements_setup(self): 
@@ -211,11 +216,9 @@ def icp_elements_setup(self):
     
     # Create a QDoubleValidator
     validator = QDoubleValidator()
-    # Set the range of valid floating-point values
     validator.setRange(-10000, 10000.0)  
-    # Set the number of decimal places allowed
-    validator.setDecimals(10)  # Allow up to 5 decimal places
-    
+    validator.setDecimals(10)  
+
     # Set the validator for the QLineEdit to only allow float values 
     self.ui.lowerLimit.setValidator(validator)
     self.ui.upperLimit.setValidator(validator)
@@ -225,7 +228,7 @@ def icp_elements_setup(self):
     loadReportsTree(self)
     
     # Drop Down Widget 
-    reportType = getAllParameters(self.preferencesDB)
+    reportType = getAllParameters(self.tempDB)
     reportType = [report[1] for report in reportType]
     reportType.insert(0,'')
 
@@ -249,7 +252,6 @@ def icp_elements_setup(self):
     self.ui.saveCompBtn.clicked.connect(lambda: saveIcpBtnClicked(self))
     self.ui.icpCancelBtn.clicked.connect(lambda: cancelIcpBtnClicked(self))
         
-
 def clearElementInfo(self): 
     # Clear element info 
     self.ui.symbolInput.clear()
@@ -310,7 +312,7 @@ def loadElementsList(self):
         
 def loadReportsTree(self): 
     print(f'[FUNCTION]: loadReportsTree(self))') 
-    reportTypes = getAllParameters(self.preferencesDB)
+    reportTypes = getAllParameters(self.tempDB)
     
     # set the tree widget 
     for currentReport in reportTypes: 
@@ -390,7 +392,6 @@ def elementManagerSignalHandler(self, value, element):
     print(f'[SIGNAL FUNCTION]: elementManagerSignalHandler({value}, {element})')
     
     if(value == 'ADD'): 
-        
         # Update QList, does the order really matter when we do this?
         pass; 
     
@@ -400,6 +401,7 @@ def elementManagerSignalHandler(self, value, element):
     if(value == 'UPDATE'):  
         loadElementReportTypeInfo(self, element)  
 
+
 def addIcpElementBtnClicked(self): 
     print('[DIALOG]: addIcpElementBtnClicked(self)')
     # Get the report Types 
@@ -408,7 +410,7 @@ def addIcpElementBtnClicked(self):
     
     # Update the QList and Element Manager
     
-    reportType = getAllParameters(self.preferencesDB)
+    reportType = getAllParameters(self.tempDB)
     reportType = [[report[0], report[1]] for report in reportType]
     
     dialog = addElementDialog(self.tempDB, reportType)
@@ -428,11 +430,6 @@ def saveIcpBtnClicked(self):
        
         elementName = selectedElement.text() 
  
-        # Save the element Info (name, symbol)
-        element = self.elementManager.getElementByName(elementName) 
-        elementNum = element.num
-        elementLimits = element.limits
-        
         #TODO: allow for element info to be changed instead of just the limits and stuff
         updateElementName = self.ui.elementNameinput.text()
         updateElementSymbol = self.ui.symbolInput.text()
@@ -444,16 +441,15 @@ def saveIcpBtnClicked(self):
         updateSideComment = self.ui.RightSideComment.toPlainText()
         
         reportName = self.ui.reportTypeDropdown.currentText()
-        reportNum = getReportNum(self.preferencesDB, reportName) #TODO: make this better somehow? 
-        
-        
-        # TODO: Update the element and QList element and QTree report info  
-        # TODO: Error checking if we allowed to make those changes
-        print(f'ReportNum: {reportNum}, reportName: {reportName}')
+        reportNum = getReportNum(self.tempDB, reportName)
 
-        newLimitData = [updateUnitType, updateLowerLimit, updateUpperLimit, updateSideComment]
-        element.limits[reportNum] = newLimitData
-        self.elementManager.updateElement(elementNum, element)
+        print(f'ReportNum: {reportNum}, reportName: {reportName}')    
+    
+        if(reportNum): 
+            reportNum = reportNum[0][0]
+            newLimitData = [updateUnitType, updateLowerLimit, updateUpperLimit, updateSideComment]
+            self.elementManager.updateElementLimit(elementName, reportNum, newLimitData)
+
 
    
 def onIcpListWidgetChange(self): 
@@ -616,8 +612,8 @@ class Element:
         self.num = elementNum
         self.name = elementName
         self.symbol = elementSymbol
-        self.limits = limits         
-
+        self.limits = limits    
+        
 class ElementsManager(QObject): 
     elementsChanged = pyqtSignal(str, Element)  # Custom signal to indicate changes in elements
     
@@ -635,7 +631,7 @@ class ElementsManager(QObject):
             elementSymbol = element[2]
        
             elementLimits = self.loadElementLimits(elementNum)
-
+ 
             self.elements[elementNum] = Element(elementNum, elementName, elementSymbol, elementLimits)
         
     def loadElementLimits(self, elementNum): 
@@ -685,6 +681,22 @@ class ElementsManager(QObject):
         #TODO: remove element from the database 
         self.elementsChanged.emit('REMOVE', None)
     
+    
+    def updateElementLimit(self, elementName, reportNum, newLimits): 
+        element = self.getElementByName(elementName) 
+        elementNum = element.num
+        elementLimits = element.limits 
+        
+        print(f'Old Limits: {elementLimits}')
+        
+        elementLimits[reportNum] = newLimits
+        print(f'New Limits: {elementLimits}')
+        
+        # Update the information to the database
+        updateIcpLimits(self.db, reportNum, elementNum, newLimits)
+
+        self.elementsChanged.emit('UPDATE', element)
+
     def updateElement(self, elementNum, element): 
         print(f'[CLASS]: UpdateElement(self, {elementNum}, element)')
         if(elementNum in self.elements): 
@@ -692,11 +704,7 @@ class ElementsManager(QObject):
         
         self.elementsChanged.emit('UPDATE', element)
 
-class ElementsView(): 
-    pass; 
-    
 
-    
 class addElementDialog(QDialog):
 
     addedElement = pyqtSignal(str, Element)  

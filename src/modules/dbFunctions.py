@@ -68,7 +68,18 @@ def getAllChmTestsInfo2(db):
     except Exception as e: 
         print(f'An error occured: {e}')
         return None 
+
+def getAllChmTestsInfo3(db): 
+    try: 
+        query = 'SELECT * FROM Tests WHERE testName NOT LIKE "%ICP%" ORDER BY testNum'    
+        tests = db.query(query)    
+        return tests 
+
+    except Exception as e: 
+        print(f'An error occured: {e}')
+        return None 
         
+
 def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
     try: 
         query = 'INSERT INTO chemTestsData (sampleNum, testNum, testValue, standardValue, unitValue, jobNum) VALUES (?, ?, ?, ?, ?, ?)'
@@ -129,7 +140,9 @@ def getTestsTextName(db, testNum):
 
 
 def getTestsInfo(db, textName): 
+
     try: 
+        #query = 'SELECT testNum, testName, benchMicroname, displayName, recoveryValue, recoveryValue FROM Tests WHERE benchMicroName = ?'
         query = 'SELECT * FROM chemTestsInfo WHERE textName = ?'
         result = db.query(query, (textName, ))
         return result[0]
@@ -138,7 +151,7 @@ def getTestsInfo(db, textName):
         print(e)
         return None; 
 
-        
+
 
 #******************************************************************
 #    ICP Queries/Commands 
@@ -300,6 +313,20 @@ def getReportNum(db, reportName):
         print(f'[ERROR]: {e}')
         return None
 
+
+def updateIcpLimits(db, reportNum, elementNum, data ): 
+    try: 
+        unitType = data[0]
+        lowerLimit = data[1]
+        uppperLimit = data[2]
+        sideComment = data[3]
+        
+        query = 'INSERT OR REPLACE INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment) VALUES (?, ?, ? , ?, ?, ?)'
+        db.execute(query, (reportNum, elementNum, unitType, lowerLimit, uppperLimit, sideComment, ))
+        db.commit()
+    except Exception as e: 
+        print(e)
+
         
 
 def getIcpFooterComment(db, reportNum, elementNum): 
@@ -318,6 +345,8 @@ def getReportNum(db, reportName):
     except Exception as e: 
         print(f'[ERROR]: {e}')
         return None; 
+
+
 
 
 

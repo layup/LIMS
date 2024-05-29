@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1619</width>
-    <height>889</height>
+    <height>890</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -27,7 +27,7 @@
 	padding:2px;
 	padding-left: 5px; 
 	color:white; 
-	border: 1px solid #30333b; 
+	
 	background-color: #363f4d; 
 	selection-background-color: blue; /* Background color of the selected item */
 	min-height:25px; 
@@ -58,6 +58,7 @@
 #QComboBox::item:selected {
 	background-color:rgb(66, 78, 101)
 }
+
 
 
 /******************************************************************
@@ -372,19 +373,7 @@ First Instacnce of QWidget within the stack
 	/* background-color:#323a47; */
 	border-radius: 10px; 
 }
-#reportsSearchWidget QPushButton { 
-	min-height: 20px; 
-	min-width:120px; 
-	max-width:120px; 
-	border: 2px solid #333C4A; 
-	border-radius: 5px;
-	color:white; 
-	background-color: #555555
-} 
 
-#reportsSearchWidget QPushButton::hover {
-	background-color: rgb(107, 108, 108);
-}
 
 #reportsSearchWidget QLineEdit {
 	border: 2px solid #333C4A; 
@@ -399,30 +388,46 @@ First Instacnce of QWidget within the stack
 	border-radius: 10px;
 }
 
-#reportsSearchWidget QPushButton{ 
-	background-color:#555555;
-	border:none;
-	color:white; 
-	max-width: 50px; 
-}
-#reportsFooterWidget QPushButton {
-	background-color:#555555;
-	border:none;
-	color:white; 
-	max-width: 50px; 
-} 
-
-#reportsTable QPushButton {
-	background-color:#555555;
-	border:none;
-	color:white; 
-	max-width: 100px; 
-	padding:1px; 
-}
-
 #reportsTableWidget QLabel {
 	color:white; 
 }
+
+#reportsFooterWidget QComboBox {
+	color:white; 
+	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+}
+
+#reportsFooterWidget QComboBox::drop-down:button {
+	border-left: 1px solid #30333b; 
+}
+
+#reportsFooterWidget QComboBox::item { /*current hightlighted item */ 
+	background-color: rgb(107, 108, 108);
+}
+
+#reportsFooterWidget QComboBox::item:selected { /*current active item */ 
+	background-color:rgb(66, 78, 101);
+	
+}
+#reportsFooterWidget QComboBox::popup { /* item when choosing */ 
+	min-height:100px; 
+ 	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+ 	color:white; 
+}
+
+
+
+
+#reportsFooterWidget QSpinBox {
+	color:white; 
+	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+} 
+
+
+
 
 
 /******************************************************************
@@ -450,6 +455,7 @@ First Instacnce of QWidget within the stack
 	color:white; 
 }
 
+
 #createReportWidget QComboBox {
 	padding:2px;
 	padding-left: 5px; 
@@ -458,10 +464,6 @@ First Instacnce of QWidget within the stack
 	background-color: rgb(55, 65, 84);
 } 
 
-QComboBox{
-	padding:2px;
-	padding-left: 10px; 
-}
 
 #createReportWidget QComboBox::item:selected {
 	background-color:rgb(66, 78, 101);
@@ -1443,7 +1445,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1506,276 +1508,204 @@ margin: 0;
                    <number>12</number>
                   </property>
                   <item>
-                   <widget class="QWidget" name="reportsSearchWidget" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
+                   <layout class="QVBoxLayout" name="verticalLayout_10">
+                    <property name="topMargin">
+                     <number>5</number>
                     </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>50</height>
-                     </size>
+                    <property name="bottomMargin">
+                     <number>0</number>
                     </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_5">
-                     <property name="spacing">
-                      <number>12</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>18</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>12</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>18</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>12</number>
-                     </property>
-                     <item>
-                      <widget class="QLineEdit" name="reportsSearchLine">
-                       <property name="minimumSize">
-                        <size>
-                         <width>204</width>
-                         <height>24</height>
-                        </size>
+                    <item>
+                     <widget class="QWidget" name="reportsSearchWidget" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>50</height>
+                       </size>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <property name="spacing">
+                        <number>12</number>
                        </property>
-                       <property name="text">
-                        <string/>
+                       <property name="leftMargin">
+                        <number>12</number>
                        </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="reportsSearchBtn">
-                       <property name="minimumSize">
-                        <size>
-                         <width>120</width>
-                         <height>20</height>
-                        </size>
+                       <property name="topMargin">
+                        <number>12</number>
                        </property>
-                       <property name="text">
-                        <string>Search</string>
+                       <property name="rightMargin">
+                        <number>18</number>
                        </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="reportsTableWidget" native="true">
-                    <property name="styleSheet">
-                     <string notr="true"/>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_18">
-                     <property name="spacing">
-                      <number>-1</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>18</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>18</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>18</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QTableWidget" name="reportsTable">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
+                       <property name="bottomMargin">
+                        <number>12</number>
                        </property>
-                       <property name="layoutDirection">
-                        <enum>Qt::LeftToRight</enum>
-                       </property>
-                       <property name="styleSheet">
-                        <string notr="true"/>
-                       </property>
-                       <property name="alternatingRowColors">
-                        <bool>false</bool>
-                       </property>
-                       <property name="showGrid">
-                        <bool>true</bool>
-                       </property>
-                       <property name="gridStyle">
-                        <enum>Qt::SolidLine</enum>
-                       </property>
-                       <property name="sortingEnabled">
-                        <bool>false</bool>
-                       </property>
-                       <property name="wordWrap">
-                        <bool>true</bool>
-                       </property>
-                       <attribute name="horizontalHeaderCascadingSectionResizes">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderDefaultSectionSize">
-                        <number>170</number>
-                       </attribute>
-                       <attribute name="horizontalHeaderHighlightSections">
-                        <bool>true</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="horizontalHeaderStretchLastSection">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="verticalHeaderVisible">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="verticalHeaderCascadingSectionResizes">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="verticalHeaderHighlightSections">
-                        <bool>true</bool>
-                       </attribute>
-                       <attribute name="verticalHeaderMinimumSectionSize">
-                        <number>20</number>
-                       </attribute>
-                       <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-                        <bool>false</bool>
-                       </attribute>
-                       <attribute name="verticalHeaderStretchLastSection">
-                        <bool>false</bool>
-                       </attribute>
-                       <row>
-                        <property name="text">
-                         <string>1</string>
-                        </property>
-                       </row>
-                       <column>
-                        <property name="text">
-                         <string>Job Number</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Report Type </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Parameter</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>DIlution Factor</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Date Created </string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Open Report </string>
-                        </property>
-                       </column>
-                       <item row="0" column="0">
-                        <property name="text">
-                         <string>test</string>
-                        </property>
+                       <item>
+                        <widget class="QLineEdit" name="reportsSearchLine">
+                         <property name="minimumSize">
+                          <size>
+                           <width>204</width>
+                           <height>24</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string/>
+                         </property>
+                        </widget>
                        </item>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="reportsFooterWidget" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_61">
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <spacer name="horizontalSpacer_12">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
+                       <item>
+                        <widget class="QPushButton" name="reportsSearchBtn">
+                         <property name="minimumSize">
+                          <size>
+                           <width>102</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="text">
+                          <string>Search</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="reportsTableWidget" native="true">
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_18">
+                       <property name="spacing">
+                        <number>-1</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>12</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>18</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>12</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QTableWidget" name="reportsTable">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                         <property name="layoutDirection">
+                          <enum>Qt::LeftToRight</enum>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true"/>
+                         </property>
+                         <property name="alternatingRowColors">
+                          <bool>false</bool>
+                         </property>
+                         <property name="showGrid">
+                          <bool>true</bool>
+                         </property>
+                         <property name="gridStyle">
+                          <enum>Qt::SolidLine</enum>
+                         </property>
+                         <property name="sortingEnabled">
+                          <bool>false</bool>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>true</bool>
+                         </property>
+                         <attribute name="horizontalHeaderCascadingSectionResizes">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="horizontalHeaderDefaultSectionSize">
+                          <number>170</number>
+                         </attribute>
+                         <attribute name="horizontalHeaderHighlightSections">
+                          <bool>true</bool>
+                         </attribute>
+                         <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="horizontalHeaderStretchLastSection">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderVisible">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderCascadingSectionResizes">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderHighlightSections">
+                          <bool>true</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderMinimumSectionSize">
+                          <number>20</number>
+                         </attribute>
+                         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+                          <bool>false</bool>
+                         </attribute>
+                         <attribute name="verticalHeaderStretchLastSection">
+                          <bool>false</bool>
+                         </attribute>
+                         <row>
+                          <property name="text">
+                           <string>1</string>
                           </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>590</width>
-                            <height>20</height>
-                           </size>
+                         </row>
+                         <column>
+                          <property name="text">
+                           <string>Job Number</string>
                           </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QWidget" name="widget_36" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>300</width>
-                            <height>0</height>
-                           </size>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Report Type </string>
                           </property>
-                          <layout class="QHBoxLayout" name="horizontalLayout_62">
-                           <property name="spacing">
-                            <number>-1</number>
-                           </property>
-                           <property name="leftMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="topMargin">
-                            <number>5</number>
-                           </property>
-                           <property name="rightMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="bottomMargin">
-                            <number>5</number>
-                           </property>
-                           <item>
-                            <widget class="QLabel" name="historyCurrentSectionLabel">
-                             <property name="layoutDirection">
-                              <enum>Qt::LeftToRight</enum>
-                             </property>
-                             <property name="text">
-                              <string>Show 1 to 50 of 242</string>
-                             </property>
-                             <property name="alignment">
-                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="historyPrevBtn">
-                             <property name="text">
-                              <string>&lt;</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="historyNextBtn">
-                             <property name="text">
-                              <string>&gt;</string>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Parameter</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>DIlution Factor</string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Date Created </string>
+                          </property>
+                         </column>
+                         <column>
+                          <property name="text">
+                           <string>Open Report </string>
+                          </property>
+                         </column>
+                         <item row="0" column="0">
+                          <property name="text">
+                           <string>test</string>
+                          </property>
+                         </item>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </widget>
@@ -2132,7 +2062,7 @@ margin: 0;
                      <widget class="QComboBox" name="paramType">
                       <property name="minimumSize">
                        <size>
-                        <width>0</width>
+                        <width>25</width>
                         <height>0</height>
                        </size>
                       </property>
@@ -2309,264 +2239,201 @@ margin: 0;
                 <number>12</number>
                </property>
                <item>
-                <widget class="QWidget" name="icpData" native="true">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>100</height>
-                  </size>
+                <layout class="QVBoxLayout" name="icpHistoryLayout">
+                 <property name="topMargin">
+                  <number>0</number>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true"/>
+                 <property name="bottomMargin">
+                  <number>0</number>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_28">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QWidget" name="icpSearchBar" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
+                 <item>
+                  <widget class="QWidget" name="icpSearchBar" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_24">
+                    <property name="leftMargin">
+                     <number>5</number>
                     </property>
-                    <property name="styleSheet">
-                     <string notr="true"/>
+                    <property name="topMargin">
+                     <number>5</number>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_24">
-                     <property name="leftMargin">
-                      <number>5</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>5</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>5</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>5</number>
-                     </property>
-                     <item>
-                      <widget class="QPushButton" name="icpUploadBtn">
+                    <property name="rightMargin">
+                     <number>5</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>5</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="icpUploadBtn">
+                      <property name="text">
+                       <string>Upload</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="widget_39" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>400</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_55">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="leftMargin">
+                        <number>20</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>20</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QPushButton" name="icpSearchBtn1">
+                         <property name="text">
+                          <string>Search</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLineEdit" name="icpSearchLine1">
+                         <property name="minimumSize">
+                          <size>
+                           <width>201</width>
+                           <height>22</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="placeholderText">
+                          <string>Search Job Number</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_60">
+                      <property name="text">
+                       <string>Filter By</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QComboBox" name="filterComboBox">
+                      <property name="minimumSize">
+                       <size>
+                        <width>122</width>
+                        <height>26</height>
+                       </size>
+                      </property>
+                      <property name="currentText">
+                       <string>Filter_by</string>
+                      </property>
+                      <item>
                        <property name="text">
-                        <string>Upload</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="widget_39" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>400</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout_55">
-                        <property name="spacing">
-                         <number>0</number>
-                        </property>
-                        <property name="leftMargin">
-                         <number>20</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>20</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="icpSearchBtn1">
-                          <property name="text">
-                           <string>Search</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLineEdit" name="icpSearchLine1">
-                          <property name="minimumSize">
-                           <size>
-                            <width>201</width>
-                            <height>22</height>
-                           </size>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>16777215</width>
-                            <height>16777215</height>
-                           </size>
-                          </property>
-                          <property name="placeholderText">
-                           <string>Search Job Number</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_60">
-                       <property name="text">
-                        <string>Filter By</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QComboBox" name="filterComboBox">
-                       <property name="minimumSize">
-                        <size>
-                         <width>122</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="currentText">
                         <string>Filter_by</string>
                        </property>
-                       <item>
-                        <property name="text">
-                         <string>Filter_by</string>
-                        </property>
-                       </item>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_54">
+                      </item>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_54">
+                      <property name="text">
+                       <string>Show</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QComboBox" name="ShowComboBox">
+                      <property name="minimumSize">
+                       <size>
+                        <width>122</width>
+                        <height>26</height>
+                       </size>
+                      </property>
+                      <item>
                        <property name="text">
-                        <string>Show</string>
+                        <string>Show </string>
                        </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QComboBox" name="ShowComboBox">
-                       <property name="minimumSize">
-                        <size>
-                         <width>122</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <item>
-                        <property name="text">
-                         <string>Show </string>
-                        </property>
-                       </item>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QTableWidget" name="icpTable">
-                    <attribute name="horizontalHeaderCascadingSectionResizes">
-                     <bool>true</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderDefaultSectionSize">
-                     <number>200</number>
-                    </attribute>
-                    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderStretchLastSection">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderVisible">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderCascadingSectionResizes">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-                     <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderStretchLastSection">
-                     <bool>false</bool>
-                    </attribute>
-                    <column>
-                     <property name="text">
-                      <string>Sample Name </string>
-                     </property>
-                    </column>
-                    <column>
-                     <property name="text">
-                      <string>Job Number</string>
-                     </property>
-                    </column>
-                    <column>
-                     <property name="text">
-                      <string>Machine Type</string>
-                     </property>
-                    </column>
-                    <column>
-                     <property name="text">
-                      <string>File Location </string>
-                     </property>
-                    </column>
-                    <column>
-                     <property name="text">
-                      <string>Upload Date </string>
-                     </property>
-                    </column>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="icpHistoryFooter" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>20</height>
-                     </size>
+                      </item>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="icpTable">
+                   <attribute name="horizontalHeaderCascadingSectionResizes">
+                    <bool>true</bool>
+                   </attribute>
+                   <attribute name="horizontalHeaderDefaultSectionSize">
+                    <number>200</number>
+                   </attribute>
+                   <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="horizontalHeaderStretchLastSection">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderVisible">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderCascadingSectionResizes">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+                    <bool>false</bool>
+                   </attribute>
+                   <attribute name="verticalHeaderStretchLastSection">
+                    <bool>false</bool>
+                   </attribute>
+                   <column>
+                    <property name="text">
+                     <string>Sample Name </string>
                     </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout_69">
-                     <item>
-                      <spacer name="horizontalSpacer_24">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>879</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_61">
-                       <property name="text">
-                        <string>Show {_} to {_} of {_}</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_9">
-                       <property name="text">
-                        <string>&lt;</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_4">
-                       <property name="text">
-                        <string>&gt;</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Job Number</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Machine Type</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>File Location </string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
+                     <string>Upload Date </string>
+                    </property>
+                   </column>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -3127,6 +2994,13 @@ margin: 0;
                       </widget>
                      </item>
                      <item>
+                      <widget class="QLabel" name="label_11">
+                       <property name="text">
+                        <string>Appear at the </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
                       <spacer name="verticalSpacer_5">
                        <property name="orientation">
                         <enum>Qt::Vertical</enum>
@@ -3482,7 +3356,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -3514,350 +3388,209 @@ p, li { white-space: pre-wrap; }
                    <number>12</number>
                   </property>
                   <item>
-                   <widget class="QWidget" name="chmDatabaseWidget" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>200</height>
-                     </size>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_33">
-                     <property name="spacing">
-                      <number>-1</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QWidget" name="widget_11" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_54">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="chmTopMenu1" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
+                   <layout class="QVBoxLayout" name="chmDatabaseLayout">
+                    <item>
+                     <widget class="QWidget" name="chmTopMenu1" native="true">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <layout class="QHBoxLayout" name="horizontalLayout_56">
+                       <property name="spacing">
+                        <number>-1</number>
                        </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout_56">
-                        <property name="spacing">
-                         <number>-1</number>
-                        </property>
-                        <property name="leftMargin">
-                         <number>5</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>5</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>5</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>5</number>
-                        </property>
-                        <item>
-                         <widget class="QWidget" name="widget_32" native="true">
-                          <layout class="QHBoxLayout" name="horizontalLayout_13">
-                           <property name="spacing">
-                            <number>8</number>
-                           </property>
-                           <property name="leftMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="topMargin">
-                            <number>2</number>
-                           </property>
-                           <property name="rightMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="bottomMargin">
-                            <number>2</number>
-                           </property>
-                           <item>
-                            <widget class="QPushButton" name="chmAddItemBtn">
-                             <property name="text">
-                              <string>Add Item</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="chmImportBtn">
-                             <property name="enabled">
-                              <bool>false</bool>
-                             </property>
-                             <property name="text">
-                              <string>Import</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="chmExportBtn">
-                             <property name="enabled">
-                              <bool>false</bool>
-                             </property>
-                             <property name="text">
-                              <string>Export</string>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QWidget" name="chmSearchWidget" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>0</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                          <layout class="QHBoxLayout" name="horizontalLayout_65">
-                           <property name="spacing">
-                            <number>0</number>
-                           </property>
-                           <property name="leftMargin">
-                            <number>20</number>
-                           </property>
-                           <property name="topMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="rightMargin">
-                            <number>20</number>
-                           </property>
-                           <property name="bottomMargin">
-                            <number>0</number>
-                           </property>
-                           <item>
-                            <widget class="QPushButton" name="chmSearchBtn1">
-                             <property name="enabled">
-                              <bool>false</bool>
-                             </property>
-                             <property name="text">
-                              <string>Search </string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QLineEdit" name="chmSearchLine1">
-                             <property name="minimumSize">
-                              <size>
-                               <width>201</width>
-                               <height>22</height>
-                              </size>
-                             </property>
-                             <property name="placeholderText">
-                              <string>Search CHM database</string>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_50">
-                          <property name="text">
-                           <string>Filter By</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="comboBox_2">
-                          <property name="minimumSize">
-                           <size>
-                            <width>122</width>
-                            <height>22</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_57">
-                          <property name="text">
-                           <string>Show</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="comboBox">
-                          <property name="minimumSize">
-                           <size>
-                            <width>122</width>
-                            <height>22</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QTableWidget" name="chmInputTable">
-                       <property name="styleSheet">
-                        <string notr="true"/>
+                       <property name="leftMargin">
+                        <number>5</number>
                        </property>
-                       <row>
-                        <property name="text">
-                         <string>1</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>2</string>
-                        </property>
-                       </row>
-                       <column>
-                        <property name="text">
-                         <string>test</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>test</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>test2</string>
-                        </property>
-                       </column>
-                       <item row="0" column="0">
-                        <property name="text">
-                         <string>test</string>
-                        </property>
+                       <property name="topMargin">
+                        <number>5</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>5</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>5</number>
+                       </property>
+                       <item>
+                        <widget class="QWidget" name="widget_32" native="true">
+                         <layout class="QHBoxLayout" name="horizontalLayout_13">
+                          <property name="spacing">
+                           <number>8</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>2</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>2</number>
+                          </property>
+                          <item>
+                           <widget class="QPushButton" name="chmAddItemBtn">
+                            <property name="text">
+                             <string>Add Item</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="chmImportBtn">
+                            <property name="enabled">
+                             <bool>false</bool>
+                            </property>
+                            <property name="text">
+                             <string>Import</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="chmExportBtn">
+                            <property name="enabled">
+                             <bool>false</bool>
+                            </property>
+                            <property name="text">
+                             <string>Export</string>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
                        </item>
-                       <item row="0" column="1">
-                        <property name="text">
-                         <string>test2</string>
-                        </property>
+                       <item>
+                        <widget class="QWidget" name="chmSearchWidget" native="true">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_65">
+                          <property name="spacing">
+                           <number>0</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>20</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>20</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <widget class="QPushButton" name="chmSearchBtn1">
+                            <property name="enabled">
+                             <bool>false</bool>
+                            </property>
+                            <property name="text">
+                             <string>Search </string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="chmSearchLine1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>201</width>
+                              <height>22</height>
+                             </size>
+                            </property>
+                            <property name="placeholderText">
+                             <string>Search CHM database</string>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
                        </item>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="widget_34" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_63">
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <spacer name="horizontalSpacer_21">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>590</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QWidget" name="widget_37" native="true">
-                          <property name="minimumSize">
-                           <size>
-                            <width>300</width>
-                            <height>0</height>
-                           </size>
-                          </property>
-                          <layout class="QHBoxLayout" name="horizontalLayout_64">
-                           <property name="spacing">
-                            <number>-1</number>
-                           </property>
-                           <property name="leftMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="topMargin">
-                            <number>5</number>
-                           </property>
-                           <property name="rightMargin">
-                            <number>0</number>
-                           </property>
-                           <property name="bottomMargin">
-                            <number>5</number>
-                           </property>
-                           <item>
-                            <widget class="QLabel" name="historyCurrentSectionLabel_2">
-                             <property name="minimumSize">
-                              <size>
-                               <width>100</width>
-                               <height>0</height>
-                              </size>
-                             </property>
-                             <property name="layoutDirection">
-                              <enum>Qt::LeftToRight</enum>
-                             </property>
-                             <property name="text">
-                              <string>Show 1 to 50 of 242</string>
-                             </property>
-                             <property name="alignment">
-                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="historyPrevBtn_2">
-                             <property name="minimumSize">
-                              <size>
-                               <width>102</width>
-                               <height>22</height>
-                              </size>
-                             </property>
-                             <property name="text">
-                              <string>&lt;</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item>
-                            <widget class="QPushButton" name="historyNextBtn_2">
-                             <property name="minimumSize">
-                              <size>
-                               <width>102</width>
-                               <height>22</height>
-                              </size>
-                             </property>
-                             <property name="text">
-                              <string>&gt;</string>
-                             </property>
-                            </widget>
-                           </item>
-                          </layout>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
+                       <item>
+                        <widget class="QLabel" name="label_50">
+                         <property name="text">
+                          <string>Filter By</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_2">
+                         <property name="minimumSize">
+                          <size>
+                           <width>122</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="label_57">
+                         <property name="text">
+                          <string>Show</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox">
+                         <property name="minimumSize">
+                          <size>
+                           <width>122</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTableWidget" name="chmInputTable">
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <row>
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                      </row>
+                      <row>
+                       <property name="text">
+                        <string>2</string>
+                       </property>
+                      </row>
+                      <column>
+                       <property name="text">
+                        <string>test</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>test</string>
+                       </property>
+                      </column>
+                      <column>
+                       <property name="text">
+                        <string>test2</string>
+                       </property>
+                      </column>
+                      <item row="0" column="0">
+                       <property name="text">
+                        <string>test</string>
+                       </property>
+                      </item>
+                      <item row="0" column="1">
+                       <property name="text">
+                        <string>test2</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </widget>
@@ -5452,7 +5185,7 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox_2">
                     <property name="currentIndex">
-                     <number>0</number>
+                     <number>2</number>
                     </property>
                     <widget class="QWidget" name="page_3">
                      <property name="geometry">
@@ -5460,7 +5193,7 @@ p, li { white-space: pre-wrap; }
                        <x>0</x>
                        <y>0</y>
                        <width>1329</width>
-                       <height>602</height>
+                       <height>568</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5725,8 +5458,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>1329</width>
+                       <height>568</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5771,12 +5504,17 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>1329</width>
+                       <height>569</height>
                       </rect>
                      </property>
                      <attribute name="label">
-                      <string>Page</string>
+                      <string>Units </string>
+                     </attribute>
+                    </widget>
+                    <widget class="QWidget" name="page_7">
+                     <attribute name="label">
+                      <string>Tables</string>
                      </attribute>
                     </widget>
                    </widget>
@@ -5801,8 +5539,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>924</width>
-                       <height>167</height>
+                       <width>1329</width>
+                       <height>636</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5936,8 +5674,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1034</width>
-                       <height>175</height>
+                       <width>1329</width>
+                       <height>636</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6050,6 +5788,41 @@ p, li { white-space: pre-wrap; }
                  <attribute name="title">
                   <string>Tests</string>
                  </attribute>
+                 <layout class="QVBoxLayout" name="verticalLayout_7">
+                  <item>
+                   <widget class="QToolBox" name="toolBox_3">
+                    <property name="currentIndex">
+                     <number>0</number>
+                    </property>
+                    <widget class="QWidget" name="page">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>1321</width>
+                       <height>636</height>
+                      </rect>
+                     </property>
+                     <attribute name="label">
+                      <string>Page 1</string>
+                     </attribute>
+                    </widget>
+                    <widget class="QWidget" name="page_6">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>100</width>
+                       <height>30</height>
+                      </rect>
+                     </property>
+                     <attribute name="label">
+                      <string>Page 2</string>
+                     </attribute>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                 <widget class="QWidget" name="icpTab">
                  <attribute name="title">

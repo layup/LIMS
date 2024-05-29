@@ -216,7 +216,7 @@ def settingsReportSetup(self):
 #TODO: can lazy load the data 
 def loadReportParameters(self): 
     
-    paramList = getAllParameters(self.preferencesDB)
+    paramList = getAllParameters(self.tempDB)
     
     print(paramList)
     
@@ -234,7 +234,7 @@ def loadReportParameters(self):
         
 def loadReportAuthors(self): 
     
-    authorList = getAllAuthors(self.preferencesDB)
+    authorList = getAllAuthors(self.tempDB)
     
     authorTreeWidget = self.ui.authorTreeWidget 
     

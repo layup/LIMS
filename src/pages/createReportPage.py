@@ -44,7 +44,7 @@ def reportSetup(self):
     #load in the authors 
     #TODO: have some error checking and deal with the loadiong section 
     # FIXME: load in the other authors to the section
-    authorsList = [item[0] for item in getAllAuthorNames(self.preferencesDB)]
+    authorsList = [item[0] for item in getAllAuthorNames(self.tempDB)]
     authorsList.insert(0, '')
     
     print(authorsList)
@@ -129,13 +129,20 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         self.clearDataTable()
         self.ui.jobNum.setText(jobNum)
         
-        if(reportType == 'ICP'):         
-            self.createState = 1 
-            icpReportLoader(self)
-            
-        if(reportType == 'CHM'):    
-            self.createState = 2 
-            chmReportLoader(self)
+        try: 
+            if(reportType == 'ICP'):         
+                self.createState = 1 
+                icpReportLoader(self)
+                
+            if(reportType == 'CHM'):    
+                self.createState = 2 
+                chmReportLoader(self)
+                
+        except Exception as error: 
+            print(error)
+
+            #TODO: open up a dialog box about not being able to open the file
+        
         
     else: 
         reportErrorHandler(self, errorCheck)
@@ -283,6 +290,8 @@ def populateTableRow(tableWidget, row, col, alignment, value):
 #******************************************************************
 #    Chemisty Loader  
 #****************************************************************** 
+
+#TODO: need to convert the classes into dirct 
 class chemReportTestData: 
     def __init__(self, testNum, testName, textName, displayName, unitType):  
         self.testNum = testNum 
@@ -303,7 +312,7 @@ class chemReportSampleData:
         self.sampleName = sampleName 
         
         self.data = {}
-            
+        
     def add_data(self, testNum, testValue, recovery, unitType): 
         self.data[testNum] = [testValue, recovery, unitType]
         print(f'{self.sampleName} ADDED {testNum}: {self.data[testNum]}')
@@ -361,6 +370,11 @@ class chemReportManager:
         print(f'self.samples: {self.samples}')
 
         return self.samples 
+
+    def load_samples(self): 
+        pass; 
+    def load_tests(self): 
+        pass; 
 
     def init_test(self, test_list): 
         print(f'init_samples: {test_list}') 

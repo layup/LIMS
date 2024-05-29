@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1619</width>
+    <height>71</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>71</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QLabel {
+	color:white; 
+}
+
+QComboBox {
+	color:white; 
+	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+}
+QComboBox::drop-down:button {
+	border-left: 1px solid #30333b; 
+}
+
+QComboBox::item { /*current hightlighted item */ 
+	background-color: rgb(107, 108, 108);
+}
+
+QComboBox::item:selected { /*current active item */ 
+	background-color:rgb(66, 78, 101);
+	
+}
+QComboBox::popup { /* item when choosing */ 
+	min-height:100px; 
+ 	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+ 	color:white; 
+}
+
+QSpinBox {
+	color:white; 
+	background-color: #363f4d; 
+	border: 1px solid #30333b; 
+} 
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="historyFooter" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_62">
+      <property name="spacing">
+       <number>-1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="prevBtn">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Previous</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="pageWidget" native="true">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="historyCurrentSectionLabel">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Page</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="QSpinBox">
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="pageLabel">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>of 1</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="rowsWidget" native="true">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_73">
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QComboBox" name="QComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>180</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>100 Rows</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>200 Rows</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>300 Rows</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="nextBtn">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Next</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
