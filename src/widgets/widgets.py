@@ -41,8 +41,6 @@ class TableFooterWidget(QWidget):
         self.QSpinBox.valueChanged.connect(lambda value: print(f'New Value: {value}'))
         self.QComboBox.currentIndexChanged.connect(lambda index: print(f'New Index: {index}'))
 
-     
-
 
 class SampleNameWidget(QWidget): 
     def __init__(self, labelName, valueName, parent=None): 

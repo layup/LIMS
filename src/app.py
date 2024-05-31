@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import (
     QSpacerItem, QSizePolicy, QCompleter, QStyleFactory, QGraphicsDropShadowEffect
 )
 
-
 from modules.constants import *
 from modules.createExcel import * 
 from modules.dbManager import *
@@ -52,7 +51,6 @@ class MainWindow(QMainWindow):
         self.loadCreatePage()
         self.loadStartup() 
 
-        #
         self.dataTransfer()
 
         # Page Setups 
@@ -64,7 +62,6 @@ class MainWindow(QMainWindow):
 
         apply_drop_shadow_effect(self.ui.headerWidget)
         
-
    #******************************************************************
    #    inline Slot Function Calls 
    #******************************************************************  
@@ -167,7 +164,6 @@ class MainWindow(QMainWindow):
             #    btn.setChecked(False)
             btn.setAutoExclusive(True)
 
-        
         self.ui.headerWidget.show()
                    
         if(index == 0): # History
@@ -188,7 +184,6 @@ class MainWindow(QMainWindow):
             self.ui.paramType.setCurrentIndex(0)
             self.ui.dilutionInput.setText('')
 
-            
         if(index == 2): # ICP Page 
             self.ui.icpTabWidget.setCurrentIndex(1)
             self.ui.icpTabWidget.setCurrentIndex(0)
@@ -238,15 +233,11 @@ class MainWindow(QMainWindow):
             self.ui.headerDesc.setText(''); 
             populateChmDatabase(self);  
             
-            
         if(index == 1): # Input Data 
-
             self.ui.headerTitle.setText('Chemisty Data Entry'); 
             self.ui.headerDesc.setText(''); 
            
-        
         if(index == 2): # Test Info  
-
             self.ui.headerTitle.setText('Chemisty Tests Information'); 
             self.ui.headerDesc.setText(''); 
             #totalTests = getChmTotalTests(self.db) 
@@ -296,18 +287,14 @@ class MainWindow(QMainWindow):
 
         for attempt in range(3):  
             print(f'Attemp: {attempt}')
-            
-            #TODO: try to connect the each of the databases 
-            #TODO: need to update the widget opening item 
-
-            # if(databaseStatus.count() != 3): 
-                
+                            
             try: 
                 mainDatabasePath = self.preferences.get('databasePath') 
                 officeDatabasePath = self.preferences.get('officeDbPath')
                 preferencesDatabasePath = self.preferences.get('preferencesPath')
                 tempPath = self.preferences.get('temp_backend_path')
 
+                # Connect the temp new database that will be replacing the main database 
                 self.tempDB = Database(tempPath)
                 
                 # Connect the backend database (Harry Systems)
@@ -365,13 +352,11 @@ class MainWindow(QMainWindow):
         self.ui.reportType.addItems(REPORTS_TYPE)
         
         #paramResults = sorted(getReportTypeList(self.db))
-        
         paramResults = sorted(getAllParameters(self.tempDB))
         paramResults =  [sublist[1] for sublist in paramResults]
         
         paramResults.insert(0, "")
         self.ui.paramType.addItems(paramResults)
-
     
     # TODO: make this more a general application  
     def formatTable(self, table): 
@@ -413,7 +398,6 @@ class MainWindow(QMainWindow):
         else:
             print("User canceled.")
             
-
     def dataTransfer(self): 
         print('Data Transfer File test')
         
@@ -449,13 +433,6 @@ class LocalPreferences:
     def save(self): 
         with open(self.path, 'wb') as file:
             pickle.dump(self.preferences, file)
-
-
-
-#TODO: global tests class that contains the testNum and the testnNames 
-
-class Tests(): 
-    pass; 
     
 
 

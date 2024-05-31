@@ -11,35 +11,27 @@ from PyQt5.QtWidgets import (
 
 from modules.constants import *; 
 #from modules.createExcel import * 
-from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory 
+from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory, getParameterName
 from modules.dialogBoxes import openJobDialog
 from modules.utilities import apply_drop_shadow_effect
+from widgets.widgets import TableFooterWidget
 
 from pages.createReportPage import createReportPage
 
 
 def historyPageSetup(self): 
     
-    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Action']
+    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Status', 'Action']
     frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
 
     formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
     formatHistoryDatabaseTable(self.ui.frontDeskTable, frontHistoryHeaders)
 
-    #FIXME: make this better somehow 
-    jobList = getAllJobNumbersList(self.db) 
-    jobList_as_strings = [str(item) for item in jobList]
+    historySearchSetup(self)
 
-    # Sets the completers
-    completer = QCompleter(jobList_as_strings)
-    completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
-    completer.setMaxVisibleItems(10)
+    footer_widget = TableFooterWidget(69)
+    self.ui.historyLayout.addWidget(footer_widget)
     
-    self.ui.reportsSearchLine.setCompleter(completer)
-    self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...")
-
-
-
     #load the inital table data 
     loadReportsPage(self); 
 
@@ -54,15 +46,29 @@ def formatHistoryDatabaseTable(table, columns):
     # Disable editing for the entire table 
     table.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
+    # Set the column count 
+    table.setColumnCount(len(columns))
+
     # Set the column names and info 
     table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
     table.setHorizontalHeaderLabels(columns)
     
-    # Set the column widget 
-    
     table.verticalHeader().setVisible(True)
     table.verticalHeader().setDefaultSectionSize(rowHeight)
     
+#TODO: load in new data to the search as well 
+def historySearchSetup(self): 
+    # Get the all of the jobNums for the completer
+    jobList = getAllJobNumbersList(self.tempDB) 
+    jobList_as_strings = [str(item) for item in jobList]
+
+    # Sets the completers
+    completer = QCompleter(jobList_as_strings)
+    completer.setCompletionMode(QCompleter.PopupCompletion)  # Set completion mode to popup
+    completer.setMaxVisibleItems(10)
+    
+    self.ui.reportsSearchLine.setCompleter(completer)
+    self.ui.reportsSearchLine.setPlaceholderText("Enter Job Number...") 
     
 #******************************************************************
 #   Chemistry History 
@@ -74,15 +80,18 @@ def loadReportsPage(self, searchValue=None):
     print('[FUNCTION]: historyPageSetup')
     print(f'Search Value: {searchValue}')
 
+    historySearchSetup(self)
+
+    # When user uses the search bar 
     if(searchValue): 
         try: 
-            results = searchJobsList(self.db, searchValue)
+            results = searchJobsList(self.tempDB, searchValue)
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
             results = []
     else: 
         try: 
-            results = getAllJobsList(self.db);
+            results = getAllJobsList(self.tempDB);
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
             results = []
@@ -93,23 +102,26 @@ def loadReportsPage(self, searchValue=None):
     historyTable.setRowCount(len(results))
     
     for row, current in enumerate(results): 
-        #(20, 191303, 'ICP', 'Water', 1, '2024-03-05')
-        #TODO: could format this into a cheeckly little for loop and remove this setItemFunction 
-        jobNumber = str(current[1])
-        reportType = str(current[2])
-        parameterType = str(current[3])
-        dilutionFactor = str(current[4])
-        creationDate = str(current[5])
+        historyTable.setRowHeight(row, TABLE_ROW_HEIGHT)
+        
+        # Define the table data by breaking down the SQL results
+        jobNumber = str(current[0])
+        reportType = REPORT_NAME[current[1]]
+        parameterType = getParameterName(self.tempDB, int(current[2]))
+        dilutionFactor = str(current[3])
+        creationDate = str(current[4])
+        status = 'N/A'
         
         setTableItem(historyTable, row, 0, jobNumber) 
         setTableItem(historyTable, row, 1, reportType)
         setTableItem(historyTable, row, 2, parameterType)
         setTableItem(historyTable, row, 3, dilutionFactor)
         setTableItem(historyTable, row, 4, creationDate) 
+        setTableItem(historyTable, row, 5, status)  
             
         openButton = QPushButton("Open")
         openButton.clicked.connect(lambda _, row=row: openExistingReport(self, row));
-        historyTable.setCellWidget(row, 5, openButton)
+        historyTable.setCellWidget(row, 6, openButton)
 
 @pyqtSlot()
 def on_reportsSearchBtn_clicked(self): 
@@ -118,8 +130,6 @@ def on_reportsSearchBtn_clicked(self):
     searchValueString = self.ui.reportsSearchLine.text()
     print(f'Searching for Job Number: {searchValueString}')
 
-    #self.ui.reportsTable.clearContents()
-    #self.ui.reportsTable.setRowCount(0)
     loadReportsPage(self, searchValueString)
     
 def setTableItem(table, row, column, text, alignment=Qt.AlignCenter): 
@@ -151,17 +161,12 @@ def openExistingReport(self, row):
     
     if result == QDialog.Accepted:
         print('Opening Existing Report')
-        isExistingReport = True 
-        createReportPage(self, rowData[0], rowData[1], rowData[2], rowData[3], isExistingReport) 
+        existingReport = True 
+        createReportPage(self, rowData[0], rowData[1], rowData[2], rowData[3], existingReport) 
         
     else:
         print("Not Opening Existing Report'")
         
-        
-
-#******************************************************************
-#   Front Desk History
-#******************************************************************
 
 
 

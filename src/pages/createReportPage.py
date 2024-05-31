@@ -1,4 +1,4 @@
-
+from datetime import date
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
@@ -18,9 +18,7 @@ from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
-
 #TODO: move a lot of these functions to the db fuinctions 
-
 #******************************************************************
 #   Create Report Page Setup 
 #******************************************************************
@@ -70,9 +68,9 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     print('[FUNCTION]: createReportPage')
         
     # strip the basic informatioin 
-    jobNum = jobNum or self.ui.jobNumInput.text().strip()
-    reportType = reportType or self.ui.reportType.currentText()
-    parameter = parameter or self.ui.paramType.currentText()
+    self.jobNum = jobNum or self.ui.jobNumInput.text().strip()
+    self.reportType = reportType or self.ui.reportType.currentText()
+    self.parameter = parameter or self.ui.paramType.currentText()
     dilution = dilution or self.ui.dilutionInput.text()
     
     print('*JobNumber: ', jobNum)
@@ -89,19 +87,16 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     errorCheck[2] = 0 if parameter != '' else 1
     errorCheck[3] = 0 if textFileExists != '' else 1    
     
-    # Set the status of the report 
-    self.ui.statusHeaderLabel.setText('undefined')
-    
-    
+     
     if(sum(errorCheck) == 0): 
-        #FIXME: I can adjust the client Info, so I don't need this (do I need global functions, bad pratice)
-
+        # Clear existing data from previous jobs
         self.ui.reportsTab.setCurrentIndex(0)
+        self.ui.stackedWidget.setCurrentIndex(5) 
+        self.clearDataTable()
+        self.ui.jobNum.setText(jobNum)
         
-        self.jobNum = jobNum; 
-        self.parameter = parameter 
-        self.reportType = reportType
-        self.activeCreation = True; 
+        reportNum = REPORT_NUM[self.reportType]
+        paramNum = getReportNum(self.tempDB, parameter)[0][0] #TODO: fix this so just returns the num
 
         #TODO: load the information from database later (front house database) 
         tempLocation = scanForTXTFolders(self.jobNum) 
@@ -113,37 +108,34 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         self.sampleNames = sampleNames
         self.sampleTests = sampleTests
 
-        reportResult = checkReportExists(self.db, jobNum, reportType)
+        jobResult  = checkJobExists(self.tempDB, jobNum, reportNum)
         
-        if reportResult is None:  
-            print('No Exists, adding to the file')
-            createReport(self.db, jobNum, reportType, parameter, self.dilution)
+        if jobResult is None:  
+            # Adding Job to the database
+            currentDate = date.today()
+            addNewJob(self.tempDB, jobNum, reportNum, paramNum, self.dilution, currentDate)
+            self.ui.statusHeaderLabel.setText('NEW')
+
         else: 
             if(method2 is not True): 
                 print('Report Exists')
-                print(reportResult)
+                print(jobResult)
+                
                 #TODO: load the report if exists
-                loadReportDialog(self)          
+                loadReportDialog(self)      
 
-        self.ui.stackedWidget.setCurrentIndex(5) 
-        self.clearDataTable()
-        self.ui.jobNum.setText(jobNum)
-        
         try: 
+            self.createState = REPORT_NUM[reportType]  
+            
             if(reportType == 'ICP'):         
-                self.createState = 1 
                 icpReportLoader(self)
                 
             if(reportType == 'CHM'):    
-                self.createState = 2 
                 chmReportLoader(self)
                 
         except Exception as error: 
-            print(error)
+            showErrorDialog(self, 'Could not create report', error)
 
-            #TODO: open up a dialog box about not being able to open the file
-        
-        
     else: 
         reportErrorHandler(self, errorCheck)
 
@@ -545,7 +537,7 @@ def handleTableChange(self, item):
             
             if(column > 5):
                 # Update the samples values
-                testNum = self.reportManager.test[textName].testNum
+                testNum = self.reportManager.tests[textName].testNum
                 self.reportManager.samples[column_name].update_data(testNum, updatedValue)
             
 
@@ -737,6 +729,10 @@ def chmReportHandler(self, columnLength,  tests):
 
     createdReportDialog('test')
 
+    # Save the other client info 
+    # Authors, client ifno, samples name. sample data
+    
+
 
 #******************************************************************
 #    ICP Loader 
@@ -810,7 +806,7 @@ def icpReportLoader(self):
     sampleData = getIcpMachineData(self.tempDB, self.jobNum)
 
     #TODO: change database later so we have just one database 
-    reportNum = getReportNum(self.preferencesDB, self.parameter)[0][0]
+    reportNum = getReportNum(self.tempDB, self.parameter)[0][0]
     print(f'Parameter: {reportNum}')
     
     #TODO: add a try-except block here 
@@ -1117,8 +1113,6 @@ def icpGenerateFooter(self):
         
     return footerComments
 
-    
-    
 
 class icpManager: 
     pass; 

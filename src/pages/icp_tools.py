@@ -1,4 +1,6 @@
 
+import math 
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
@@ -38,10 +40,6 @@ def icpSetup(self):
     self.ui.reportsList.clicked.connect(lambda: on_reportsList_clicked(self))
     self.ui.saveFooterBtn.clicked.connect(lambda: on_saveFooterBtn_clicked(self))
     self.ui.deleteFooterBtn.clicked.connect(lambda: on_deleteFooterBtn_clicked(self))
-    
-    footer_widget = TableFooterWidget(20)
-    
-    self.ui.icpHistoryLayout.addWidget(footer_widget)
 
 # TODO: don't even think I need to have a seperate reports section, can just combine it all into a single ICP page 
 
@@ -57,7 +55,6 @@ def loadReportList(self):
         for item in results: 
             self.ui.reportsList.addItem(item[0])    
 
-            
 #******************************************************************
 #    ICP History 
 #****************************************************************** 
@@ -84,19 +81,34 @@ def icp_history_setup(self):
     self.ui.icpTable.setColumnWidth(4, smallCol)
     self.ui.icpTable.setColumnWidth(5, medCol)
     
-    
     # Search bar section 
     # TODO: add signals that will effect this 
     self.ui.filterComboBox.clear()
-    self.ui.ShowComboBox.clear()
     self.ui.filterComboBox.addItems(FILTER_BY)
-    self.ui.ShowComboBox.addItems(SHOW_ENTITIES)
- 
+
+    icpFooterSetup(self)
+    
     # Connect the signals/buttons and change the database 
     self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.tempDB))
     self.ui.icpSearchBtn1.clicked.connect(lambda: on_icpSearchBtn_clicked(self))
 
     loadIcpHistory(self) 
+    
+    
+def icpFooterSetup(self): 
+
+    query = 'SELECT COUNT(*) FROM icpData' 
+    rows = 100
+    
+    totalPages = self.tempDB.query(query)[0][0]
+    totalPages = int(math.ceil(totalPages/rows)); 
+
+    #print(f'Total Pages: {totalPages}'); 
+
+    footer_widget = TableFooterWidget(totalPages)
+    
+    self.ui.icpHistoryLayout.addWidget(footer_widget)
+    
 
 @pyqtSlot()
 def on_icpUploadBtn_clicked(database): 
@@ -154,8 +166,7 @@ def populateIcpHistoryTable(self, result):
 
     for row , data in enumerate(result):
         #loops throught items in the order sql requested 
-        height = 20
-        self.ui.icpTable.setRowHeight(row, height)
+        self.ui.icpTable.setRowHeight(row, TABLE_ROW_HEIGHT)
         
         sampleNum = data[0] 
         machineType = data[2]
@@ -749,7 +760,7 @@ class addElementDialog(QDialog):
         if(self.reportTypes):         
             for row, item in enumerate(self.reportTypes): 
                 
-                self.table.setRowHeight(row, 25)
+                self.table.setRowHeight(row, TABLE_ROW_HEIGHT)
                 
                 reportNumItem = QTableWidgetItem(str(item[0])) # Convert number into a string  
                 reportNameItem = QTableWidgetItem(item[1])

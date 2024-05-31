@@ -103,13 +103,13 @@ def populateChmDatabase(self):
                     item = QTableWidgetItem(testName[0][0])
                     item.setTextAlignment(Qt.AlignCenter)       
                 
-                    chmTable.setRowHeight(i, 18)
+                    chmTable.setRowHeight(i, TABLE_ROW_HEIGHT)
                     chmTable.setItem(i, j, item)    
             else: 
                 item = QTableWidgetItem(data)
                 item.setTextAlignment(Qt.AlignCenter)       
                 
-                chmTable.setRowHeight(i, 18)
+                chmTable.setRowHeight(i, TABLE_ROW_HEIGHT)
                 chmTable.setItem(i, j, item)     
 
         actionWidget = createActionWidget(self, i)
@@ -629,20 +629,19 @@ class TestsDataModel():
     def loadTestsData(self):
         # special to get ride of the all the ICP names 
         #testsList = getAllChmTestsInfo2(self.db) 
-        testsList = getAllChmTestsInfo3(self.db) 
+        testsList = getAllChmTestsInfo2(self.db) 
  
         print('Total Tests: ', len(testsList))
         print(testsList[0])
-
 
         if(testsList): 
             for test in testsList: 
                 testNum     = test[0]
                 testName    = test[1]
-                textName    = test[4]
-                displayName = test[5]
-                recoveryVal = test[6]
-                unitType    = test[6]
+                textName    = test[2]
+                displayName = test[3]
+                recoveryVal = test[4]
+                unitType    = test[5]
 
                 self.tests[testNum] = TestData(testNum, testName, textName, displayName, recoveryVal, unitType)
 

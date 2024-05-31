@@ -354,45 +354,7 @@ def getReportNum(db, reportName):
 #    General Queries/Commands
 #****************************************************************** 
 
-def checkReportExists(db, jobNum, reportType): 
-    try: 
-        query = 'SELECT * FROM jobs WHERE jobNum = ? and reportType = ?'
-        db.execute(query, (jobNum, reportType))
-        result = db.fetchone()
-        return result
-    except Exception as e: 
-        print(f'An error occured: {e}')
-        return None 
 
-def searchJobsList(db, searchValue): 
-    try:
-        query = 'SELECT * FROM jobs WHERE jobNum LIKE ? ORDER BY creationDate DESC'
-        results = list(db.query(query, (searchValue + '%',)))
-        return results
-    except Exception as e:
-        print(f"An error occurred during the database query: {e}")
-        return None
-
-def getAllJobsList(db): 
-    try:
-        query = 'SELECT * FROM jobs ORDER BY creationDate DESC'  
-        results = list(db.query(query)) 
-        return results
-    except Exception as e:
-        print(f"An error occurred during the database query: {e}")
-        return None
-   
-def getAllJobNumbersList(db):  
-    query = 'SELECT DISTINCT jobNum FROM jobs'  
-    db.execute(query)
-
-    jobNumbers = db.fetchall()
-    return  [item[0] for item in jobNumbers]
-
-def getReportTypeList(db): 
-    query = 'SELECT * FROM icpReportType' 
-    report_types = db.query(query)
-    return [item[0] for item in report_types]
      
 #******************************************************************
 #   Author Commands  
@@ -424,6 +386,19 @@ def getAllParameters(db):
     except Exception as e: 
         print(e)
         return None 
+
+def getParameterName(db, paramNum): 
+
+    try: 
+        print(f'TYPE: {type(paramNum)}, {paramNum}')
+        query = 'SELECT parameterName FROM parameters WHERE parameterNum = ?'  
+        result = db.query(query, (paramNum,))[0][0]
+        return result
+        
+    except Exception as e: 
+        print(e)
+        return None 
+    
     
 def addParameter(db, parameterName):
     try:
@@ -502,11 +477,63 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
      
     
 #******************************************************************
-#    Client Queries
+#    Report Queries
 #****************************************************************** 
 
+def addNewJob(db, jobNum, reportNum, parameter, dilution, currentDate):
+    print('[SQLITE]: addNewJob()')
+    try: 
+        sql = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, creationDate, dilution) values (?,?,?,?,?)'
+        db.execute(sql, (jobNum, reportNum, parameter, currentDate, dilution))
+        db.commit()
+    except Exception as e: 
+        print(f'An error occured: {e}')
+        
+def getAllJobsList(db): 
+    try:
+        query = 'SELECT * FROM jobs ORDER BY creationDate DESC'  
+        results = list(db.query(query)) 
+        return results
+    except Exception as e:
+        print(f"An error occurred during the database query: {e}")
+        return None
 
+def getAllJobNumbersList(db):  
+    try: 
+        query = 'SELECT DISTINCT jobNum FROM jobs'  
+        db.execute(query)
 
+        jobNumbers = db.fetchall()
+        return  [item[0] for item in jobNumbers] 
+
+    except Exception as e:
+        print(f'An error occured: {e}')
+        return []
+
+def getReportTypeList(db): 
+    query = 'SELECT * FROM icpReportType' 
+    report_types = db.query(query)
+    return [item[0] for item in report_types]
+
+def checkJobExists(db, jobNum, reportNum): 
+    try: 
+        query = 'SELECT * FROM jobs WHERE jobNum = ? and reportNum = ?'
+        db.execute(query, (jobNum, reportNum))
+        result = db.fetchone()
+        return result
+    except Exception as e: 
+        print(f'An error occured: {e}')
+        return None 
+    
+
+def searchJobsList(db, searchValue): 
+    try:
+        query = 'SELECT * FROM jobs WHERE jobNum LIKE ? ORDER BY creationDate DESC'
+        results = list(db.query(query, (searchValue + '%',)))
+        return results
+    except Exception as e:
+        print(f"An error occurred during the database query: {e}")
+        return None
 
 #******************************************************************
 #    Front Database Queries 

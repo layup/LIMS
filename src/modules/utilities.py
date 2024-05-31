@@ -658,12 +658,7 @@ def formatStringArray(inputArray):
     return(outputArray)
         
 
-def createReport(db, jobNum, reportType, parameter, dilution): 
-    sql = 'INSERT INTO jobs (jobNum, reportType, parameter, creationDate, dilution) values (?,?,?,?,?)'
-    currentDate = date.today()
-    db.execute(sql, (jobNum, reportType, parameter, currentDate, dilution))
-    db.commit()
-    
+
     
 def viewIcpTable(filePath, data, reportType): 
     print('Viewing ICP Table')

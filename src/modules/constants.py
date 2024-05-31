@@ -1,14 +1,23 @@
 
-REPORTS_TYPE = ['','CHM','ICP']
 
-
-
+# Report Variables 
 ICP_REPORT = 1 
 CHM_REPORT = 2 
 
+REPORTS_TYPE = ['','CHM','ICP']
+REPORT_NUM = {
+    'ICP': 1, 
+    'CHM': 2 
+}
+REPORT_NAME = {
+    1: 'ICP', 
+    2: 'CHM'
+}
 
+# Table variables 
 TABLE_ROW_HEIGHT    = 20 
 TREE_ROW_HEIGHT     = 20 
+
 
 SAMPLETYPES = [ 
     '1um wound fiter', 
