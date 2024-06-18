@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
     QSpacerItem, QSizePolicy
 )
+
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 from modules.excel.chmExcel import createChmReport
@@ -19,6 +20,8 @@ from modules.utilities import *
 from widgets.widgets import *
 
 #TODO: move a lot of these functions to the db fuinctions 
+#FIXME: when file is sucessfully created it makes two copies of the dialog box 
+#FIXME: when the use info is empty it will crash because it can't scan any of the existing files 
 #******************************************************************
 #   Create Report Page Setup 
 #******************************************************************
@@ -68,9 +71,9 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     print('[FUNCTION]: createReportPage')
         
     # strip the basic informatioin 
-    self.jobNum = jobNum or self.ui.jobNumInput.text().strip()
-    self.reportType = reportType or self.ui.reportType.currentText()
-    self.parameter = parameter or self.ui.paramType.currentText()
+    jobNum = jobNum or self.ui.jobNumInput.text().strip()
+    reportType = reportType or self.ui.reportType.currentText()
+    parameter = parameter or self.ui.paramType.currentText()
     dilution = dilution or self.ui.dilutionInput.text()
     
     print('*JobNumber: ', jobNum)
@@ -78,18 +81,22 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     print('*Parameter: ', parameter)
     print('*Dilution: ', dilution )
 
-    self.dilution = 1 if (dilution == '' or dilution == None) else dilution       
+    dilution = 1 if (dilution == '' or dilution == None) else dilution       
     textFileExists = scanForTXTFolders(jobNum)
     
     errorCheck = [0, 0, 0, 0]     
     errorCheck[0] = 0 if re.match('^([0-9]{6})$', jobNum) else 1 
     errorCheck[1] = 0 if reportType in REPORTS_TYPE else 1
     errorCheck[2] = 0 if parameter != '' else 1
-    errorCheck[3] = 0 if textFileExists != '' else 1    
-    
+    errorCheck[3] = 0 if textFileExists != '' and textFileExists  else 1    
      
     if(sum(errorCheck) == 0): 
         # Clear existing data from previous jobs
+        self.jobNum = jobNum
+        self.reportType = reportType
+        self.parameter = parameter
+        self.dilution = dilution
+        
         self.ui.reportsTab.setCurrentIndex(0)
         self.ui.stackedWidget.setCurrentIndex(5) 
         self.clearDataTable()
@@ -98,17 +105,18 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         reportNum = REPORT_NUM[self.reportType]
         paramNum = getReportNum(self.tempDB, parameter)[0][0] #TODO: fix this so just returns the num
 
-        #TODO: load the information from database later (front house database) 
-        tempLocation = scanForTXTFolders(self.jobNum) 
-        clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, tempLocation)
-        
-        checkTextFile(self, tempLocation)
+        #TODO: load the information from database later (front house database)  
+        clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, textFileExists)
+
+        checkTextFile(self, textFileExists)
         
         self.clientInfo = clientInfo 
         self.sampleNames = sampleNames
         self.sampleTests = sampleTests
 
         jobResult  = checkJobExists(self.tempDB, jobNum, reportNum)
+        
+        print(f'SAMPLE NAMES: {self.sampleNames}')
         
         if jobResult is None:  
             # Adding Job to the database
@@ -124,6 +132,7 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
                 #TODO: load the report if exists
                 loadReportDialog(self)      
 
+    
         try: 
             self.createState = REPORT_NUM[reportType]  
             
@@ -134,7 +143,8 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
                 chmReportLoader(self)
                 
         except Exception as error: 
-            showErrorDialog(self, 'Could not create report', error)
+            print(error)
+            showErrorDialog(self, 'Could not create report', 'ERROR')
 
     else: 
         reportErrorHandler(self, errorCheck)
@@ -159,6 +169,8 @@ def reportErrorHandler(self, errorCheck):
         if(errorCheck[3] == 1): 
             print("Error: TXT File doesn't exist")
             errorMsg += 'TXT File could not be located\n'
+
+            
             
         showErrorDialog(self, errorTitle, errorMsg)
         

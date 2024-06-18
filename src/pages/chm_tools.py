@@ -731,8 +731,11 @@ class MacroDialog(QDialog):
     def __init__(self, data, item, title):
         super().__init__()
         # Load the UI file
-        ui_path = QDir.currentPath() + '/ui/macroDialog.ui'
-        self.ui = loadUi(ui_path, self)
+
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'macroDialog.ui')
+        
+        self.ui = loadUi(file_path, self)
         
         #set the titles 
         self.setWindowTitle(title) 
@@ -747,16 +750,16 @@ class MacroDialog(QDialog):
         self.saveButton.clicked.connect(self.handleSave)
         self.cancelButton.clicked.connect(self.handleCancel) 
 
-
 class CreateTestsDialog(QDialog): 
-    
-    
+     
     def __init__(self, database, title): 
         super().__init__()
         
         # Load the UI File 
-        ui_path = QDir.currentPath() + '/ui/addTestsDialog.ui'
-        self.ui = loadUi(ui_path, self)
+        #ui_path = QDir.currentPath() + '/ui/addTestsDialog.ui'
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'addTestsDialog.ui')
+        self.ui = loadUi(file_path, self)
 
         #set the titles 
         self.setWindowTitle('Add New Chemical') 

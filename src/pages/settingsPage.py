@@ -1,7 +1,10 @@
-
+import os 
 import sqlite3
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QTreeWidgetItem, QPushButton
+from PyQt5.uic import loadUi 
+from PyQt5.QtWidgets import QTreeWidgetItem, QPushButton, QHBoxLayout, QWidget, QDialog
+from PyQt5.QtCore import QObject, pyqtSignal
+
 
 #from modules.dbManager import * 
 from modules.dbFunctions import getAuthorInfo, getAllParameters, getAllAuthors 
@@ -17,7 +20,6 @@ def settingsSetup(self):
     loadSettings(self) 
     
     settingsReportSetup(self)
-    
     
     self.ui.SettingsTab.setCurrentIndex(0) 
 
@@ -39,28 +41,20 @@ def settingsSetup(self):
     self.ui.dbPathBtn.clicked.connect(lambda: updateFileItem(databasePathWidget, 'databasePath'))
     self.ui.preferenceDbBtn.clicked.connect(lambda:updateFileItem(preferenceDbPath, 'preferencesPath'))
 
-    self.ui.saveAuthorBtn.clicked.connect(lambda: on_saveAuthorBtn_clicked(self)) 
-    self.ui.deleteAuthorBtn.clicked.connect(lambda: on_deleteAuthorBtn_clicked(self))
-    
-    self.ui.authorList.currentItemChanged.connect(lambda authorName: on_authorList_currentItemChanged(self,authorName))
-    self.ui.addAuthor.clicked.connect(lambda: on_addAuthor_clicked(self))
 
 
 #TODO: I can have some more global functions that I can change
 def settingsTab_changes(self, index):  
     
-    authorList = self.ui.authorList 
-
-    if(index == 0): 
+    if(index == 0): # General Tab 
         loadSettings(self) 
 
-    if(index == 1): 
+    if(index == 1): # Reports Tab 
         # clear the items 
         self.ui.authorList.clear()
         self.ui.authorNameLine.clear()
         self.ui.authorPostionLine.clear()
         
-        #loadAuthors(self.db, authorList)
         loadReportAuthors(self)
 
         # Load the report type section 
@@ -106,92 +100,8 @@ def updateFileItem(widget, pathName):
         widget.setText(paths[pathName]) 
         
     
-def loadAuthors(database, authorList): 
-    authorsQuery = 'SELECT * FROM authors ORDER BY authorName ASC'
 
-    try: 
-        results = database.query(authorsQuery)
-        print('Loading Authors')
-        print(results)
-        for author in results: 
-            authorList.addItem(author[0])
-        
-    except: 
-        print('Error: could not load authors')
     
-#******************************************************************
-#    Author Functions 
-#****************************************************************** 
-@pyqtSlot()  
-def on_saveAuthorBtn_clicked(self): 
-    authorName = self.ui.authorNameLine.text()
-    authorPosition = self.ui.authorPostionLine.text()
-    
-    if((authorName != None or '') and (authorPosition != None or "")): 
-        sql = 'INSERT OR REPLACE INTO authors (authorName, authorPosition) VALUES (?,?)'
-        try:
-            self.db.execute(sql, (authorName, authorPosition,) )
-            self.db.commit()
-
-        except sqlite3.IntegrityError as e:
-            print(e) 
-    
-@pyqtSlot()  
-def on_deleteAuthorBtn_clicked(self): 
-    deleteQuery = 'DELETE FROM authors WHERE authorName = ?' 
-    authorName = self.ui.authorList.currentItem().text() 
-    
-    try: 
-        self.db.execute(deleteQuery, (authorName,))
-        self.db.commit()
-        removeAuthorFromAuthorList(self, authorName)
-    except:
-        print("Error: Could not delete author: ", authorName)
-
-def on_authorList_currentItemChanged(self, authorName):   
-    if(authorName != None):  
-        loadAuthorInfo(self, authorName.text())
-
-def removeAuthorFromAuthorList(self, authorName): 
-    for row in range(self.ui.authorList.count()): 
-        item = self.ui.authorList.item(row)
-        if item.text() == authorName: 
-            self.ui.authorList.takeItem(row)
-            break;         
-
-
-def loadAuthorInfo(self, authorName):             
-    result = getAuthorInfo(self.db, authorName) 
-    
-    if(result): 
-        self.ui.authorNameLine.setText(result[0])
-        self.ui.authorPostionLine.setText(result[1])
-    else: 
-        print("Error loading author info")
-        self.ui.authorNameLine.clear()
-        self.ui.authorPostionLine.clear()
-        self.ui.enterAuthorName.clear()
-        self.ui.authorNameLine.setText(authorName)
-        
-
-@pyqtSlot()  
-def on_addAuthor_clicked(self): 
-
-    authorName = self.ui.enterAuthorName.text()
-
-    sql = "SELECT authorName FROM authors"
-    result = self.db.query(sql)
-    
-    print(result)
-    
-    if(authorName != ''): 
-        self.ui.authorList.addItem(authorName)
-        self.ui.authorNameLine.setText(authorName)
-        
-        new_item_index = self.ui.authorList.count() - 1
-        self.ui.authorList.setCurrentRow(new_item_index)
-
-        
         
 #******************************************************************
 #    Reports Functions 
@@ -204,18 +114,31 @@ def settingsReportSetup(self):
     
     
     # button configuation setup 
-
+    
+    # Set the author tree labels 
     authorLabels = ['Author Name', 'Author Postion', 'Actions']
     self.ui.authorTreeWidget.setHeaderLabels(authorLabels)
+    # Define Author Tree Column Widths     
+    self.ui.authorTreeWidget.setColumnWidth(0, 220) 
+    self.ui.authorTreeWidget.setColumnWidth(1, 220) 
     
-    
+    self.ui.addAuthorBtn.clicked.connect(lambda: add_author_btn_clicked(self.tempDB, self.ui.authorTreeWidget))
 
+def add_author_btn_clicked(database, tree): 
+    dialog = authorDialog(database)
+        
+    dialog.updated_data.connect(lambda: print('Handle Data'))
+        
+    dialog.exec_() 
+    
+    
+def addAuthor(database, tree): 
     pass; 
 
 
 #TODO: can lazy load the data 
 def loadReportParameters(self): 
-    
+
     paramList = getAllParameters(self.tempDB)
     
     print(paramList)
@@ -233,31 +156,130 @@ def loadReportParameters(self):
 
         
 def loadReportAuthors(self): 
-    
+    # Retrieve all of the authors information
     authorList = getAllAuthors(self.tempDB)
-    
     authorTreeWidget = self.ui.authorTreeWidget 
-    
     authorTreeWidget.clear()
     
-    for authorItem in authorList: 
-        authorNum = authorItem[0]
-        authorName = authorItem[1]
-        authorRole = authorItem[2]
-
-        editButton = QPushButton('Edit')
+    for i, authorItem in enumerate(authorList):         
+        authorNum, authorName, authorRole = authorItem
 
         childTreeItem = QTreeWidgetItem(authorTreeWidget)
         childTreeItem.setText(0, authorName)
         childTreeItem.setText(1, authorRole)
-        
-        self.ui.authorTreeWidget.setItemWidget(childTreeItem, 2, editButton)
-        
-        
 
+        buttonWidget = ButtonItemWidget(authorNum, authorName, authorRole, self.tempDB, authorTreeWidget, childTreeItem)
         
+        authorTreeWidget.setItemWidget(childTreeItem, 2, buttonWidget)
         
-def on_addAuthor_clicked2(self): 
+#******************************************************************
+#    Reports Classes  
+#******************************************************************  
+
+class ButtonItemWidget(QWidget):
+    def __init__(self, authorNum, authorName, authorPostion, database, tree, treeItem, parent=None):
+        super().__init__(parent)
+        
+        self.num = authorNum
+        self.name = authorName
+        self.postion = authorPostion
+        self.db = database
+        self.tree = tree 
+        self.treeItem = treeItem
+        
+        self.editBtn = QPushButton('Edit')
+        self.deleteBtn = QPushButton('Delete')
+
+        self.editBtn.clicked.connect(self.handle_edit_button_clicked)
+        self.deleteBtn.clicked.connect(self.handle_delete_button_clicked)
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)  # Set zero margins
+
+        layout.addWidget(self.editBtn)
+        layout.addWidget(self.deleteBtn)
+        
+        self.setLayout(layout)
+        #self.setFixedSize(200,12) 
+        self.setFixedWidth(260)
     
-    #setup buttons 
-    pass; 
+    def handle_edit_button_clicked(self): 
+        #print(f'Current Row: {self.row}')
+        
+        dialog = authorDialog(self.db, self.numm, self.name, self.postion)
+        
+        dialog.updated_data.connect(self.handle_updated_data)
+        
+        dialog.exec_()
+    
+    def handle_delete_button_clicked(self): 
+
+        try:
+            query = 'DELETE FROM authors WHERE authorNum = ?'
+            self.db.execute(query, self.num)
+            self.db.commit()
+
+            self.tree.removeItemWidget(self.treeItem, self.treeItem.parent())
+
+        except sqlite3.Error as e:
+            print("Error:", e)
+
+    
+    def handle_updated_data(self, data): 
+        print(f'Handling Data: {data}')
+        
+        self.treeItem.setText(0, data[0])
+        self.treeItem.setText(1, data[1])
+    
+class authorDialog(QDialog): 
+    
+    updated_data = pyqtSignal(list)
+    
+    def __init__(self, database, authorNum=None, authorName=None, authorPostion=None):
+        super().__init__()
+
+        self.authorNum = authorNum 
+        self.authorName = authorName
+        self.authorPostion = authorPostion
+        self.db = database 
+        
+        # load UI
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'addAuthorDialog.ui')
+        loadUi(file_path, self)
+        
+        if(authorName and authorPostion): 
+            self.authorNameLineEdit.setText(authorName)
+            self.authorPostionLineEdit.setText(authorPostion)
+            
+        self.cancelBtn.clicked.connect(self.close)
+        self.saveBtn.clicked.connect(self.save_button_clicked)
+        
+        
+    def save_button_clicked(self):
+        currentName = self.authorNameLineEdit.text()
+        currentPostion = self.authorPostionLineEdit.text()
+        
+        if(self.authorNum): 
+            # Update to database 
+            try: 
+                query = 'UPDATE authors SET authorName = ?, authorRole = ? WHERE authorNum = ?' 
+                self.db.execute(query, (currentName, currentPostion))
+                self.db.commit()
+            except Exception as error: 
+                print(error)
+            
+        else: 
+            # Save to Database 
+            try: 
+                query = 'INSERT INTO authors (authorName, authorRole) VALUES (?, ?)'
+                self.db.execute(query, (currentName, currentPostion))
+                self.db.commit()
+            except Exception as error: 
+                print(error)
+         
+        # Send updated data to update Tree
+        self.updated_data.emit([currentName, currentPostion])
+        self.close()
+
+    

@@ -1,4 +1,4 @@
-
+import os 
 
 
 from PyQt5.QtWidgets import (
@@ -29,8 +29,12 @@ class TableFooterWidget(QWidget):
     def __init__(self, totalPages, showRows=1, parent=None):
         super().__init__(parent)
 
-        path = './ui/tableFooterWidget.ui'
-        self.ui = loadUi(path, self)  # Pass 'self' as parent
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'tableFooterWidget.ui')
+
+        #path = './ui/tableFooterWidget.ui'
+        
+        self.ui = loadUi(file_path, self)  # Pass 'self' as parent
         
         self.QSpinBox.setMaximum(totalPages)
         self.pageLabel.setText(f'of {totalPages}')
@@ -174,8 +178,9 @@ class FileLocationDialog(QDialog):
     def __init__(self, preferences, parent=None):
         super().__init__()
         # Load the UI of the Dialog
-        filePath = './ui/FileLocationDialog.ui' 
-        loadUi(filePath, self)
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'FileLocationDialog.ui')
+        loadUi(file_path, self)
 
         self.preferences = preferences
          
@@ -187,7 +192,7 @@ class FileLocationDialog(QDialog):
         self.setupItems('reportsPath', self.line3)
         self.setupItems('databasePath', self.line4)
         self.setupItems('officeDbPath', self.line5)
-        self.setupItems('preferencesPath', self.line6)
+        self.setupItems('temp_backend_path', self.line6)
 
         # Connect the Buttons 
         self.closeBtn.clicked.connect(self.close)
@@ -199,7 +204,7 @@ class FileLocationDialog(QDialog):
         self.browse3.clicked.connect(lambda: self.browseForFolder('reportsPath', self.line3))
         self.browse4.clicked.connect(lambda: self.browseForFile('databasePath', self.line4))
         self.browse5.clicked.connect(lambda: self.browseForFile('officeDbPath', self.line5))
-        self.browse6.clicked.connect(lambda: self.browseForFile('preferencesPath', self.line6))
+        self.browse6.clicked.connect(lambda: self.browseForFile('temp_backend_path', self.line6))
      
     def setupItems(self, pathName, lineItem):
         try: 

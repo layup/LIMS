@@ -208,7 +208,7 @@ class MainWindow(QMainWindow):
             self.ui.headerDesc.setText(''); 
         
             # Load the data again when the 
-            loadIcpHistory(self)
+            #loadIcpHistory(self)
         
         if(index == 1): # Elements Info 
             self.ui.headerTitle.setText('ICP Elements Information'); 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1619</width>
-    <height>890</height>
+    <height>889</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -2351,7 +2351,7 @@ margin: 0;
                      </widget>
                     </item>
                     <item>
-                     <widget class="QWidget" name="widget_39" native="true">
+                     <widget class="QWidget" name="icpSearchWidget" native="true">
                       <property name="minimumSize">
                        <size>
                         <width>400</width>
@@ -5209,7 +5209,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>3</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -5222,15 +5222,15 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox_2">
                     <property name="currentIndex">
-                     <number>2</number>
+                     <number>0</number>
                     </property>
                     <widget class="QWidget" name="page_3">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>568</height>
+                       <width>628</width>
+                       <height>389</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5372,7 +5372,7 @@ p, li { white-space: pre-wrap; }
                             <item>
                              <widget class="QLabel" name="label_71">
                               <property name="text">
-                               <string>Convert Folder</string>
+                               <string>Converted Data Folder</string>
                               </property>
                              </widget>
                             </item>
@@ -5426,7 +5426,7 @@ p, li { white-space: pre-wrap; }
                             <item>
                              <widget class="QLabel" name="label_35">
                               <property name="text">
-                               <string>Database 2 Folder </string>
+                               <string>Front Database Folder</string>
                               </property>
                              </widget>
                             </item>
@@ -5455,7 +5455,7 @@ p, li { white-space: pre-wrap; }
                             <item>
                              <widget class="QLabel" name="label_42">
                               <property name="text">
-                               <string>Preferences Database</string>
+                               <string>TEMP Database Folder</string>
                               </property>
                              </widget>
                             </item>
@@ -5495,8 +5495,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>568</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5541,8 +5541,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>569</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5550,6 +5550,14 @@ p, li { white-space: pre-wrap; }
                      </attribute>
                     </widget>
                     <widget class="QWidget" name="page_7">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>100</width>
+                       <height>30</height>
+                      </rect>
+                     </property>
                      <attribute name="label">
                       <string>Tables</string>
                      </attribute>
@@ -5569,15 +5577,15 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox">
                     <property name="currentIndex">
-                     <number>0</number>
+                     <number>1</number>
                     </property>
                     <widget class="QWidget" name="page_2">
                      <property name="geometry">
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>636</height>
+                       <width>924</width>
+                       <height>167</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5602,6 +5610,9 @@ p, li { white-space: pre-wrap; }
                          </size>
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout_58">
+                         <property name="leftMargin">
+                          <number>20</number>
+                         </property>
                          <item>
                           <widget class="QWidget" name="widget_63" native="true">
                            <property name="minimumSize">
@@ -5617,6 +5628,9 @@ p, li { white-space: pre-wrap; }
                             </size>
                            </property>
                            <layout class="QVBoxLayout" name="verticalLayout_56">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
                             <item>
                              <widget class="QTreeWidget" name="parameterTreeWidget">
                               <property name="maximumSize">
@@ -5646,6 +5660,18 @@ p, li { white-space: pre-wrap; }
                                </size>
                               </property>
                               <layout class="QHBoxLayout" name="horizontalLayout_68">
+                               <property name="leftMargin">
+                                <number>0</number>
+                               </property>
+                               <property name="topMargin">
+                                <number>5</number>
+                               </property>
+                               <property name="rightMargin">
+                                <number>0</number>
+                               </property>
+                               <property name="bottomMargin">
+                                <number>5</number>
+                               </property>
                                <item>
                                 <widget class="QPushButton" name="pushButton">
                                  <property name="text">
@@ -5711,24 +5737,14 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1329</width>
-                       <height>636</height>
+                       <width>924</width>
+                       <height>175</height>
                       </rect>
                      </property>
                      <attribute name="label">
                       <string>Authors</string>
                      </attribute>
                      <layout class="QHBoxLayout" name="horizontalLayout_67">
-                      <item>
-                       <widget class="QWidget" name="widget_18" native="true">
-                        <property name="minimumSize">
-                         <size>
-                          <width>100</width>
-                          <height>0</height>
-                         </size>
-                        </property>
-                       </widget>
-                      </item>
                       <item>
                        <widget class="QWidget" name="widget_58" native="true">
                         <property name="minimumSize">
@@ -5744,6 +5760,9 @@ p, li { white-space: pre-wrap; }
                          </size>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_49">
+                         <property name="leftMargin">
+                          <number>20</number>
+                         </property>
                          <item>
                           <widget class="QTreeWidget" name="authorTreeWidget">
                            <column>
@@ -5836,8 +5855,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1321</width>
-                       <height>636</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5867,49 +5886,6 @@ p, li { white-space: pre-wrap; }
                  </attribute>
                  <layout class="QHBoxLayout" name="horizontalLayout_39">
                   <item>
-                   <widget class="QWidget" name="widget_52" native="true">
-                    <property name="maximumSize">
-                     <size>
-                      <width>400</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_35">
-                     <item>
-                      <widget class="QWidget" name="widget_54" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_35">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>12</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>12</number>
-                        </property>
-                        <item>
-                         <widget class="QLineEdit" name="enterAuthorName"/>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="addAuthor">
-                          <property name="text">
-                           <string>Add</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QListWidget" name="authorList"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QWidget" name="widget_56" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_36">
                      <property name="topMargin">
@@ -5918,90 +5894,6 @@ p, li { white-space: pre-wrap; }
                      <property name="bottomMargin">
                       <number>5</number>
                      </property>
-                     <item>
-                      <widget class="QWidget" name="widget_55" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_36">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>12</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>12</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="saveAuthorBtn">
-                          <property name="text">
-                           <string>Save</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="deleteAuthorBtn">
-                          <property name="text">
-                           <string>Delete</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_17">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="widget_53" native="true">
-                       <layout class="QGridLayout" name="gridLayout_11">
-                        <item row="0" column="0">
-                         <widget class="QLabel" name="label_27">
-                          <property name="text">
-                           <string>Author Name </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="0" column="1">
-                         <widget class="QLineEdit" name="authorNameLine"/>
-                        </item>
-                        <item row="1" column="0">
-                         <widget class="QLabel" name="label_64">
-                          <property name="text">
-                           <string>Author Position</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item row="1" column="1">
-                         <widget class="QLineEdit" name="authorPostionLine"/>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <spacer name="verticalSpacer_15">
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>20</width>
-                         <height>40</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
                     </layout>
                    </widget>
                   </item>
