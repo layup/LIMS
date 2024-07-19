@@ -1,7 +1,9 @@
+import traceback
+import sys
 from datetime import date
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
@@ -9,7 +11,7 @@ from PyQt5.QtWidgets import (
     QSpacerItem, QSizePolicy
 )
 
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent 
 
 from modules.excel.chmExcel import createChmReport
 from modules.excel.icpExcel import createIcpReport
@@ -19,12 +21,19 @@ from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
-#TODO: move a lot of these functions to the db fuinctions 
-#FIXME: when file is sucessfully created it makes two copies of the dialog box 
+#TODO: move a lot of these functions to the db functions 
+#TODO: We can save the data, when closing the thing, such as if we are editing/adding new info. We want to save it for the future 
+#FIXME: when file is successfully created it makes two copies of the dialog box 
 #FIXME: when the use info is empty it will crash because it can't scan any of the existing files 
 #******************************************************************
 #   Create Report Page Setup 
 #******************************************************************
+
+#TODO: move this into constants later  
+REPORT_STATUS = {
+    0: 'Not Generated',
+    1: 'Generated'
+}
 
 def reportSetup(self): 
     #TODO: ERROR could not load TEXT_FILE please try again
@@ -36,14 +45,14 @@ def reportSetup(self):
     # Set input limits and Validators
     self.ui.jobNumInput.setValidator(validatorInt)
     self.ui.dilutionInput.setValidator(validatorDec)
-    
+    # Set the max length for both     
     self.ui.jobNumInput.setMaxLength(6)
     self.ui.dilutionInput.setMaxLength(6)
     
     apply_drop_shadow_effect(self.ui.createReportHeader)
 
     #load in the authors 
-    #TODO: have some error checking and deal with the loadiong section 
+    #TODO: have some error checking and deal with the loading section 
     # FIXME: load in the other authors to the section
     authorsList = [item[0] for item in getAllAuthorNames(self.tempDB)]
     authorsList.insert(0, '')
@@ -58,9 +67,43 @@ def reportSetup(self):
     
     # Connect signals  
     self.ui.NextSection.clicked.connect(lambda: createReportPage(self))
+    
+
 
     # Connect create table info
+    #FIXME:
+    ''' Happens when creating/opening CHM files when they have something that can be used>? 
+    Traceback (most recent call last):
+  File "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/src/pages/createReportPage.py", line 71, in <lambda>
     self.ui.dataTable.itemChanged.connect(lambda item: handleTableChange(self, item))
+  File "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/src/pages/createReportPage.py", line 554, in handleTableChange
+    column_name = table.horizontalHeaderItem(column).text()
+AttributeError: 'NoneType' object has no attribute 'text'
+make: *** [run] Abort trap: 6''' 
+    
+    #self.ui.dataTable.itemChanged.connect(lambda item: handleTableChange(self, item))
+     
+#TODO: replace the create report with a custom thing that can paste strings and remove the ints 
+class CustomIntLineEdit(QLineEdit): 
+    
+    attemptedPaste = pyqtSignal(str)  # Custom signal for attempted pastes
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setValidator(QIntValidator()) 
+        
+    def keyPressEvent(self, event: QKeyEvent):
+        if event.matches(QKeyEvent.Paste):
+            clipboard = QApplication.clipboard()
+            attempted_text = clipboard.text()
+            
+            # Check if the pasted text would be fully accepted
+            if not all(char.isdigit() for char in attempted_text):
+                self.attemptedPaste.emit(attempted_text)
+                return  # Don't process the paste event
+        
+        super().keyPressEvent(event)
+    
 
 #******************************************************************
 #   Creating Report 
@@ -69,8 +112,8 @@ def reportSetup(self):
 @pyqtSlot()
 def createReportPage(self, jobNum = None, reportType = None, parameter = None, dilution =None, method2= None):
     print('[FUNCTION]: createReportPage')
-        
-    # strip the basic informatioin 
+    
+    # strip the basic information 
     jobNum = jobNum or self.ui.jobNumInput.text().strip()
     reportType = reportType or self.ui.reportType.currentText()
     parameter = parameter or self.ui.paramType.currentText()
@@ -84,6 +127,7 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     dilution = 1 if (dilution == '' or dilution == None) else dilution       
     textFileExists = scanForTXTFolders(jobNum)
     
+    # Error Checking Section
     errorCheck = [0, 0, 0, 0]     
     errorCheck[0] = 0 if re.match('^([0-9]{6})$', jobNum) else 1 
     errorCheck[1] = 0 if reportType in REPORTS_TYPE else 1
@@ -91,6 +135,7 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
     errorCheck[3] = 0 if textFileExists != '' and textFileExists  else 1    
      
     if(sum(errorCheck) == 0): 
+        #TODO: I like the idea of just creating a ICP or CHM class that deals with either 
         # Clear existing data from previous jobs
         self.jobNum = jobNum
         self.reportType = reportType
@@ -108,6 +153,8 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         #TODO: load the information from database later (front house database)  
         clientInfo, sampleNames, sampleTests = processClientInfo(self.jobNum, textFileExists)
 
+        # Read the text file 
+        #TODO: later can just load it from the front database  
         checkTextFile(self, textFileExists)
         
         self.clientInfo = clientInfo 
@@ -119,20 +166,20 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         print(f'SAMPLE NAMES: {self.sampleNames}')
         
         if jobResult is None:  
-            # Adding Job to the database
+            # Adding to the Job table in database, when creating a new file 
             currentDate = date.today()
-            addNewJob(self.tempDB, jobNum, reportNum, paramNum, self.dilution, currentDate)
-            self.ui.statusHeaderLabel.setText('NEW')
+            currentStatus = 0 
+            addNewJob(self.tempDB, jobNum, reportNum, paramNum, self.dilution, currentStatus, currentDate)
+            self.ui.statusHeaderLabel.setText(REPORT_STATUS[currentStatus])
 
         else: 
+            #TODO: idk what but make this better this is a mess of code 
             if(method2 is not True): 
                 print('Report Exists')
                 print(jobResult)
                 
                 #TODO: load the report if exists
                 loadReportDialog(self)      
-
-    
         try: 
             self.createState = REPORT_NUM[reportType]  
             
@@ -143,8 +190,11 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
                 chmReportLoader(self)
                 
         except Exception as error: 
-            print(error)
-            showErrorDialog(self, 'Could not create report', 'ERROR')
+            print(f'[ERROR]: {error}') 
+            traceback.print_exc(file=sys.stderr)  # Print detailed traceback
+            
+            if(method2 != None): 
+                showErrorDialog(self, 'Could not create report', 'ERROR')
 
     else: 
         reportErrorHandler(self, errorCheck)
@@ -164,14 +214,13 @@ def reportErrorHandler(self, errorCheck):
             
         if(errorCheck[2] == 1): 
             print('Error: Please Select a parameter')
-            errorMsg += 'Please Select a Parmeter\n'
+            errorMsg += 'Please Select a Parameter\n'
         
         if(errorCheck[3] == 1): 
             print("Error: TXT File doesn't exist")
             errorMsg += 'TXT File could not be located\n'
 
-            
-            
+    
         showErrorDialog(self, errorTitle, errorMsg)
         
 #TODO: this should be in the preference section, move this into other database  
@@ -184,7 +233,7 @@ def populateAuthorNames(self):
         self.authors = [{result[0]: result[1]} for result in results]
         print(self.authors)
 
-        #TODO: clear a global author varliable 
+        #TODO: clear a global author variable 
         
     except: 
         print('Error: Could not load the authors for Create Report Page ')
@@ -292,7 +341,7 @@ def populateTableRow(tableWidget, row, col, alignment, value):
     return 
 
 #******************************************************************
-#    Chemisty Loader  
+#    Chemistry Loader  
 #****************************************************************** 
 
 #TODO: need to convert the classes into dirct 
@@ -519,9 +568,12 @@ def handleTableChange(self, item):
 
     updatedValue = table.item(row, column).text()
     column_name = table.horizontalHeaderItem(column).text()
-    
+   
+    # ICP create state  
     if(self.createState == 1): 
         pass; 
+    
+    # CHM Create State
     if(self.createState == 2): 
 
         textNameCol = 1
@@ -565,12 +617,14 @@ def chmReportLoader(self):
   
     loadClientInfo(self)
     
+    #FIXME: this is the error, what happens when the data isn't added into the file, we have to just scan the text file 
     chmTestsLists, testResults = chmGetTestsList(self) 
+
 
     dataTable = self.ui.dataTable
     rowCount = len(chmTestsLists) 
     
-    # Prepare the chm cliennt Info and the table 
+    # Prepare the chm client Info and the table 
     chmIntalize(self, dataTable, rowCount)    
     
     # Prepare the objects 
@@ -589,7 +643,6 @@ def chmReportLoader(self):
     # Signals
     self.ui.dataTable.itemChanged.connect(lambda item: handleTableChange(self, item))
     self.ui.createGcmsReportBtn.clicked.connect(lambda: chmReportHandler(self, 6, chmTestsLists)); 
-    
     
     
 def chmGetTestsList(self): 
@@ -655,7 +708,7 @@ def chmIntalize(self, table, rowCount):
     formatReportTable(table, rowCount, colCount) 
     table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
     
-    # Initalize the columns 
+    # Initialize the columns 
     for i, name in enumerate(columnNames):
         item = QtWidgets.QTableWidgetItem(name)
         table.setHorizontalHeaderItem(i, item)
@@ -678,8 +731,8 @@ def chmIntalize(self, table, rowCount):
 #******************************************************************
     
 #FIXME: adjust based on the sample information 
-#FIXME: crashes when doing gcms to icp without closing program 
-#TODO: move the message to the center of the screen and change the dimensions 
+#TODO: move the message to the center of the screen and change the dimensions  self.portion
+@pyqtSlot() 
 def chmReportHandler(self, columnLength,  tests):
     print('[FUNCTION]: chmReportHandler(self, tests)')
     print('*Tests: ', tests)
@@ -692,7 +745,7 @@ def chmReportHandler(self, columnLength,  tests):
     recovery = []
     displayNames = []
     
-    # Retreive the Sample Input Data 
+    # Retrieve the Sample Input Data 
     for col in range(columnLength, totalSamples + columnLength): 
         currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
         print('currentJob Test: ', currentJob)
@@ -707,7 +760,7 @@ def chmReportHandler(self, columnLength,  tests):
         sampleData[currentJob] = jobValues
         #print(currentJob, sampleData[currentJob])
         
-    # Retreive the Tests Info 
+    # Retrieve the Tests Info 
     for row in range(totalTests): 
         try: 
             testsName = self.ui.dataTable.item(row, 1).text()
@@ -736,6 +789,18 @@ def chmReportHandler(self, columnLength,  tests):
                 recovery.append(recoveryVal) 
         except: 
             recovery.append('')       
+
+            
+    #TODO: save the status of the job 
+    try: 
+        query = 'UPDATE jobs SET status = ? WHERE jobNum = ? AND reportNum = ?' 
+        completeJobStatus = 'CREATED'; 
+        reportNum = 1; 
+        self.tempDB.execute(query, (completeJobStatus, self.jobNum, reportNum))
+        self.tempDB.commit()
+        
+    except Exception as error: 
+        print(error)
             
     createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
 
@@ -835,7 +900,7 @@ def icpReportLoader(self):
 
     machineData = {item[0]: json.loads(item[2]) for item in sampleData}
 
-    #print(f'Elment Names: {elementNames}')
+    #print(f'Element Names: {elementNames}')
     print(f'Element Unit Values: {elementUnitValues}')
     print('SelectedSampleItems: ', selectedSampleNames)    
     
@@ -849,8 +914,8 @@ def icpReportLoader(self):
     #dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
     self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elements, elementUnitValues, totalSamples, reportNum));     
 
-    # Format and intalize the tables 
-    icpIntalizeTable(self, dataTable, colCount, totalRows, selectedSampleNames, columnNames)
+    # Format and initialize the tables 
+    icpInitTable(self, dataTable, colCount, totalRows, selectedSampleNames, columnNames)
     
     # Populate the sample table information 
     icpPopulateSamplesSection(self, selectedSampleNames)
@@ -865,8 +930,8 @@ def icpReportLoader(self):
     icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)
             
 
-def icpIntalizeTable(self, table, colCount, totalRows, selectedSampleNames, columnNames): 
-    print(f'[FUNCTION]: icpIntalizeTable(self, table, colCount, totalRows, selectedSampleNames, columnNames)')
+def icpInitTable(self, table, colCount, totalRows, selectedSampleNames, columnNames): 
+    print(f'[FUNCTION]: icpInitTable(self, table, colCount, totalRows, selectedSampleNames, columnNames)')
 
     formatReportTable(table, totalRows, colCount)
 
@@ -875,7 +940,7 @@ def icpIntalizeTable(self, table, colCount, totalRows, selectedSampleNames, colu
     total_width = column_width + padding
     table.setColumnWidth(2, total_width)    
     
-    # inital column names
+    # initialise the column names
     for i, name in enumerate(columnNames): 
         item = QtWidgets.QTableWidgetItem(name)
         table.setHorizontalHeaderItem(i, item)
@@ -923,11 +988,11 @@ def icpPopulateTable(self, elements, elementUnitValues):
         if(elementNum in elementUnitValues): 
             unitType   = elementUnitValues[elementNum][0]
             lowerLimit = elementUnitValues[elementNum][1]
-            upperlimit = elementUnitValues[elementNum][2]
+            upperLimit = elementUnitValues[elementNum][2]
             
             icpPopulateRow(tableWidget, i, 2, 1, unitType)
             icpPopulateRow(tableWidget, i, 3, 1,  lowerLimit)
-            icpPopulateRow(tableWidget, i, 4, 1, upperlimit)
+            icpPopulateRow(tableWidget, i, 4, 1, upperLimit)
            
 def icpPopulateRow(tableWidget, row, col, alignment, value): 
     item = QtWidgets.QTableWidgetItem()  
@@ -947,21 +1012,21 @@ def icpPopulateAdditonalRows(self, totalRows, addtionalRows ):
     tableWidget = self.ui.dataTable
     
     for i, elementName in enumerate(addtionalRows): 
-        postion = totalRows - i - 1; 
-        icpPopulateRow(tableWidget, postion, 0, 0, elementName)
+        position = totalRows - i - 1; 
+        icpPopulateRow(tableWidget, position, 0, 0, elementName)
         
         if(elementName == 'Hardness'): 
             symbolName = "CaC0₃"
             unitType = "ug/L"
             
-            icpPopulateRow(tableWidget, postion, 1, 1, symbolName) 
-            icpPopulateRow(tableWidget, postion, unitCol, 1, unitType) 
+            icpPopulateRow(tableWidget, position, 1, 1, symbolName) 
+            icpPopulateRow(tableWidget, position, unitCol, 1, unitType) 
         else: 
             symbolName = ""
             unitType = "unit"
         
-            icpPopulateRow(tableWidget, postion, 1, 1, symbolName) 
-            icpPopulateRow(tableWidget, postion, unitCol, 1, unitType) 
+            icpPopulateRow(tableWidget, position, 1, 1, symbolName) 
+            icpPopulateRow(tableWidget, position, unitCol, 1, unitType) 
 
 def icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames): 
     #print('[FUNCTION]: icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)')
@@ -1005,14 +1070,14 @@ def icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnN
 
             icpPopulateRow(tableWidget, hardnessRow, sampleCol, 1, result)
 
-def dilutionConversion(machineList, sample, symbol, dilutuion):
-    print(f'[FUNCTION]: dilutionConversion(machineList, {sample}, {symbol}, {dilutuion})')
+def dilutionConversion(machineList, sample, symbol, dilution):
+    print(f'[FUNCTION]: dilutionConversion(machineList, {sample}, {symbol}, {dilution})')
    
     machineValue = machineList[sample][symbol]
     
-    if(is_float(machineValue) and dilutuion != 1): 
+    if(is_float(machineValue) and dilution != 1): 
         newVal = float(machineValue)
-        newVal = newVal * float(dilutuion)
+        newVal = newVal * float(dilution)
         newVal = round(newVal, 3)
         return newVal
         
@@ -1029,7 +1094,7 @@ def dilutionConversion(machineList, sample, symbol, dilutuion):
 #    ICP Report Handler Function  
 #******************************************************************
 
-    
+@pyqtSlot()  
 def icpReportHander(self, elements, limits, totalSamples, reportNum): 
     print('[FUNCTION]: icpReportHander(self, tests, totalSamples)')
     print(f'Total Samples: {totalSamples}') 
@@ -1076,7 +1141,7 @@ def icpReportHander(self, elements, limits, totalSamples, reportNum):
             print(f'[ERROR]: {e}') 
             unitType.append('')
         
-    footerComments = icpGenerateFooter(self)
+    footerComments = icpGenerateFooter(self.tempDB, self.parameter)
 
     #print(f'Sample Data: {sampleData}')
     print('*Limits')
@@ -1106,24 +1171,24 @@ def icpReportHander(self, elements, limits, totalSamples, reportNum):
     createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, elementNames, unitType, elementNames, limits, footerComments)
     #createIcpReport2(self.clientInfo, self.samplenames, self.jobNum, sampleData, elements, limitsInfo, footer)
 
-    createdReportDialog('test')
-    
-def icpGenerateFooter(self): 
-    try: 
-        commentQuery = 'SELECT footerComment FROM icpReportType WHERE reportType = ?'
-        self.db.execute(commentQuery, (self.parameter,))
-        commentResults = self.db.fetchone()
-    except Exception as error: 
-        print(f'[ERROR]: {error}')
+    #TODO: if successful update the database set the status = 1 
 
-    footerComments = ''
+    createdReportDialog('test')
+
+def icpGenerateFooter(database, paramenterName):
+    print('[FUNCTION]: icpGenerateFooter()')
+    paramNum = getParameterNum(database, paramenterName)
+    footerComment = getIcpReportFooter(database, paramNum)
+    print(footerComment)
     
-    if(commentResults):
-        footerComments = pickle.loads(commentResults[0])
-        footerList = '\n'.join(footerComments)
-        footerComments = footerList.split('\n') 
-        
-    return footerComments
+    if(footerComment): 
+        #footerList = '\n'.join(footerComment)
+        footerComment = footerComment.split('\n')  
+        print(footerComment)
+    
+        return footerComment
+    else: 
+        return ''
 
 
 class icpManager: 

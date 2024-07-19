@@ -12,17 +12,19 @@ from PyQt5.QtWidgets import (
 from modules.constants import *; 
 #from modules.createExcel import * 
 from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory, getParameterName
-from modules.dialogBoxes import openJobDialog
+from modules.dialogBoxes import openJobDialog, showErrorDialog
 from modules.utilities import apply_drop_shadow_effect
 from widgets.widgets import TableFooterWidget
 
 from pages.createReportPage import createReportPage
 
+#TODO: add in errors that will have to fix 
 
 def historyPageSetup(self): 
     
     historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Status', 'Action']
     frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
+
 
     formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
     formatHistoryDatabaseTable(self.ui.frontDeskTable, frontHistoryHeaders)
@@ -32,32 +34,47 @@ def historyPageSetup(self):
     footer_widget = TableFooterWidget(69)
     self.ui.historyLayout.addWidget(footer_widget)
     
-    #load the inital table data 
+    #load the initialize table data 
+    historySearchSetup(self)
     loadReportsPage(self); 
+
+    # Add tool tips 
+    self.ui.reportsSearchBtn.setToolTip('This is a tooltip for the button')
 
     # Connect the signals 
     self.ui.reportsTable.doubleClicked.connect(lambda index: on_table_double_clicked(index))
     self.ui.reportsSearchBtn.clicked.connect(lambda: on_reportsSearchBtn_clicked(self)) 
+    self.ui.reportsSearchLine.returnPressed.connect(lambda: on_reportsSearchBtn_clicked(self))
     
 
-def formatHistoryDatabaseTable(table, columns): 
+def formatHistoryDatabaseTable(table, headers, tooltips=None): 
     rowHeight = 25
     
     # Disable editing for the entire table 
     table.setEditTriggers(QAbstractItemView.NoEditTriggers)
     
     # Set the column count 
-    table.setColumnCount(len(columns))
+    table.setColumnCount(len(headers))
 
     # Set the column names and info 
     table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
-    table.setHorizontalHeaderLabels(columns)
+    table.setHorizontalHeaderLabels(headers)
+    
+    ''' OPT: Setting the tool tips for the headers 
+    
+    for col in range(table.columnCount()): 
+        header_item = QTableWidgetItem(headers[col])
+        header_item.setToolTip('This is a test')
+        table.setHorizontalHeaderItem(col, header_item)
+    
+    ''' 
     
     table.verticalHeader().setVisible(True)
     table.verticalHeader().setDefaultSectionSize(rowHeight)
     
-#TODO: load in new data to the search as well 
+
 def historySearchSetup(self): 
+    print('[FUNCTION]: historyPageSetup')
     # Get the all of the jobNums for the completer
     jobList = getAllJobNumbersList(self.tempDB) 
     jobList_as_strings = [str(item) for item in jobList]
@@ -74,13 +91,10 @@ def historySearchSetup(self):
 #   Chemistry History 
 #******************************************************************
 
-#TODO: could have a model item that keeps tracks of all the histroy
-
 def loadReportsPage(self, searchValue=None): 
-    print('[FUNCTION]: historyPageSetup')
-    print(f'Search Value: {searchValue}')
+    print(f'[FUNCTION]: loadReportsPage(self, {searchValue})') 
 
-    historySearchSetup(self)
+    #historySearchSetup(self)
 
     # When user uses the search bar 
     if(searchValue): 
@@ -91,7 +105,7 @@ def loadReportsPage(self, searchValue=None):
             results = []
     else: 
         try: 
-            results = getAllJobsList(self.tempDB);
+            results = getAllJobsList(self.tempDB);            
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
             results = []
@@ -110,7 +124,16 @@ def loadReportsPage(self, searchValue=None):
         parameterType = getParameterName(self.tempDB, int(current[2]))
         dilutionFactor = str(current[3])
         creationDate = str(current[4])
-        status = 'N/A'
+        
+        if(current[5] is not None):  
+            try:
+                status = REPORT_STATUS[int(current[5])]  # Attempt conversion to int
+            except (ValueError, TypeError):  # Catch potential conversion errors
+                print("Error: Invalid value for REPORT STATUS. Using 'N/A'.")
+                status = 'N/A'
+        else: 
+            status = 'N/A' 
+        
         
         setTableItem(historyTable, row, 0, jobNumber) 
         setTableItem(historyTable, row, 1, reportType)
@@ -123,14 +146,26 @@ def loadReportsPage(self, searchValue=None):
         openButton.clicked.connect(lambda _, row=row: openExistingReport(self, row));
         historyTable.setCellWidget(row, 6, openButton)
 
+    if(searchValue == None): 
+        return None
+
 @pyqtSlot()
 def on_reportsSearchBtn_clicked(self): 
-    print('ReportSearchBtn Clicked:')
+    try: 
+        print('ReportSearchBtn Clicked:')
 
-    searchValueString = self.ui.reportsSearchLine.text()
-    print(f'Searching for Job Number: {searchValueString}')
+        searchValueString = self.ui.reportsSearchLine.text()
+        print(f'Searching for Job Number: {searchValueString}')
 
-    loadReportsPage(self, searchValueString)
+        results = loadReportsPage(self, searchValueString)
+        
+        if(results == None): 
+            errorTitle = "Not Search Results"
+            errorMsg = "Couldn't find any jobs that matched the job num" 
+            showErrorDialog(self, errorTitle, errorMsg)
+        
+    except Exception as error: 
+        print(error)
     
 def setTableItem(table, row, column, text, alignment=Qt.AlignCenter): 
     item = QTableWidgetItem()

@@ -87,6 +87,7 @@ def hardnessCalc(calcium, magnesium, dilution):
     return round(calcium * 2.497 + calcium * 4.11, 1)
 
 
+
 #******************************************************************
 #    OS Access Functions 
 #******************************************************************

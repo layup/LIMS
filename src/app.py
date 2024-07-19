@@ -26,14 +26,14 @@ from interface import *
 
 from pages.createReportPage import reportSetup, deleteAllSampleWidgets
 from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
-from pages.chm_tools import ( populateChmDatabase, chemistySetup, chmClearEnteredTestsData, ) 
+from pages.chm_tools import ( chemistySetup, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
 
 from widgets.widgets import * 
     
     
-#TODO: need to have more class objects that deal with insertion, that way we can have lazy loading isntead of constant 
+#TODO: need to have more class objects that deal with insertion, that way we can have lazy loading instead of constant 
 # need to get more info 
 class MainWindow(QMainWindow):
     
@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
         settingsSetup(self)
         historyPageSetup(self)
         icpSetup(self)
+
         chemistySetup(self)
 
         apply_drop_shadow_effect(self.ui.headerWidget)
@@ -65,7 +66,7 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    inline Slot Function Calls 
    #******************************************************************  
-   #FIXME: not sure if it is good pratice to have just something like this 
+   #FIXME: not sure if it is good practice to have just something like this 
    #FIXME: can replace with something that just scans all of the files 
     def on_clientName_1_textChanged(self):
         self.clientInfo['clientName'] = self.ui.clientName_1.text()
@@ -146,7 +147,7 @@ class MainWindow(QMainWindow):
          self.change_index(4)
          
    #******************************************************************
-   #    Navigatioin Mangament 
+   #    Navigation Management 
    #****************************************************************** 
     def change_index(self, index): 
         self.previous_index = self.ui.stackedWidget.currentIndex() 
@@ -201,52 +202,6 @@ class MainWindow(QMainWindow):
             self.ui.headerWidget.hide()
             deleteAllSampleWidgets(self) 
 
-    def on_icpTabWidget_currentChanged(self, index):
-        print(f'ICP TAB INDEX: {index}')
-        if(index == 0): #History  
-            self.ui.headerTitle.setText('ICP Database'); 
-            self.ui.headerDesc.setText(''); 
-        
-            # Load the data again when the 
-            #loadIcpHistory(self)
-        
-        if(index == 1): # Elements Info 
-            self.ui.headerTitle.setText('ICP Elements Information'); 
-
-            totalElements = self.elementManager.getTotalElements()
-            self.ui.headerDesc.setText("Total Elements: {}".format(totalElements))
-            
-            #loadDefinedElements(self)
-
-        if(index == 2): #  Reports Info 
-            self.ui.headerTitle.setText('ICP Reports Information'); 
-            self.ui.headerDesc.setText(''); 
-            
-            loadReportList(self)
-
-    def on_chmTabWidget_currentChanged(self, index): 
-        #TODO: reload in the data for all the sections (new data)? 
-        print(f'CHM TAB CHANGE INDEX {index}')
-        
-        if(index == 0): # Database 
-            self.ui.headerTitle.setText('Chemisty Tests Database'); 
-            self.ui.headerDesc.setText(''); 
-            populateChmDatabase(self);  
-            
-        if(index == 1): # Input Data 
-            self.ui.headerTitle.setText('Chemisty Data Entry'); 
-            self.ui.headerDesc.setText(''); 
-           
-        if(index == 2): # Test Info  
-            self.ui.headerTitle.setText('Chemisty Tests Information'); 
-            self.ui.headerDesc.setText(''); 
-            #totalTests = getChmTotalTests(self.db) 
-            #self.ui.gcmsSubTitleLabel.setText('Total Tests: ' + str(totalTests))
-
-        if(index == 3): # Report Info 
-            self.ui.headerTitle.setText('Chemisty Reports Information')
-            self.ui.headerDesc.setText('Total Reports: ') 
-
    #******************************************************************
    #    Setup Loading
    #******************************************************************  
@@ -300,7 +255,7 @@ class MainWindow(QMainWindow):
                 # Connect the backend database (Harry Systems)
                 self.db = Database(mainDatabasePath)
 
-                # Connect the Office database (Front and Histroy Systems)
+                # Connect the Office database (Front and History Systems)
                 self.officeDB = Database(officeDatabasePath)
             
                 # Connect the preferences database
@@ -321,7 +276,7 @@ class MainWindow(QMainWindow):
                     print(f'Temp Location: {tempLocation}')
                     self.preferences.update('temp_backend_path', tempLocation)
                     
-                    # Dialog popup to load the necessaary database Information for the user 
+                    # Dialog popup to load the necessary database Information for the user 
                     dialog = FileLocationDialog(self.preferences)
                     dialog.exec_()
           
@@ -401,7 +356,7 @@ class MainWindow(QMainWindow):
     def dataTransfer(self): 
         print('Data Transfer File test')
         
-            
+        
 #******************************************************************
 #   Classes
 #******************************************************************    

@@ -13,6 +13,10 @@ REPORT_NAME = {
     1: 'ICP', 
     2: 'CHM'
 }
+REPORT_STATUS = {
+    0: 'Not Generated',
+    1: 'Generated'
+}
 
 # Table variables 
 TABLE_ROW_HEIGHT    = 20 

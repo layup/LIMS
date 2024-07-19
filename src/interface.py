@@ -396,6 +396,10 @@ class Ui_MainWindow(object):
 "    height:20px;\n"
 "} \n"
 "\n"
+"#reportsSearchWidget QPushButton::hover {\n"
+"    background-color: rgb(107, 108, 108);\n"
+"}\n"
+"\n"
 "\n"
 "#reportsTableWidget  {    \n"
 "    /* background-color:#323a47; */\n"
@@ -642,6 +646,34 @@ class Ui_MainWindow(object):
 "/    ICP Reports Info Page  \n"
 "/******************************************************************/\n"
 "\n"
+"\n"
+"\n"
+"#icpReportHeader {\n"
+"    background-color: #323a47;\n"
+"    border-radius: 10px;    \n"
+"} \n"
+"\n"
+"#icpReportFooter {\n"
+"    background-color: #323a47;\n"
+"    border-radius: 10px;    \n"
+"}\n"
+"\n"
+"\n"
+"#icpReportFooter QPushButton {\n"
+"    min-height: 20px; \n"
+"    min-width:120px; \n"
+"    border: 1px solid gray; \n"
+"    border-radius: 5px;\n"
+"    color:white; \n"
+"    background-color: #555555\n"
+"}\n"
+"\n"
+"#icpReportFooter QPushButton:hover{\n"
+"    background-color: rgb(180, 180, 180)\n"
+"}\n"
+"\n"
+"\n"
+"\n"
 "#icpReportTypeWidget { \n"
 "    background-color: #323a47;\n"
 "    border-radius: 10px;    \n"
@@ -663,6 +695,7 @@ class Ui_MainWindow(object):
 "/******************************************************************/\n"
 "\n"
 "\n"
+"\n"
 "#icpSearchBtn1 {\n"
 "    background: #555555;\n"
 "    border-top-right-radius: 0px; \n"
@@ -674,7 +707,6 @@ class Ui_MainWindow(object):
 "    height:20px;\n"
 "} \n"
 "\n"
-"\n"
 "#icpUploadBtn  {\n"
 "    min-height:20px; \n"
 "} \n"
@@ -683,7 +715,6 @@ class Ui_MainWindow(object):
 "    min-width: 120px; \n"
 "    min-height:24px; \n"
 "} \n"
-"\n"
 "\n"
 "#icpSearchLine1 {\n"
 "    border:none;\n"
@@ -749,6 +780,7 @@ class Ui_MainWindow(object):
 "/    CHM Test Info Tab  \n"
 "/******************************************************************/\n"
 "\n"
+"\n"
 "#chmTestDisplayWidget  {\n"
 "    background-color: #323a47;\n"
 "    border-radius: 10px;\n"
@@ -795,6 +827,8 @@ class Ui_MainWindow(object):
 "/    CHM Reports Info Tab   \n"
 "/******************************************************************/\n"
 "\n"
+"\n"
+"\n"
 "#chmReportsWidget {\n"
 "    background-color: #323a47;\n"
 "    border-radius: 10px;\n"
@@ -803,6 +837,25 @@ class Ui_MainWindow(object):
 "    background-color: #323a47;\n"
 "    border-radius: 10px;\n"
 "} \n"
+"\n"
+"#chmReportFooter {\n"
+"    background-color: #323a47;\n"
+"    border-radius: 10px;\n"
+"} \n"
+"\n"
+"#chmReportFooter QPushButton {\n"
+"    min-height: 20px; \n"
+"    min-width:120px; \n"
+"    border: 1px solid gray; \n"
+"    border-radius: 5px;\n"
+"    color:white; \n"
+"    background-color: #555555\n"
+"}\n"
+"\n"
+"#chmReportFooter QPushButton:hover{\n"
+"    background-color: rgb(180, 180, 180)\n"
+"}\n"
+"\n"
 "#chmReportHeaderWidget {\n"
 "    background-color: #323a47;\n"
 "    border-radius: 10px;\n"
@@ -816,6 +869,11 @@ class Ui_MainWindow(object):
 "/******************************************************************\n"
 "/    CHM Database Tab  \n"
 "/******************************************************************/\n"
+"\n"
+"#chmEditWidget {\n"
+"    background-color: #323a47;\n"
+"    border-radius: 10px;\n"
+"} \n"
 "\n"
 "#chmTopMenu1 {\n"
 "\n"
@@ -874,6 +932,8 @@ class Ui_MainWindow(object):
 "/******************************************************************\n"
 "/    Settings Page  \n"
 "/******************************************************************/\n"
+"\n"
+"\n"
 "\n"
 "#SettingsTab QLabel { \n"
 "    color:white; \n"
@@ -1407,7 +1467,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_20.setContentsMargins(12, 0, 12, 0)
         self.verticalLayout_20.setObjectName("verticalLayout_20")
         self.icpHistoryLayout = QtWidgets.QVBoxLayout()
-        self.icpHistoryLayout.setContentsMargins(0, 5, 0, 0)
+        self.icpHistoryLayout.setContentsMargins(0, 0, 0, 0)
         self.icpHistoryLayout.setObjectName("icpHistoryLayout")
         self.icpSearchBar = QtWidgets.QWidget(self.icpHistory)
         self.icpSearchBar.setMinimumSize(QtCore.QSize(0, 0))
@@ -1432,6 +1492,7 @@ class Ui_MainWindow(object):
         self.icpSearchLine1 = QtWidgets.QLineEdit(self.icpSearchWidget)
         self.icpSearchLine1.setMinimumSize(QtCore.QSize(201, 22))
         self.icpSearchLine1.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.icpSearchLine1.setMaxLength(10)
         self.icpSearchLine1.setObjectName("icpSearchLine1")
         self.horizontalLayout_55.addWidget(self.icpSearchLine1)
         self.horizontalLayout_24.addWidget(self.icpSearchWidget)
@@ -1697,11 +1758,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_19.setObjectName("horizontalLayout_19")
         self.icpReports = QtWidgets.QWidget(self.icpReportsTab)
         self.icpReports.setMinimumSize(QtCore.QSize(350, 0))
-        self.icpReports.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.icpReports.setMaximumSize(QtCore.QSize(350, 16777215))
         self.icpReports.setStyleSheet("")
         self.icpReports.setObjectName("icpReports")
         self.verticalLayout_12 = QtWidgets.QVBoxLayout(self.icpReports)
-        self.verticalLayout_12.setContentsMargins(20, 20, 20, 20)
+        self.verticalLayout_12.setContentsMargins(12, 0, 12, 12)
         self.verticalLayout_12.setObjectName("verticalLayout_12")
         self.widget_31 = QtWidgets.QWidget(self.icpReports)
         self.widget_31.setMinimumSize(QtCore.QSize(0, 0))
@@ -1709,13 +1770,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15 = QtWidgets.QHBoxLayout(self.widget_31)
         self.horizontalLayout_15.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_15.setObjectName("horizontalLayout_15")
-        self.reportNameInput = QtWidgets.QLineEdit(self.widget_31)
-        self.reportNameInput.setMinimumSize(QtCore.QSize(202, 22))
-        self.reportNameInput.setObjectName("reportNameInput")
-        self.horizontalLayout_15.addWidget(self.reportNameInput)
-        self.addReportBtn = QtWidgets.QPushButton(self.widget_31)
-        self.addReportBtn.setObjectName("addReportBtn")
-        self.horizontalLayout_15.addWidget(self.addReportBtn)
         self.verticalLayout_12.addWidget(self.widget_31)
         self.label_21 = QtWidgets.QLabel(self.icpReports)
         self.label_21.setObjectName("label_21")
@@ -1734,51 +1788,55 @@ class Ui_MainWindow(object):
         self.icpReportHeader.setObjectName("icpReportHeader")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.icpReportHeader)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.label_45 = QtWidgets.QLabel(self.icpReportHeader)
-        self.label_45.setObjectName("label_45")
-        self.horizontalLayout_4.addWidget(self.label_45)
+        self.icpReportNameLabel = QtWidgets.QLabel(self.icpReportHeader)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.icpReportNameLabel.setFont(font)
+        self.icpReportNameLabel.setObjectName("icpReportNameLabel")
+        self.horizontalLayout_4.addWidget(self.icpReportNameLabel)
         spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem8)
-        self.deleteFooterBtn = QtWidgets.QPushButton(self.icpReportHeader)
-        self.deleteFooterBtn.setObjectName("deleteFooterBtn")
-        self.horizontalLayout_4.addWidget(self.deleteFooterBtn)
         self.verticalLayout_53.addWidget(self.icpReportHeader)
         self.icpReportsOptions = QtWidgets.QWidget(self.widget_19)
         self.icpReportsOptions.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.icpReportsOptions.setStyleSheet("")
         self.icpReportsOptions.setObjectName("icpReportsOptions")
         self.gridLayout_10 = QtWidgets.QGridLayout(self.icpReportsOptions)
-        self.gridLayout_10.setContentsMargins(20, 20, 20, 0)
+        self.gridLayout_10.setContentsMargins(12, 12, 12, 0)
         self.gridLayout_10.setObjectName("gridLayout_10")
-        self.icpReportNameLabel = QtWidgets.QLineEdit(self.icpReportsOptions)
-        self.icpReportNameLabel.setEnabled(False)
-        self.icpReportNameLabel.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.icpReportNameLabel.setObjectName("icpReportNameLabel")
-        self.gridLayout_10.addWidget(self.icpReportNameLabel, 1, 0, 1, 1)
-        self.label_49 = QtWidgets.QLabel(self.icpReportsOptions)
-        self.label_49.setObjectName("label_49")
-        self.gridLayout_10.addWidget(self.label_49, 2, 0, 1, 1)
-        self.footerComments = QtWidgets.QTextEdit(self.icpReportsOptions)
-        self.footerComments.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.footerComments.setAutoFillBackground(False)
-        self.footerComments.setObjectName("footerComments")
-        self.gridLayout_10.addWidget(self.footerComments, 3, 0, 1, 1)
-        self.label_56 = QtWidgets.QLabel(self.icpReportsOptions)
-        self.label_56.setObjectName("label_56")
-        self.gridLayout_10.addWidget(self.label_56, 0, 0, 1, 1)
         self.widget_57 = QtWidgets.QWidget(self.icpReportsOptions)
         self.widget_57.setMinimumSize(QtCore.QSize(0, 0))
         self.widget_57.setObjectName("widget_57")
         self.horizontalLayout_40 = QtWidgets.QHBoxLayout(self.widget_57)
         self.horizontalLayout_40.setContentsMargins(0, 0, 0, 12)
         self.horizontalLayout_40.setObjectName("horizontalLayout_40")
-        spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_40.addItem(spacerItem9)
-        self.saveFooterBtn = QtWidgets.QPushButton(self.widget_57)
-        self.saveFooterBtn.setObjectName("saveFooterBtn")
-        self.horizontalLayout_40.addWidget(self.saveFooterBtn)
-        self.gridLayout_10.addWidget(self.widget_57, 4, 0, 1, 1)
+        self.gridLayout_10.addWidget(self.widget_57, 2, 0, 1, 1)
+        self.label_49 = QtWidgets.QLabel(self.icpReportsOptions)
+        self.label_49.setObjectName("label_49")
+        self.gridLayout_10.addWidget(self.label_49, 0, 0, 1, 1)
+        self.footerComments = QtWidgets.QTextEdit(self.icpReportsOptions)
+        self.footerComments.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.footerComments.setAutoFillBackground(False)
+        self.footerComments.setObjectName("footerComments")
+        self.gridLayout_10.addWidget(self.footerComments, 1, 0, 1, 1)
         self.verticalLayout_53.addWidget(self.icpReportsOptions)
+        self.icpReportFooter = QtWidgets.QWidget(self.widget_19)
+        self.icpReportFooter.setMinimumSize(QtCore.QSize(0, 0))
+        self.icpReportFooter.setObjectName("icpReportFooter")
+        self.horizontalLayout_35 = QtWidgets.QHBoxLayout(self.icpReportFooter)
+        self.horizontalLayout_35.setContentsMargins(-1, 12, -1, 12)
+        self.horizontalLayout_35.setObjectName("horizontalLayout_35")
+        spacerItem9 = QtWidgets.QSpacerItem(685, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_35.addItem(spacerItem9)
+        self.icpReportCancelBtn = QtWidgets.QPushButton(self.icpReportFooter)
+        self.icpReportCancelBtn.setObjectName("icpReportCancelBtn")
+        self.horizontalLayout_35.addWidget(self.icpReportCancelBtn)
+        self.saveFooterBtn = QtWidgets.QPushButton(self.icpReportFooter)
+        self.saveFooterBtn.setObjectName("saveFooterBtn")
+        self.horizontalLayout_35.addWidget(self.saveFooterBtn)
+        self.verticalLayout_53.addWidget(self.icpReportFooter)
         self.horizontalLayout_19.addWidget(self.widget_19)
         self.icpTabWidget.addTab(self.icpReportsTab, "")
         self.verticalLayout_15.addWidget(self.icpTabWidget)
@@ -1805,9 +1863,9 @@ class Ui_MainWindow(object):
         self.chmTabWidget.setObjectName("chmTabWidget")
         self.chmDataTab = QtWidgets.QWidget()
         self.chmDataTab.setObjectName("chmDataTab")
-        self.verticalLayout_29 = QtWidgets.QVBoxLayout(self.chmDataTab)
-        self.verticalLayout_29.setContentsMargins(12, 0, 12, 0)
-        self.verticalLayout_29.setObjectName("verticalLayout_29")
+        self.horizontalLayout_61 = QtWidgets.QHBoxLayout(self.chmDataTab)
+        self.horizontalLayout_61.setContentsMargins(12, 0, 12, 0)
+        self.horizontalLayout_61.setObjectName("horizontalLayout_61")
         self.chmDatabaseLayout = QtWidgets.QVBoxLayout()
         self.chmDatabaseLayout.setContentsMargins(-1, 0, -1, -1)
         self.chmDatabaseLayout.setObjectName("chmDatabaseLayout")
@@ -1879,7 +1937,16 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.chmInputTable.setItem(0, 1, item)
         self.chmDatabaseLayout.addWidget(self.chmInputTable)
-        self.verticalLayout_29.addLayout(self.chmDatabaseLayout)
+        self.horizontalLayout_61.addLayout(self.chmDatabaseLayout)
+        self.editContainerWidget = QtWidgets.QWidget(self.chmDataTab)
+        self.editContainerWidget.setObjectName("editContainerWidget")
+        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.editContainerWidget)
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.chmEditWidget = QtWidgets.QWidget(self.editContainerWidget)
+        self.chmEditWidget.setMinimumSize(QtCore.QSize(300, 0))
+        self.chmEditWidget.setObjectName("chmEditWidget")
+        self.verticalLayout_8.addWidget(self.chmEditWidget)
+        self.horizontalLayout_61.addWidget(self.editContainerWidget)
         self.chmTabWidget.addTab(self.chmDataTab, "")
         self.chmInputTab = QtWidgets.QWidget()
         self.chmInputTab.setObjectName("chmInputTab")
@@ -2127,7 +2194,7 @@ class Ui_MainWindow(object):
         self.testInfoTopWidget = QtWidgets.QWidget(self.widget_64)
         self.testInfoTopWidget.setObjectName("testInfoTopWidget")
         self.horizontalLayout_72 = QtWidgets.QHBoxLayout(self.testInfoTopWidget)
-        self.horizontalLayout_72.setContentsMargins(-1, 5, -1, 5)
+        self.horizontalLayout_72.setContentsMargins(-1, 12, -1, 12)
         self.horizontalLayout_72.setSpacing(0)
         self.horizontalLayout_72.setObjectName("horizontalLayout_72")
         self.chmSearchBtn3 = QtWidgets.QPushButton(self.testInfoTopWidget)
@@ -2293,35 +2360,29 @@ class Ui_MainWindow(object):
         self.widget_25.setMaximumSize(QtCore.QSize(400, 16777215))
         self.widget_25.setObjectName("widget_25")
         self.verticalLayout_52 = QtWidgets.QVBoxLayout(self.widget_25)
-        self.verticalLayout_52.setContentsMargins(0, 0, 0, -1)
+        self.verticalLayout_52.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_52.setObjectName("verticalLayout_52")
         self.chmReportsWidget = QtWidgets.QWidget(self.widget_25)
-        self.chmReportsWidget.setMinimumSize(QtCore.QSize(0, 0))
-        self.chmReportsWidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.chmReportsWidget.setMinimumSize(QtCore.QSize(350, 0))
+        self.chmReportsWidget.setMaximumSize(QtCore.QSize(350, 16777215))
         self.chmReportsWidget.setStyleSheet("")
         self.chmReportsWidget.setObjectName("chmReportsWidget")
         self.verticalLayout_41 = QtWidgets.QVBoxLayout(self.chmReportsWidget)
-        self.verticalLayout_41.setContentsMargins(20, 20, 20, 20)
+        self.verticalLayout_41.setContentsMargins(12, 12, 12, 12)
         self.verticalLayout_41.setObjectName("verticalLayout_41")
         self.widget_40 = QtWidgets.QWidget(self.chmReportsWidget)
         self.widget_40.setMinimumSize(QtCore.QSize(0, 0))
         self.widget_40.setObjectName("widget_40")
         self.horizontalLayout_52 = QtWidgets.QHBoxLayout(self.widget_40)
-        self.horizontalLayout_52.setContentsMargins(0, 0, 0, 12)
+        self.horizontalLayout_52.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_52.setObjectName("horizontalLayout_52")
         self.label_34 = QtWidgets.QLabel(self.widget_40)
         self.label_34.setObjectName("label_34")
         self.horizontalLayout_52.addWidget(self.label_34)
-        spacerItem15 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_52.addItem(spacerItem15)
-        self.addReportBtn_2 = QtWidgets.QPushButton(self.widget_40)
-        self.addReportBtn_2.setMinimumSize(QtCore.QSize(102, 22))
-        self.addReportBtn_2.setObjectName("addReportBtn_2")
-        self.horizontalLayout_52.addWidget(self.addReportBtn_2)
         self.verticalLayout_41.addWidget(self.widget_40)
-        self.reportsList_2 = QtWidgets.QListWidget(self.chmReportsWidget)
-        self.reportsList_2.setObjectName("reportsList_2")
-        self.verticalLayout_41.addWidget(self.reportsList_2)
+        self.chmReportList = QtWidgets.QListWidget(self.chmReportsWidget)
+        self.chmReportList.setObjectName("chmReportList")
+        self.verticalLayout_41.addWidget(self.chmReportList)
         self.verticalLayout_52.addWidget(self.chmReportsWidget)
         self.horizontalLayout_53.addWidget(self.widget_25)
         self.chmReportsInfoWidget_2 = QtWidgets.QWidget(self.chmReportInfoTab)
@@ -2329,53 +2390,46 @@ class Ui_MainWindow(object):
         self.chmReportsInfoWidget_2.setStyleSheet("")
         self.chmReportsInfoWidget_2.setObjectName("chmReportsInfoWidget_2")
         self.verticalLayout_34 = QtWidgets.QVBoxLayout(self.chmReportsInfoWidget_2)
-        self.verticalLayout_34.setContentsMargins(0, 0, 0, 12)
+        self.verticalLayout_34.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_34.setObjectName("verticalLayout_34")
         self.chmReportHeaderWidget = QtWidgets.QWidget(self.chmReportsInfoWidget_2)
         self.chmReportHeaderWidget.setMinimumSize(QtCore.QSize(0, 40))
         self.chmReportHeaderWidget.setObjectName("chmReportHeaderWidget")
         self.horizontalLayout_22 = QtWidgets.QHBoxLayout(self.chmReportHeaderWidget)
-        self.horizontalLayout_22.setContentsMargins(20, 12, 20, 12)
+        self.horizontalLayout_22.setContentsMargins(12, 12, 12, 12)
         self.horizontalLayout_22.setObjectName("horizontalLayout_22")
-        self.label_43 = QtWidgets.QLabel(self.chmReportHeaderWidget)
-        self.label_43.setObjectName("label_43")
-        self.horizontalLayout_22.addWidget(self.label_43)
-        spacerItem16 = QtWidgets.QSpacerItem(292, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_22.addItem(spacerItem16)
-        self.gcmsDeleteReportBtn = QtWidgets.QPushButton(self.chmReportHeaderWidget)
-        self.gcmsDeleteReportBtn.setMinimumSize(QtCore.QSize(102, 22))
-        self.gcmsDeleteReportBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.gcmsDeleteReportBtn.setObjectName("gcmsDeleteReportBtn")
-        self.horizontalLayout_22.addWidget(self.gcmsDeleteReportBtn)
+        self.chmReportNameLabel = QtWidgets.QLabel(self.chmReportHeaderWidget)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        font.setWeight(75)
+        self.chmReportNameLabel.setFont(font)
+        self.chmReportNameLabel.setObjectName("chmReportNameLabel")
+        self.horizontalLayout_22.addWidget(self.chmReportNameLabel)
+        spacerItem15 = QtWidgets.QSpacerItem(292, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_22.addItem(spacerItem15)
         self.verticalLayout_34.addWidget(self.chmReportHeaderWidget)
         self.chmReportsInfo = QtWidgets.QWidget(self.chmReportsInfoWidget_2)
-        self.chmReportsInfo.setMinimumSize(QtCore.QSize(450, 450))
+        self.chmReportsInfo.setMinimumSize(QtCore.QSize(0, 0))
         self.chmReportsInfo.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.chmReportsInfo.setStyleSheet("")
         self.chmReportsInfo.setObjectName("chmReportsInfo")
         self.verticalLayout_37 = QtWidgets.QVBoxLayout(self.chmReportsInfo)
-        self.verticalLayout_37.setContentsMargins(20, 20, 20, 20)
+        self.verticalLayout_37.setContentsMargins(12, 0, 12, 12)
         self.verticalLayout_37.setObjectName("verticalLayout_37")
         self.widget_24 = QtWidgets.QWidget(self.chmReportsInfo)
         self.widget_24.setObjectName("widget_24")
         self.horizontalLayout_51 = QtWidgets.QHBoxLayout(self.widget_24)
         self.horizontalLayout_51.setContentsMargins(0, 0, -1, 0)
         self.horizontalLayout_51.setObjectName("horizontalLayout_51")
-        self.label_77 = QtWidgets.QLabel(self.widget_24)
-        self.label_77.setObjectName("label_77")
-        self.horizontalLayout_51.addWidget(self.label_77)
         self.verticalLayout_37.addWidget(self.widget_24)
-        self.icpReportType_2 = QtWidgets.QLineEdit(self.chmReportsInfo)
-        self.icpReportType_2.setEnabled(False)
-        self.icpReportType_2.setObjectName("icpReportType_2")
-        self.verticalLayout_37.addWidget(self.icpReportType_2)
         self.label_78 = QtWidgets.QLabel(self.chmReportsInfo)
         self.label_78.setObjectName("label_78")
         self.verticalLayout_37.addWidget(self.label_78)
-        self.footerComments_3 = QtWidgets.QTextEdit(self.chmReportsInfo)
-        self.footerComments_3.setAutoFillBackground(False)
-        self.footerComments_3.setObjectName("footerComments_3")
-        self.verticalLayout_37.addWidget(self.footerComments_3)
+        self.chmFooterComment = QtWidgets.QTextEdit(self.chmReportsInfo)
+        self.chmFooterComment.setAutoFillBackground(False)
+        self.chmFooterComment.setObjectName("chmFooterComment")
+        self.verticalLayout_37.addWidget(self.chmFooterComment)
         self.widget_22 = QtWidgets.QWidget(self.chmReportsInfo)
         self.widget_22.setMinimumSize(QtCore.QSize(0, 0))
         self.widget_22.setStyleSheet("")
@@ -2383,15 +2437,26 @@ class Ui_MainWindow(object):
         self.horizontalLayout_50 = QtWidgets.QHBoxLayout(self.widget_22)
         self.horizontalLayout_50.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_50.setObjectName("horizontalLayout_50")
-        spacerItem17 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_50.addItem(spacerItem17)
-        self.gcmsSaveReportBtn = QtWidgets.QPushButton(self.widget_22)
-        self.gcmsSaveReportBtn.setMinimumSize(QtCore.QSize(102, 22))
-        self.gcmsSaveReportBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.gcmsSaveReportBtn.setObjectName("gcmsSaveReportBtn")
-        self.horizontalLayout_50.addWidget(self.gcmsSaveReportBtn)
         self.verticalLayout_37.addWidget(self.widget_22)
         self.verticalLayout_34.addWidget(self.chmReportsInfo)
+        self.chmReportFooter = QtWidgets.QWidget(self.chmReportsInfoWidget_2)
+        self.chmReportFooter.setObjectName("chmReportFooter")
+        self.horizontalLayout_36 = QtWidgets.QHBoxLayout(self.chmReportFooter)
+        self.horizontalLayout_36.setContentsMargins(-1, 12, -1, 12)
+        self.horizontalLayout_36.setObjectName("horizontalLayout_36")
+        spacerItem16 = QtWidgets.QSpacerItem(686, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_36.addItem(spacerItem16)
+        self.chmReportCancelBtn = QtWidgets.QPushButton(self.chmReportFooter)
+        self.chmReportCancelBtn.setMinimumSize(QtCore.QSize(122, 22))
+        self.chmReportCancelBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.chmReportCancelBtn.setObjectName("chmReportCancelBtn")
+        self.horizontalLayout_36.addWidget(self.chmReportCancelBtn)
+        self.chmReportSaveBtn = QtWidgets.QPushButton(self.chmReportFooter)
+        self.chmReportSaveBtn.setMinimumSize(QtCore.QSize(122, 22))
+        self.chmReportSaveBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        self.chmReportSaveBtn.setObjectName("chmReportSaveBtn")
+        self.horizontalLayout_36.addWidget(self.chmReportSaveBtn)
+        self.verticalLayout_34.addWidget(self.chmReportFooter)
         self.horizontalLayout_53.addWidget(self.chmReportsInfoWidget_2)
         self.chmTabWidget.addTab(self.chmReportInfoTab, "")
         self.verticalLayout_21.addWidget(self.chmTabWidget)
@@ -2416,24 +2481,30 @@ class Ui_MainWindow(object):
         self.horizontalLayout_46 = QtWidgets.QHBoxLayout(self.generalTab)
         self.horizontalLayout_46.setContentsMargins(12, -1, -1, -1)
         self.horizontalLayout_46.setObjectName("horizontalLayout_46")
-        self.toolBox_2 = QtWidgets.QToolBox(self.generalTab)
-        self.toolBox_2.setObjectName("toolBox_2")
+        self.generalToolBox = QtWidgets.QToolBox(self.generalTab)
+        self.generalToolBox.setObjectName("generalToolBox")
+        self.page_8 = QtWidgets.QWidget()
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 1335, 568))
+        self.page_8.setObjectName("page_8")
+        self.label_44 = QtWidgets.QLabel(self.page_8)
+        self.label_44.setGeometry(QtCore.QRect(20, 10, 91, 16))
+        self.label_44.setObjectName("label_44")
+        self.spinBox = QtWidgets.QSpinBox(self.page_8)
+        self.spinBox.setGeometry(QtCore.QRect(130, 10, 48, 24))
+        self.spinBox.setObjectName("spinBox")
+        self.generalToolBox.addItem(self.page_8, "")
         self.page_3 = QtWidgets.QWidget()
-        self.page_3.setGeometry(QtCore.QRect(0, 0, 628, 389))
+        self.page_3.setGeometry(QtCore.QRect(0, 0, 1335, 568))
         self.page_3.setObjectName("page_3")
         self.horizontalLayout_20 = QtWidgets.QHBoxLayout(self.page_3)
         self.horizontalLayout_20.setObjectName("horizontalLayout_20")
-        self.widget_20 = QtWidgets.QWidget(self.page_3)
-        self.widget_20.setMinimumSize(QtCore.QSize(100, 0))
-        self.widget_20.setObjectName("widget_20")
-        self.horizontalLayout_20.addWidget(self.widget_20)
         self.fileLocationsWidget = QtWidgets.QWidget(self.page_3)
         self.fileLocationsWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.fileLocationsWidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.fileLocationsWidget.setStyleSheet("")
         self.fileLocationsWidget.setObjectName("fileLocationsWidget")
         self.verticalLayout_31 = QtWidgets.QVBoxLayout(self.fileLocationsWidget)
-        self.verticalLayout_31.setContentsMargins(0, 5, 0, 20)
+        self.verticalLayout_31.setContentsMargins(80, 5, 80, 5)
         self.verticalLayout_31.setObjectName("verticalLayout_31")
         self.widget_16 = QtWidgets.QWidget(self.fileLocationsWidget)
         self.widget_16.setMinimumSize(QtCore.QSize(0, 20))
@@ -2520,6 +2591,7 @@ class Ui_MainWindow(object):
         self.label_35.setObjectName("label_35")
         self.horizontalLayout_47.addWidget(self.label_35)
         self.frontPath = QtWidgets.QLineEdit(self.widget_10)
+        self.frontPath.setReadOnly(True)
         self.frontPath.setObjectName("frontPath")
         self.horizontalLayout_47.addWidget(self.frontPath)
         self.pushButton_6 = QtWidgets.QPushButton(self.widget_10)
@@ -2535,38 +2607,26 @@ class Ui_MainWindow(object):
         self.label_42.setObjectName("label_42")
         self.horizontalLayout_71.addWidget(self.label_42)
         self.prefrenceDbPath = QtWidgets.QLineEdit(self.widget_17)
+        self.prefrenceDbPath.setReadOnly(True)
         self.prefrenceDbPath.setObjectName("prefrenceDbPath")
         self.horizontalLayout_71.addWidget(self.prefrenceDbPath)
         self.preferenceDbBtn = QtWidgets.QPushButton(self.widget_17)
         self.preferenceDbBtn.setObjectName("preferenceDbBtn")
         self.horizontalLayout_71.addWidget(self.preferenceDbBtn)
         self.verticalLayout_31.addWidget(self.widget_17)
-        spacerItem18 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_31.addItem(spacerItem18)
+        spacerItem17 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_31.addItem(spacerItem17)
         self.horizontalLayout_20.addWidget(self.fileLocationsWidget)
-        self.toolBox_2.addItem(self.page_3, "")
-        self.page_4 = QtWidgets.QWidget()
-        self.page_4.setGeometry(QtCore.QRect(0, 0, 100, 30))
-        self.page_4.setObjectName("page_4")
-        self.widget_44 = QtWidgets.QWidget(self.page_4)
-        self.widget_44.setGeometry(QtCore.QRect(170, 80, 371, 51))
-        self.widget_44.setObjectName("widget_44")
-        self.label_44 = QtWidgets.QLabel(self.widget_44)
-        self.label_44.setGeometry(QtCore.QRect(20, 10, 91, 16))
-        self.label_44.setObjectName("label_44")
-        self.spinBox = QtWidgets.QSpinBox(self.widget_44)
-        self.spinBox.setGeometry(QtCore.QRect(110, 10, 48, 24))
-        self.spinBox.setObjectName("spinBox")
-        self.toolBox_2.addItem(self.page_4, "")
+        self.generalToolBox.addItem(self.page_3, "")
         self.page_5 = QtWidgets.QWidget()
-        self.page_5.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.page_5.setGeometry(QtCore.QRect(0, 0, 1335, 568))
         self.page_5.setObjectName("page_5")
-        self.toolBox_2.addItem(self.page_5, "")
+        self.generalToolBox.addItem(self.page_5, "")
         self.page_7 = QtWidgets.QWidget()
-        self.page_7.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.page_7.setGeometry(QtCore.QRect(0, 0, 1335, 568))
         self.page_7.setObjectName("page_7")
-        self.toolBox_2.addItem(self.page_7, "")
-        self.horizontalLayout_46.addWidget(self.toolBox_2)
+        self.generalToolBox.addItem(self.page_7, "")
+        self.horizontalLayout_46.addWidget(self.generalToolBox)
         self.SettingsTab.addTab(self.generalTab, "")
         self.tab_6 = QtWidgets.QWidget()
         self.tab_6.setObjectName("tab_6")
@@ -2576,7 +2636,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtWidgets.QToolBox(self.tab_6)
         self.toolBox.setObjectName("toolBox")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 924, 167))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 1335, 636))
         self.page_2.setObjectName("page_2")
         self.horizontalLayout_70 = QtWidgets.QHBoxLayout(self.page_2)
         self.horizontalLayout_70.setContentsMargins(12, -1, -1, -1)
@@ -2585,50 +2645,53 @@ class Ui_MainWindow(object):
         self.widget_38.setMinimumSize(QtCore.QSize(900, 0))
         self.widget_38.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.widget_38.setObjectName("widget_38")
-        self.horizontalLayout_58 = QtWidgets.QHBoxLayout(self.widget_38)
-        self.horizontalLayout_58.setContentsMargins(20, -1, -1, -1)
+        self.verticalLayout_10 = QtWidgets.QVBoxLayout(self.widget_38)
+        self.verticalLayout_10.setContentsMargins(80, 5, 80, 5)
+        self.verticalLayout_10.setObjectName("verticalLayout_10")
+        self.widget = QtWidgets.QWidget(self.widget_38)
+        self.widget.setMinimumSize(QtCore.QSize(50, 0))
+        self.widget.setObjectName("widget")
+        self.verticalLayout_55 = QtWidgets.QVBoxLayout(self.widget)
+        self.verticalLayout_55.setContentsMargins(-1, 0, -1, 0)
+        self.verticalLayout_55.setObjectName("verticalLayout_55")
+        self.label_27 = QtWidgets.QLabel(self.widget)
+        self.label_27.setObjectName("label_27")
+        self.verticalLayout_55.addWidget(self.label_27)
+        self.verticalLayout_10.addWidget(self.widget)
+        self.widget_11 = QtWidgets.QWidget(self.widget_38)
+        self.widget_11.setObjectName("widget_11")
+        self.horizontalLayout_58 = QtWidgets.QHBoxLayout(self.widget_11)
+        self.horizontalLayout_58.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_58.setObjectName("horizontalLayout_58")
-        self.widget_63 = QtWidgets.QWidget(self.widget_38)
+        self.widget_63 = QtWidgets.QWidget(self.widget_11)
         self.widget_63.setMinimumSize(QtCore.QSize(0, 100))
-        self.widget_63.setMaximumSize(QtCore.QSize(400, 16777215))
+        self.widget_63.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.widget_63.setObjectName("widget_63")
         self.verticalLayout_56 = QtWidgets.QVBoxLayout(self.widget_63)
         self.verticalLayout_56.setContentsMargins(0, -1, -1, -1)
         self.verticalLayout_56.setObjectName("verticalLayout_56")
         self.parameterTreeWidget = QtWidgets.QTreeWidget(self.widget_63)
-        self.parameterTreeWidget.setMaximumSize(QtCore.QSize(400, 16777215))
+        self.parameterTreeWidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.parameterTreeWidget.setObjectName("parameterTreeWidget")
         self.verticalLayout_56.addWidget(self.parameterTreeWidget)
-        self.widget_62 = QtWidgets.QWidget(self.widget_63)
-        self.widget_62.setMinimumSize(QtCore.QSize(0, 20))
-        self.widget_62.setObjectName("widget_62")
-        self.horizontalLayout_68 = QtWidgets.QHBoxLayout(self.widget_62)
-        self.horizontalLayout_68.setContentsMargins(0, 5, 0, 5)
-        self.horizontalLayout_68.setObjectName("horizontalLayout_68")
-        self.pushButton = QtWidgets.QPushButton(self.widget_62)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_68.addWidget(self.pushButton)
-        spacerItem19 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_68.addItem(spacerItem19)
-        self.verticalLayout_56.addWidget(self.widget_62)
+        self.widget_18 = QtWidgets.QWidget(self.widget_63)
+        self.widget_18.setMinimumSize(QtCore.QSize(0, 30))
+        self.widget_18.setObjectName("widget_18")
+        self.horizontalLayout_62 = QtWidgets.QHBoxLayout(self.widget_18)
+        self.horizontalLayout_62.setObjectName("horizontalLayout_62")
+        self.addParamBtn = QtWidgets.QPushButton(self.widget_18)
+        self.addParamBtn.setMinimumSize(QtCore.QSize(102, 22))
+        self.addParamBtn.setObjectName("addParamBtn")
+        self.horizontalLayout_62.addWidget(self.addParamBtn)
+        spacerItem18 = QtWidgets.QSpacerItem(899, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_62.addItem(spacerItem18)
+        self.verticalLayout_56.addWidget(self.widget_18)
         self.horizontalLayout_58.addWidget(self.widget_63)
-        self.widget = QtWidgets.QWidget(self.widget_38)
-        self.widget.setMinimumSize(QtCore.QSize(50, 0))
-        self.widget.setObjectName("widget")
-        self.verticalLayout_55 = QtWidgets.QVBoxLayout(self.widget)
-        self.verticalLayout_55.setObjectName("verticalLayout_55")
-        self.label_53 = QtWidgets.QLabel(self.widget)
-        self.label_53.setObjectName("label_53")
-        self.verticalLayout_55.addWidget(self.label_53)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.widget)
-        self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.verticalLayout_55.addWidget(self.plainTextEdit)
-        self.horizontalLayout_58.addWidget(self.widget)
+        self.verticalLayout_10.addWidget(self.widget_11)
         self.horizontalLayout_70.addWidget(self.widget_38)
         self.toolBox.addItem(self.page_2, "")
         self.Authors = QtWidgets.QWidget()
-        self.Authors.setGeometry(QtCore.QRect(0, 0, 924, 175))
+        self.Authors.setGeometry(QtCore.QRect(0, 0, 924, 161))
         self.Authors.setObjectName("Authors")
         self.horizontalLayout_67 = QtWidgets.QHBoxLayout(self.Authors)
         self.horizontalLayout_67.setObjectName("horizontalLayout_67")
@@ -2637,7 +2700,7 @@ class Ui_MainWindow(object):
         self.widget_58.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.widget_58.setObjectName("widget_58")
         self.verticalLayout_49 = QtWidgets.QVBoxLayout(self.widget_58)
-        self.verticalLayout_49.setContentsMargins(20, -1, -1, -1)
+        self.verticalLayout_49.setContentsMargins(80, 5, 80, 5)
         self.verticalLayout_49.setObjectName("verticalLayout_49")
         self.authorTreeWidget = QtWidgets.QTreeWidget(self.widget_58)
         self.authorTreeWidget.setObjectName("authorTreeWidget")
@@ -2651,8 +2714,8 @@ class Ui_MainWindow(object):
         self.addAuthorBtn.setMinimumSize(QtCore.QSize(102, 22))
         self.addAuthorBtn.setObjectName("addAuthorBtn")
         self.horizontalLayout_59.addWidget(self.addAuthorBtn)
-        spacerItem20 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_59.addItem(spacerItem20)
+        spacerItem19 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_59.addItem(spacerItem19)
         self.verticalLayout_49.addWidget(self.widget_61)
         self.horizontalLayout_67.addWidget(self.widget_58)
         self.toolBox.addItem(self.Authors, "")
@@ -2665,7 +2728,7 @@ class Ui_MainWindow(object):
         self.toolBox_3 = QtWidgets.QToolBox(self.testsTab)
         self.toolBox_3.setObjectName("toolBox_3")
         self.page = QtWidgets.QWidget()
-        self.page.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.page.setGeometry(QtCore.QRect(0, 0, 1327, 636))
         self.page.setObjectName("page")
         self.toolBox_3.addItem(self.page, "")
         self.page_6 = QtWidgets.QWidget()
@@ -2798,8 +2861,8 @@ class Ui_MainWindow(object):
         self.label_31.setObjectName("label_31")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_31)
         self.horizontalLayout_7.addWidget(self.widget_14)
-        spacerItem21 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem21)
+        spacerItem20 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem20)
         self.icpDataField = QtWidgets.QWidget(self.createReportHeader)
         self.icpDataField.setMaximumSize(QtCore.QSize(300, 16777215))
         self.icpDataField.setObjectName("icpDataField")
@@ -2814,8 +2877,8 @@ class Ui_MainWindow(object):
         self.radioButton_2.setCheckable(False)
         self.radioButton_2.setObjectName("radioButton_2")
         self.verticalLayout_25.addWidget(self.radioButton_2)
-        spacerItem22 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_25.addItem(spacerItem22)
+        spacerItem21 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_25.addItem(spacerItem21)
         self.horizontalLayout_7.addWidget(self.icpDataField)
         self.verticalLayout_14.addWidget(self.createReportHeader)
         self.Main = QtWidgets.QWidget(self.dataPage)
@@ -3196,8 +3259,8 @@ class Ui_MainWindow(object):
         self.pushButton_2.setMinimumSize(QtCore.QSize(128, 23))
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_60.addWidget(self.pushButton_2)
-        spacerItem23 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_60.addItem(spacerItem23)
+        spacerItem22 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_60.addItem(spacerItem22)
         self.createIcpReportBtn = QtWidgets.QPushButton(self.tabSectionWidget)
         self.createIcpReportBtn.setMinimumSize(QtCore.QSize(128, 23))
         self.createIcpReportBtn.setObjectName("createIcpReportBtn")
@@ -3234,13 +3297,13 @@ class Ui_MainWindow(object):
         self.actionUpload_ISP_Files.setObjectName("actionUpload_ISP_Files")
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         self.historyTabWidget.setCurrentIndex(0)
-        self.icpTabWidget.setCurrentIndex(0)
-        self.chmTabWidget.setCurrentIndex(0)
-        self.SettingsTab.setCurrentIndex(3)
-        self.toolBox_2.setCurrentIndex(0)
-        self.toolBox.setCurrentIndex(1)
+        self.icpTabWidget.setCurrentIndex(2)
+        self.chmTabWidget.setCurrentIndex(1)
+        self.SettingsTab.setCurrentIndex(1)
+        self.generalToolBox.setCurrentIndex(1)
+        self.toolBox.setCurrentIndex(0)
         self.toolBox_3.setCurrentIndex(0)
         self.reportsTab.setCurrentIndex(0)
         self.toggleMenuLarge.clicked['bool'].connect(self.LeftMenuContainer.setHidden) # type: ignore
@@ -3376,17 +3439,15 @@ class Ui_MainWindow(object):
         self.label_29.setText(_translate("MainWindow", "Footer Comment"))
         self.label_11.setText(_translate("MainWindow", "Appear at the "))
         self.icpTabWidget.setTabText(self.icpTabWidget.indexOf(self.icpElements), _translate("MainWindow", "Elements"))
-        self.addReportBtn.setText(_translate("MainWindow", "Add Report"))
         self.label_21.setText(_translate("MainWindow", "Report Type"))
-        self.label_45.setText(_translate("MainWindow", "Report Name"))
-        self.deleteFooterBtn.setText(_translate("MainWindow", "Delete Report "))
+        self.icpReportNameLabel.setText(_translate("MainWindow", "Report Name"))
         self.label_49.setText(_translate("MainWindow", "Footer Comment "))
         self.footerComments.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
-        self.label_56.setText(_translate("MainWindow", "Report Name"))
+        self.icpReportCancelBtn.setText(_translate("MainWindow", "Cancel"))
         self.saveFooterBtn.setText(_translate("MainWindow", "Save Report"))
         self.icpTabWidget.setTabText(self.icpTabWidget.indexOf(self.icpReportsTab), _translate("MainWindow", "Reports"))
         self.chmAddItemBtn.setText(_translate("MainWindow", "Add Item"))
@@ -3464,19 +3525,19 @@ class Ui_MainWindow(object):
         self.chmTestSaveBtn.setText(_translate("MainWindow", "Save Changes"))
         self.label_63.setText(_translate("MainWindow", "Tests"))
         self.chmTabWidget.setTabText(self.chmTabWidget.indexOf(self.chmTestsInfoTab2), _translate("MainWindow", "Tests"))
-        self.label_34.setText(_translate("MainWindow", "Report Type Names "))
-        self.addReportBtn_2.setText(_translate("MainWindow", "Add Report"))
-        self.label_43.setText(_translate("MainWindow", "Report Type Name"))
-        self.gcmsDeleteReportBtn.setText(_translate("MainWindow", "Delete Report"))
-        self.label_77.setText(_translate("MainWindow", "Report Type"))
+        self.label_34.setText(_translate("MainWindow", "Report Type "))
+        self.chmReportNameLabel.setText(_translate("MainWindow", "Report Name"))
         self.label_78.setText(_translate("MainWindow", "Footer Comment "))
-        self.footerComments_3.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.chmFooterComment.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
-        self.gcmsSaveReportBtn.setText(_translate("MainWindow", "Save Changes"))
+        self.chmReportCancelBtn.setText(_translate("MainWindow", "Cancel"))
+        self.chmReportSaveBtn.setText(_translate("MainWindow", "Save Changes"))
         self.chmTabWidget.setTabText(self.chmTabWidget.indexOf(self.chmReportInfoTab), _translate("MainWindow", "Reports"))
+        self.label_44.setText(_translate("MainWindow", "Set Font Size"))
+        self.generalToolBox.setItemText(self.generalToolBox.indexOf(self.page_8), _translate("MainWindow", "General"))
         self.label_13.setText(_translate("MainWindow", "File Paths"))
         self.label_52.setText(_translate("MainWindow", "Set the defeault location that files will be accessed from"))
         self.label_55.setText(_translate("MainWindow", "Report Folder "))
@@ -3491,15 +3552,13 @@ class Ui_MainWindow(object):
         self.pushButton_6.setText(_translate("MainWindow", "Browse"))
         self.label_42.setText(_translate("MainWindow", "TEMP Database Folder"))
         self.preferenceDbBtn.setText(_translate("MainWindow", "Browse"))
-        self.toolBox_2.setItemText(self.toolBox_2.indexOf(self.page_3), _translate("MainWindow", "File Paths"))
-        self.label_44.setText(_translate("MainWindow", "Set Font Size"))
-        self.toolBox_2.setItemText(self.toolBox_2.indexOf(self.page_4), _translate("MainWindow", "General"))
-        self.toolBox_2.setItemText(self.toolBox_2.indexOf(self.page_5), _translate("MainWindow", "Units "))
-        self.toolBox_2.setItemText(self.toolBox_2.indexOf(self.page_7), _translate("MainWindow", "Tables"))
+        self.generalToolBox.setItemText(self.generalToolBox.indexOf(self.page_3), _translate("MainWindow", "File Paths"))
+        self.generalToolBox.setItemText(self.generalToolBox.indexOf(self.page_5), _translate("MainWindow", "Units "))
+        self.generalToolBox.setItemText(self.generalToolBox.indexOf(self.page_7), _translate("MainWindow", "Tables"))
         self.SettingsTab.setTabText(self.SettingsTab.indexOf(self.generalTab), _translate("MainWindow", "General"))
+        self.label_27.setText(_translate("MainWindow", "Parameters are the something something that reports are defined by"))
         self.parameterTreeWidget.headerItem().setText(0, _translate("MainWindow", "Parameter"))
-        self.pushButton.setText(_translate("MainWindow", "Add Parameter"))
-        self.label_53.setText(_translate("MainWindow", "Footer Comment"))
+        self.addParamBtn.setText(_translate("MainWindow", "Add Parameter"))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), _translate("MainWindow", "Parameters "))
         self.authorTreeWidget.headerItem().setText(0, _translate("MainWindow", "Author Name "))
         self.authorTreeWidget.headerItem().setText(1, _translate("MainWindow", "Author Position"))

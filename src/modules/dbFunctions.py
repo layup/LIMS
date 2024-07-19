@@ -336,7 +336,7 @@ def getIcpFooterComment(db, reportNum, elementNum):
         print(f'[ERROR]: {e}')
         return None; 
 
-    
+#TODO: delete this     
 def getReportNum(db, reportName): 
     try: 
         query = 'SELECT * FROM parameters WHERE parameterName = ?'
@@ -346,9 +346,50 @@ def getReportNum(db, reportName):
         print(f'[ERROR]: {e}')
         return None; 
 
+#******************************************************************
+#    ICP Reports  
+#****************************************************************** 
 
+def addIcpReportFooter(db, parameterNum, footerComment): 
+    try: 
+        query = 'INSERT OR REPLACE INTO icpReports (parameterNum, footerComment) VALUES (?, ?)'
+        db.execute(query, (parameterNum, footerComment,  ))
+        db.commit()
+   
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
 
+def getIcpReportFooter(db, parameterNum):
+    try: 
+        query = 'SELECT footerComment FROM icpReports WHERE parameterNum = ?'
+        result = db.query(query, (parameterNum, ))
+        return result[0][0] 
+    
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None; 
 
+#******************************************************************
+#    CHEM Reports  
+#****************************************************************** 
+def addChmReportFooter(db, parameterNum, footerComment): 
+    try: 
+        query = 'INSERT OR REPLACE INTO chemReports (parameterNum, footerComment) VALUES (?, ?)'
+        db.execute(query, (parameterNum, footerComment,  ))
+        db.commit()
+   
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+
+def getChmReportFooter(db, parameterNum):
+    try: 
+        query = 'SELECT footerComment FROM chemReports WHERE parameterNum = ?'
+        result = db.query(query, (parameterNum, ))
+        return result[0][0] 
+    
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None; 
 
 #******************************************************************
 #    General Queries/Commands
@@ -386,6 +427,17 @@ def getAllParameters(db):
     except Exception as e: 
         print(e)
         return None 
+
+def getParameterNum(db, parameterName): 
+    try: 
+        query = 'SELECT parameterNum FROM parameters WHERE parameterName = ?'
+        result = db.query(query, (parameterName,))[0][0]
+        return result
+        
+        
+    except Exception as e: 
+        print(e)
+        return None; 
 
 def getParameterName(db, paramNum): 
 
@@ -480,14 +532,14 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
 #    Report Queries
 #****************************************************************** 
 
-def addNewJob(db, jobNum, reportNum, parameter, dilution, currentDate):
+def addNewJob(db, jobNum, reportNum, parameter, dilution, status, currentDate):
     print('[SQLITE]: addNewJob()')
     try: 
-        sql = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, creationDate, dilution) values (?,?,?,?,?)'
-        db.execute(sql, (jobNum, reportNum, parameter, currentDate, dilution))
+        sql = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, status, creationDate, dilution) values (?,?,?, ?,?,?)'
+        db.execute(sql, (jobNum, reportNum, parameter, status, currentDate, dilution))
         db.commit()
     except Exception as e: 
-        print(f'An error occured: {e}')
+        print(f'An error occurred: {e}')
         
 def getAllJobsList(db): 
     try:

@@ -26,21 +26,14 @@ def settingsSetup(self):
     # Connect Buttons and Signals  
     self.ui.SettingsTab.currentChanged.connect(lambda index: settingsTab_changes(self, index))
     
-    reportPathWidget = self.ui.reportPath
-    textPathWidget = self.ui.txtPath
-    fileConvertedPathWidget = self.ui.convertPath
-    databasePathWidget = self.ui.dbPath
-    preferenceDbPath = self.ui.prefrenceDbPath
-
     # File paths button signals 
-    self.ui.reportsPathBtn.clicked.connect(lambda: updateFilePath(reportPathWidget, 'reportsPath'))
-    self.ui.txtPathBtn.clicked.connect(lambda: updateFilePath(textPathWidget, 'TXTDirLocation'))
-    self.ui.convertedPathBtn.clicked.connect(lambda: updateFilePath(fileConvertedPathWidget, 'ispDataUploadPath'))
+    self.ui.reportsPathBtn.clicked.connect(lambda: updateFilePath(self.ui.reportPath, 'reportsPath'))
+    self.ui.txtPathBtn.clicked.connect(lambda: updateFilePath(self.ui.txtPath, 'TXTDirLocation'))
+    self.ui.convertedPathBtn.clicked.connect(lambda: updateFilePath(self.ui.convertPath, 'ispDataUploadPath'))
     
     # Database Connections 
-    self.ui.dbPathBtn.clicked.connect(lambda: updateFileItem(databasePathWidget, 'databasePath'))
-    self.ui.preferenceDbBtn.clicked.connect(lambda:updateFileItem(preferenceDbPath, 'preferencesPath'))
-
+    self.ui.dbPathBtn.clicked.connect(lambda: updateFileItem(self.ui.dbPath, 'databasePath'))
+    self.ui.preferenceDbBtn.clicked.connect(lambda:updateFileItem(self.ui.prefrenceDbPath, 'preferencesPath'))
 
 
 #TODO: I can have some more global functions that I can change
@@ -51,9 +44,9 @@ def settingsTab_changes(self, index):
 
     if(index == 1): # Reports Tab 
         # clear the items 
-        self.ui.authorList.clear()
-        self.ui.authorNameLine.clear()
-        self.ui.authorPostionLine.clear()
+        #self.ui.authorList.clear()
+        #self.ui.authorNameLine.clear()
+        #self.ui.authorPostionLine.clear()
         
         loadReportAuthors(self)
 
@@ -99,9 +92,7 @@ def updateFileItem(widget, pathName):
         save_pickle(paths)
         widget.setText(paths[pathName]) 
         
-    
 
-    
         
 #******************************************************************
 #    Reports Functions 
@@ -112,74 +103,153 @@ def settingsReportSetup(self):
     
     # Parameters setup 
     
-    
     # button configuation setup 
     
-    # Set the author tree labels 
-    authorLabels = ['Author Name', 'Author Postion', 'Actions']
-    self.ui.authorTreeWidget.setHeaderLabels(authorLabels)
-    # Define Author Tree Column Widths     
-    self.ui.authorTreeWidget.setColumnWidth(0, 220) 
-    self.ui.authorTreeWidget.setColumnWidth(1, 220) 
+    #Parameters Setup  
+    parameterColumns = ['Parameter #', 'Parameter Name', 'Actions']
+    self.ui.parameterTreeWidget.setHeaderLabels(parameterColumns)
     
+    self.ui.parameterTreeWidget.setColumnWidth(0, 60) 
+    self.ui.parameterTreeWidget.setColumnWidth(1, 220) 
+    
+    # Set the author tree labels 
+    authorColumns = ['Author #', 'Author Name', 'Author Postion', 'Actions']
+    #TODO: rename this to 
+    self.ui.authorTreeWidget.setHeaderLabels(authorColumns)
+    # Define Author Tree Column Widths     
+    self.ui.authorTreeWidget.setColumnWidth(0, 60) 
+    self.ui.authorTreeWidget.setColumnWidth(1, 220) 
+    self.ui.authorTreeWidget.setColumnWidth(2, 220) 
+    
+    # Connect Signals 
+    self.ui.addParamBtn.clicked.connect(lambda: add_parameter_btn_clicked(self.ui.parameterTreeWidget, self.tempDB))
     self.ui.addAuthorBtn.clicked.connect(lambda: add_author_btn_clicked(self.tempDB, self.ui.authorTreeWidget))
 
 def add_author_btn_clicked(database, tree): 
+    print(f'[FUNCTION]: add_author_btn_clicked')  
+
     dialog = authorDialog(database)
         
-    dialog.updated_data.connect(lambda: print('Handle Data'))
+    dialog.updated_data.connect(lambda data: print(f'Updated Data: {data}')) 
+        
+    dialog.exec_() 
+
+def add_parameter_btn_clicked(tree, database): 
+    print(f'[FUNCTION]: add_parameter_btn_clicked')    
+    
+    dialog = parameterDialog(database)
+        
+    dialog.updated_data.connect(lambda data: print(f'Updated Data: {data}'))
         
     dialog.exec_() 
     
+    #TODO: need to add this to the tree section 
     
-def addAuthor(database, tree): 
+def parameterHandler(): 
     pass; 
+    
+    
+    
 
-
-#TODO: can lazy load the data 
 def loadReportParameters(self): 
 
     paramList = getAllParameters(self.tempDB)
-    
-    print(paramList)
-    
     paramTreeWidget = self.ui.parameterTreeWidget
+    
     # Clear the tree widget and reload the data 
     paramTreeWidget.clear()
     
     for paramItem in paramList: 
-        paraNum = paramItem[0]
-        paramName = paramItem[1]
-        
+        paramNum, paramName = paramItem
+   
         childTreeItem = QTreeWidgetItem(paramTreeWidget)
-        childTreeItem.setText(0, paramName)
+        childTreeItem.setText(0, str(paramNum))
+        childTreeItem.setText(1, paramName)
+    
+        buttonWidget = parameterButtonItemWidget(paramNum, paramName, self.tempDB, paramTreeWidget, childTreeItem )
 
+        paramTreeWidget.setItemWidget(childTreeItem, 2, buttonWidget)
         
 def loadReportAuthors(self): 
     # Retrieve all of the authors information
     authorList = getAllAuthors(self.tempDB)
     authorTreeWidget = self.ui.authorTreeWidget 
+    
     authorTreeWidget.clear()
     
     for i, authorItem in enumerate(authorList):         
         authorNum, authorName, authorRole = authorItem
 
         childTreeItem = QTreeWidgetItem(authorTreeWidget)
-        childTreeItem.setText(0, authorName)
-        childTreeItem.setText(1, authorRole)
+        childTreeItem.setText(0, str(authorNum)) #TODO: can set the item 
+        childTreeItem.setText(1, authorName)
+        childTreeItem.setText(2, authorRole)
 
         buttonWidget = ButtonItemWidget(authorNum, authorName, authorRole, self.tempDB, authorTreeWidget, childTreeItem)
         
-        authorTreeWidget.setItemWidget(childTreeItem, 2, buttonWidget)
+        authorTreeWidget.setItemWidget(childTreeItem, 3, buttonWidget)
         
 #******************************************************************
 #    Reports Classes  
 #******************************************************************  
+    
+class parameterButtonItemWidget(QWidget): 
+    def __init__(self, paraNum, paraName, database, tree, treeItem, parent=None): 
+        super().__init__(parent) 
+        
+        # Parameters 
+        self.paraNum = paraNum
+        self.paraName = paraName
+        self.db = database
+        self.tree = tree
+        self.treeItem = treeItem
+        
+        # Button 
+        self.editBtn = QPushButton('Edit')
+        self.deleteBtn = QPushButton('Delete')
+
+        self.editBtn.clicked.connect(self.handle_edit_button_clicked)
+        self.deleteBtn.clicked.connect(self.handle_delete_button_clicked)
+
+        # Layout  
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0) 
+        layout.addWidget(self.editBtn)
+        layout.addWidget(self.deleteBtn)
+        
+        self.setLayout(layout)
+        self.setFixedWidth(260)
+        
+    def handle_edit_button_clicked(self): 
+        dialog = parameterDialog(self.db, self.paraName)
+        
+        dialog.updated_data.connect(self.handle_updated_data)
+        
+        dialog.exec_()      
+    
+    def handle_delete_button_clicked(self): 
+        try:
+            query = 'DELETE FROM parameters WHERE parameterNum= ?'
+            self.db.execute(query, self.parameterNum)
+            self.db.commit()
+
+            self.tree.removeItemWidget(self.treeItem, self.treeItem.parent())
+
+        except sqlite3.Error as e:
+            print("Error:", e) 
+    
+    def handle_updated_data(self, data): 
+        print(f'Handling Data: {data}')
+        
+        self.treeItem.setText(1, data)
+
+    
 
 class ButtonItemWidget(QWidget):
     def __init__(self, authorNum, authorName, authorPostion, database, tree, treeItem, parent=None):
         super().__init__(parent)
-        
+    
+        # Parameters 
         self.num = authorNum
         self.name = authorName
         self.postion = authorPostion
@@ -187,15 +257,16 @@ class ButtonItemWidget(QWidget):
         self.tree = tree 
         self.treeItem = treeItem
         
+        # Button 
         self.editBtn = QPushButton('Edit')
         self.deleteBtn = QPushButton('Delete')
 
         self.editBtn.clicked.connect(self.handle_edit_button_clicked)
         self.deleteBtn.clicked.connect(self.handle_delete_button_clicked)
 
+        # Layout  
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)  # Set zero margins
-
+        layout.setContentsMargins(0, 0, 0, 0)  
         layout.addWidget(self.editBtn)
         layout.addWidget(self.deleteBtn)
         
@@ -206,7 +277,7 @@ class ButtonItemWidget(QWidget):
     def handle_edit_button_clicked(self): 
         #print(f'Current Row: {self.row}')
         
-        dialog = authorDialog(self.db, self.numm, self.name, self.postion)
+        dialog = authorDialog(self.db, self.num, self.name, self.postion)
         
         dialog.updated_data.connect(self.handle_updated_data)
         
@@ -281,5 +352,57 @@ class authorDialog(QDialog):
         # Send updated data to update Tree
         self.updated_data.emit([currentName, currentPostion])
         self.close()
+
+class parameterDialog(QDialog): 
+    
+    updated_data = pyqtSignal(str)
+
+    def __init__(self, database, parameter=None):
+        super().__init__()
+        
+        self.parameter = parameter
+        self.db = database
+
+        current_dir = os.getcwd()
+        file_path = os.path.join(current_dir, "ui", 'addParameterDialog.ui')
+        loadUi(file_path, self)  
+
+        if(parameter): 
+            self.parameterNameEdit.setText(parameter)
+
+        self.cancelBtn.clicked.connect(self.close)
+        self.saveBtn.clicked.connect(self.save_button_clicked)
+
+    def save_button_clicked(self): 
+        parameterName = self.parameterNameEdit.text() 
+
+        if(self.parameter): 
+            # Update to database 
+            try: 
+                query = 'UPDATE parameters SET parameterName = ?' 
+                self.db.execute(query, parameterName,)
+                self.db.commit()
+            except Exception as error: 
+                print(error)
+            
+        else: 
+            # Save to Database 
+            try: 
+                query = 'INSERT INTO parameters (parameterName) VALUES (?)'
+                self.db.execute(query, parameterName)
+                self.db.commit()
+            except Exception as error: 
+                print(error)
+         
+        # Send updated data to update Tree
+        self.updated_data.emit(self.parameter)
+        self.close()
+
+            
+    
+    
+    
+    
+    
 
     
