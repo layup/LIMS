@@ -1,6 +1,6 @@
 from modules.utilities import * 
 from modules.constants import *
-from modules.createExcel import *
+from modules.excel.excel_utils import *
 
 def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitType, recovery):
     print('***CREATING CHM REPORT')
@@ -12,7 +12,7 @@ def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitT
     print(recovery)
     print("--------------------")
    
-    #FIXME: picke saving and loading without being fucked up, get path of where things should be saved
+    #FIXME: pickle saving and loading without being fucked up, get path of where things should be saved
     temp = load_pickle('data.pickle') 
     exportPath = temp['reportsPath']
     

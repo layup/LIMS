@@ -1,6 +1,6 @@
 from modules.utilities import * 
 from modules.constants import *
-from modules.createExcel import *
+from modules.excel.excel_utils import *
 
 
 def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, footerComment): 

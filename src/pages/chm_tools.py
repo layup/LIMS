@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 
-from modules.excel.chmExcel import createChmReport
+
 from modules.dbFunctions import (loadChmTestsData, deleteChmData, getAllChmTestsData, getAllChmTestsInfo,
                                 getAllChmTestsInfo2, getChmTestData, addChmTestData, getTestsName, getAllChmTestsInfo3,
                                 getAllParameters, getParameterNum, getChmReportFooter, addChmReportFooter

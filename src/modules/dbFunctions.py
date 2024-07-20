@@ -308,6 +308,7 @@ def getReportNum(db, reportName):
         parameterName = db.query(query, (reportName,))
         if(parameterName): 
             return parameterName[0][0]
+        
     
     except Exception as e: 
         print(f'[ERROR]: {e}')
@@ -336,15 +337,7 @@ def getIcpFooterComment(db, reportNum, elementNum):
         print(f'[ERROR]: {e}')
         return None; 
 
-#TODO: delete this     
-def getReportNum(db, reportName): 
-    try: 
-        query = 'SELECT * FROM parameters WHERE parameterName = ?'
-        result = db.query(query, (reportName, ))
-        return result; 
-    except Exception as e: 
-        print(f'[ERROR]: {e}')
-        return None; 
+
 
 #******************************************************************
 #    ICP Reports  
@@ -502,7 +495,7 @@ def addAuthor(db, authorName, authorPostion):
     try: 
         query = 'INSERT INTO authors (authorName, authorPostion) VALUES (?, ?)' 
         db.execute(query, (authorName, authorPostion))
-        db.ecommit()
+        db.commit()
             
     except Exception as e: 
         print(e) 
@@ -512,7 +505,7 @@ def deleteAuthor(db, authorNum):
     try: 
         query = 'DELETE FROM authors WHERE authorNum = ?' 
         db.execute(query, (authorNum, ))
-        db.ecommit()
+        db.commit()
             
     except Exception as e: 
         print(e)  
@@ -559,13 +552,36 @@ def getAllJobNumbersList(db):
         return  [item[0] for item in jobNumbers] 
 
     except Exception as e:
-        print(f'An error occured: {e}')
+        print(f'An error occurred: {e}')
         return []
+
+def getJobStatus(db, jobNum, reportNum): 
+    try: 
+        query = 'SELECT status FROM jobs WHERE jobNum = ? and reportNum = ?'
+        result = db.query(query, (jobNum, reportNum)) 
+        return result[0][0]
+        
+    except Exception as e: 
+        print(f'An error occurred: {e}')
+        return None 
 
 def getReportTypeList(db): 
     query = 'SELECT * FROM icpReportType' 
     report_types = db.query(query)
     return [item[0] for item in report_types]
+
+
+def updateJobStatus(db, jobNum, reportNum, status): 
+    try: 
+        query = 'UPDATE jobs SET status = ? WHERE jobNum = ? AND reportNum = ?' 
+        db.execute(query, (status, jobNum, reportNum))
+        db.commit()
+        
+        print(f'Successfully updated {jobNum} status: {status}')
+        
+    except Exception as error: 
+        print(error)
+        print(f'Could not update {jobNum} status' )
 
 def checkJobExists(db, jobNum, reportNum): 
     try: 
@@ -574,9 +590,9 @@ def checkJobExists(db, jobNum, reportNum):
         result = db.fetchone()
         return result
     except Exception as e: 
-        print(f'An error occured: {e}')
-        return None 
-    
+        print(f'An error occurred: {e}')
+        return None     
+
 
 def searchJobsList(db, searchValue): 
     try:

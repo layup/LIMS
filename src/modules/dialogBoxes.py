@@ -46,7 +46,7 @@ def createdReportDialog(fileName):
     msg.setIcon(QMessageBox.Information)
 
     msg.setText('Success')
-    msg.setInformativeText(f'Report successfully created.')
+    msg.setInformativeText(f'Report successfully created. \n {fileName}')
         
     msg.setStandardButtons(QMessageBox.Ok )
     

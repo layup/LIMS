@@ -2,6 +2,8 @@ import sys
 import re 
 import pickle
 
+
+from assets import resource_rc
 from PyQt5 import QtWidgets
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import pyqtSlot
@@ -14,17 +16,17 @@ from PyQt5.QtWidgets import (
 )
 
 from modules.constants import *
-from modules.createExcel import * 
+#from modules.createExcel import * 
 from modules.dbManager import *
 from modules.dbFunctions import * 
 from modules.dialogBoxes import *
 from modules.utilities import * 
 
-from assets import resource_rc
-
 from interface import *
 
-from pages.createReportPage import reportSetup, deleteAllSampleWidgets
+from modules.reports.report_utils import deleteAllSampleWidgets
+
+from pages.createReportPage import reportSetup 
 from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
 from pages.chm_tools import ( chemistySetup, chmClearEnteredTestsData, ) 
 from pages.settingsPage import settingsSetup

@@ -95,7 +95,7 @@ def loadReportsPage(self, searchValue=None):
     print(f'[FUNCTION]: loadReportsPage(self, {searchValue})') 
 
     #historySearchSetup(self)
-
+    
     # When user uses the search bar 
     if(searchValue): 
         try: 
@@ -110,6 +110,7 @@ def loadReportsPage(self, searchValue=None):
             print(f"An error occurred: {e}")
             results = []
 
+            
     historyTable = self.ui.reportsTable 
     
     historyTable.clearContents()
@@ -133,8 +134,7 @@ def loadReportsPage(self, searchValue=None):
                 status = 'N/A'
         else: 
             status = 'N/A' 
-        
-        
+    
         setTableItem(historyTable, row, 0, jobNumber) 
         setTableItem(historyTable, row, 1, reportType)
         setTableItem(historyTable, row, 2, parameterType)

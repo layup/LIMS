@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
 from modules.constants import *
 from modules.dialogBoxes import *
 
+# Project wide reused functions 
 
 #******************************************************************
 #   General Functions  
@@ -188,6 +189,7 @@ def processTXTFolders(jobNum, locations):
 #   TEXT File Processing 
 #******************************************************************
         
+#FIXME: Cannot process big text information 
 def processClientInfo(jobNum, fileLocation):
     
     clientInfoDict = {
@@ -222,9 +224,13 @@ def processClientInfo(jobNum, fileLocation):
         return clientInfoDict, sampleNames, sampleTests; 
     
     with open(fileLocation) as file: 
+
+        sampleNum = None; 
     
         for lineLocation, line in enumerate(file, 0):
-
+            
+            # Scan the initial 8 lines for information 
+            
             if(prevLine[0]+1 == prevLineHelper[0]):
                 prevLine[0] = copy(prevLineHelper[0])
                 prevLine[1] = copy(prevLineHelper[1])
@@ -276,7 +282,7 @@ def processClientInfo(jobNum, fileLocation):
                     try: 
                         clientInfoDict['recvTemp'] = line[71:].strip()
                     except:
-                        print('No recv temp avaliable')
+                        print('No recv temp available')
                         
             if(lineLocation == 6): 
                 clientInfoDict['tel'] = line[26:50].strip() 
@@ -298,21 +304,27 @@ def processClientInfo(jobNum, fileLocation):
                     clientInfoDict['payment'] = line[51:].strip()
                      
             #FIXME: error with 172235 ICP, not showing the proper text amount
+            #FIXME: 
+            # Scan the bottom half to  lines for information 
             if(lineLocation > 35 and len(line) > 0): 
                
                 if(sampleCounter != int(clientInfoDict['totalSamples']) ):
 
                     try: 
-                        sampleMatch = re.search('(?<=\s[0-9]).*', line).group()
-                        if(sampleMatch): 
+                        sampleNum = re.search(r"\d+", line).group()
+                        sampleName = re.search('(?<=\s[0-9]).*', line).group()
+                        
+                        print(f'Sample Match Group: {sampleName} Sample Num: {sampleNum}')
+                        
+                        if(sampleName): 
                             sampleName = str(jobNum) + '-' + str(sampleCounter+1)
-                            sampleNames[sampleName] = sampleMatch.strip()
+                            sampleNames[sampleName] = sampleName.strip()
                             sampleCounter+=1; 
                            
                         #TODO: add something to get the - afterwords 
                     except: 
                         pass
-                #find the report information that does with corrisponding thing                
+                #find the report information that does with corresponding thing                
                 if(re.search('(?<=\s-\s).*', line)):
                     prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
                     #print('CURRENT: ', line)
@@ -334,7 +346,7 @@ def processClientInfo(jobNum, fileLocation):
                     #Prev sample name 
                     if(prevSampleMatchCheck):
                         #print('prev was a sampleName')
-                        #print(sampleName[prevSampleName]) #doesnt work 
+                        #print(sampleName[prevSampleName]) #doesn't work 
                         pass; 
                        
                     #append onto them 
@@ -350,18 +362,20 @@ def processClientInfo(jobNum, fileLocation):
     file.close()
     
     #print(sampleTests)
-    #process tyhe sampleTests 
+    #process type sampleTests 
     for key,value in sampleTests.items():
         
         testLists = [x.strip() for x in value.split(',')]
         sampleTests[key] = testLists
-           
-    
+            
     #print(clientInfoDict)
     #print(sampleNames)
     #print(sampleTests)
     return clientInfoDict, sampleNames, sampleTests; 
 
+
+
+#TODO: move this into icp tools 
 #******************************************************************
 #    ICP Uploads Files 
 #******************************************************************
@@ -386,7 +400,7 @@ def icpMethod1(filePath, db):
     file1 = open(filePath, 'r')
     baseName = os.path.basename(filePath)
     fname = baseName.split('.txt')[0]
-    #remove extenion 
+    #remove extension 
     
     print('Method 1')
     print('FileName: ', fname)
@@ -394,7 +408,7 @@ def icpMethod1(filePath, db):
     Lines = file1.readlines()
     
     startingLine = 'Date Time Label Element Label (nm) Conc %RSD Unadjusted Conc Intensity %RSD' 
-    headers = ['Sample', 'Analyte', 'Element', 'HT', ' ', 'units', 'rep', ' ', ' '] 
+    headers = ['Sample', 'Analyze', 'Element', 'HT', ' ', 'units', 'rep', ' ', ' '] 
     
     startingPostion = []
     endPostion = []
@@ -524,7 +538,7 @@ def icpMethod1(filePath, db):
         return False; 
 
     
-#scans throught all the text files and finds all the different sample types and the ISP and GSMS files     
+#scans thought all the text files and finds all the different sample types and the ISP and CHM files     
 #TODO: insert try catch block 
 def icpMethod2(filePath, db): 
     wb = openpyxl.load_workbook(filePath)
