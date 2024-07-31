@@ -1,6 +1,8 @@
 import math 
 import os 
 
+from base_logger import logger
+
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Alignment, borders, Border, Side
@@ -22,18 +24,19 @@ doubleBorder = Side(border_style='double', color="000000")
 
 
 def pageSetup(ws): 
+    logger.info('Entering pageSetup')
     # set the default view to page layout
     ws.sheet_view.view = "pageLayout" 
 
-    # Set the page width to auto
+    logger.info('Preparing to set page width to auto')
     page_setup = ws.page_setup
     
-    #setup page size 
+    logger.info('Preparing to set page size defaults')
     page_setup.fitToPage = True
     page_setup.fitToHeight = False 
-    page_setup.fitToWidth = True
+    page_setup.fitToWidth = True 
     
-    #page margins     
+    logger.info('Preparing to set page margins')
     page_margins = PageMargins()
     page_margins.left = 0.7
     page_margins.right = 0.7
@@ -46,6 +49,8 @@ def pageSetup(ws):
     
 #FORMATS WAY MORE THEN NEEDED BUT W/
 def formatRows(ws, totalSamples, totalCols, pageSize): 
+    logger.info(f'Entering formatRows with parameters: totalSamples: {repr(totalSamples)}, totalCols: {repr(totalCols)}, pageSize: {(repr(pageSize))}')
+
     #WINDOWS VALUES 
     #window_conversion = 0.75 
     #row_height_pixels = 15
@@ -57,16 +62,18 @@ def formatRows(ws, totalSamples, totalCols, pageSize):
     totalPages = math.ceil(totalSamples/4) 
     totalRows = (pageSize * totalPages) - (8 * (totalPages-1))
     
-    print('Total Pages: ', totalPages)
-    print('Total Rows: ', totalRows)
+    logger.debug(f'Total Pages: {repr(totalPages)}')
+    logger.debug(f'Total Rows : {repr(totalRows)}')
 
     for row in ws.iter_rows(min_row=1, max_col=totalCols, max_row=totalRows): 
         for cell in row:
             cell.font = defaultFont 
             ws.row_dimensions[cell.row].height = (row_height_pixels * window_conversion)
-            
+
 
 def generateSampleHeaderNames(ws, sampleNames): 
+    logger.info(f'Entering generateSampleHeaderNames with parameters: {sampleNames}')
+    
     sampleSections = []
     samplePlacement = []
     
@@ -93,6 +100,8 @@ def generateSampleHeaderNames(ws, sampleNames):
     return sampleSections, samplePlacement 
 
 def createFooters(ws, title, jobNumber): 
+    logger.info(f'Entering createFooters with parameters: title:{title}, jobNumber: {jobNumber}')
+    
     ws.oddHeader.left.font = 'Times New Roman'
     ws.oddHeader.left.size = 11
     ws.oddHeader.right.font = 'Times New Roman'
@@ -120,6 +129,7 @@ def createFooters(ws, title, jobNumber):
     
 
 def createHeader(ws, clientInfo, column2): 
+    logger.info('Entering createHeader')
     
     ws['A1'] = clientInfo['clientName']
         
@@ -158,6 +168,7 @@ def nextPage(curVal, curPage):
         return True; 
 
 def insertSampleName(ws, row, sampleSection, totalRows): 
+    logger.info(f'Entering insertSampleName with parameters: row: {row}, totalRows: {totalRows}, sampleSection: {sampleSection}')
     temp = ws.cell(row=row, column=1)
     temp.value = 'Samples: ' + sampleSection
     temp.border = Border(bottom=thinBorder)
@@ -168,6 +179,8 @@ def insertSampleName(ws, row, sampleSection, totalRows):
     return row + 3; 
     
 def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, totalCols): 
+    logger.info(f'Entering insertTestTitles')
+    
     tests = ws.cell(row=pageLocation, column=1)
     if(reportType == 0):
         tests.value = 'Tests'
@@ -197,7 +210,6 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, total
              
         sample.alignment = Alignment(horizontal='center', vertical='center')
         sample.border = Border(right=thinBorder, left=thinBorder) 
-
 
     so = ws.cell(row=pageLocation, column=7) 
     if(reportType == 0): 
@@ -234,17 +246,15 @@ def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, total
             
         else: 
             current.border = Border(bottom=doubleBorder)
-            
-         
+                     
     pageLocation+=1; 
 
     return pageLocation 
 
-
 #will change how we get the tests and unit type, will be saved somewhere 
 #TODO: better ways to pass function instead of a large amount of parameters 
 def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, totalTests, unitType, recovery): 
-    print('test info fam: ', testInfo)
+    logger.info('Entering insertTestInfo')    
     counter = pageLocation
 
     for i in range(len(testInfo)): 
@@ -301,11 +311,13 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
     return pageLocation; 
 
 def insertIcpComment(ws, footerComment, pageLocation): 
+    logger.info(f'Entering insertIcpComment')
     for (i, value) in enumerate(footerComment):
         comment = ws.cell(row=pageLocation, column=1)
         comment.value = value
         comment.font = Font(size=9, name="Times New Roman") 
         pageLocation+=1; 
+        
     '''     
     additonalComments = [
         'Comments:', 
@@ -317,10 +329,12 @@ def insertIcpComment(ws, footerComment, pageLocation):
         comment.value = currentComment 
         pageLocation+=1; 
     '''
+    
     pageLocation +=2; 
     insertSignature(ws, pageLocation, [3,6])
 
 def insertComments(ws, pageLocation): 
+    logger.info(f'Entering insertComments with parameters: pageLocation: {repr(pageLocation)}')
 
     comments = { 
         "SD":  'SD    = standard devition;       Standard Recovery = primary or secondary reference material', 
@@ -336,7 +350,10 @@ def insertComments(ws, pageLocation):
     return pageLocation; 
 
 
+#TODO: get the proper info from the database
 def insertSignature(ws, pageLocation, startColumn): 
+    logger.info(f'Entering insertSignature with parameters: pageLocation:{repr(pageLocation)}, startColumn: {repr(startColumn)}')
+    
     names = [
         'R. Bilodeau', 
         'H. Hartmann'

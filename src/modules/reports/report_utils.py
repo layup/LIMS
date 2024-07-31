@@ -1,10 +1,12 @@
-
+from base_logger import logger
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QTableWidgetItem
 
 from modules.dbFunctions import getAllAuthorNames 
-from widgets.widgets import SampleNameWidget 
+from widgets.widgets import SampleNameWidget, QSpacerItem, QSizePolicy 
+
 
 #from modules.reports.create_chm_report import chemReportTestData
 
@@ -72,22 +74,36 @@ def populateReportAuthorDropdowns(self):
     self.ui.authorOneDropDown.addItems(authorsList)
     self.ui.authorTwoDropDown.addItems(authorsList)
 
+def disconnect_all_slots(obj): 
+    logger.info('Entering disconnect_all_slots')
+    while True: 
+        try: 
+            if(isinstance(obj, QPushButton)): 
+                obj.clicked.disconnect() 
+            if(isinstance(obj, QTableWidget)): 
+                obj.itemChanged.disconnect()
+        except TypeError: 
+            break
+
 
 #******************************************************************
 #   Table Functions 
 #******************************************************************
 
 def clearDataTable(table): 
+    logger.info('Entering clearDataTable')
     table.clearContents()
     table.setRowCount(0)
 
 def formatReportTable(table, rowCount, colCount): 
+    logger.info('Entering formatReportTable')
     table.setRowCount(rowCount)
     table.setColumnCount(colCount)
     table.horizontalHeader().setVisible(True)
     table.verticalHeader().setVisible(True)
 
 def populateTableRow(tableWidget, row, col, alignment, value): 
+    logger.info('Entering populateTableRow with parameters: row: {row}, col: {col}, value: {value}')
     item = QtWidgets.QTableWidgetItem()  
     if(alignment == 1):   
         item.setTextAlignment(Qt.AlignCenter)
@@ -101,11 +117,9 @@ def populateTableRow(tableWidget, row, col, alignment, value):
         
     return 
 
-    
 #******************************************************************
 #   Sample Widget Functions 
-#******************************************************************
-    
+#****************************************************************** 
 def deleteAllSampleWidgets2(self): 
     for widget in self.ui.samplesContainer.children():
         if isinstance(widget, SampleNameWidget):
@@ -124,13 +138,44 @@ def deleteAllSampleWidgets(self):
                 item.widget().deleteLater()
         elif item.spacerItem():
             self.ui.samplesContainer.layout().removeItem(item)
+
+def clearLayout(layout): 
+    logger.info('Entering clearLayout')
+
+    for i in reversed(range(layout.count())):
+        item = layout.takeAt(i)
+        if item:
+            widget = item.widget()
+            if widget:
+                widget.setParent(None)  # Optional: Detach the widget from its parent
+
+
+def populateSamplesContainer(layout, sampleNames): 
+    logger.info(f'Entering populateSamplesContainer with parameters: sampleNames: {sampleNames}')
+
+    logger.info(f'Preparing to load sample names into client information section')
+    for i, (key,value) in enumerate(sampleNames.items()):
+
+        logger.debug(f'Active Sample: {key}, Sample Name: {value}')
+        sampleItem = SampleNameWidget(key, value)
+        layout.addWidget(sampleItem)
+        sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(sampleNames, textChange, key))
+
+    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    layout.addItem(spacer)
+
+    logger.info('Populated populateSamplesContainer')
+    
+def updateSampleNames(sampleNames, textChange, key):
+    sampleNames[key] = textChange; 
+    print(f'Update Sample Name: {sampleNames}')
     
 #******************************************************************
 #   Client Info Functions 
 #******************************************************************
     
 def loadClientInfo(self): 
-    print('[Function]: loadClientInfo(self)')
+    logger.info('Entering loadClientInfo')
     
     # Set the header parameter 
     self.ui.jobNum.setText("W" + self.jobNum)
@@ -157,7 +202,6 @@ def loadClientInfo(self):
     self.ui.fax_1.setText(self.clientInfo['fax'])
     self.ui.payment_1.setText(self.clientInfo['payment'])
 
-def updateSampleNames(sampleNames, textChange, key):
-    sampleNames[key] = textChange; 
-    print(f'Update Sample Name: {sampleNames}')
+    logger.info('Populated loadClientInfo')
+
     

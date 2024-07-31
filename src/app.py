@@ -39,11 +39,15 @@ from widgets.widgets import *
 # need to get more info 
 class MainWindow(QMainWindow):
     
-    def __init__(self):
+    def __init__(self,logger):
         super(MainWindow, self).__init__()
       
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self) 
+
+        # Access the existing logger from setup.py
+        self.logger = logger
+        self.logger.info('Creating MainWindow class')
 
         # Set the current working directory to the directory containing the script
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -53,9 +57,7 @@ class MainWindow(QMainWindow):
         self.loadCreatePage()
         self.loadStartup() 
 
-        self.dataTransfer()
-
-        # Page Setups 
+        self.logger.info('Preparing Page Setup Functions')
         reportSetup(self) 
         settingsSetup(self)
         historyPageSetup(self)
@@ -152,11 +154,13 @@ class MainWindow(QMainWindow):
    #    Navigation Management 
    #****************************************************************** 
     def change_index(self, index): 
+        self.logger.info('Entering change_index with index: {index}')
         self.previous_index = self.ui.stackedWidget.currentIndex() 
         self.ui.stackedWidget.setCurrentIndex(index)
     
     def on_stackedWidget_currentChanged(self, index):
-        print(f'Stack Index: {index}')
+        self.logger.info(f"Stack Widget Switched to Index: {index}")
+
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
@@ -204,10 +208,11 @@ class MainWindow(QMainWindow):
             self.ui.headerWidget.hide()
             deleteAllSampleWidgets(self) 
 
-   #******************************************************************
+  #******************************************************************
    #    Setup Loading
    #******************************************************************  
     def loadStartup(self): 
+        self.logger.info("Entering loadStartup function")
         self.setWindowTitle("Laboratory Information management System") 
         self.setStyle(QStyleFactory.create('Fusion'))
         
@@ -229,21 +234,22 @@ class MainWindow(QMainWindow):
         self.setTabOrder(self.ui.gcmsTestsSample, self.ui.gcmsTestsVal) 
        
     def loadDatabase(self): 
+        self.logger.info("Entering loadDatabase function")
+
         #TODO: convert all the database into one data base for the front and backend
         # self.paths = load_pickle('data.pickle')
         self.preferences = LocalPreferences('data.pickle')
         preferences = self.preferences.values()
         
-        print('Preferences Items')
+        self.logger.debug('Preferences Items')
         for key, value in preferences.items(): 
-            print(f'*{key}: {value}')
-        print('\n')
-       
+            self.logger.debug(f'Database Path Name: {key}, Path: {value}')
+   
         # Represents the three databases 
         databaseStatus = [0, 0, 0] 
 
         for attempt in range(3):  
-            print(f'Attemp: {attempt}')
+            print(f'Attempt: {attempt}')
                             
             try: 
                 mainDatabasePath = self.preferences.get('databasePath') 
@@ -262,17 +268,15 @@ class MainWindow(QMainWindow):
             
                 # Connect the preferences database
                 #self.preferencesDB = Database(preferencesDatabasePath)
-
                 return
 
             except Exception as error: 
-                print(error)
+                self.logger.error(f"Error loading database: {error}")
 
                 if attempt == 2:
-                    print("Max attempts reached. Unable to connect to databases.")
+                    self.logger.warning("Max attempts reached. Unable to connect to databases.")
                     return
                 else:
-                    
                     # TODO: remove this later 
                     tempLocation = openFile()
                     print(f'Temp Location: {tempLocation}')
@@ -285,24 +289,12 @@ class MainWindow(QMainWindow):
     #******************************************************************
     #   Helper/Other Functions 
     #******************************************************************         
-    #TODO: could be moved to the utiles.py 
-    #TODO: find out what this does 
-    
-    def connect_to_database(path): 
-        try: 
-            connection = Database(path);
-            return connection
             
-        except Exception as error: 
-            print(f'Could not connect to database {path}')
-            print(error)
-            
-    
     def on_tab_pressed1(self): 
         self.ui.gcmsTestsVal.setFocus()
     
     def loadCreatePage(self): 
-        print('[FUNCTION]: loadCreatePage(self)')
+        self.logger.info(f'Entering loadCreatePage function')
  
         #load the report Types
         self.ui.reportType.clear()
@@ -317,6 +309,7 @@ class MainWindow(QMainWindow):
     
     # TODO: make this more a general application  
     def formatTable(self, table): 
+        self.logger.info(f'Entering formatTable with table: {table.objectName()}')
         rowHeight = 25; 
         
         #table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
@@ -340,7 +333,7 @@ class MainWindow(QMainWindow):
             
     def updateSampleNames(self, textChange, key):
         self.sampleNames[key] = textChange; 
-        print(f'Update Sample Name: {self.sampleNames}')
+        self.logger.debug(f'Update Sample Names: {repr(self.sampleNames)}')
  
 
     @pyqtSlot()
@@ -355,8 +348,6 @@ class MainWindow(QMainWindow):
         else:
             print("User canceled.")
             
-    def dataTransfer(self): 
-        print('Data Transfer File test')
         
         
 #******************************************************************

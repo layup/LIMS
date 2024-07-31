@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QSizePolicy 
 )
 from PyQt5.uic import loadUi
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QSize
 
 from modules.utilities import openFile, getFileLocation; 
 
@@ -53,13 +53,12 @@ class SampleNameWidget(QWidget):
         newName = str(valueName).strip()
     
         self.label = QLabel(labelName)
-        #self.label.setFixedWidth(60)
         self.edit = QLineEdit(valueName)
         
-        self.button = QPushButton()
-        pixmapi = getattr(QStyle, 'SP_TitleBarCloseButton')
-        icon = self.style().standardIcon(pixmapi)
-        self.button.setIcon(icon)
+        #self.button = QPushButton()
+        #pixalmap= getattr(QStyle, 'SP_TitleBarCloseButton')
+        #icon = self.style().standardIcon(pixalmap)
+        #self.button.setIcon(icon)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)

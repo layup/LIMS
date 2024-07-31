@@ -1,5 +1,5 @@
-
 import json 
+from base_logger import logger
 from datetime import date
 
 from PyQt5 import QtWidgets
@@ -16,17 +16,18 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent
 from modules.dbFunctions import getReportNum, getParameterNum,getIcpReportFooter  
 from modules.dialogBoxes import createdReportDialog 
 from modules.excel.create_icp_excel import createIcpReport
-from modules.reports.report_utils import loadClientInfo,  formatReportTable, updateSampleNames  
+from modules.reports.report_utils import loadClientInfo,  formatReportTable, updateSampleNames, disconnect_all_slots, populateSamplesContainer  
 from modules.utilities import is_float, hardnessCalc
 from widgets.widgets import SampleNameWidget 
 
 
 #TODO: disable editing for certain things in the table
+#TODO: add the items to the table even if there are no loaded files for the ICP ones
 
 #******************************************************************
 #    ICP Loader 
 #******************************************************************
-#TODO: move into dbFunctions
+#TODO: move into dbFunctions (4)
 def getIcpMachineData(database, jobNumber): 
     query = 'SELECT sampleName, jobNum, data FROM icpData WHERE jobNum = ? ORDER BY sampleName ASC'
     
@@ -50,9 +51,6 @@ def getIcpElementsList2(db):
         return None
 
 def getIcpLimitResults2(database, parameters):
-    print('[FUNCTION]: getIcpLimitResults2(database, parameters)')
-    print(parameters)
-    
     try: 
         query = 'SELECT elementNum, unitType, lowerLimit, upperLimit, sideComment FROM icpLimits WHERE parameterNum = ?'
         result = database.query(query, (parameters, ))
@@ -65,13 +63,10 @@ def getIcpLimitResults2(database, parameters):
 #TODO: have a helper change the hardness values when cal and mg values change 
 #TODO: does this effect hardness and also what about the new values we enter in 
 def icpReportLoader(self): 
-    print('[FUNCTION]: icpLoader(self)')
-   
-    self.ui.createIcpReportBtn.setVisible(True)
-    self.ui.createGcmsReportBtn.setVisible(False)
-    self.ui.icpDataField.show()
-   
+    self.logger.info('Entering icpLoader')
+       
     # FIXME: fix the machine getting username Information, can use a loop instead 
+    self.logger.info('Preparing to load client info')
     loadClientInfo(self)
  
     columnNames = [
@@ -90,13 +85,13 @@ def icpReportLoader(self):
     elements = getIcpElementsList2(self.tempDB)
     elementNames = [t[1] for t in elements]
     
-    print(f'Elements: {elements}')
-    
     sampleData = getIcpMachineData(self.tempDB, self.jobNum)
 
     #TODO: change database later so we have just one database 
-    reportNum = getReportNum(self.tempDB, self.parameter)[0][0]
-    print(f'Parameter: {reportNum}')
+    reportNum = getReportNum(self.tempDB, self.parameter)
+
+    self.logger.debug(f'Elements: {elements}')
+    self.logger.debug(f'Parameter: {reportNum}')
     
     #TODO: add a try-except block here 
     
@@ -113,8 +108,8 @@ def icpReportLoader(self):
     machineData = {item[0]: json.loads(item[2]) for item in sampleData}
 
     #print(f'Element Names: {elementNames}')
-    print(f'Element Unit Values: {elementUnitValues}')
-    print('SelectedSampleItems: ', selectedSampleNames)    
+    self.logger.debug(f'Element Unit Values: {elementUnitValues}')
+    self.logger.debug('SelectedSampleItems: ', selectedSampleNames)    
     
     dataTable = self.ui.dataTable
     colCount = len(columnNames) + len(selectedSampleNames)
@@ -122,29 +117,36 @@ def icpReportLoader(self):
     totalSamples = len(selectedSampleNames)    
     
     # Connect Signals 
-    
     #dataTable.itemChanged.connect(lambda item: self.handle_item_changed(item, 'test')) 
+    disconnect_all_slots(self.ui.createIcpReportBtn)
+    
     self.ui.createIcpReportBtn.clicked.connect(lambda: icpReportHander(self, elements, elementUnitValues, totalSamples, reportNum));     
 
-    # Format and initialize the tables 
+    self.logger.info('Preparing to format and initialize the table')
     icpInitTable(self, dataTable, colCount, totalRows, selectedSampleNames, columnNames)
     
-    # Populate the sample table information 
-    icpPopulateSamplesSection(self, selectedSampleNames)
+    self.logger.info('Preparing to populate the sample table information')
+    populateSamplesContainer(self.ui.samplesContainerLayout_2, self.sampleNames)
     
-    # Populate Hardness and pH 
+    self.logger.info('Preparing to populate the hardness and pH section of the table')
     icpPopulateAdditonalRows(self, totalRows, additionalRows)
     
-    # populate the table with column and smaple info 
+    # populate the table with column and sample info 
+    self.logger.info('Preparing to populate the table with column and sample info')
     icpPopulateTable(self, elements, elementUnitValues)
     
-    # load the tables elemental machine info and  hardness calculations 
+    self.logger.info('Preparing to load the table with elemental machine information and do the hardness calculations')
     icpLoadMachineData(self, elements, selectedSampleNames, machineData, columnNames)
             
 
 def icpInitTable(self, table, colCount, totalRows, selectedSampleNames, columnNames): 
-    print(f'[FUNCTION]: icpInitTable(self, table, colCount, totalRows, selectedSampleNames, columnNames)')
-
+    self.logger.info('Entering icpInitTable with parameters:')
+    self.logger.info(f'colCount             : {repr(colCount)}')
+    self.logger.info(f'totalRows            : {repr(totalRows)}')
+    self.logger.info(f'selectedSampleNames  : {repr(selectedSampleNames)}')
+    self.logger.info(f'columnNames          : {repr(columnNames)}')
+    
+    self.logger.info('Preparing to format report table')
     formatReportTable(table, totalRows, colCount)
 
     column_width = self.ui.dataTable.columnWidth(2)
@@ -152,30 +154,15 @@ def icpInitTable(self, table, colCount, totalRows, selectedSampleNames, columnNa
     total_width = column_width + padding
     table.setColumnWidth(2, total_width)    
     
-    # initialise the column names
+    self.logger.info('Preparing to initialise the column names')
     for i, name in enumerate(columnNames): 
         item = QtWidgets.QTableWidgetItem(name)
         table.setHorizontalHeaderItem(i, item)
     
-    # Set the sample names in the column (after)
+    self.logger.info('Preparing to set the sample names in the column')
     for i , (key) in enumerate(selectedSampleNames, start=len(columnNames)):
         item = QtWidgets.QTableWidgetItem(key)
         table.setHorizontalHeaderItem(i, item)
-
-def icpPopulateSamplesSection(self, selectedSampleNames):
-    print(f'[FUNCTION]: icpPopulateSamples(self, selectedSampleNames)')
-        
-    # Create the sample names in the client info section        
-    for i, (key, value) in enumerate(self.sampleNames.items()):
-        
-        if(key in selectedSampleNames):
-            print('active:', key)
-            sampleItem = SampleNameWidget(key, value)
-            self.ui.samplesContainerLayout.addWidget(sampleItem)
-            sampleItem.edit.textChanged.connect(lambda textChange, key = key: updateSampleNames(self.sampleNames, textChange, key))
-
-    spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-    self.ui.samplesContainerLayout.addItem(spacer) 
 
 def icpPopulateTable(self, elements, elementUnitValues): 
     print('[FUNCTION]:icpPopulateTable(self, elements, elementUnitValues)')
@@ -385,7 +372,7 @@ def icpReportHander(self, elements, limits, totalSamples, reportNum):
 
     #TODO: if successful update the database set the status = 1 
 
-    createdReportDialog('test')
+    createdReportDialog(self,'test')
 
 def icpGenerateFooter(database, paramenterName):
     print('[FUNCTION]: icpGenerateFooter()')

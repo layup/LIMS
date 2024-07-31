@@ -1,6 +1,11 @@
 import sqlite3 
+import logging
 
 from widgets.widgets import * 
+
+
+logger = logging.getLogger(__name__)
+
 
 #******************************************************************
 #    CHM  Queries/Commands
@@ -162,9 +167,6 @@ def getIcpElements(db):
     query = 'SELECT * FROM icpElements ORDER BY element ASC'
     definedElements = db.query(query)    
     return definedElements   
-
-def getIcpFooterComment(db, reportType): 
-    pass; 
 
 def getIcpElementsList(db): 
     query = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
@@ -433,9 +435,10 @@ def getParameterNum(db, parameterName):
         return None; 
 
 def getParameterName(db, paramNum): 
+    logger.debug(f"getParameterName called with db={db} and paramNum={paramNum}")
 
     try: 
-        print(f'TYPE: {type(paramNum)}, {paramNum}')
+
         query = 'SELECT parameterName FROM parameters WHERE parameterNum = ?'  
         result = db.query(query, (paramNum,))[0][0]
         return result
@@ -526,7 +529,6 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
 #****************************************************************** 
 
 def addNewJob(db, jobNum, reportNum, parameter, dilution, status, currentDate):
-    print('[SQLITE]: addNewJob()')
     try: 
         sql = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, status, creationDate, dilution) values (?,?,?, ?,?,?)'
         db.execute(sql, (jobNum, reportNum, parameter, status, currentDate, dilution))
@@ -570,6 +572,14 @@ def getReportTypeList(db):
     report_types = db.query(query)
     return [item[0] for item in report_types]
 
+def updateJob(db, jobNum, reportNum, parameter, dilution, status, currentDate):
+    try: 
+       # sql = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, status, creationDate, dilution) values (?,?,?, ?,?,?)'
+        sql = 'UPDATE jobs SET status = ?, creationDate = ?, dilution = ? WHERE jobNum = ? AND reportNum = ? AND parameter = ?'
+        db.execute(sql, (status, currentDate, dilution, jobNum, reportNum, parameter))
+        db.commit()
+    except Exception as e: 
+        print(f'An error occurred: {e}') 
 
 def updateJobStatus(db, jobNum, reportNum, status): 
     try: 

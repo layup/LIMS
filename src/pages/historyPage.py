@@ -1,6 +1,6 @@
 import sqlite3 
 
-
+from base_logger import logger
 from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
@@ -21,15 +21,13 @@ from pages.createReportPage import createReportPage
 #TODO: add in errors that will have to fix 
 
 def historyPageSetup(self): 
+    self.logger.info(f'Entering historyPageSetup ...')
     
     historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Status', 'Action']
     frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
 
-
     formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
     formatHistoryDatabaseTable(self.ui.frontDeskTable, frontHistoryHeaders)
-
-    historySearchSetup(self)
 
     footer_widget = TableFooterWidget(69)
     self.ui.historyLayout.addWidget(footer_widget)
@@ -48,6 +46,7 @@ def historyPageSetup(self):
     
 
 def formatHistoryDatabaseTable(table, headers, tooltips=None): 
+    
     rowHeight = 25
     
     # Disable editing for the entire table 
@@ -74,7 +73,7 @@ def formatHistoryDatabaseTable(table, headers, tooltips=None):
     
 
 def historySearchSetup(self): 
-    print('[FUNCTION]: historyPageSetup')
+    self.logger.info(f'Entering historyPageSetup')
     # Get the all of the jobNums for the completer
     jobList = getAllJobNumbersList(self.tempDB) 
     jobList_as_strings = [str(item) for item in jobList]
@@ -92,10 +91,8 @@ def historySearchSetup(self):
 #******************************************************************
 
 def loadReportsPage(self, searchValue=None): 
-    print(f'[FUNCTION]: loadReportsPage(self, {searchValue})') 
+    self.logger.info(f'Entering loadReportsPage with parameter of searchValue: {searchValue}') 
 
-    #historySearchSetup(self)
-    
     # When user uses the search bar 
     if(searchValue): 
         try: 
@@ -110,7 +107,6 @@ def loadReportsPage(self, searchValue=None):
             print(f"An error occurred: {e}")
             results = []
 
-            
     historyTable = self.ui.reportsTable 
     
     historyTable.clearContents()
@@ -130,7 +126,7 @@ def loadReportsPage(self, searchValue=None):
             try:
                 status = REPORT_STATUS[int(current[5])]  # Attempt conversion to int
             except (ValueError, TypeError):  # Catch potential conversion errors
-                print("Error: Invalid value for REPORT STATUS. Using 'N/A'.")
+                self.logger.error("Error: Invalid value for REPORT STATUS. Setting Status to 'N/A'.")
                 status = 'N/A'
         else: 
             status = 'N/A' 
@@ -149,18 +145,21 @@ def loadReportsPage(self, searchValue=None):
     if(searchValue == None): 
         return None
 
+    return results
+
 @pyqtSlot()
 def on_reportsSearchBtn_clicked(self): 
     try: 
-        print('ReportSearchBtn Clicked:')
+        self.logger.info('ReportSearchBtn Clicked:')
 
         searchValueString = self.ui.reportsSearchLine.text()
-        print(f'Searching for Job Number: {searchValueString}')
+        self.logger.info(f'Searching for Job Number: {searchValueString}')
 
         results = loadReportsPage(self, searchValueString)
+
         
         if(results == None): 
-            errorTitle = "Not Search Results"
+            errorTitle = "No Search Results"
             errorMsg = "Couldn't find any jobs that matched the job num" 
             showErrorDialog(self, errorTitle, errorMsg)
         
@@ -181,7 +180,7 @@ def on_table_double_clicked(index):
     
 #TODO: save the user data that they have entered? that might be a pain in the ass that will get done later
 def openExistingReport(self, row): 
-    print('[FUNCTION]: openExistingReport')
+    self.logger.info(f'Entering openExistingReport on row: {row}')
     rowData = []
     
     for i in range(4): 
@@ -195,12 +194,12 @@ def openExistingReport(self, row):
     result = popup.exec_()
     
     if result == QDialog.Accepted:
-        print('Opening Existing Report')
+        self.logger.info('Opening Existing Report')
         existingReport = True 
         createReportPage(self, rowData[0], rowData[1], rowData[2], rowData[3], existingReport) 
         
     else:
-        print("Not Opening Existing Report'")
+        self.logger.info("Report doesn't exist in database'")
         
 
 

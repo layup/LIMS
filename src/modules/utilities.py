@@ -7,6 +7,8 @@ import json
 import string
 import pickle 
 import openpyxl
+
+from base_logger import logger
 from copy import copy
 from datetime import date
 
@@ -27,15 +29,15 @@ from modules.dialogBoxes import *
 #   General Functions  
 #******************************************************************
 def apply_drop_shadow_effect(widget):
+    logger.info('Entering apply_drop_shadow_effect')
     # Create drop shadow effect
     shadow = QGraphicsDropShadowEffect(widget)
     shadow.setColor(QColor(0, 0, 0, 150))  # Set shadow color
     shadow.setBlurRadius(10)  # Set shadow blur radius
     shadow.setOffset(0, 0)  # Set shadow offset (no offset)
 
-    # Apply drop shadow effect to the widget
+    logger.info('Applying drop shadow effect to the widget')
     widget.raise_()
-
     widget.setAutoFillBackground(True) 
     widget.setGraphicsEffect(shadow)
 
@@ -48,7 +50,6 @@ def removeIllegalCharacters(input_string):
     cleaned_string = re.sub(pattern, '', input_string)
     
     return cleaned_string
-
 
 def is_float(value):
     try:
@@ -93,27 +94,33 @@ def hardnessCalc(calcium, magnesium, dilution):
 #    OS Access Functions 
 #******************************************************************
 
-def save_pickle(dictonaryName):
+def save_pickle(dictionaryName):
+    logger.info(f'Entering save_pickle with parameter: dictionaryName: {repr(dictionaryName)}')
     try:
         with open("data.pickle", "wb") as f:
-            pickle.dump(dictonaryName, f, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(dictionaryName, f, protocol=pickle.HIGHEST_PROTOCOL)
     except Exception as ex:
         print("Error during pickling object (Possibly unsupported):", ex)
+        logger.error(ex)
 
 
 def load_pickle(filename):
+    logger.info(f'Entering load_pickle with parameter: filename: {repr(filename)}')
     try:
         with open(filename, "rb") as f:
             return pickle.load(f)
     except Exception as ex:
         print("Error during unpickling object (Possibly unsupported):", ex)
+        logger.error(ex)
+        
  
-
 def openFile(): 
+    logger.info('Entering openFile')
     fileName, _ = QFileDialog.getOpenFileName(None, 'Open File', '',)
     return fileName
 
 def getFileLocation():
+    logger.info('Entering getFileLocation')
     dlg = QFileDialog().getExistingDirectory()
     print(dlg)
     return dlg
@@ -128,14 +135,14 @@ def isValidDatabase(database_path):
         return False
 
 def saveNewLocation():
-    location = getFileLocation()
-    
+    location = getFileLocation() 
     text = input('Save File Name')
+    
     save_pickle({text:location})
 
 
 def scanDir(path): 
-    print("Scanning Dir: ", path)    
+    logger.info(f'Entering ScanDir with parameter path: {path}')
 
     obj = os.scandir(path)
     #file = os.listdir(path)
@@ -148,8 +155,10 @@ def scanDir(path):
     obj.close()
 
 def scanForTXTFolders(jobNum): 
-    fileLocationsDictonary = load_pickle('data.pickle')
-    TXTLocation = fileLocationsDictonary['TXTDirLocation']
+    logger.info(f'Entering scanForTXTFolders with parameter jobNum: {jobNum}')
+    
+    fileLocationsDictionary = load_pickle('data.pickle')
+    TXTLocation = fileLocationsDictionary['TXTDirLocation']
     locationsObject = os.scandir(TXTLocation)
 
     txtFolderLocations = [] 
@@ -164,6 +173,7 @@ def scanForTXTFolders(jobNum):
   
  
 def processTXTFolders(jobNum, locations):
+    logger.info(f'Entering processTXTFolders with parameter jobNum: {jobNum}, locations: {locations}')
     
     fileName = "W" + jobNum + ".TXT"
     
@@ -173,7 +183,7 @@ def processTXTFolders(jobNum, locations):
         for entry in tempLocationObject: 
             if(entry.is_file()): 
                 if(re.match(fileName, entry.name)): 
-                    print("TXT File found")
+                    logger.info('TXT FILE FOUND')
                     #print(entry.name)
                     tempLocationObject.close()
                     return os.path.join(locations[i], entry.name)
@@ -191,6 +201,7 @@ def processTXTFolders(jobNum, locations):
         
 #FIXME: Cannot process big text information 
 def processClientInfo(jobNum, fileLocation):
+    logger.info(f'Entering processClientInfo with jobNum: {jobNum}')
     
     clientInfoDict = {
         'clientName': '', 
@@ -221,15 +232,23 @@ def processClientInfo(jobNum, fileLocation):
     prevLineHelper = [0, ""]
     
     if(fileLocation == None): 
+        logger.info('Completed Processing Client Info returning info')
+        logger.info(f'Client Information Dictionary: {clientInfoDict}')
+        logger.info(f'Sample Names: {repr(sampleName)}')
+        logger.info(f'Sample Tests: {sampleTests}')
+        
         return clientInfoDict, sampleNames, sampleTests; 
     
     with open(fileLocation) as file: 
-
-        sampleNum = None; 
+        logger.debug(f'Opening File: {repr(fileLocation)}')    
+        sampleNum = ''; 
     
         for lineLocation, line in enumerate(file, 0):
             
-            # Scan the initial 8 lines for information 
+            logger.debug(f'{lineLocation}: {repr(line)}')
+            
+            #TODO: can put this into a own function 
+            # Scan the initial 8 lines for information
             
             if(prevLine[0]+1 == prevLineHelper[0]):
                 prevLine[0] = copy(prevLineHelper[0])
@@ -239,21 +258,18 @@ def processClientInfo(jobNum, fileLocation):
             else: 
                 prevLineHelper[0] = copy(int(lineLocation))
                 prevLineHelper[1] = copy(line)
-            
-            #print('PrevLine: ', prevLine[0], prevLine[1])
-            #print('PrevLineHelper: ', prevLineHelper[0], prevLineHelper[1])
-            #print('currentLine: ', lineLocation, line)
                     
             if(lineLocation == 1): 
                 clientInfoDict['clientName'] = line[0:54].strip()
                 clientInfoDict['date'] = line[50:(54+7)].strip()
                 clientInfoDict['time'] = line[66:71].strip()
-                
-            if(lineLocation == 2): 
+                   
+            if lineLocation == 2:
                 clientInfoDict['sampleType1'] = line[54:].strip()
-                
+            
                 if "*" in line: 
                     clientInfoDict['attn'] = line[:54].strip()
+                    
                 else: 
                     clientInfoDict['addy1'] = line[:54].strip()
                 
@@ -282,7 +298,8 @@ def processClientInfo(jobNum, fileLocation):
                     try: 
                         clientInfoDict['recvTemp'] = line[71:].strip()
                     except:
-                        print('No recv temp available')
+                        logger.debug('No recv temp available')
+                    
                         
             if(lineLocation == 6): 
                 clientInfoDict['tel'] = line[26:50].strip() 
@@ -298,7 +315,8 @@ def processClientInfo(jobNum, fileLocation):
                     if(foundEmail): 
                         clientInfoDict['email'] = foundEmail; 
                 except:
-                    print("email error")
+                    logger.error('Email Error')
+                
                 
                 if("pd" in line.lower()): 
                     clientInfoDict['payment'] = line[51:].strip()
@@ -307,44 +325,58 @@ def processClientInfo(jobNum, fileLocation):
             #FIXME: 
             # Scan the bottom half to  lines for information 
             if(lineLocation > 35 and len(line) > 0): 
-               
+                #FIXME: don't think I need this try-except section 
                 if(sampleCounter != int(clientInfoDict['totalSamples']) ):
-
                     try: 
-                        sampleNum = re.search(r"\d+", line).group()
-                        sampleName = re.search('(?<=\s[0-9]).*', line).group()
-                        
-                        print(f'Sample Match Group: {sampleName} Sample Num: {sampleNum}')
-                        
-                        if(sampleName): 
-                            sampleName = str(jobNum) + '-' + str(sampleCounter+1)
-                            sampleNames[sampleName] = sampleName.strip()
-                            sampleCounter+=1; 
+                        sampleNumCheck = re.search(r"\d+", line)
+                        sampleNameCheck = re.search('(?<=\s[0-9]).*', line)
+                                                
+                        if(sampleNameCheck): 
+                            sampleNum = sampleNumCheck.group() 
+                            sampleName = sampleNameCheck.group().strip() 
+
+                            #print(f'**Sample Name: {sampleName} Sample Num: {sampleNum}')
+                            logger.info(f'**Sample Name: {repr(sampleName)} Sample Num: {repr(sampleNum)}')
+                            
+                            #combined_name = str(jobNum) + '-' + str(sampleCounter+1)
+                            combined_name = str(jobNum) + '-' + str(sampleNum)
+                            sampleNames[combined_name] = sampleName
+                            #sampleCounter+=1; 
                            
-                        #TODO: add something to get the - afterwords 
-                    except: 
-                        pass
+                        #TODO: add something to get the - afterwords names
+                    except Exception as error: 
+                        print(f'[ERROR]: {error}')
+                        print('Invalid Line: Name Assignment Fail')
+
                 #find the report information that does with corresponding thing                
                 if(re.search('(?<=\s-\s).*', line)):
-                    prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
-                    #print('CURRENT: ', line)
-                    #print('PREV: ', prevLine[1])
-                    currentTestsCheck = re.search('(?<=\s-\s).*', line)
+                    #prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
+                    prevSampleJobName = str(jobNum) + '-' + str(sampleNum)
+                    
+                    currentLineTestsCheck = re.search('(?<=\s-\s).*', line)
                     prevSampleMatchCheck = re.search('(?<=\s[0-9]).*', prevLine[1])
                     prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
                     #sampleTests[prevSampleName] = currentTestsCheck.group()
                     #not could be apart of the string name longer 
                     
                     #add to most recent sample
-                    if(currentTestsCheck):
-                        #print('current is a test: ', currentTestsCheck.group())
+                    if(currentLineTestsCheck):
+                        logger.debug('currentLineTestsCheck: True')
+                        
+                        print(f'**Prev Sample Name: {prevSampleJobName} Sample Name: {sampleName} Sample Num: {sampleNum}')
+                        #print(f'Current is a test: {currentLineTestsCheck.group()}')
+                        #print(f'SAMPLE TESTS: {sampleTests}')
+ 
                         if(prevSampleTestsCheck):
-                            sampleTests[prevSampleName] = sampleTests[prevSampleName]  + ", " + currentTestsCheck.group()
+                            logger.debug('currentLineTestsCheck & prevSampleTestsCheck: True')
+                            sampleTests[prevSampleJobName] = sampleTests[prevSampleJobName]  + ", " + currentLineTestsCheck.group()
                         else: 
-                            sampleTests[prevSampleName] = currentTestsCheck.group()
+                            logger.debug('currentLineTestsCheck & prevSampleTestsCheck: False')
+                            sampleTests[prevSampleJobName] = currentLineTestsCheck.group()
                         
                     #Prev sample name 
                     if(prevSampleMatchCheck):
+                        logger.debug('prevSampleMatchCheck: True')
                         #print('prev was a sampleName')
                         #print(sampleName[prevSampleName]) #doesn't work 
                         pass; 
@@ -353,24 +385,25 @@ def processClientInfo(jobNum, fileLocation):
                         
                     #TODO: solve this later, add previous name onto current name sample 
                     if((not bool(prevSampleMatchCheck)) and not( bool(prevSampleTestsCheck))): 
-                        print('prev was apart of the name yo')
+                        logger.debug('prevSampleMatchCheck: False and prevSampleTestsCheck: False') 
                         
-                    
-            #print('---------------------------') 
-                
-                    
+
     file.close()
-    
-    #print(sampleTests)
+
     #process type sampleTests 
     for key,value in sampleTests.items():
-        
         testLists = [x.strip() for x in value.split(',')]
         sampleTests[key] = testLists
             
-    #print(clientInfoDict)
-    #print(sampleNames)
-    #print(sampleTests)
+    logger.info('Exiting processClientInfo and returning')
+    logger.info(f'Client Information Dictionary: ')
+   
+    for key, value in clientInfoDict.items(): 
+        logger.info(f'*{key}: {repr(value)}')
+    
+    logger.info(f'Sample Names: {repr(sampleName)}')
+    logger.info(f'Sample Tests: {sampleTests}')
+    
     return clientInfoDict, sampleNames, sampleTests; 
 
 
@@ -381,8 +414,9 @@ def processClientInfo(jobNum, fileLocation):
 #******************************************************************
     
 def icp_upload(filePath, db): 
-    print('Scanning the file')
+    logger.info('Entering icp_upload with filePath: {filePath}')
 
+    logger.info('Scanning File... ')
     if(filePath.endswith('.txt')):
         icpMethod1(filePath, db)
     elif(filePath.endswith('.xlsx')):
@@ -396,14 +430,14 @@ def icp_upload(filePath, db):
 #FIXME: tracking the icpData is wrong as well 
  #TODO: insert try catch block 
 def icpMethod1(filePath, db): 
+    logger.info('Entering icpMethod1 txt filetype detected')
 
     file1 = open(filePath, 'r')
     baseName = os.path.basename(filePath)
     fname = baseName.split('.txt')[0]
     #remove extension 
-    
-    print('Method 1')
-    print('FileName: ', fname)
+
+    logger.debug('FileName: ', fname)
     
     Lines = file1.readlines()
     
@@ -436,7 +470,7 @@ def icpMethod1(filePath, db):
     loadPath = load_pickle('data.pickle') 
     newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName) 
      
-    print('Writing CSV File: {}'.format(newPath))
+    logger.info('Writing CSV File: {}'.format(newPath))
     
     f = open(newPath, 'w')
     writer = csv.writer(f)
@@ -510,13 +544,11 @@ def icpMethod1(filePath, db):
     file1.close()
     
     #TODO: factor in a way to show all the things and the lines where duplicates are 
-        
-    print(sampleNumbers)
-    print('****')
-    print(jobData)
-   
+    logger.debug(f'SampleNumbers: {sampleNumbers}')
+    logger.debug(f'JobData: {jobData}')
+
     save = viewIcpTable(filePath, sampleNumbers, 1) 
-    print('Save Status: ', save)
+    logger.info(f"Save Status: {repr(save)}")
 
 
     #save to database 
@@ -541,6 +573,7 @@ def icpMethod1(filePath, db):
 #scans thought all the text files and finds all the different sample types and the ISP and CHM files     
 #TODO: insert try catch block 
 def icpMethod2(filePath, db): 
+    logger.info('Entering icpMethod1 xlsx filetype detected')
     wb = openpyxl.load_workbook(filePath)
     sheets = wb.sheetnames 
     
@@ -608,6 +641,10 @@ def icpMethod2(filePath, db):
     return; 
 
 def formatMachineData(ws, selectedRows, elementColumns, newPath): 
+    logger.info('Entering formatMachineData with parameters:')
+    logger.info(f'selectedRows: {repr(selectedRows)}')
+    logger.info(f'elementColumns: {repr(elementColumns)}')
+    logger.info(f'newPath: {repr(newPath)}')
 
     newWb = openpyxl.Workbook()
     ws2 = newWb.active 
@@ -676,7 +713,7 @@ def formatStringArray(inputArray):
 
     
 def viewIcpTable(filePath, data, reportType): 
-    print('Viewing ICP Table')
+    logger.info(f'Entering viewIcpTable with parameters: filePath: {filePath}, data: {data}, reportType: {reportType}')
 
     dialog = icpTableView(filePath, data, reportType)
     

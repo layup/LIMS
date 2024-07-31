@@ -1,11 +1,12 @@
+from base_logger import logger
 from PyQt5.QtWidgets import QDialog, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QDesktopWidget 
-
 
 #******************************************************************
 #    General Dialog 
 #******************************************************************
 
 def loadReportDialog(self): 
+    self.logger.info('Entering loadReportDialog')
     msgBox = QMessageBox()  
     msgBox.setText("Report Already Exists");
     msgBox.setInformativeText("Would you like to load existing report or overwrite report?");
@@ -15,15 +16,17 @@ def loadReportDialog(self):
     x = msgBox.exec_()
 
     if(x == QMessageBox.Yes): 
-        pass
-        #FIXME: load in the values as well 
+        return 'Yes'
     if(x == QMessageBox.No):
-        pass 
+        return 'No'
     if(x == QMessageBox.Cancel):
-        pass 
+        return 'Cancel'
     
 def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
-    
+    self.logger.info('Entering showErrorDialog')
+    self.logger.error(errorTitle)
+    self.logger.error(errorMsg)
+        
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Information)
 
@@ -38,22 +41,20 @@ def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
     retval = msg.exec_()
     print("value of pressed message box button:", retval)
 
-def createdReportDialog(fileName): 
-
-    msg = QMessageBox()
-    msg.setFixedWidth(8000)
+def createdReportDialog(self, fileName): 
+    self.logger.info(f'Entering createdReportDialog with parameters: fileName: {repr(fileName)}')
+    msg = QMessageBox(self)
+    msg.setFixedWidth(7000)
     
     msg.setIcon(QMessageBox.Information)
 
     msg.setText('Success')
-    msg.setInformativeText(f'Report successfully created. \n {fileName}')
+    msg.setInformativeText(f'Report successfully created. {fileName}')
         
     msg.setStandardButtons(QMessageBox.Ok )
     
     msg.exec_()
-    
-    
-
+     
 
 ## Change QPushButton Checkable status when stackedWidget index changed
 def messageBox(self):
