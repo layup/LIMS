@@ -14,10 +14,8 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 
 
-from modules.dbFunctions import (loadChmTestsData, deleteChmData, getAllChmTestsData, getAllChmTestsInfo,
-                                getAllChmTestsInfo2, getChmTestData, addChmTestData, getTestsName, getAllChmTestsInfo3,
-                                getAllParameters, getParameterNum, getChmReportFooter, addChmReportFooter
-                                )
+from modules.dbFunctions import (getAllChmTestsData, getAllChmTestsInfo, getAllChmTestsInfo2, getChmTestData, 
+    addChmTestData, getTestsName, getAllParameters, getParameterNum, getChmReportFooter, addChmReportFooter )
 from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
@@ -26,7 +24,7 @@ from widgets.widgets import *
 #    Chemistry Setup 
 #****************************************************************** 
 
-def chemistySetup(self): 
+def chemistrySetup(self): 
     chmTestsInfoSetup(self)
     chmInputSectionSetup(self)
     #chmDatabaseSetup(self)
@@ -35,7 +33,6 @@ def chemistySetup(self):
 
     # Connect the chem tab widget change function    
     self.ui.chmTabWidget.currentChanged.connect(lambda index: on_chmTabWidget_currentChanged(self, index))
-
     
 #******************************************************************
 #    Chemistry General Functions  
@@ -95,15 +92,15 @@ def createActionWidget(self, row, table):
 
     #TODO: add the edit button 
     deleteBtn = QPushButton("Delete")
-    editbtn = QPushButton('Edit')
+    editBtn = QPushButton('Edit')
 
     # Connect the signals
     deleteBtn.clicked.connect(lambda _, row=row: chmTableDeleteRow(self, row));
-    editbtn.clicked.connect(lambda _, row=row: chmTableEditRow(self, row, table))
+    editBtn.clicked.connect(lambda _, row=row: chmTableEditRow(self, row, table))
 
     button_widget = QWidget()
     button_layout = QHBoxLayout(button_widget)
-    button_layout.addWidget(editbtn)
+    button_layout.addWidget(editBtn)
     button_layout.addWidget(deleteBtn)
     button_layout.setContentsMargins(5, 0, 0, 0)
     button_layout.setAlignment(Qt.AlignLeft)
@@ -726,7 +723,7 @@ def chmClearEnteredTestsData(self, clearTable=False):
         self.ui.inputDataTree.clear()
 
 #******************************************************************
-#    Chemisty Input Data Classes 
+#    Chemistry Input Data Classes 
 #*****************************************************************
 
 class parameterItem: 
@@ -735,7 +732,7 @@ class parameterItem:
         self.testName = testName 
 
 #******************************************************************
-#    Chemisty Tests Info 
+#    Chemistry Tests Info 
 #*****************************************************************
 #TODO: integrate everything into one database 
 def chmTestsInfoSetup(self): 

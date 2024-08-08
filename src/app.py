@@ -27,12 +27,13 @@ from interface import *
 from modules.reports.report_utils import deleteAllSampleWidgets
 
 from pages.createReportPage import reportSetup 
-from pages.icp_tools import  icpSetup, loadReportList, loadIcpHistory
-from pages.chm_tools import ( chemistySetup, chmClearEnteredTestsData, ) 
+from pages.icp_tools import  icpSetup
+from pages.chm_tools import  chemistrySetup  
 from pages.settingsPage import settingsSetup
 from pages.historyPage import historyPageSetup, loadReportsPage
 
 from widgets.widgets import * 
+   
     
     
 #TODO: need to have more class objects that deal with insertion, that way we can have lazy loading instead of constant 
@@ -63,7 +64,7 @@ class MainWindow(QMainWindow):
         historyPageSetup(self)
         icpSetup(self)
 
-        chemistySetup(self)
+        chemistrySetup(self)
 
         apply_drop_shadow_effect(self.ui.headerWidget)
         

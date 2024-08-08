@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent, QValidator
 
-from modules.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout
+from modules.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout, EmptyDataTableError
 from modules.reports.create_chm_report import chmReportLoader  
 from modules.reports.create_icp_report import icpReportLoader 
 
@@ -167,9 +167,9 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             self.ui.statusHeaderLabel.setText(REPORT_STATUS[status])
     
         try: 
-            # Determine if ICP or CHM loader 
             layout_config(self, self.reportType) 
-            
+
+
         except Exception as error: 
             self.logger.error(error)
             traceback.print_exc(file=sys.stderr)  # Print detailed traceback
@@ -194,6 +194,10 @@ def layout_config(self, reportType):
     reportNum = REPORT_NUM[reportType]
     
     if(reportNum == 1):  
+        self.logger.info('Preparing ICP report Configuration')
+        self.ui.reloadDataBtn.setVisible(True)
+        self.ui.calcHardnessBtn.setVisible(True)
+        
         self.ui.createIcpReportBtn.setVisible(True)
         self.ui.createGcmsReportBtn.setVisible(False)
         self.ui.icpDataField.show()
@@ -201,6 +205,10 @@ def layout_config(self, reportType):
         icpReportLoader(self)
         
     if(reportNum == 2): 
+        self.logger.info('Preparing CHM report Configuration')
+        self.ui.reloadDataBtn.setVisible(False)
+        self.ui.calcHardnessBtn.setVisible(False)
+        
         self.ui.createIcpReportBtn.setVisible(False)
         self.ui.createGcmsReportBtn.setVisible(True)
         self.ui.icpDataField.hide()  

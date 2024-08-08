@@ -44,7 +44,7 @@ def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
 def createdReportDialog(self, fileName): 
     self.logger.info(f'Entering createdReportDialog with parameters: fileName: {repr(fileName)}')
     msg = QMessageBox(self)
-    msg.setFixedWidth(7000)
+    #msg.setFixedWidth(7000)
     
     msg.setIcon(QMessageBox.Information)
 

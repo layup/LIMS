@@ -145,8 +145,12 @@ def createChmReport(clientInfo, jobNum, sampleNames, sampleData, testInfo, unitT
     fileName = 'W' + str(jobNum) + ".chm" 
     filePath = os.path.join(exportPath, fileName)
 
-    logger.info(f'Excel Report Created')
+    logger.info(f'Excel Report Created: {repr(fileName)}')
     logger.info(f'Exporting excel report to: {repr(filePath)}')
     
     wb.save(filePath)
+
+    return filePath, fileName
+
+    
     

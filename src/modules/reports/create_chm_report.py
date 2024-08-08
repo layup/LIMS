@@ -1,3 +1,4 @@
+import sqlite3
 from base_logger import logger
 from datetime import date
 
@@ -12,12 +13,15 @@ from PyQt5.QtWidgets import (
 
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent 
 
-from modules.constants import REPORT_NUM 
+from modules.constants import REPORT_NUM, REPORT_STATUS
 from modules.dbFunctions import getTestsName, getTestsInfo, getTestsTextName, getJobStatus, updateJobStatus
-from modules.dialogBoxes import createdReportDialog
+from modules.dialogBoxes import createdReportDialog, showErrorDialog
 from modules.excel.create_chm_excel import createChmReport
 from modules.utilities import removeIllegalCharacters, is_float 
-from modules.reports.report_utils import loadClientInfo,  formatReportTable, disconnect_all_slots, populateSamplesContainer, populateReportAuthorDropdowns
+from modules.reports.report_utils import (
+    loadClientInfo,  formatReportTable, disconnect_all_slots, populateSamplesContainer, 
+    populateReportAuthorDropdowns, EmptyDataTableError, updateReport
+)
 from widgets.widgets import SampleNameWidget 
 
 #******************************************************************
@@ -28,6 +32,7 @@ from widgets.widgets import SampleNameWidget
 #TODO: fix the error checking 
 #TODO: make sure we set limits for the table items (limit text and to nums for some)
 #TODO: we can have items with the same job num, report type but need to make sure the parameter is different 
+#FIXME: if the row column doesn't have the data make it so we can't edit it in 
 def chmReportLoader(self): 
     self.logger.info('Entering chmLoader...')
        
@@ -61,7 +66,6 @@ def chmReportLoader(self):
 
     # Signals
     #FIXME: there seems to be a problem when the signals and connects when we call them keeps on adding connection signals 
-
 
     disconnect_all_slots(self.ui.dataTable)
     disconnect_all_slots(self.ui.createGcmsReportBtn)
@@ -166,6 +170,21 @@ def chmReportHandler(self, columnLength,  tests):
     unitType = []
     recovery = []
     displayNames = []
+
+    try:  
+        # Check if the data files are not empty 
+        if(self.ui.dataTable.rowCount() == 0): 
+            raise EmptyDataTableError("Data table is empty. Cannot create Excel file.") 
+    
+    except EmptyDataTableError as error:
+        print(error)
+        self.logger.error('Data table is empty. Cannot create Excel file') 
+        showErrorDialog(self, 'Cannot create report', f'Data table is empty. Cannot create excel file for Job: {self.jobNum}')
+        return 
+    
+    except Exception as e:
+        print("Unexpected error:", e) 
+        return 
     
     # Retrieve the Sample Input Data 
     self.logger.info('retrieving sample input data')
@@ -204,30 +223,27 @@ def chmReportHandler(self, columnLength,  tests):
             recoveryVal = self.ui.dataTable.item(row, 5).text()
             recovery.append(float(recoveryVal) if is_float(recoveryVal) else recoveryVal)
         except: 
-            recovery.append('')       
-        
-    # Check and update the job status  
-    try: 
-        jobStatus = getJobStatus(self.tempDB, self.jobNum, self.reportNum)
-        self.logger.debug(f'Current Job Status: : {jobStatus}')
-        
-        if(jobStatus == 0): 
-            completeJobStatus = 1  
-            updateJobStatus(self.tempDB, self.jobNum, self.reportNum, completeJobStatus) 
-        
-    except Exception as error: 
-        print(error)
+            recovery.append('')   
             
-
     self.logger.info('Preparing to create CHM Report')
-    createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery)
+    try: 
+        filePath, fileName = createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery) 
+        createdReportDialog(self, fileName)
+        
+        jobCreatedNum = 1 
+        self.logger.info(f'CHM Report Creation Successful: jobCreated: {jobCreatedNum}')  
+            
+    except: 
+        #TODO: debating purring the error here so it's more clean 
+        jobCreatedNum = 0; 
+        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
+        
+    if(jobCreatedNum == 1): 
+        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.reportNum)
+        
 
-    self.logger.info('CHM Report created')    
-    createdReportDialog(self,'test.py')
-
-
-    # Save the other client info 
-    # Authors, client info, samples name. sample data
+    # TODO: Save the other client info 
+    # TODO: Authors, client info, samples name. sample data 
 
 #TODO: Move this into a report_utils.py so both functions can have access to this 
 #TODO: need to move this can account for both ICP and CHM reports 
@@ -240,6 +256,7 @@ def handleTableChange(self, item):
     table = self.ui.dataTable 
     row = item.row()
     column = item.column()
+    #TODO: have an error for this thing 
     value = item.text()
 
     #self.logger.debug(f'Row: {repr(row)}, column: {repr(column)}, value: {repr(value)}')
@@ -297,7 +314,7 @@ def handleTableChange(self, item):
 #    CHM Classes 
 #******************************************************************
 
-#TODO: need to convert the classes into direct 
+#TODO: is it easier to just scan all of the information in or just to pass the data lol 
 class chemReportTestData: 
     def __init__(self, testNum, testName, textName, displayName, unitType):  
         self.testNum = testNum 
@@ -310,8 +327,8 @@ class chemReportTestData:
         prevDisplayName = self.displayName
         self.displayName = newName
         logger.debug(f'Updating Display Name: {repr(self.textName)} from {repr(prevDisplayName)} to {repr(self.displayName)}')
-        
-
+         
+         
 #FIXME: this is too complicated, just need to have something that contains samples in a dict and their values
 class chemReportSampleData: 
     def __init__(self, sampleNum, jobNum, sampleName): 
@@ -342,7 +359,6 @@ class chemReportSampleData:
             #self.data[testNum] = [newValue, None, None]
             self.data[testNum] = float(newValue)
             logger.debug(f'{self.sampleName} ADDED {testNum} TO {float(newValue)}')
-
 
     def get_data(self): 
         return self.data; 
@@ -394,7 +410,7 @@ class chemReportManager:
             self.samples[sampleName].add_data(testNum, testValue, recovery, unitType)
             
         #FIXME: add the other samples into this  
-
+        
         logger.info(f'Returning self.samples: {self.samples}')
 
         return self.samples 

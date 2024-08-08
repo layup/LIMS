@@ -1,3 +1,4 @@
+from base_logger import logger
 from modules.utilities import * 
 from modules.constants import *
 from modules.excel.excel_utils import *
@@ -12,22 +13,22 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #TODO: determine how long the extra tests comments are 
     #TODO: factor that into the size insertion 
 
-    print('ICP general Information')
-    print(clientInfo)
-    print(sampleNames)
-    print(sampleData)
-    print(testInfo)
-    print(unitType)
-    print(limitElements)
-    print(limits)
-    print('-------------------------')
+    logger.info('Entering createIcpReport with parameters: ')
+    logger.info(f'jobNum     : {repr(jobNum)}')
+    logger.info(f'clientInfo : {clientInfo}')
+    logger.info(f'sampleNames: {sampleNames}')
+    logger.info(f'sampleData : {sampleData}')
+    logger.info(f'testInfo   : {testInfo}')
+    logger.info(f'unitType   : {unitType}')
+    logger.info(f'limits     : {limits}')
+    logger.info(f'limitElements: {limitElements}')
+
         
     temp = load_pickle('data.pickle') 
     exportPath = temp['reportsPath']
 
     newList = [item.lower() for item in testInfo]
     
-    print(newList)
     limitRef = {}
     
     for i, item in enumerate(limitElements): 
@@ -35,9 +36,10 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             index = newList.index(item)
             limitRef[index] = limits[i]
         except:
-            print("could not find") 
+            logger.error("could not find") 
             
-    print(limitRef)
+    logger.info(f'newList: {newList}')
+    logger.info(f'limitRef: {limitRef}')
 
     wb = Workbook()
     ws = wb.active
@@ -56,8 +58,6 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     samplePlacement = []    
     selectedNames = []
         
-    #determine how many sample sections we will need 
-   
     currentWord = ''
     temp = []
     
@@ -66,11 +66,11 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         selectedNames.append(key)
     
     #can only display 4 at a time 
-    print('!------ GENERATING SAMPLE NAME ------!')
+    logger.info('!------ GENERATING SAMPLE NAME ------!')
     for i, sampleNum in enumerate(selectedNames, start=1): 
         sampleName = sampleNames[sampleNum]
-        condencedName = " ".join(sampleName.split())
-        currentWord += " " + str(i) + ") " + condencedName + " "
+        condensedName = " ".join(sampleName.split())
+        currentWord += " " + str(i) + ") " + condensedName + " "
         temp.append(sampleNum)
 
         if(i % 4 == 0): 
@@ -85,8 +85,8 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         currentWord = ""
         temp = [] 
             
-    print('Sample Placement: ', samplePlacement)
-    print('Sample Sections: ', sampleSections)
+    logger.info('Sample Placement: ', samplePlacement)
+    logger.info('Sample Sections: ', sampleSections)
     
     totalTests = len(testInfo)
     totalPages = len(samplePlacement)
@@ -99,15 +99,15 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #FIXME: include the length of the comments 
     totalSamples = len(sampleData.keys())
     
-    print('Total Samples: ', totalSamples);
+    logger.info('Total Samples: ', totalSamples);
     formatRows(ws, totalSamples, totalCols, pageSize)
 
     for currentPage in range(totalPages): 
         
         sampleAmount = len(samplePlacement[currentPage])
-        print('Sample Amount: ', sampleAmount);
+        logger.info('Sample Amount: ', sampleAmount);
         
-        #first page infomation 
+        #first page information 
         if(currentPage == 0): 
             pageLocation = 9; 
             pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage], totalCols)
@@ -123,7 +123,7 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
                   
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 
-            print('Starting Location: ', pageLocation) 
+            logger.info('Starting Location: ', pageLocation) 
             pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage], totalCols)
             pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1, totalCols) 
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
@@ -139,24 +139,24 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
         usedSamples += sampleAmount; 
     
     maxWidth = ws.max_column 
-    print(f'The width of the worksheet is {maxWidth} columns')
-    print('Current Page location: ', pageLocation); 
+    logger.info(f'The width of the worksheet is {maxWidth} columns')
+    logger.info('Current Page location: ', pageLocation); 
     
     fileName = 'W' + str(jobNum) + ".001" 
     filePath = os.path.join(exportPath, fileName)
-    print('Export Path: ', filePath)
+    logger.info('Export Path: ', filePath)
 
     # Create the directory if it doesn't exist
     #if not os.path.exists(exportPath):
     #    os.makedirs(exportPath)
  
     wb.save(filePath)
+
+    logger.info('ICP Report Created')
+    print('ICP Report Created')
     
-def createIcpReport2(clientInfo, samplenames, jobNum, sampleData, elements, limitsInfo, footer): 
-    
-    # convert elements 
-    
-    pass; 
+    return filePath, fileName
+
 
 def insertIcpComment(ws, footerComment, pageLocation): 
     for (i, value) in enumerate(footerComment):
@@ -165,12 +165,12 @@ def insertIcpComment(ws, footerComment, pageLocation):
         comment.font = Font(size=9, name="Times New Roman") 
         pageLocation+=1; 
     '''     
-    additonalComments = [
+    additionalComments = [
         'Comments:', 
         'All constituents tested meet Canadian and B.C drinking water standards.'
     ]
 
-    for currentComment in additonalComments: 
+    for currentComment in additionalComments: 
         comment = ws.cell(row=pageLocation, column=1)
         comment.value = currentComment 
         pageLocation+=1; 
@@ -182,9 +182,9 @@ def insertIcpComment(ws, footerComment, pageLocation):
 def insertComments(ws, pageLocation): 
 
     comments = { 
-        "SD":  'SD    = standard devition;       Standard Recovery = primary or secondary reference material', 
+        "SD":  'SD    = standard devotion;       Standard Recovery = primary or secondary reference material', 
         'STD': 'STD  = secondary standard calibrated to primary standard reference material', 
-        'ND':  'ND   = none is detcted;          n/a = not applicable'
+        'ND':  'ND   = none is detected;          n/a = not applicable'
     }
     
     for i, (key,value) in enumerate(comments.items()): 
@@ -195,8 +195,8 @@ def insertComments(ws, pageLocation):
     
     return pageLocation; 
 
-
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
+    logger.info('Entering insertIcpTests')
     counter = pageLocation; 
     
     #FIXME: need to change because will be loading elements and symbols based on the info 
@@ -300,7 +300,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
         if(current != 8): 
             temp.border = Border(right=thinBorder)
         else: 
-            #TODO: add differet comments basedp m the hardness 
+            #TODO: add different comments basedp m the hardness 
             temp.value = '0-75 mg/L = soft'
             temp.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
         

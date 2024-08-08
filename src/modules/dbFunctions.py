@@ -1,57 +1,12 @@
 import sqlite3 
 import logging
 
+from base_logger import logger
 from widgets.widgets import * 
-
-
-logger = logging.getLogger(__name__)
 
 
 #******************************************************************
 #    CHM  Queries/Commands
-#****************************************************************** 
-
-def getChmTotalTests(db): 
-    query = 'SELECT count(*) FROM gcmsTests'
-    
-    db.execute(query)
-    total = db.fetchone()[0]
-    
-    return total; 
-
-def deleteChmData(db, sampleNum, testsName): 
-    try: 
-        query = 'DELETE FROM gcmsTestsData WHERE sampleNum = ? and testsName = ?'
-        db.execute(query, [sampleNum, testsName])
-        db.commit()
-    except Exception as e: 
-        print(f'Error, could not delete item {sampleNum}: {testsName}')
-        print(e)
-        return None; 
-
-def loadChmTotalTest(db): 
-    query = 'SELECT * FROM gcmsTests'
-    return db.query(query)
-
-def loadChmTestsData(db): 
-    query = 'SELECT * FROM gcmsTestsData ORDER BY jobNum ASC'
-    results = db.query(query, [])
-    return results 
-
-def insertChmTests(db, txtName, unitType, recoveryVal, displayName): 
-    try:
-        definedTestsValues = 'INSERT OR REPLACE INTO gcmsTests (testName, unitType, recoveryVal, displayName) VALUES (?,?,?, ?)' 
-        db.execute(definedTestsValues, (txtName, unitType, recoveryVal, displayName) )
-        db.commit()
-
-    except sqlite3.IntegrityError as e:
-        print(e)
-    except Exception as e: 
-        print(e)
-
-        
-#******************************************************************
-#    CHM  Queries/Commands 2.0
 #****************************************************************** 
 
 def getAllChmTestsInfo(db): 
@@ -61,7 +16,7 @@ def getAllChmTestsInfo(db):
         return tests 
 
     except Exception as e: 
-        print(f'An error occured: {e}')
+        print(f'An error occurred: {e}')
         return None 
 
 def getAllChmTestsInfo2(db): 
@@ -71,7 +26,7 @@ def getAllChmTestsInfo2(db):
         return tests 
 
     except Exception as e: 
-        print(f'An error occured: {e}')
+        print(f'An error occurred: {e}')
         return None 
 
 def getAllChmTestsInfo3(db): 
@@ -81,7 +36,7 @@ def getAllChmTestsInfo3(db):
         return tests 
 
     except Exception as e: 
-        print(f'An error occured: {e}')
+        print(f'An error occurred: {e}')
         return None 
         
 
@@ -96,11 +51,6 @@ def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, 
     except Exception as e: 
         print(e)
 
-def deleteChmTestData(db, sampleNum, testNum, jobNum): 
-    pass; 
-
-def editChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
-    pass; 
         
 def getChmTestData(db, sampleNum, testNum): 
     try: 
@@ -142,10 +92,7 @@ def getTestsTextName(db, testNum):
         print(e)
         return None; 
 
-
-
 def getTestsInfo(db, textName): 
-
     try: 
         #query = 'SELECT testNum, testName, benchMicroname, displayName, recoveryValue, recoveryValue FROM Tests WHERE benchMicroName = ?'
         query = 'SELECT * FROM chemTestsInfo WHERE textName = ?'
@@ -156,91 +103,8 @@ def getTestsInfo(db, textName):
         print(e)
         return None; 
 
-
-
 #******************************************************************
-#    ICP Queries/Commands 
-#****************************************************************** 
-#TODO: rename all of the load items to get items? 
-
-def getIcpElements(db): 
-    query = 'SELECT * FROM icpElements ORDER BY element ASC'
-    definedElements = db.query(query)    
-    return definedElements   
-
-def getIcpElementsList(db): 
-    query = 'SELECT element, symbol FROM icpElements ORDER BY element ASC' 
-    
-    elements = list(db.query(query))
-    
-    return elements
-
-def getTotalElements(db): 
-    amountQuery = 'SELECT count(*) FROM icpElements'
-    
-    db.execute(amountQuery)
-    total = db.fetchone()[0]
-    
-    return total; 
-
-#TODO: define which report this is going to be  
-def getElementLimits(db): 
-    elementsQuery = 'SELECT element FROM icpLimits WHERE reportType = ? ORDER BY element ASC'
-    elementWithLimits = db.query(elementsQuery, ('Water',))    
-
-    temp = []
-
-    for item in elementWithLimits: 
-        #print(item)
-        temp.append(item[0]) 
-
-    return temp; 
-
-# Gets all of the machine data and process the data
-def getMachineData(db, jobNum): 
-    pass; 
-
-
-def loadIcpMachineHistory(db, offset, limit=50):
-    # offset is the starting section that I will, so offset 50 will be 51 forward 
-    query = 'SELECT * FROM icpMachineData1 ORDER BY createdDate DESC LIMIT ? OFFSET ?'
-    
-    db.execute(query, (limit, offset))
-    result = db.fetchone()
-    return result
-    
-
-def loadIcpElement(db, elementName): 
-    query = 'SELECT * FROM icpElements WHERE element = ?'
-    db.execute(query, (elementName,))
-    result = db.fetchone() 
-
-    return result
-    
-def loadIcpLimit(db, elementName, reportType): 
-    query = 'SELECT * FROM icpLimits WHERE element = ? and ReportType = ?'
-    db.execute(query, (elementName, reportType))
-    result =  db.fetchone() ;
-    return result 
-
-def loadIcpReportList(db): 
-    try: 
-        query = 'SELECT * FROM icpReportType' 
-        results = db.query(query)
-        
-        return results
-    except Exception as e: 
-        print(f'An error occured: {e}')
-        return None 
-    
-def loadIcpFooterComment(db, reportType):  
-    query = 'SELECT footerComment from icpReportType WHERE reportType = ?'
-    db.execute(query, (reportType,))
-    result = db.fetchone()
-    return result
-
-#******************************************************************
-#    NEW ICP Database Connections 
+#   ICP Queries/Commands 
 #****************************************************************** 
 
 #TODO: deal with it on the report side of things
@@ -255,9 +119,14 @@ def getIcpElements(db):
         print(f'[ERROR]: {e}')
         return None
 
-
-def getIcpElementNum(db, elementName): 
-    pass; 
+def getIcpElementsList(db):  
+    try: 
+        query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
+        results = db.query(query)
+        return results
+    except Exception as error: 
+        print(f'[ERROR]: {error}')
+        return None
 
 
 def getIcpElementInfo(db, elementNum): 
@@ -280,6 +149,7 @@ def getIcpElementLimits(db, elementNum):
     except Exception as e: 
         print(f'[ERROR]: {e}')
         return None
+    
 
 def getIcpElements2(db): 
 
@@ -292,6 +162,26 @@ def getIcpElements2(db):
         print(f'[ERROR]: {e}')
         return None 
     
+def getIcpLimitResults(database, parameters):
+    try: 
+        query = 'SELECT elementNum, unitType, lowerLimit, upperLimit, sideComment FROM icpLimits WHERE parameterNum = ?'
+        result = database.query(query, (parameters, ))
+        return {item[0]: [item[1], item[2], item[3], item[4]] for item in result}
+        
+    except Exception as e: 
+        print(e)  
+        return None 
+    
+def getIcpMachineData(database, jobNumber): 
+    try: 
+        query = 'SELECT sampleName, jobNum, data FROM icpData WHERE jobNum = ? ORDER BY sampleName ASC'
+    
+        return list(database.query(query, (jobNumber, )))
+
+    except Exception as e: 
+        print(e)  
+        return None 
+
 def addIcpElement(db): 
     pass; 
         
@@ -331,7 +221,6 @@ def updateIcpLimits(db, reportNum, elementNum, data ):
         print(e)
 
         
-
 def getIcpFooterComment(db, reportNum, elementNum): 
     try: 
         pass; 
@@ -386,11 +275,6 @@ def getChmReportFooter(db, parameterNum):
         print(f'[ERROR]: {e}')
         return None; 
 
-#******************************************************************
-#    General Queries/Commands
-#****************************************************************** 
-
-
      
 #******************************************************************
 #   Author Commands  
@@ -406,7 +290,6 @@ def getAuthorInfo(db, authorName):
             print(e) 
             return None 
 #TODO: import previous functions later on 
-
 
 
 #******************************************************************
@@ -428,8 +311,7 @@ def getParameterNum(db, parameterName):
         query = 'SELECT parameterNum FROM parameters WHERE parameterName = ?'
         result = db.query(query, (parameterName,))[0][0]
         return result
-        
-        
+     
     except Exception as e: 
         print(e)
         return None; 
@@ -438,15 +320,12 @@ def getParameterName(db, paramNum):
     logger.debug(f"getParameterName called with db={db} and paramNum={paramNum}")
 
     try: 
-
         query = 'SELECT parameterName FROM parameters WHERE parameterNum = ?'  
         result = db.query(query, (paramNum,))[0][0]
         return result
-        
     except Exception as e: 
         print(e)
         return None 
-    
     
 def addParameter(db, parameterName):
     try:
@@ -523,6 +402,7 @@ def updateAuthor(db, authorNum, authorName, authorPostion):
     except Exception as e: 
         print(e)
      
+
     
 #******************************************************************
 #    Report Queries
@@ -587,7 +467,7 @@ def updateJobStatus(db, jobNum, reportNum, status):
         db.execute(query, (status, jobNum, reportNum))
         db.commit()
         
-        print(f'Successfully updated {jobNum} status: {status}')
+        logger.info(f'Successfully updated {jobNum} status: {status}')
         
     except Exception as error: 
         print(error)
@@ -618,7 +498,7 @@ def searchJobsList(db, searchValue):
 #****************************************************************** 
 
 def getFrontHistory(db): 
-    query = 'SELECT jobNumber, companyNamme, creationDate, status FROM history'  
+    query = 'SELECT jobNumber, companyName, creationDate, status FROM history'  
     db.execute(query)
 
     jobNumbers = db.fetchall()

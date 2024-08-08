@@ -4,7 +4,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QTableWidgetItem
 
-from modules.dbFunctions import getAllAuthorNames 
+from modules.constants import REPORT_STATUS
+from modules.dbFunctions import getAllAuthorNames, getJobStatus, updateJobStatus
 from widgets.widgets import SampleNameWidget, QSpacerItem, QSizePolicy 
 
 
@@ -85,6 +86,22 @@ def disconnect_all_slots(obj):
         except TypeError: 
             break
 
+def updateReport(statusWidget, database, jobNum, reportNum):
+    try: 
+        jobStatus = getJobStatus(database, jobNum, reportNum)
+        logger.debug(f'Checking current job status: : {jobStatus}')
+        
+        if(jobStatus == 0): 
+            completeJobStatusNum = 1  
+            logger.info("Preparing to update job status")
+            updateJobStatus(database, jobNum, reportNum, completeJobStatusNum) 
+        
+            logger.info('Updating Header Status')
+            statusWidget.setText(REPORT_STATUS[completeJobStatusNum])
+        
+    except Exception as error: 
+        logger.error(f'Could not update Report Status for {(repr(jobNum))}')
+        print(error)
 
 #******************************************************************
 #   Table Functions 
@@ -96,7 +113,7 @@ def clearDataTable(table):
     table.setRowCount(0)
 
 def formatReportTable(table, rowCount, colCount): 
-    logger.info('Entering formatReportTable')
+    logger.info(f'Entering formatReportTable with parameters: rowCount: {repr(rowCount)}, colCount: {repr(colCount)}')
     table.setRowCount(rowCount)
     table.setColumnCount(colCount)
     table.horizontalHeader().setVisible(True)
@@ -203,5 +220,12 @@ def loadClientInfo(self):
     self.ui.payment_1.setText(self.clientInfo['payment'])
 
     logger.info('Populated loadClientInfo')
+
+
+#******************************************************************
+#   Custom Exceptions 
+#******************************************************************
+class EmptyDataTableError(Exception):
+    pass
 
     

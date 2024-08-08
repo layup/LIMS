@@ -5,7 +5,6 @@ import json
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QAbstractTableModel, QModelIndex
 
-
 from PyQt5.QtWidgets import (
     QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
     QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
@@ -73,15 +72,6 @@ def on_icpTabWidget_currentChanged(self, index):
         self.ui.headerTitle.setText('ICP Reports Information'); 
         self.ui.headerDesc.setText(''); 
 
-
-def loadReportList(self): 
-    results = loadIcpReportList(self.db)
-    self.ui.reportsList.clear()
-    
-    if(results): 
-        for item in results: 
-            self.ui.reportsList.addItem(item[0])    
-
 #******************************************************************
 #    ICP History 
 #****************************************************************** 
@@ -94,7 +84,6 @@ def icp_history_setup(self):
 
     # Set the tool tips 
     self.ui.icpUploadBtn.setToolTip('Upload .txt or .xlsx files into the database from machines') 
-
 
     # update footer (buttons, page change, filter update) -> update data 
     # update search -> update data and footer 
@@ -178,14 +167,14 @@ def populateIcpHistoryTable(self, result):
         button = QPushButton("Open") 
         button.setFixedSize(100, 10)  # Set the fixed size of the button (width, height)
        
-        button.clicked.connect(lambda _, sampleNum=sampleNum, machineType=machineType: icpOpenbutton(self, sampleNum, machineType))
+        button.clicked.connect(lambda _, sampleNum=sampleNum, machineType=machineType: icpOpenButton(self, sampleNum, machineType))
         actionRow = 5 
         self.ui.icpTable.setCellWidget(row, actionRow, button)
 
     
     self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-def icpOpenbutton(database, sampleNum, machineType): 
+def icpOpenButton(database, sampleNum, machineType): 
     print(f'Sample: {sampleNum} Machine: {machineType}')
     
     dialog = viewIcpDataDialog(database, sampleNum, machineType) 
@@ -863,7 +852,7 @@ class ElementsManager(QObject):
         self.db = db   
         self.elements = {} 
         
-    # load the inital data 
+    # load the initial data 
     def loadElements(self, elementsList ): 
         
         for element in elementsList: 

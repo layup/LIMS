@@ -231,10 +231,15 @@ def processClientInfo(jobNum, fileLocation):
     prevLine = [0, ""]
     prevLineHelper = [0, ""]
     
+    pageSize = 65; 
+    testsSection = 37; 
+    
+    totalPageCounter = 0; 
+    
     if(fileLocation == None): 
         logger.info('Completed Processing Client Info returning info')
         logger.info(f'Client Information Dictionary: {clientInfoDict}')
-        logger.info(f'Sample Names: {repr(sampleName)}')
+        logger.info(f'Sample Names: {repr(sampleNames)}')
         logger.info(f'Sample Tests: {sampleTests}')
         
         return clientInfoDict, sampleNames, sampleTests; 
@@ -242,6 +247,7 @@ def processClientInfo(jobNum, fileLocation):
     with open(fileLocation) as file: 
         logger.debug(f'Opening File: {repr(fileLocation)}')    
         sampleNum = ''; 
+        currentSampleName = ''; 
     
         for lineLocation, line in enumerate(file, 0):
             
@@ -324,38 +330,43 @@ def processClientInfo(jobNum, fileLocation):
             #FIXME: error with 172235 ICP, not showing the proper text amount
             #FIXME: 
             # Scan the bottom half to  lines for information 
-            if(lineLocation > 35 and len(line) > 0): 
-                #FIXME: don't think I need this try-except section 
-                if(sampleCounter != int(clientInfoDict['totalSamples']) ):
-                    try: 
-                        sampleNumCheck = re.search(r"\d+", line)
-                        sampleNameCheck = re.search('(?<=\s[0-9]).*', line)
-                                                
-                        if(sampleNameCheck): 
-                            sampleNum = sampleNumCheck.group() 
-                            sampleName = sampleNameCheck.group().strip() 
 
-                            #print(f'**Sample Name: {sampleName} Sample Num: {sampleNum}')
-                            logger.info(f'**Sample Name: {repr(sampleName)} Sample Num: {repr(sampleNum)}')
-                            
-                            #combined_name = str(jobNum) + '-' + str(sampleCounter+1)
-                            combined_name = str(jobNum) + '-' + str(sampleNum)
-                            sampleNames[combined_name] = sampleName
-                            #sampleCounter+=1; 
-                           
-                        #TODO: add something to get the - afterwords names
-                    except Exception as error: 
-                        print(f'[ERROR]: {error}')
-                        print('Invalid Line: Name Assignment Fail')
+
+            if(lineLocation > 0 and lineLocation % 65 == 0): 
+                totalPageCounter+=1; 
+
+            if((lineLocation > (testsSection + (totalPageCounter * pageSize))) and len(line) > 0): 
+
+                hyphenCheck = re.search('(?<=\s-\s).*', line);  
+                sampleNameCheck = re.search(r'(?<=\s)(\d{1,2})(.*)', line)
+                
+                try:                 
+                    if(sampleNameCheck): 
+                        sampleNum = sampleNameCheck.group(1) 
+                        sampleName = sampleNameCheck.group(2).strip() 
+
+                        #print(f'**Sample Name: {sampleName} Sample Num: {sampleNum}')
+                        logger.debug(f'**Sample Name: {repr(sampleName)} Sample Num: {repr(sampleNum)}')
+                        
+                        #combined_name = str(jobNum) + '-' + str(sampleCounter+1)
+                        combined_name = str(jobNum) + '-' + str(sampleNum)
+                        sampleNames[combined_name] = sampleName
+                        #sampleCounter+=1; 
+                        
+                    #TODO: add something to get the - afterwords names
+                except Exception as error: 
+                    print(f'[ERROR]: {error}')
+                    print('Invalid Line: Name Assignment Fail')
 
                 #find the report information that does with corresponding thing                
-                if(re.search('(?<=\s-\s).*', line)):
+                if(hyphenCheck):
                     #prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
                     prevSampleJobName = str(jobNum) + '-' + str(sampleNum)
                     
                     currentLineTestsCheck = re.search('(?<=\s-\s).*', line)
-                    prevSampleMatchCheck = re.search('(?<=\s[0-9]).*', prevLine[1])
+                    prevSampleMatchCheck = re.search(r'(?<=\s)(\d{1,2})(.*)', prevLine[1])
                     prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
+                    
                     #sampleTests[prevSampleName] = currentTestsCheck.group()
                     #not could be apart of the string name longer 
                     
@@ -363,7 +374,8 @@ def processClientInfo(jobNum, fileLocation):
                     if(currentLineTestsCheck):
                         logger.debug('currentLineTestsCheck: True')
                         
-                        print(f'**Prev Sample Name: {prevSampleJobName} Sample Name: {sampleName} Sample Num: {sampleNum}')
+                        
+                        logger.debug(f'**Prev Sample Name: {prevSampleJobName} Sample Name: {prevSampleJobName} Sample Num: {sampleNum}')
                         #print(f'Current is a test: {currentLineTestsCheck.group()}')
                         #print(f'SAMPLE TESTS: {sampleTests}')
  
@@ -377,10 +389,24 @@ def processClientInfo(jobNum, fileLocation):
                     #Prev sample name 
                     if(prevSampleMatchCheck):
                         logger.debug('prevSampleMatchCheck: True')
+
                         #print('prev was a sampleName')
                         #print(sampleName[prevSampleName]) #doesn't work 
                         pass; 
-                       
+                     
+  
+                    #current isn't test, and last was sampleName 
+                     
+                     
+                    if(prevSampleMatchCheck and (not currentLineTestsCheck)): 
+                        print('WINNING')
+                        fullname = prevSampleMatchCheck.group(2) 
+                        first_half = fullname[:21].rstrip()
+                        later_half = fullname[21:]
+
+                        newName = first_half + line.strip() + later_half
+                        
+                        print(f'Fullname: {newName}')
                     #append onto them 
                         
                     #TODO: solve this later, add previous name onto current name sample 
@@ -401,7 +427,7 @@ def processClientInfo(jobNum, fileLocation):
     for key, value in clientInfoDict.items(): 
         logger.info(f'*{key}: {repr(value)}')
     
-    logger.info(f'Sample Names: {repr(sampleName)}')
+    logger.info(f'Sample Names: {repr(sampleNames)}')
     logger.info(f'Sample Tests: {sampleTests}')
     
     return clientInfoDict, sampleNames, sampleTests; 
