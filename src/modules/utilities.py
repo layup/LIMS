@@ -199,7 +199,6 @@ def processTXTFolders(jobNum, locations):
 #   TEXT File Processing 
 #******************************************************************
         
-#FIXME: Cannot process big text information 
 def processClientInfo(jobNum, fileLocation):
     logger.info(f'Entering processClientInfo with jobNum: {jobNum}')
     
@@ -221,19 +220,11 @@ def processClientInfo(jobNum, fileLocation):
         'payment': ''
     }
     
-    #grab the file names 
     sampleNames = {}
-    
-    #have the information about the file, what kind of reports and etc 
     sampleTests = {}
 
-    sampleCounter = 0; 
-    prevLine = [0, ""]
-    prevLineHelper = [0, ""]
-    
     pageSize = 65; 
     testsSection = 37; 
-    
     totalPageCounter = 0; 
     
     if(fileLocation == None): 
@@ -246,174 +237,48 @@ def processClientInfo(jobNum, fileLocation):
     
     with open(fileLocation) as file: 
         logger.debug(f'Opening File: {repr(fileLocation)}')    
-        sampleNum = ''; 
+
         currentSampleName = ''; 
+        sampleJob = ''
     
-        for lineLocation, line in enumerate(file, 0):
+        for lineNumber, line in enumerate(file, 0):
             
-            logger.debug(f'{lineLocation}: {repr(line)}')
-            
-            #TODO: can put this into a own function 
-            # Scan the initial 8 lines for information
-            
-            if(prevLine[0]+1 == prevLineHelper[0]):
-                prevLine[0] = copy(prevLineHelper[0])
-                prevLine[1] = copy(prevLineHelper[1])
-                prevLineHelper[0] = copy(int(lineLocation))
-                prevLineHelper[1] = copy(line)
-            else: 
-                prevLineHelper[0] = copy(int(lineLocation))
-                prevLineHelper[1] = copy(line)
-                    
-            if(lineLocation == 1): 
-                clientInfoDict['clientName'] = line[0:54].strip()
-                clientInfoDict['date'] = line[50:(54+7)].strip()
-                clientInfoDict['time'] = line[66:71].strip()
+            logger.debug(f'{lineNumber}: {repr(line)}')
+
+            if(lineNumber < 10): 
+                process_client_info_text(lineNumber, line, clientInfoDict)
                    
-            if lineLocation == 2:
-                clientInfoDict['sampleType1'] = line[54:].strip()
-            
-                if "*" in line: 
-                    clientInfoDict['attn'] = line[:54].strip()
-                    
-                else: 
-                    clientInfoDict['addy1'] = line[:54].strip()
-                
-            if(lineLocation == 3): 
-                clientInfoDict['sampleType2'] = line[54:].strip()
-                
-                if(clientInfoDict['attn'] != ''):
-                    clientInfoDict['addy1'] = line[:60].strip()
-                else: 
-                    clientInfoDict['addy2'] = line[:60].strip()
-            
-            if(lineLocation == 4): 
-                clientInfoDict['totalSamples'] = line[60:].strip()
-                
-                if(clientInfoDict['attn'] != ''):
-                    clientInfoDict['addy2'] = line[:60].strip()
-                else: 
-                    clientInfoDict['addy3'] = line[:60].strip() 
-                    
-            if(lineLocation == 5): 
-                if(clientInfoDict['attn'] and clientInfoDict['addy2']): 
-                    clientInfoDict['addy3'] = line[:60].strip()
-                else: 
-                    clientInfoDict['tel'] = line[26:50].strip()
-
-                    try: 
-                        clientInfoDict['recvTemp'] = line[71:].strip()
-                    except:
-                        logger.debug('No recv temp available')
-                    
-                        
-            if(lineLocation == 6): 
-                clientInfoDict['tel'] = line[26:50].strip() 
-                clientInfoDict['recvTemp'] = line[71:].strip()
-            
-            if(lineLocation == 7): 
-                clientInfoDict['fax'] = line[26:].strip()
-                
-            if(lineLocation == 8): 
-                
-                try: 
-                    foundEmail = re.search('([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', line).group()
-                    if(foundEmail): 
-                        clientInfoDict['email'] = foundEmail; 
-                except:
-                    logger.error('Email Error')
-                
-                
-                if("pd" in line.lower()): 
-                    clientInfoDict['payment'] = line[51:].strip()
-                     
-            #FIXME: error with 172235 ICP, not showing the proper text amount
-            #FIXME: 
-            # Scan the bottom half to  lines for information 
-
-
-            if(lineLocation > 0 and lineLocation % 65 == 0): 
+            if(lineNumber > 0 and lineNumber % 65 == 0): 
                 totalPageCounter+=1; 
 
-            if((lineLocation > (testsSection + (totalPageCounter * pageSize))) and len(line) > 0): 
+            # Section where we scan for sample names and sample tests 
+            if((lineNumber > (testsSection + (totalPageCounter * pageSize))) and line != '\n'): 
 
-                hyphenCheck = re.search('(?<=\s-\s).*', line);  
-                sampleNameCheck = re.search(r'(?<=\s)(\d{1,2})(.*)', line)
+                tests_check = re.search('(?<=\s-\s).*', line);  
+                sample_name_check = re.search(r'(?<=\s)(\d{1,2})(.*)', line)
                 
-                try:                 
-                    if(sampleNameCheck): 
-                        sampleNum = sampleNameCheck.group(1) 
-                        sampleName = sampleNameCheck.group(2).strip() 
-
-                        #print(f'**Sample Name: {sampleName} Sample Num: {sampleNum}')
-                        logger.debug(f'**Sample Name: {repr(sampleName)} Sample Num: {repr(sampleNum)}')
-                        
-                        #combined_name = str(jobNum) + '-' + str(sampleCounter+1)
-                        combined_name = str(jobNum) + '-' + str(sampleNum)
-                        sampleNames[combined_name] = sampleName
-                        #sampleCounter+=1; 
-                        
-                    #TODO: add something to get the - afterwords names
-                except Exception as error: 
-                    print(f'[ERROR]: {error}')
-                    print('Invalid Line: Name Assignment Fail')
-
-                #find the report information that does with corresponding thing                
-                if(hyphenCheck):
-                    #prevSampleName = str(jobNum) + "-" + str(sampleCounter-1)
-                    prevSampleJobName = str(jobNum) + '-' + str(sampleNum)
+                if(sample_name_check): 
+                    sampleNum = sample_name_check.group(1) 
+                    sampleName = sample_name_check.group(2).strip() 
+                    currentSampleName = sampleName 
+                    sampleJob = str(jobNum) + '-' + str(sampleNum)
                     
-                    currentLineTestsCheck = re.search('(?<=\s-\s).*', line)
-                    prevSampleMatchCheck = re.search(r'(?<=\s)(\d{1,2})(.*)', prevLine[1])
-                    prevSampleTestsCheck = re.search('(?<=\s-\s).*', prevLine[1])
+                    logger.debug(f'Sample: {sampleJob}, Sample Name: {sampleName}')
+                    sampleNames[sampleJob] = sampleName
+                        
+                if(tests_check): 
+                    if(sampleJob in sampleTests): 
+                        sampleTests[sampleJob] = sampleTests[sampleJob] + ', ' + tests_check.group() 
+                    else: 
+                        sampleTests[sampleJob] = tests_check.group()
+                          
+                if(sample_name_check == None and tests_check == None): 
+                    first_part = currentSampleName[:21].rstrip()
+                    other_part = currentSampleName[21:] 
+                            
+                    sampleName = first_part + " " + line.strip() + " " + other_part; 
                     
-                    #sampleTests[prevSampleName] = currentTestsCheck.group()
-                    #not could be apart of the string name longer 
-                    
-                    #add to most recent sample
-                    if(currentLineTestsCheck):
-                        logger.debug('currentLineTestsCheck: True')
-                        
-                        
-                        logger.debug(f'**Prev Sample Name: {prevSampleJobName} Sample Name: {prevSampleJobName} Sample Num: {sampleNum}')
-                        #print(f'Current is a test: {currentLineTestsCheck.group()}')
-                        #print(f'SAMPLE TESTS: {sampleTests}')
- 
-                        if(prevSampleTestsCheck):
-                            logger.debug('currentLineTestsCheck & prevSampleTestsCheck: True')
-                            sampleTests[prevSampleJobName] = sampleTests[prevSampleJobName]  + ", " + currentLineTestsCheck.group()
-                        else: 
-                            logger.debug('currentLineTestsCheck & prevSampleTestsCheck: False')
-                            sampleTests[prevSampleJobName] = currentLineTestsCheck.group()
-                        
-                    #Prev sample name 
-                    if(prevSampleMatchCheck):
-                        logger.debug('prevSampleMatchCheck: True')
-
-                        #print('prev was a sampleName')
-                        #print(sampleName[prevSampleName]) #doesn't work 
-                        pass; 
-                     
-  
-                    #current isn't test, and last was sampleName 
-                     
-                     
-                    if(prevSampleMatchCheck and (not currentLineTestsCheck)): 
-                        print('WINNING')
-                        fullname = prevSampleMatchCheck.group(2) 
-                        first_half = fullname[:21].rstrip()
-                        later_half = fullname[21:]
-
-                        newName = first_half + line.strip() + later_half
-                        
-                        print(f'Fullname: {newName}')
-                    #append onto them 
-                        
-                    #TODO: solve this later, add previous name onto current name sample 
-                    if((not bool(prevSampleMatchCheck)) and not( bool(prevSampleTestsCheck))): 
-                        logger.debug('prevSampleMatchCheck: False and prevSampleTestsCheck: False') 
-                        
-
+                    sampleNames[sampleJob] = sampleName
     file.close()
 
     #process type sampleTests 
@@ -423,16 +288,77 @@ def processClientInfo(jobNum, fileLocation):
             
     logger.info('Exiting processClientInfo and returning')
     logger.info(f'Client Information Dictionary: ')
-   
+    
     for key, value in clientInfoDict.items(): 
         logger.info(f'*{key}: {repr(value)}')
     
-    logger.info(f'Sample Names: {repr(sampleNames)}')
-    logger.info(f'Sample Tests: {sampleTests}')
+    logger.info('Sample Information')
+    logger.info(f'*Sample Names: {repr(sampleNames)}')
+    logger.info(f'*Sample Tests: {sampleTests}')
     
     return clientInfoDict, sampleNames, sampleTests; 
 
+def process_client_info_text(lineNumber, line, clientInfoDict): 
+    if(lineNumber == 1): 
+        clientInfoDict['clientName'] = line[0:54].strip()
+        clientInfoDict['date'] = line[50:(54+7)].strip()
+        clientInfoDict['time'] = line[66:71].strip()
+        
+    if lineNumber == 2:
+        clientInfoDict['sampleType1'] = line[54:].strip()
 
+        if "*" in line: 
+            clientInfoDict['attn'] = line[:54].strip()
+            
+        else: 
+            clientInfoDict['addy1'] = line[:54].strip()
+        
+    if(lineNumber == 3): 
+        clientInfoDict['sampleType2'] = line[54:].strip()
+        
+        if(clientInfoDict['attn'] != ''):
+            clientInfoDict['addy1'] = line[:60].strip()
+        else: 
+            clientInfoDict['addy2'] = line[:60].strip()
+
+    if(lineNumber == 4): 
+        clientInfoDict['totalSamples'] = line[60:].strip()
+        
+        if(clientInfoDict['attn'] != ''):
+            clientInfoDict['addy2'] = line[:60].strip()
+        else: 
+            clientInfoDict['addy3'] = line[:60].strip() 
+            
+    if(lineNumber == 5): 
+        if(clientInfoDict['attn'] and clientInfoDict['addy2']): 
+            clientInfoDict['addy3'] = line[:60].strip()
+        else: 
+            clientInfoDict['tel'] = line[26:50].strip()
+
+            try: 
+                clientInfoDict['recvTemp'] = line[71:].strip()
+            except:
+                logger.debug('No recv temp available')
+            
+    if(lineNumber == 6): 
+        clientInfoDict['tel'] = line[26:50].strip() 
+        clientInfoDict['recvTemp'] = line[71:].strip()
+
+    if(lineNumber == 7): 
+        clientInfoDict['fax'] = line[26:].strip()
+        
+    if(lineNumber == 8): 
+        
+        try: 
+            foundEmail = re.search('([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+', line).group()
+            if(foundEmail): 
+                clientInfoDict['email'] = foundEmail; 
+        except:
+            logger.error('Email Error')
+        
+        if("pd" in line.lower()): 
+            clientInfoDict['payment'] = line[51:].strip()
+            
 
 #TODO: move this into icp tools 
 #******************************************************************

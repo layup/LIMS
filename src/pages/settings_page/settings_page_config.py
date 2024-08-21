@@ -1,22 +1,19 @@
 import os 
 import sqlite3
+
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.uic import loadUi 
 from PyQt5.QtWidgets import QTreeWidgetItem, QPushButton, QHBoxLayout, QWidget, QDialog
 from PyQt5.QtCore import QObject, pyqtSignal
 
-
-#from modules.dbManager import * 
 from modules.dbFunctions import getAuthorInfo, getAllParameters, getAllAuthors 
-#from modules.constants import *
 from modules.utilities import load_pickle, save_pickle, getFileLocation, openFile
-#from widgets.widgets import *
 
 
-#TODO: update the localPrefernece stuff
+#TODO: update the local Preference stuff
 def settingsSetup(self): 
     
-    #load the intial settings 
+    #load the initial settings 
     loadSettings(self) 
     
     settingsReportSetup(self)
@@ -73,7 +70,7 @@ def loadSettings(self):
 @pyqtSlot() 
 def updateFilePath(widget, pathName): 
     paths = load_pickle('data.pickle')
-    # Get the file Locatioin 
+    # Get the file Location 
     newFilePath = getFileLocation()
     if(newFilePath != '' and newFilePath != None): 
         paths[pathName] = newFilePath 
@@ -103,7 +100,7 @@ def settingsReportSetup(self):
     
     # Parameters setup 
     
-    # button configuation setup 
+    # button configuration setup 
     
     #Parameters Setup  
     parameterColumns = ['Parameter #', 'Parameter Name', 'Actions']
@@ -149,8 +146,6 @@ def parameterHandler():
     pass; 
     
     
-    
-
 def loadReportParameters(self): 
 
     paramList = getAllParameters(self.tempDB)

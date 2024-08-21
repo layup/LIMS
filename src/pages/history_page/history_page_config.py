@@ -1,22 +1,16 @@
 import sqlite3 
 
 from base_logger import logger
+
 from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtWidgets import (
-    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
-    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, QCompleter 
-)
+from PyQt5.QtWidgets import QHeaderView, QDialog, QPushButton, QAbstractItemView, QTableWidgetItem, QCompleter
 
-
-from modules.constants import *; 
-#from modules.createExcel import * 
+from modules.constants import TABLE_ROW_HEIGHT, REPORT_NAME, REPORT_STATUS 
 from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory, getParameterName
 from modules.dialogBoxes import openJobDialog, showErrorDialog
-from modules.utilities import apply_drop_shadow_effect
-from widgets.widgets import TableFooterWidget
+from widgets.TableFooterWidget import TableFooterWidget
 
-from pages.createReportPage import createReportPage
+from pages.reports_page.create_report_page import createReportPage
 
 #TODO: add in errors that will have to fix 
 
@@ -29,7 +23,7 @@ def historyPageSetup(self):
     formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
     formatHistoryDatabaseTable(self.ui.frontDeskTable, frontHistoryHeaders)
 
-    footer_widget = TableFooterWidget(69)
+    footer_widget = TableFooterWidget()
     self.ui.historyLayout.addWidget(footer_widget)
     
     #load the initialize table data 

@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent, QValidator
 
 from modules.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout, EmptyDataTableError
-from modules.reports.create_chm_report import chmReportLoader  
+from modules.reports.create_chm_report import chmReportLoader, chemReportTestData, chemReportSampleData  
 from modules.reports.create_icp_report import icpReportLoader 
 
 from modules.dbFunctions import *
@@ -23,36 +23,36 @@ from modules.constants import *
 from modules.utilities import *
 from widgets.widgets import *
 
-#TODO: move a lot of these functions to the db functions 
+
 #TODO: We can save the data, when closing the thing, such as if we are editing/adding new info. We want to save it for the future 
-#FIXME: when file is successfully created it makes two copies of the dialog box 
-#FIXME: when the use info is empty it will crash because it can't scan any of the existing files 
 #******************************************************************
 #   Report Setup 
 #******************************************************************
 def reportSetup(self): 
     self.logger.info(f'Entering reportSetup')
-    #TODO: ERROR could not load TEXT_FILE please try again
-    apply_drop_shadow_effect(self.ui.createReportHeader)
+
+    try:
+        apply_drop_shadow_effect(self.ui.createReportHeader)
+    except Exception as e:
+        self.logger.error(f"Error applying shadow effect: {e}")
 
     self.logger.info(f'setting input limits and Validators')
+    
     # Create a validator to accept only integer input
     validatorInt = QIntValidator(0, 999999) 
     validatorDec = QDoubleValidator(0.0, 999999.99, 3)
-
-    self.logger.info(f'setting input limits, validators and max lengths')
+    
+    # Combine validator creation and assignment
     self.ui.jobNumInput.setValidator(validatorInt)
     self.ui.dilutionInput.setValidator(validatorDec)
   
+    # Set max lengths simultaneously
     self.ui.jobNumInput.setMaxLength(6)
     self.ui.dilutionInput.setMaxLength(6)
     
     # Connect signals  
     self.ui.NextSection.clicked.connect(lambda: createReportPage(self))
-    
-    #FIXME: error on the setup because there isn't anything there yet    
     #self.ui.dataTable.itemChanged.connect(lambda item: handleTableChange(self, item))
-    
     
 #TODO: replace the create report with a custom thing that can paste strings and remove the ints 
 class CustomIntLineEdit(QLineEdit): 
@@ -75,7 +75,6 @@ class CustomIntLineEdit(QLineEdit):
         
         super().keyPressEvent(event)
     
-
 #******************************************************************
 #   Creating Report 
 #******************************************************************
@@ -116,11 +115,9 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         self.logger.info('Checking if the job exists...')
         jobResult = checkJobExists(self.tempDB, self.jobNum, self.reportNum)
 
-        #TODO: load the information from database later (front house database)  
-        #FIXME: error when it is the 5th sample and not the first, the sample name gets it wrong ex. W172485.TXT  
         self.logger.info('Processing client information...')
         self.clientInfo, self.sampleNames, self.sampleTests = processClientInfo(self.jobNum, textFileExists)
-  
+
         populateReportAuthorDropdowns(self)
 
         # Add the text file to the text file tab 
@@ -136,8 +133,6 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         # Check if the job exists in the database or not 
         if(jobResult is None):  
             self.logger.info(f'Retrieved job data: {jobResult}')
-            
-            # New Job so set the header status to 'Not Generated' 
             self.ui.statusHeaderLabel.setText(REPORT_STATUS[currentStatus])
             
             # Attempts to job to the database 
@@ -148,16 +143,14 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
             #TODO: make it so we can save the data and load it in later
             if(method2 is not True): 
                 self.logger.info('Report Exists')
-                print(f'Job Contents: {jobResult}')
+                self.logger.debug(f'jobResult: {jobResult}')
                 
                 overwrite = loadReportDialog(self)     
                 self.logger.info(f'User overwrite choose: {overwrite}')
                 
                 if(overwrite == 'Cancel'): 
                     return;  
-                if(overwrite == 'No'): 
-                    # Does this just load the normal data and doesn't overwrite the database? 
-                    pass; 
+
                 if(overwrite == 'Yes'):   
                     updateJob(self.tempDB, jobNum, self.reportNum, paramNum, self.dilution, currentStatus, currentDate) 
             
@@ -192,14 +185,14 @@ def layout_config(self, reportType):
     self.logger.info(f'Entering layout_config with parameter: reportType: {repr(reportType)}')
     
     reportNum = REPORT_NUM[reportType]
-    
+ 
     if(reportNum == 1):  
         self.logger.info('Preparing ICP report Configuration')
         self.ui.reloadDataBtn.setVisible(True)
         self.ui.calcHardnessBtn.setVisible(True)
         
         self.ui.createIcpReportBtn.setVisible(True)
-        self.ui.createGcmsReportBtn.setVisible(False)
+        self.ui.createChmReportBtn.setVisible(False)
         self.ui.icpDataField.show()
 
         icpReportLoader(self)
@@ -210,7 +203,7 @@ def layout_config(self, reportType):
         self.ui.calcHardnessBtn.setVisible(False)
         
         self.ui.createIcpReportBtn.setVisible(False)
-        self.ui.createGcmsReportBtn.setVisible(True)
+        self.ui.createChmReportBtn.setVisible(True)
         self.ui.icpDataField.hide()  
        
         chmReportLoader(self) 

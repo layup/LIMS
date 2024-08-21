@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtWidgets, QtCore  
 from app import MainWindow
 
-from modules.SplashScreen import SplashScreen
+from modules.widgets.SplashScreenWidget import SplashScreen
 from PyQt5.QtCore import QTimer
 
 from base_logger import logger 

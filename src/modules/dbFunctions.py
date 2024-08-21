@@ -1,9 +1,6 @@
 import sqlite3 
-import logging
 
 from base_logger import logger
-from widgets.widgets import * 
-
 
 #******************************************************************
 #    CHM  Queries/Commands
@@ -108,7 +105,6 @@ def getTestsInfo(db, textName):
 #****************************************************************** 
 
 #TODO: deal with it on the report side of things
-
 def getIcpElements(db): 
     try: 
         query = 'SELECT * FROM icpElements'
@@ -211,11 +207,11 @@ def updateIcpLimits(db, reportNum, elementNum, data ):
     try: 
         unitType = data[0]
         lowerLimit = data[1]
-        uppperLimit = data[2]
+        upperLimit = data[2]
         sideComment = data[3]
         
         query = 'INSERT OR REPLACE INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment) VALUES (?, ?, ? , ?, ?, ?)'
-        db.execute(query, (reportNum, elementNum, unitType, lowerLimit, uppperLimit, sideComment, ))
+        db.execute(query, (reportNum, elementNum, unitType, lowerLimit, upperLimit, sideComment, ))
         db.commit()
     except Exception as e: 
         print(e)
@@ -289,8 +285,6 @@ def getAuthorInfo(db, authorName):
         except Exception as e: 
             print(e) 
             return None 
-#TODO: import previous functions later on 
-
 
 #******************************************************************
 #    Settings Options 
@@ -373,10 +367,11 @@ def getAllAuthorNames(db):
         return None 
     
 
-def addAuthor(db, authorName, authorPostion): 
+def addAuthor(db, authorName, authorPosition): 
     try: 
+        #TODO: fix the naming of this, check if this is a real issue
         query = 'INSERT INTO authors (authorName, authorPostion) VALUES (?, ?)' 
-        db.execute(query, (authorName, authorPostion))
+        db.execute(query, (authorName, authorPosition))
         db.commit()
             
     except Exception as e: 
@@ -392,11 +387,11 @@ def deleteAuthor(db, authorNum):
     except Exception as e: 
         print(e)  
 
-def updateAuthor(db, authorNum, authorName, authorPostion):
+def updateAuthor(db, authorNum, authorName, authorPosition):
     
     try: 
         query = 'UPDATE authors SET authorName = ? , authorRole = ? WHERE authorNum = ?'
-        db.execute(query, (authorName, authorPostion, authorNum))
+        db.execute(query, (authorName, authorPosition, authorNum))
         db.commit()
     
     except Exception as e: 

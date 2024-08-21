@@ -63,7 +63,7 @@ def messageBox(self):
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel);
     msgBox.setDefaultButton(QMessageBox.Save);
-    #msgBox.buttonClicked.connect(self.msgbtn)
+    
     x = msgBox.exec_()  # this will show our messagebox
     
     if(x == QMessageBox.Save): 

@@ -1,43 +1,28 @@
-import sys 
-import re 
+import os
 import pickle
 
-
 from assets import resource_rc
-from PyQt5 import QtWidgets
-from PyQt5.Qt import Qt
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (
-    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
-    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy, QCompleter, QStyleFactory, QGraphicsDropShadowEffect
-)
+from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory)
 
-from modules.constants import *
-#from modules.createExcel import * 
-from modules.dbManager import *
-from modules.dbFunctions import * 
+from modules.constants import REPORTS_TYPE 
+from modules.dbManager import Database 
+from modules.dbFunctions import getAllParameters 
 from modules.dialogBoxes import *
-from modules.utilities import * 
+from modules.utilities import apply_drop_shadow_effect, openFile  
+from modules.reports.report_utils import deleteAllSampleWidgets
+from modules.widgets.dialogs import FileLocationDialog, ChmTestsDialog
 
 from interface import *
 
-from modules.reports.report_utils import deleteAllSampleWidgets
-
-from pages.createReportPage import reportSetup 
-from pages.icp_tools import  icpSetup
-from pages.chm_tools import  chemistrySetup  
-from pages.settingsPage import settingsSetup
-from pages.historyPage import historyPageSetup, loadReportsPage
-
-from widgets.widgets import * 
-   
+# Page setup imports 
+from pages.reports_page.create_report_page import reportSetup
+from pages.icp_page.icp_page_config import  icpSetup
+from pages.chm_page.chm_page_config import chemistrySetup  
+from pages.settings_page.settings_page_config import settingsSetup
+from pages.history_page.history_page_config import historyPageSetup, loadReportsPage
     
-    
-#TODO: need to have more class objects that deal with insertion, that way we can have lazy loading instead of constant 
-# need to get more info 
+
 class MainWindow(QMainWindow):
     
     def __init__(self,logger):
@@ -52,72 +37,42 @@ class MainWindow(QMainWindow):
 
         # Set the current working directory to the directory containing the script
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        apply_drop_shadow_effect(self.ui.headerWidget)
         
         # Load the setup 
         self.loadDatabase()
         self.loadCreatePage()
         self.loadStartup() 
-
+        
         self.logger.info('Preparing Page Setup Functions')
         reportSetup(self) 
         settingsSetup(self)
         historyPageSetup(self)
         icpSetup(self)
-
         chemistrySetup(self)
 
-        apply_drop_shadow_effect(self.ui.headerWidget)
+        self.connect_client_info_signals()
         
-   #******************************************************************
-   #    inline Slot Function Calls 
-   #******************************************************************  
-   #FIXME: not sure if it is good practice to have just something like this 
-   #FIXME: can replace with something that just scans all of the files 
-    def on_clientName_1_textChanged(self):
-        self.clientInfo['clientName'] = self.ui.clientName_1.text()
-     
-    def on_date_1_textChanged(self): 
-        self.clientInfo['date'] = self.ui.date_1.text()
+    def connect_client_info_signals(self):
+        self.ui.clientName_1.textChanged.connect(lambda text: self.on_client_info_changed('clientName', text))
+        self.ui.date_1.textChanged.connect(lambda text: self.on_client_info_changed('date', text))
+        self.ui.time_1.textChanged.connect(lambda text: self.on_client_info_changed('time', text))
+        self.ui.attention_1.textChanged.connect(lambda text: self.on_client_info_changed('attn', text))
+        self.ui.addy1_1.textChanged.connect(lambda text: self.on_client_info_changed('addy1', text))
+        self.ui.addy2_1.textChanged.connect(lambda text: self.on_client_info_changed('addy2', text))
+        self.ui.addy3_1.textChanged.connect(lambda text: self.on_client_info_changed('addy3', text))
+        self.ui.sampleType1_1.textChanged.connect(lambda text: self.on_client_info_changed('sampleType1', text))
+        self.ui.sampleType2_1.textChanged.connect(lambda text: self.on_client_info_changed('sampleType2', text))
+        self.ui.totalSamples_1.textChanged.connect(lambda text: self.on_client_info_changed('totalSamples', text))
+        self.ui.recvTemp_1.textChanged.connect(lambda text: self.on_client_info_changed('recvTemp', text))
+        self.ui.tel_1.textChanged.connect(lambda text: self.on_client_info_changed('tel', text))
+        self.ui.email_1.textChanged.connect(lambda text: self.on_client_info_changed('email', text))
+        self.ui.fax_1.textChanged.connect(lambda text: self.on_client_info_changed('fax', text))
+        self.ui.payment_1.textChanged.connect(lambda text: self.on_client_info_changed('payment', text))
     
-    def on_time_1_textChanged(self):
-        self.clientInfo['time'] = self.ui.time_1.text()
-    
-    def on_attention_1_textChanged(self):
-        self.clientInfo['attn'] = self.ui.attention_1.text()
+    def on_client_info_changed(self, field_name, text): 
+        self.clientInfo[field_name] = text; 
         
-    def on_addy1_1_textChanged(self): 
-        self.clientInfo['addy1'] = self.ui.addy1_1.text()
-        
-    def on_addy2_1_textChanged(self): 
-        self.clientInfo['addy2'] = self.ui.addy2_1.text()
-    
-    def on_addy3_1_textChanged(self): 
-        self.clientInfo['addy3'] = self.ui.addy3_1.text()
-        
-    def on_sampleType1_1_textChanged(self):
-        self.clientInfo['sampleType1'] = self.ui.sampleType1_1.text()
-        
-    def on_sampleType_2_textChanged(self):
-        self.clientInfo['sampleType2'] = self.ui.sampleType2_1.text()
-    
-    def on_totalSamples_1_textChanged(self): 
-        self.clientInfo['totalSamples'] = self.ui.totalSamples_1.text() 
-    
-    def on_recvTemp_1_textChanged(self): 
-        self.clientInfo['recvTemp'] = self.ui.recvTemp_1.text()
-        
-    def on_tel_1_textChanged(self):
-        self.clientInfo['tel'] = self.ui.tel_1.text()
-    
-    def on_email_1_textChanged(self):
-        self.clientInfo['email'] = self.ui.email_1.text()
-    
-    def on_fax_1_textChanged(self): 
-        self.clientInfo['fax'] = self.ui.fax_1.text()
-    
-    def on_payment_1_textChanged(self): 
-        self.clientInfo['payment'] = self.ui.payment_1.text()
-       
    #******************************************************************
    #    Menu Buttons 
    #******************************************************************   
@@ -349,8 +304,6 @@ class MainWindow(QMainWindow):
         else:
             print("User canceled.")
             
-        
-        
 #******************************************************************
 #   Classes
 #******************************************************************    

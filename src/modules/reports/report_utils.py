@@ -2,67 +2,81 @@ from base_logger import logger
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QTableWidgetItem, QSpacerItem, QSizePolicy
 
-from modules.constants import REPORT_STATUS
+from modules.constants import REPORT_STATUS, REPORT_NAME 
 from modules.dbFunctions import getAllAuthorNames, getJobStatus, updateJobStatus
-from widgets.widgets import SampleNameWidget, QSpacerItem, QSizePolicy 
-
-
-#from modules.reports.create_chm_report import chemReportTestData
+from modules.reports.chm_report_models import chemReportSampleData, chemReportTestData, chemReportManager, chemReportView
+from modules.widgets.SampleNameWidget import SampleNameWidget
 
 #******************************************************************
 #   General Functions 
 #******************************************************************
 
-#TODO: Move this into a report_utils.py so both functions can have access to this 
-#TODO: need to move this can account for both ICP and CHM reports 
 @pyqtSlot() 
 def handleTableChange(self, item):
+    self.logger.info(f'Entering handleTableChange with Report Status: {self.reportNum}, Report Name: {REPORT_NAME[self.reportNum]}')
     
     table = self.ui.dataTable 
-    row = item.row()
     column = item.column()
+    row = item.row()
+    
+    #TODO: have an error for this thing, text might be None  
     value = item.text()
 
-    updatedValue = table.item(row, column).text()
-    column_name = table.horizontalHeaderItem(column).text()
-   
+    #self.logger.debug(f'Row: {repr(row)}, column: {repr(column)}, value: {repr(value)}')
+    
     # ICP create state  
-    if(self.createState == 1): 
+    if(self.reportNum == 1): 
         pass; 
     
     # CHM Create State
-    if(self.createState == 2): 
+    if(self.reportNum == 2): 
+        
+        updatedValue = table.item(row, column).text()
+        #column_name = table.horizontalHeaderItem(column).text()
 
         textNameCol = 1
         textName = table.item(row, textNameCol)
 
         #TODO: need to check if it is empty or not 
         if(textName and self.reportManager): 
+            column_name = table.horizontalHeaderItem(column).text()
             textName = textName.text()
-            print(f'Col Name: {column_name}, TEXT: {textName}, NEW VAL: {updatedValue}')
+
+            self.logger.info(f'Col Name: {column_name}, TEXT: {textName}, NEW VAL: {updatedValue}')
             
-            if(column == 2): 
-                # Update the display name 
+            if(column == 2): # Update the display name  
                 testType = self.reportManager.tests[textName]
                 
                 if(isinstance(testType, chemReportTestData)): 
                     self.reportManager.tests[textName].update_displayName(updatedValue)
                 
-            if(column == 3): 
-                # Update the unit value
+            if(column == 3): # Update the unit value 
                 pass; 
             
-            
-            if(column == 5): 
-                # Update the standard 
+            if(column == 5): # Update the standard  
                 pass; 
             
-            if(column > 5):
-                # Update the samples values
-                testNum = self.reportManager.tests[textName].testNum
-                self.reportManager.samples[column_name].update_data(testNum, updatedValue)
+            if(column > 5): # Update the samples values
+                #FIXME: if this doesn't exist we have to add it
+                #FIXME: what if the testNum doesn't exist 
+                #FIXME: error when we a string and try to convert it to a float 
+
+                if(hasattr(self.reportManager.tests[textName], 'testNum')):
+                    testNum = self.reportManager.tests[textName].testNum
+                    self.logger.debug(f'testNum: {repr(testNum)}')
+                
+                    if(column_name in self.reportManager.getSamples().keys()): 
+                        self.reportManager.samples[column_name].update_data(testNum, updatedValue)
+                    else:
+                        parts = column_name.split("-", 1)
+                        self.reportManager.samples[column_name] = chemReportSampleData(parts[0], parts[1], column_name)
+                        self.reportManager.samples[column_name].update_data(testNum, updatedValue)
+                        
+                else: 
+                    self.logger.error(f'{textName} not in reportManager')
+
 
 def populateReportAuthorDropdowns(self):
     #TODO: have some error checking and deal with the loading section 
@@ -87,6 +101,7 @@ def disconnect_all_slots(obj):
             break
 
 def updateReport(statusWidget, database, jobNum, reportNum):
+    logger.info(f'Entering updateReport')
     try: 
         jobStatus = getJobStatus(database, jobNum, reportNum)
         logger.debug(f'Checking current job status: : {jobStatus}')
@@ -119,20 +134,25 @@ def formatReportTable(table, rowCount, colCount):
     table.horizontalHeader().setVisible(True)
     table.verticalHeader().setVisible(True)
 
-def populateTableRow(tableWidget, row, col, alignment, value): 
-    logger.info('Entering populateTableRow with parameters: row: {row}, col: {col}, value: {value}')
+
+def populateTableRow(tableWidget, row, col, alignment, editable, value): 
+    logger.info(f'Entering populateTableRow in chemReportView with parameters: row: {row}, col: {col}, value: {value}')
     item = QtWidgets.QTableWidgetItem()  
     if(alignment == 1):   
         item.setTextAlignment(Qt.AlignCenter)
     
-        # Check data type and convert if necessary
+    if(editable == 0):
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+        
+    else: 
+        item.setFlags(item.flags() | Qt.ItemIsEditable) 
+        
+    # Check data type and convert if necessary
     if isinstance(value, (int, float)):
         value = str(value)  # Prevent spinbox for numeric data
-     
+    
     item.setData(Qt.DisplayRole, value)
-    tableWidget.setItem(row, col, item)
-        
-    return 
+    tableWidget.setItem(row, col, item)    
 
 #******************************************************************
 #   Sample Widget Functions 
