@@ -8,21 +8,20 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFacto
 from modules.constants import REPORTS_TYPE 
 from modules.dbManager import Database 
 from modules.dbFunctions import getAllParameters 
-from modules.dialogBoxes import *
-from modules.utilities import apply_drop_shadow_effect, openFile  
-from modules.reports.report_utils import deleteAllSampleWidgets
+from modules.utils.apply_drop_shadow_effect import apply_drop_shadow_effect
+from modules.utils.file_utils import openFile
 from modules.widgets.dialogs import FileLocationDialog, ChmTestsDialog
 
 from interface import *
 
 # Page setup imports 
 from pages.reports_page.create_report_page import reportSetup
+from pages.reports_page.reports.report_utils import deleteAllSampleWidgets
 from pages.icp_page.icp_page_config import  icpSetup
 from pages.chm_page.chm_page_config import chemistrySetup  
 from pages.settings_page.settings_page_config import settingsSetup
 from pages.history_page.history_page_config import historyPageSetup, loadReportsPage
     
-
 class MainWindow(QMainWindow):
     
     def __init__(self,logger):

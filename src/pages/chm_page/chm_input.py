@@ -13,11 +13,10 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
-
 from modules.dbFunctions import (getChmTestData, addChmTestData)
 from modules.constants import CHM_REPORT
-#TODO: move the error dialog
-from modules.utilities import is_real_number, showErrorDialog 
+from modules.utils.logic_utils import is_real_number
+from modules.widgets.dialogs import showErrorDialog
 
 
 

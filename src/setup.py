@@ -4,28 +4,23 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import sys
-import os 
-import re
-import csv
-import numpy
-import json 
-
 import PyQt5 
+
+from app import MainWindow
+from base_logger import logger 
+
 from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtWidgets, QtCore  
-from app import MainWindow
-
-from modules.widgets.SplashScreenWidget import SplashScreen
 from PyQt5.QtCore import QTimer
 
-from base_logger import logger 
+from modules.widgets.SplashScreenWidget import SplashScreen
+
 
 if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
     PyQt5.QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     PyQt5.QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
-
 
     
 def setup_logging(): 

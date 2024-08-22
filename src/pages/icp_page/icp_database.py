@@ -10,10 +10,12 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, Qt
 
 from PyQt5.QtWidgets import (QDialog, QMessageBox, QPushButton, QWidget, QAbstractItemView, QTableWidgetItem )
 
-from modules.dialogBoxes import showErrorDialog 
 from modules.constants import TABLE_ROW_HEIGHT 
-from modules.utilities import icp_upload, openFile
+from modules.utils.file_utils import openFile
+from modules.widgets.dialogs import showErrorDialog
 from modules.widgets.TableFooterWidget import TableFooterWidget
+
+from pages.icp_page.icp_upload import icp_upload
 
 #******************************************************************
 #    ICP History 
@@ -41,16 +43,16 @@ def icp_history_setup(self):
 
 @pyqtSlot()
 def on_icpUploadBtn_clicked(database): 
-    print('[SIGNAL]: on_icpUploadBtn_clicked(database)')
+    logger.info('[SIGNAL]: on_icpUploadBtn_clicked')
     
     fileLocation = openFile()
-    print(fileLocation)
+    logger.debug(f'fileLocation: {fileLocation}')
     icp_upload(fileLocation, database) 
 
 
 @pyqtSlot()
 def on_icpSearchBtn_clicked(self): 
-    print('[SIGNAL]: on_icpSearchBtn_clicked(database)')
+    logger.info('[SIGNAL]: on_icpSearchBtn_clicked')
 
     jobNum = self.ui.icpSearchInput.text() 
     
@@ -72,7 +74,7 @@ def on_icpSearchBtn_clicked(self):
             populateIcpHistoryTable(self, machineData)
 
 def loadIcpHistory(self):   
-    print('[FUNCTION]: loadIcpHistory(self)')
+    self.logger.info(f'Entering loadIcpHistory')
     
     machineDataQuery = 'SELECT sampleName, jobNum, machineNum, batchName, creationDate FROM icpData ORDER BY creationDate DESC'
     machineData = list(self.tempDB.query(machineDataQuery))
@@ -82,7 +84,7 @@ def loadIcpHistory(self):
     populateIcpHistoryTable(self, machineData) 
             
 def populateIcpHistoryTable(self, result): 
-    print('[FUNCTION]: populateIcpHistoryTable(self, result)') 
+    self.logger.info(f'Entering loadIcpHistory with parameters: result: {result}')
     
     textLabelUpdate = 'Total Search Results: ' + str(len(result))
     
@@ -118,8 +120,8 @@ def populateIcpHistoryTable(self, result):
     self.ui.icpTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
 def icpOpenButton(database, sampleNum, machineType): 
-    print(f'Sample: {sampleNum} Machine: {machineType}')
-    
+    logger.info('Entering icpOpenButton with parameters: sampleNum: {sampleNum}, machineType: {machineType}')
+
     dialog = viewIcpDataDialog(database, sampleNum, machineType) 
     dialog.exec()
     
@@ -199,8 +201,8 @@ class DatabaseTableModel(QObject):
             self.total_pages = self.get_total_rows_filter(jobNum)
             offSet = (self.current_page -1) * self.total_rows
             
-            inquery = 'SELECT sampleName, jobNum, machineNum, batchName, creationDate FROM icpData WHERE sampleName LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
-            self.filtered_data = list(self.db.query(inquery,('%' + jobNum + '%', self.total_rows, offSet)))
+            inquiry = 'SELECT sampleName, jobNum, machineNum, batchName, creationDate FROM icpData WHERE sampleName LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
+            self.filtered_data = list(self.db.query(inquiry,('%' + jobNum + '%', self.total_rows, offSet)))
             
             if(self.filtered_data): 
                 self.dataChanged.emit(self.filtered_data)
@@ -210,7 +212,7 @@ class DatabaseTableModel(QObject):
     
     def set_page(self, page_number): 
         self.current_page = page_number 
-        print(f'Changed Page to {self.current_page} of {self.total_pages}')
+        logger.info(f'DatabaseTableModel set_page, changed page to {self.current_page} of {self.total_pages}')
         # offset will be updated
         self.fetch_data()
         
@@ -298,12 +300,10 @@ class DatabaseTableView():
                 item.setTextAlignment(Qt.AlignHCenter)
                 self.table.setItem(row ,col ,item) 
                 
-            #FIXME: open button for within this class 
             button = QPushButton("Open") 
             button.setFixedSize(100, 10)  # Set the fixed size of the button (width, height)
 
-            #FIXME: cannot find where this icpOpenButton is 
-            button.clicked.connect(lambda _, sampleNum=sampleNum, machineType=machineType: icpOpenbutton(self.db, sampleNum, machineType))
+            button.clicked.connect(lambda _, sampleNum=sampleNum, machineType=machineType: icpOpenButton(self.db, sampleNum, machineType))
             actionRow = 5 
             self.table.setCellWidget(row, actionRow, button)
 
@@ -424,4 +424,5 @@ class viewIcpDataDialog(QDialog):
                     
     def updateSampleData(): 
         pass; 
-    
+   
+   

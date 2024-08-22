@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import (
 )
 from modules.dbFunctions import getTestsName
 from modules.constants import  TABLE_ROW_HEIGHT
-from modules.utilities import icp_upload
 from modules.widgets.dialogs import deleteBox
 from modules.widgets.TableFooterWidget import TableFooterWidget
 

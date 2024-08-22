@@ -6,13 +6,9 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, Qt
 from PyQt5.QtWidgets import ( QDialog, QTableWidgetItem, QTreeWidgetItem)
 from PyQt5.QtGui import QDoubleValidator
 
-from modules.dbFunctions import ( getIcpElements2, getAllParameters, getReportNum, getIcpElementLimits, 
-                                 updateIcpLimits, getIcpElements ) 
-from modules.dialogBoxes import showErrorDialog 
+from modules.dbFunctions import getIcpElements2, getAllParameters, getReportNum, getIcpElementLimits, updateIcpLimits, getIcpElements 
 from modules.constants import TABLE_ROW_HEIGHT 
 
-
-# TODO: have a view, edit on the table 
 # TODO: create a clone that holds data until user presses the save button (kind of a pain in the ass)
 #******************************************************************
 #    ICP Elements  Setup

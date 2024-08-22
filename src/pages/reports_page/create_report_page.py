@@ -1,27 +1,22 @@
+import re
 import traceback
 import sys
-import logging
 from datetime import date
 
-from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import (
-    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
-    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy, 
-)
-
+from PyQt5.QtWidgets import QApplication, QLineEdit
 from PyQt5.QtGui import QIntValidator, QDoubleValidator, QKeyEvent, QValidator
-
-from modules.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout, EmptyDataTableError
-from modules.reports.create_chm_report import chmReportLoader, chemReportTestData, chemReportSampleData  
-from modules.reports.create_icp_report import icpReportLoader 
 
 from modules.dbFunctions import *
 from modules.constants import *
-from modules.utilities import *
-from widgets.widgets import *
+from modules.utils.apply_drop_shadow_effect import apply_drop_shadow_effect
+from modules.utils.file_utils import scanForTXTFolders 
+from modules.utils.text_utils import processClientInfo
+from modules.widgets.dialogs import loadReportDialog, showErrorDialog 
+
+from pages.reports_page.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout, EmptyDataTableError
+from pages.reports_page.reports.create_chm_report import chmReportLoader, chemReportTestData, chemReportSampleData  
+from pages.reports_page.reports.create_icp_report import icpReportLoader 
 
 
 #TODO: We can save the data, when closing the thing, such as if we are editing/adding new info. We want to save it for the future 

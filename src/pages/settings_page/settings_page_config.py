@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import QTreeWidgetItem, QPushButton, QHBoxLayout, QWidget, 
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from modules.dbFunctions import getAuthorInfo, getAllParameters, getAllAuthors 
-from modules.utilities import load_pickle, save_pickle, getFileLocation, openFile
+from modules.utils.pickle_utils import load_pickle, save_pickle
+from modules.utils.file_utils import getFileLocation, openFile
 
 
 #TODO: update the local Preference stuff

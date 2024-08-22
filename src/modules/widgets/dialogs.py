@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.uic import loadUi
 
-from modules.utilities import openFile, getFileLocation; 
+from modules.utils.file_utils import openFile, getFileLocation; 
 
 #******************************************************************
 #    General Dialog 

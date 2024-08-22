@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QHeaderView, QDialog, QPushButton, QAbstractItemView
 
 from modules.constants import TABLE_ROW_HEIGHT, REPORT_NAME, REPORT_STATUS 
 from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory, getParameterName
-from modules.dialogBoxes import openJobDialog, showErrorDialog
-from widgets.TableFooterWidget import TableFooterWidget
+from modules.widgets.dialogs import openJobDialog, showErrorDialog
+from modules.widgets.TableFooterWidget import TableFooterWidget
 
 from pages.reports_page.create_report_page import createReportPage
 

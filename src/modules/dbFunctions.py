@@ -2,6 +2,16 @@ import sqlite3
 
 from base_logger import logger
 
+
+def isValidDatabase(database_path):
+    try:
+        conn = sqlite3.connect(database_path)
+        conn.close()
+        return True
+    except sqlite3.DatabaseError:
+        print
+        return False
+
 #******************************************************************
 #    CHM  Queries/Commands
 #****************************************************************** 
