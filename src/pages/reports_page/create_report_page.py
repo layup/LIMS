@@ -157,7 +157,6 @@ def createReportPage(self, jobNum = None, reportType = None, parameter = None, d
         try: 
             layout_config(self, self.reportType) 
 
-
         except Exception as error: 
             self.logger.error(error)
             traceback.print_exc(file=sys.stderr)  # Print detailed traceback

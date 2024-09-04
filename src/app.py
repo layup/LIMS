@@ -3,7 +3,7 @@ import pickle
 
 from assets import resource_rc
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory)
+from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel)
 
 from modules.constants import REPORTS_TYPE 
 from modules.dbManager import Database 
@@ -50,8 +50,16 @@ class MainWindow(QMainWindow):
         icpSetup(self)
         chemistrySetup(self)
 
+        self.statusBar().showMessage('MB LABS')
+
         self.connect_client_info_signals()
         
+
+    def init_status_bar(self): 
+        self.statusBar().addWidget(QLabel("Message to the right end"), 1)
+        self.statusBar().showMessage('MB LABS');  
+
+
     def connect_client_info_signals(self):
         self.ui.clientName_1.textChanged.connect(lambda text: self.on_client_info_changed('clientName', text))
         self.ui.date_1.textChanged.connect(lambda text: self.on_client_info_changed('date', text))
@@ -109,7 +117,7 @@ class MainWindow(QMainWindow):
    #    Navigation Management 
    #****************************************************************** 
     def change_index(self, index): 
-        self.logger.info('Entering change_index with index: {index}')
+        self.logger.info(f'Entering change_index with index: {index}')
         self.previous_index = self.ui.stackedWidget.currentIndex() 
         self.ui.stackedWidget.setCurrentIndex(index)
     
@@ -200,9 +208,7 @@ class MainWindow(QMainWindow):
         for key, value in preferences.items(): 
             self.logger.debug(f'Database Path Name: {key}, Path: {value}')
    
-        # Represents the three databases 
-        databaseStatus = [0, 0, 0] 
-
+        #TODO: remove the other database and convert them all into one 
         for attempt in range(3):  
             print(f'Attempt: {attempt}')
                             
@@ -262,18 +268,6 @@ class MainWindow(QMainWindow):
         paramResults.insert(0, "")
         self.ui.paramType.addItems(paramResults)
     
-    # TODO: make this more a general application  
-    def formatTable(self, table): 
-        self.logger.info(f'Entering formatTable with table: {table.objectName()}')
-        rowHeight = 25; 
-        
-        #table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch) 
-        table.verticalHeader().setVisible(True)
-        table.verticalHeader().setDefaultSectionSize(rowHeight)
-
-        #Disable editing for the entire table 
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
-
     def clearDataTable(self): 
         self.ui.dataTable.clearContents()
         self.ui.dataTable.setRowCount(0)
@@ -293,7 +287,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_testBtn_clicked(self): 
-        print('Test Button Pressed')
+        self.logger.info('Entering on_testBtn_clicked')
 
         dialog = ChmTestsDialog()
         user_input = dialog.get_user_input()

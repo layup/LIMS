@@ -1,23 +1,18 @@
 
 from base_logger import logger
 import math 
-import os 
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot, QDir, pyqtSignal, QObject, Qt
-from PyQt5.uic import loadUi 
 from PyQt5.QtWidgets import (
-    QApplication, QHeaderView, QLabel, QMainWindow, QVBoxLayout, QDialog, 
-    QMessageBox, QLineEdit, QPushButton, QWidget, QHBoxLayout, QStyle,
-    QStyledItemDelegate, QAbstractItemView, QTableWidget, QTableWidgetItem, 
-    QSpacerItem, QSizePolicy, QWidgetItem, QTreeWidgetItem
+    QHeaderView, QMessageBox, QPushButton, QWidget, QHBoxLayout, QAbstractItemView, 
+    QTableWidget, QTableWidgetItem,QLineEdit 
 )
 from modules.dbFunctions import getTestsName
-from modules.constants import  TABLE_ROW_HEIGHT
+from modules.constants import  TABLE_ROW_HEIGHT, TABLE_COL_SMALL, TABLE_COL_MED
 from modules.widgets.dialogs import deleteBox
 from modules.widgets.TableFooterWidget import TableFooterWidget
 
- 
 #******************************************************************
 #    Chemistry Database Section 
 #****************************************************************** 
@@ -29,67 +24,207 @@ def chm_database_setup(self):
     self.chmHistoryDataModel  = DatabaseTableModel(self.tempDB)
     self.chmTableView = DatabaseTableView(self.tempDB, self.ui.chmInputTable, self.ui.chmDatabaseLayout, self.chmHistoryDataModel, self.ui.chmEditWidget) 
 
+    self.chmTableView.dialogAction.connect(lambda row, new_data: chmTestsSaveProcess(self, row, new_data)); 
+
     # update footer (buttons, page change, filter update) -> update data 
     # update search -> update data and footer 
     # update data -> update table 
     self.chmHistoryDataModel.dataChanged.connect(lambda newData: self.chmTableView.update_table(newData))
     
-    #self.ui.chmSearchBtn1.clicked.connect(lambda: self.icpTableView.handle_search_text(self.ui.icpSearchLine1.text()))
-    #self.ui.chmSearchLine1.returnPressed.connect(lambda: self.icpTableView.handle_search_text(self.ui.icpSearchLine1.text()))
-    
-    #self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.tempDB))
-    
-    # Connect basic signals 
+    # Connect Signals
+    self.ui.chmSearchBtn1.clicked.connect(lambda: self.chmTableView.handle_search_text(self.ui.chmSearchLine1.text()))
+    self.ui.chmSearchLine1.returnPressed.connect(lambda: self.chmTableView.handle_search_text(self.ui.chmSearchLine1.text()))
     self.ui.chmAddItemBtn.clicked.connect(lambda: self.ui.chmTabWidget.setCurrentIndex(1))
- 
-    self.ui.ChmTestCancelBtn.clicked.connect(lambda: self.ui.chmEditWidget.setVisible(False))    
+    
+    # Edit Panel Signals
+    #self.ui.ChmTestCancelBtn.clicked.connect(lambda: chmTestsCancelClicked(self))    
+    #self.ui.ChmTestSaveBtn.clicked.connect(lambda: chmTestsSaveClicked(self));
+    # Import/Export Signals 
+    # Export - export all/page 
 
 
-def createActionWidget(self, row, table): 
-
+def createActionWidget(self, row): 
     deleteBtn = QPushButton("Delete")
     editBtn = QPushButton('Edit')
 
-    # Connect the signals
-    deleteBtn.clicked.connect(lambda: chmTableDeleteRow(self, row, table));
-    editBtn.clicked.connect(lambda: chmTableEditRow(self, row, table))
-
+    deleteBtn.clicked.connect(lambda: chmTableDeleteRow(self, row));
+    editBtn.clicked.connect(lambda: chmTableEditRow(self, row))
+    
     button_widget = QWidget()
     button_layout = QHBoxLayout(button_widget)
     button_layout.addWidget(editBtn)
     button_layout.addWidget(deleteBtn)
     button_layout.setContentsMargins(5, 0, 0, 0)
     button_layout.setAlignment(Qt.AlignLeft)
-    
+
+    # Connect the signals
+    if not hasattr(self, "cancel_button_connected"):
+        cancel_button = self.editWidget.findChild(QPushButton, 'ChmTestCancelBtn')
+        if(cancel_button): 
+            cancel_button.clicked.connect(lambda: chmTestsCancelClicked(self.editWidget))
+            self.cancel_button_connected = True
+
+    '''  
+    if not hasattr(self, "save_button_connected"):
+        save_button = self.editWidget.findChild(QPushButton, 'ChmTestSaveBtn')
+        if(save_button): 
+            save_button.clicked.disconnect()
+            save_button.clicked.connect(lambda: chmTestsSaveClicked(self, row)) 
+            self.save_button_connected = True
+    '''
+        
     return button_widget
 
-def chmTableDeleteRow(self, row, table): 
-    logger.info('Entering chmTableDeleteRow with parameters: row: {row}, table: {table}')
+def chmTableDeleteRow(self, row): 
+    logger.info('Entering chmTableDeleteRow with parameters: row: {row}')
     
-    sampleNum = table.item(row, 0).text()
-    testsName = table.item(row, 1).text()
-    logger.debug(f'Sample Num: {sampleNum}, Tests Name: {testsName}')
+    jobNum    = self.table.item(row, 0).text()
+    sampleNum = self.table.item(row, 1).text()
+    testsName = self.table.item(row, 2).text()
+    
+    logger.debug(f'Job Num: {jobNum}, Sample Num: {sampleNum}, Tests Name: {testsName}')
     
     result = deleteBox(self, 'Delete Item?', 'This will delete this from the database. You cannot undo this action!', 'action')
+    
     if(result): 
         print(result)
-        table.removeRow(row)
-    #deleteChmData(self.db, sampleNum, testsName)
-    #TODO: have the delete implemented from the SQL 
-    checkExistsQuery = 'SELECT 1 FROM chemTestsData WHERE sampleNum = ? AND testNum = ? AND jobNum = ?' 
+        self.table.removeRow(row)
+        
+        #deleteChmData(self.db, sampleNum, testsName)
+        
+        #TODO: have the delete implemented from the SQL 
+        testNumQuery = 'SELECT testNum FROM Tests WHERE testName = ?'
+        testNum = self.db.query(testNumQuery, (testsName, ))
+        
+        if(testNum): 
+            testNum = testNum[0][0]
+
+            logger.debug(f'testNum: {testNum}')
+            
+            checkExistsQuery = 'SELECT 1 FROM chemTestsData WHERE sampleNum = ? AND testNum = ? AND jobNum = ?' 
+            self.db.execute(checkExistsQuery, (sampleNum, testNum, jobNum))
+            result = self.db.fetchone()
+            logger.debug(f'Result: {result}')
+            
+            if(result != None): 
+                pass; 
+
+def chmTableEditRow(self, row): 
+    logger.info(f'Entering chmTableEditRow with parameter: row: {row}')
+    clearLineEdits(self.editWidget)
+
+    # highlight the current row in the table 
+    self.table.selectRow(row)
+    self.editWidget.setVisible(True)    
     
-def delete_chm_sample_tests_data(self): 
-    checkExistsQuery = 'SELECT 1 FROM chemTestsData WHERE sampleNum = ? AND testNum = ? AND jobNum = ?'  
+    save_button = self.editWidget.findChild(QPushButton, 'ChmTestSaveBtn')
+    if(save_button): 
+        if save_button.receivers(save_button.clicked):  # Check if there are connections
+            save_button.clicked.disconnect()
+        save_button.clicked.connect(lambda: chmTestsSaveClicked(self, row)) 
+        
+    #TODO: have a drop down for the chmTestsNameLine list
+    sideWidgetNames = ['chmJobNumLine', 'chmSampleNumLine', 'chmTestsNameLine', 'chmTestsValueLine', 'chmStandardValueLine', 'chmUnitValueLine']
+
+    for col in range(self.table.columnCount() -1): 
+        value = self.table.item(row, col).text()
+        self.editWidget.findChild(QWidget, sideWidgetNames[col]).setText(value) 
+    
+@pyqtSlot() 
+def chmTestsCancelClicked(widget): 
+    clearLineEdits(widget) 
+    widget.setVisible(False)
+     
+@pyqtSlot()
+def chmTestsSaveClicked(self, row):
+    print('Save Row: ', row)
+
+    # Saving the default row data to be compared with later 
+    original_data = [self.table.item(row, col).text() for col in range(self.table.columnCount() - 1)]
+        
+    # Need to edit the row values and save at the same time
+    new_data = getLineEditText(self.editWidget)
+    
+    # Compare the original_data and the new_data  
+    differences = [1 if old_value != new_value else 0 for old_value, new_value in zip(original_data, new_data)]
+    
+    print(f'Difference: {differences}')
+
+    if(sum(differences) > 0): 
+        # Emit a signal to display a dialog
+        self.dialogAction.emit(row, new_data)
+
+
+def chmTestsSaveProcess(self, row, new_data): 
+    print('slot function')
+    print(f'Row: {row}, New Data: {new_data}')
+    
+    
+    #TODO: check if the new data is valid 
+    
+    save_result = save_confirmation_dialog(self)
+    
+    if(save_result): 
+        # Save the Database 
     
 
-def chmTableEditRow(self, row, table): 
-    sampleNum = table.item(row, 0).text()
-    testsName = table.item(row, 1).text() 
+        # Update the table row
+        updateRowValues(self.ui.chmInputTable, row, new_data)
+ 
     
-    print(f'EDIT ROW: {row}')
+def updateRowValues(table, row, new_data): 
+    for col in range(table.columnCount() -1): 
+        table.item(row, col).setText(new_data[col])
+
+        
+#******************************************************************
+#    Dialog 
+#****************************************************************** 
     
-    table.selectRow(row)
-    self.editWidget.setVisible(True)
+def save_confirmation_dialog(self):
+    reply = QMessageBox.question(self,
+        "Confirmation",
+        "Are you sure you want to save?",
+        QMessageBox.Yes | QMessageBox.No,
+        QMessageBox.No  # Default button
+    )
+    if reply == QMessageBox.Yes:
+        # Perform save action
+        print("Saving...")
+        return True
+    else:
+        print("Save canceled.")
+        return False; 
+
+
+
+#******************************************************************
+#    Helper Functions 
+#****************************************************************** 
+
+def clearLineEdits(widget): 
+    lineEdits = widget.findChildren(QLineEdit)
+
+    for line in lineEdits: 
+        line.clear()    
+    
+    for child in widget.children(): 
+        if(isinstance(child, QLineEdit)): 
+            clearLineEdits(child)
+
+def getLineEditText(widget): 
+    lineEdits = widget.findChildren(QLineEdit)
+
+    text_list = []
+    for line in lineEdits: 
+        text_list.append(line.text())
+    
+    for child in widget.children(): 
+        if(isinstance(child, QLineEdit)): 
+            text_list.extend(getLineEditText(child))
+
+    return text_list
+
 
 #******************************************************************
 #    Chemistry Database Classes   
@@ -117,6 +252,7 @@ class DatabaseTableModel(QObject):
         
     def get_data(self): 
         self.data = self.fetch_data()
+        return self.data
     
     def get_total_rows(self): 
         query = 'SELECT COUNT(*) FROM chemTestsData' 
@@ -126,7 +262,7 @@ class DatabaseTableModel(QObject):
         
         return totalPages
     
-    def get_total_rows_filter(self, text): 
+    def get_total_rows_filter(self, text: str) -> int: 
         query = f'SELECT COUNT(*) FROM chemTestsData WHERE sampleNum LIKE ?'
         sample_text = '%' + text + '%'
 
@@ -145,7 +281,7 @@ class DatabaseTableModel(QObject):
     def load_init_data(self): 
         self.data = self.fetch_data() 
 
-    def fetch_data(self):
+    def fetch_data(self) -> list:
         #TODO: redo this and add the creation date 
         machineDataQuery = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData ORDER BY creationDate DESC LIMIT ? OFFSET ?'
         offSet = (self.current_page -1) * self.total_rows
@@ -157,12 +293,15 @@ class DatabaseTableModel(QObject):
         return self.data
     
     def set_filter(self, jobNum):
+        
+        print(f'set_filter: {jobNum}');
+        
         self.current_page = 1;     
         
         if(jobNum == ''): 
             # Reset the search to normal 
             self.total_pages = self.get_total_rows()
-            self.fetch_data()
+            return 1, self.fetch_data()
         else:  
             self.total_pages = self.get_total_rows_filter(jobNum)
             offSet = (self.current_page -1) * self.total_rows
@@ -172,9 +311,9 @@ class DatabaseTableModel(QObject):
             
             if(self.filtered_data): 
                 self.dataChanged.emit(self.filtered_data)
-                return self.filtered_data
+                return 2, self.filtered_data
             else: 
-                return None; 
+                return 0, None
     
     def set_page(self, page_number): 
         self.current_page = page_number 
@@ -190,11 +329,13 @@ class DatabaseTableModel(QObject):
             self.fetch_data()
 
 
-class DatabaseTableView(): 
-    
+class DatabaseTableView(QObject): 
+
     footerAction = pyqtSignal(int)
+    dialogAction = pyqtSignal(int, list)
     
     def __init__(self, database, table, layout, dataModel, editWidgetSection): 
+        super().__init__()
         self.db = database 
         self.table = table
         self.data_model = dataModel
@@ -205,18 +346,18 @@ class DatabaseTableView():
         self.footerWidget = TableFooterWidget() 
         self.layout.addWidget(self.footerWidget)   
         
-        # Populate the table and footer 
-        self.init_table()
-        self.init_footer()
+        self.setup_table()
+        self.populate_table()
+        
+        self.setup_footer()
 
         self.footerWidget.nextBtn.clicked.connect(self.handle_next_page)
         self.footerWidget.prevBtn.clicked.connect(self.handle_prev_page)
-        self.footerWidget.QSpinBox.valueChanged.connect(lambda newValue: self.handle_spinBox_change(newValue))
-        self.footerWidget.QComboBox.currentIndexChanged.connect(lambda newIndex: self.handle_row_filter_change(newIndex))
+        self.footerWidget.QSpinBox.valueChanged.connect(self.handle_spinBox_change)
+        self.footerWidget.QComboBox.currentIndexChanged.connect(self.handle_row_filter_change)
             
-    def init_table(self): 
-        # Define table columns
-        
+    def setup_table(self): 
+        # Define table columns 
         column_headers = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Standard Value', 'Unit Value', 'Actions']
         
         self.table.setColumnCount(len(column_headers))
@@ -229,30 +370,28 @@ class DatabaseTableView():
         # Disable Editing of the table 
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 
-        smallColWidth = 140
-        medColWidth = 240 
-
         # Set the width of the tables 
-        self.table.setColumnWidth(0, smallColWidth)
-        self.table.setColumnWidth(1, smallColWidth)
-        self.table.setColumnWidth(2, medColWidth)
-        self.table.setColumnWidth(3, smallColWidth)
-        self.table.setColumnWidth(4, smallColWidth)
-        self.table.setColumnWidth(5, smallColWidth)
+        self.table.setColumnWidth(0, TABLE_COL_SMALL)
+        self.table.setColumnWidth(1, TABLE_COL_SMALL)
+        self.table.setColumnWidth(2, TABLE_COL_MED)
+        self.table.setColumnWidth(3, TABLE_COL_SMALL)
+        self.table.setColumnWidth(4, TABLE_COL_SMALL)
+        self.table.setColumnWidth(5, TABLE_COL_SMALL)
 
         # Set the last column to stretch
         self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
-                
+
+    def populate_table(self): 
         # Get the init data to populate table 
         init_data = self.data_model.fetch_data()
         self.update_table(init_data)
         
-    def init_footer(self): 
+    def setup_footer(self): 
         self.update_footer() 
                 
     def update_table(self, results): 
-        print('update_table')
-        # Clear existing data 
+        logger.info('DatabaseTableView Update Table')
+
         self.clear_table()
         
         # Bring the vertical scroll bar back to the top 
@@ -263,22 +402,15 @@ class DatabaseTableView():
         self.table.setRowCount(total_results)  
         
         for row , data in enumerate(results):
-            print(f'Row: {row}, Data: {data}')
+            logger.debug(f'Row: {row}, Data: {data}')
 
-            #loops thought items in the order sql requested 
-            self.table.setRowHeight(row, TABLE_ROW_HEIGHT)
-            
-            jobNum = data[0] 
-            sampleNum = data[1]
-            testNum = data[2]
-            testVal = data[3]
-            standardVal = data[4]
-            unitVal = data[5]
+            # Set the row height of each item
+            self.table.setRowHeight(row, TABLE_ROW_HEIGHT) 
             
             for col in range(len(data)): 
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(str(data[col]))
-                item.setTextAlignment(Qt.AlignHCenter)
+                item.setTextAlignment(Qt.AlignCenter)
                             
                 # Get the Job Name 
                 if(col == 2): 
@@ -287,22 +419,17 @@ class DatabaseTableView():
          
                     if(testName): 
                         item = QTableWidgetItem(testName[0][0])
-                        #item.setTextAlignment(Qt.AlignHCenter)
                         item.setTextAlignment(Qt.AlignCenter)       
                 
                 self.table.setItem(row ,col ,item) 
                 
-
             actionRow = 6 
-            actionWidget = createActionWidget(self, row, self.table)
+            actionWidget = createActionWidget(self, row)
             self.table.setCellWidget(row, actionRow, actionWidget)
 
-            
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.update_footer()
-    
+        self.update_footer()   
 
-    
     def clear_table(self): 
         # Get the number of rows
         num_rows = self.table.rowCount()
@@ -318,17 +445,15 @@ class DatabaseTableView():
         #self.layoutChanged.emit()
     
     def handle_search_text(self, text): 
-        result = self.data_model.set_filter(text)
+        status, result = self.data_model.set_filter(text)
         
-        if(result == None): 
-            # Throw an error if result is none 
+        if(status == 0): 
             msgBox = QMessageBox()  
             msgBox.setText("No Search Results");
             msgBox.setInformativeText("No search results for given job number");
             msgBox.setStandardButtons(QMessageBox.Ok);
             x = msgBox.exec_()  
-            
-    
+             
     def handle_row_filter_change(self, index): 
         self.data_model.set_rows(index)
         
@@ -346,12 +471,6 @@ class DatabaseTableView():
         
         if((footer_info['current_page']) != 0): 
             self.data_model.set_page(footer_info['current_page']-1)
-    
 
-def chmOpenButton(database, sampleNum, machineType): 
-    print(f'Sample: {sampleNum} Machine: {machineType}')
-    
-    
-    #dialog = viewIcpDataDialog(database, sampleNum, machineType) 
-    #dialog.exec()
-
+class SideEditWidget(QWidget): 
+    pass; 

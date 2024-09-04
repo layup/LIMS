@@ -16,7 +16,8 @@ from pages.reports_page.excel.create_chm_excel import createChmReport
 from pages.reports_page.reports.chm_report_models import chemReportSampleData, chemReportTestData, chemReportManager, chemReportView
 from pages.reports_page.reports.report_utils import (
     loadClientInfo,  formatReportTable, disconnect_all_slots, populateSamplesContainer, 
-    populateReportAuthorDropdowns, EmptyDataTableError, updateReport, handleTableChange
+    populateReportAuthorDropdowns, EmptyDataTableError, updateReport, handleTableChange,
+    createExcelErrorCheck, retrieveAuthorInfo, retrieveParamComment
 )
 
 #******************************************************************
@@ -83,6 +84,9 @@ def chmGetTestsList(self):
             temp = removeIllegalCharacters(str(item)) 
             if(temp not in CHM_TESTS_LISTS and 'ICP' not in temp):          
                 CHM_TESTS_LISTS.append(temp)
+
+    
+    # TODO: have a test list cleaner and tester that makes sure it works 
      
     # loop through the tests that users have manually added to the thing 
     if(testResults):
@@ -161,7 +165,7 @@ def chmReportHandler(self, columnLength,  tests):
     unitType = []
     recovery = []
     displayNames = []
-
+ 
     try:  
         # Check if the data files are not empty 
         if(self.ui.dataTable.rowCount() == 0): 
@@ -176,6 +180,20 @@ def chmReportHandler(self, columnLength,  tests):
     except Exception as e:
         print("Unexpected error:", e) 
         return 
+
+    
+    # General Error Checking before creating excel document 
+    if(createExcelErrorCheck(self)): 
+        return 
+    
+    # Retrieve the authors info     
+    authorsInfo = retrieveAuthorInfo(self, self.ui.authorOneDropDown.currentText(), self.ui.authorTwoDropDown.currentText())
+    print(authorsInfo)
+    
+    # Retrieve the report bottom comment 
+    reportComment = retrieveParamComment(self, 'CHM', self.parameter)
+    print(reportComment)
+    
     
     # Retrieve the Sample Input Data 
     self.logger.info('retrieving sample input data')
@@ -218,7 +236,7 @@ def chmReportHandler(self, columnLength,  tests):
             
     self.logger.info('Preparing to create CHM Report')
     try: 
-        filePath, fileName = createChmReport(self.clientInfo, self.jobNum, self.sampleNames, sampleData, displayNames, unitType, recovery) 
+        filePath, fileName = createChmReport(self.clientInfo, self.jobNum, authorsInfo, reportComment, self.sampleNames, sampleData, displayNames, unitType, recovery) 
         createdReportDialog(self, fileName)
         
         jobCreatedNum = 1 

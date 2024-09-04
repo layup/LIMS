@@ -345,6 +345,16 @@ def insertComments(ws, pageLocation):
     pageLocation+=5; 
     return pageLocation; 
 
+def insertComments2(ws, pageLocation, comment): 
+    commentArray = comment.splitlines()
+    
+    for i, commentLine in enumerate(commentArray): 
+        temp = ws.cell(row = pageLocation+i, column=1)
+        temp.value = commentLine 
+        
+    pageLocation +=5; 
+    return pageLocation
+
 
 #TODO: get the proper info from the database
 def insertSignature(ws, pageLocation, startColumn): 
@@ -370,7 +380,20 @@ def insertSignature(ws, pageLocation, startColumn):
             signatureLine = ws.cell(row=pageLocation, column=col+j)
             signatureLine.border = Border(top=thinBorder)
 
-            
+def insertSignature2(ws, pageLocation:int , startColumn: int, authorsInto: list) -> int: 
+    
+    authorNames = []
+    authorRoles = []
+    
+    for author in authorsInto: 
+        authorNames.append(author[1])
+        authorRoles.append(author[2])
+        
+    for i, col in enumerate(startColumn): 
+        pass; 
+        
+        
+        
 def significantFiguresConvert(value): 
     if(value >= 100): 
         return (f'{value:.0f}')

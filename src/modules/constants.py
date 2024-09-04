@@ -21,11 +21,24 @@ REPORT_STATUS = {
     1: 'Generated'
 }
 
+REPORT_FILTER = ['Date Created', 'Status', 'Parameter', 'Job Number', 'Report Type']
+ICP_FILTER = ['Upload Date', 'Sample Number', 'Job Number']
+CHM_FILTER = ['Upload Date, ']
+
 #******************************************************************
 #    Table Variables
 #******************************************************************
 
-TABLE_ROW_HEIGHT    = 20 
+TABLE_ROW_HEIGHT    = 23 
+TABLE_COL_SMALL     = 140
+TABLE_COL_MED       = 240
+TABLE_COL_LARGE     = 340
+
+
+#******************************************************************
+#    Tree Variables
+#******************************************************************
+
 TREE_ROW_HEIGHT     = 20 
 
 

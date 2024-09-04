@@ -23,7 +23,6 @@ class chemReportTestData:
         self.displayName = newName
         logger.debug(f'Updating Display Name: {repr(self.textName)} from {repr(prevDisplayName)} to {repr(self.displayName)}')
          
-         
 #FIXME: this is too complicated, just need to have something that contains samples in a dict and their values
 class chemReportSampleData: 
     def __init__(self, sampleNum, jobNum, sampleName): 
@@ -148,7 +147,6 @@ class chemReportManager:
         #self.samples = testsInfo
         return self.tests 
 
-
     def getSamples(self): 
         return self.samples
     
@@ -160,7 +158,6 @@ class chemReportManager:
             print(sampleName)
             print(sampleData.data)
     
-        
 class chemReportView: 
     def __init__(self, table): 
         self.table = table
@@ -223,7 +220,6 @@ class chemReportView:
         logger.debug(f'Preparing to populate tree samples... ')
         for col_index in range(5, self.table.columnCount()): 
             logger.debug(f'Col Index: {col_index}')
-
             
             col_name_exist = self.table.horizontalHeaderItem(col_index)
             

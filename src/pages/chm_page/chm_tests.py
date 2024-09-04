@@ -19,6 +19,8 @@ def chm_tests_setup(self):
     # Setup the tree headers and columns
     chmSetupTreeColumns(treeWidget)
     
+    chm_tests_helper(self)
+    
     # Tree Data Manager and Tree UI Handler 
     self.testsModel = TestsDataModel(self.tempDB) 
     self.testsViewer = TestsDataView(treeWidget) 
@@ -26,15 +28,30 @@ def chm_tests_setup(self):
     # Populate the Tests Model and Update the Tests View 
     chmLoadTestsData(self.testsModel, self.testsViewer)
     
-    # TODO: Setup search functionality
-
-    #TODO: Connect other signals 
+    # Connect the signals 
     self.ui.chmTestTree.itemSelectionChanged.connect(lambda: chmTestTreeItemChanged(self))
     self.ui.chmTestSaveBtn.clicked.connect(lambda: chmTestSaveBtnClicked(self))
     self.ui.chmTestCancelBtn.clicked.connect(lambda: chmTestCancelBtnClicked(self))
+    #self.ui.chmAddTestsBtn.clicked.connect(lambda: on_chmSampleDataAdd_clicked(self) 
+    self.ui.chmSearchBtn3.clicked.connect(lambda: searchForChmTests(self))
+    self.ui.chmSearchLine3.returnPressed.connect(lambda: searchForChmTests(self))
 
-    #TODO: wtf is this 
     #self.ui.chmAddTestsBtn.clicked.connect(lambda: on_chmSampleDataAdd_clicked(self))
+
+def chm_tests_helper(self): 
+    self.ui.chmTestsReportNameLabel.setToolTip('This is what will show up on the excel report')
+
+
+def searchForChmTests(self): 
+    self.logger.info('Entering searchForChmTests') 
+
+    query = self.ui.chmSearchLine3.text()
+
+    self.logger.debug(f'Search Query: {query}')
+    
+    results = self.testsModel.search(query)
+
+    self.testsViewer.populateTree(results) 
 
 def chmSetupTreeColumns(treeWidth): 
     columnHeaders = ['Test #', 'Tests Name', 'Text Name', 'Report Name', 'Recovery Value', 'Unit Type']
@@ -56,7 +73,7 @@ def chmSetupTreeColumns(treeWidth):
     
 def chmLoadTestsData(model, view): 
     print('[FUNCTION]: chmLoadTestsData(model, view)')
-    tests_data = model.loadTestsData()
+    tests_data = model.fetchTestData()
     view.populateTree(tests_data)
 
 def chmTestTreeItemChanged(self): 
@@ -151,7 +168,7 @@ class TestsDataModel():
         self.db = database
         self.tests = {}
         
-    def loadTestsData(self):
+    def fetchTestData(self):
         # special to get ride of the all the ICP names 
         #testsList = getAllChmTestsInfo2(self.db) 
         testsList = getAllChmTestsInfo2(self.db) 
@@ -194,13 +211,35 @@ class TestsDataModel():
         
     def deleteTestsData(self): 
         pass; 
+
+    def search(self, query): 
+
+        if(query == ''): 
+            return self.tests 
+
+        results = []
+        query = query.lower()
+        
+        for key, value in self.tests.items():
+            if query in str(key).lower() or \
+                (value.testName is not None and query in value.testName.lower()) or \
+                (value.textName is not None and query in value.textName.lower()):
+                    results.append(key)
+
+        return {key: self.tests[key] for key in results}
+            
+    
+    
    
 # Handles Tree Widget UI data
 class TestsDataView():
     def __init__(self, tree_widget):
         self.tree = tree_widget
 
+    #TODO: could rename this 
     def populateTree(self, testsResults): 
+
+        self.tree.clear()
 
         #if(testsResults): 
         #    for testInfo in testsResults: 

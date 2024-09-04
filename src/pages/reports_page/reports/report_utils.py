@@ -4,8 +4,13 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QTableWidgetItem, QSpacerItem, QSizePolicy
 
+
 from modules.constants import REPORT_STATUS, REPORT_NAME 
-from modules.dbFunctions import getAllAuthorNames, getJobStatus, updateJobStatus
+from modules.dbFunctions import (
+    getAllAuthorNames, getJobStatus, updateJobStatus, getAuthorInfo, getParameterNum, 
+    getChmReportFooter, getIcpReportFooter
+) 
+from modules.widgets.dialogs import showErrorDialog
 from modules.widgets.SampleNameWidget import SampleNameWidget
 
 from pages.reports_page.reports.chm_report_models import chemReportSampleData, chemReportTestData, chemReportManager
@@ -118,6 +123,98 @@ def updateReport(statusWidget, database, jobNum, reportNum):
     except Exception as error: 
         logger.error(f'Could not update Report Status for {(repr(jobNum))}')
         print(error)
+
+def retrieveAuthorInfo(self, authorName1, authorName2): 
+    authorsInfo = []
+
+    if(authorName1 != ''): 
+        authorInfo1 = getAuthorInfo(self.tempDB, authorName1)
+        self.logger.debug(f'authorInfo1: {authorInfo1}')
+        authorsInfo.append(authorInfo1)
+        
+    if(authorName2 != ''): 
+        authorInfo2 = getAuthorInfo(self.tempDB, authorName2) 
+        self.logger.debug(f'authorInfo2: {authorInfo2}')  
+        authorsInfo.append(authorInfo2)
+        
+    return authorsInfo
+    
+def retrieveParamComment(self, reportType, paramType): 
+
+    try: 
+        paramNum = getParameterNum(self.tempDB, paramType)
+    except Exception as e: 
+        print(e)
+        return ''
+    
+    if(paramNum): 
+        if(reportType == 'CHM'): 
+            try: 
+                footerComment = getChmReportFooter(self.tempDB, paramNum)
+                return footerComment
+            except Exception as e: 
+                return ''
+        
+        if(reportType == 'ICP'): 
+            try: 
+                footerComment = getIcpReportFooter(self.tempDB, paramNum)
+                return footerComment
+            except Exception as e: 
+                return ''
+        
+#******************************************************************
+#   Error Handling 
+#******************************************************************
+def createExcelErrorCheck(self): 
+    self.logger.info('Entering createExcelErrorCheck')
+
+    errorCheck = [0,0,0]
+       
+    #check if at least one author is selected
+    if(self.ui.authorOneDropDown.currentIndex() > 0 or self.ui.authorTwoDropDown.currentIndex() > 0): 
+        authorOne = self.ui.authorOneDropDown.currentText()
+        authorTwo = self.ui.authorTwoDropDown.currentText()
+        
+        self.logger.debug('At least one combo box is selected')
+        self.logger.info(f'AuthorOne: {authorOne}, authorTwo: {authorTwo}'); 
+    else: 
+        self.logger.debug('No Combo Box is selected.')
+        errorCheck[0] = 1     
+    if(self.ui.clientName_1.text() == ''): 
+        errorCheck[1] = 1 
+     
+    if(sum(errorCheck) >= 1): 
+        self.logger.debug(f'ERROR CHECK: {errorCheck}') 
+        excelErrorHandler(self, errorCheck)
+        
+        return True 
+    else: 
+        return False
+
+def chmExcelErrorCheck(self): 
+    pass; 
+
+def icpExcelErrorCheck(self): 
+    pass; 
+
+
+def excelErrorHandler(self, errorCheck): 
+    self.logger.info('ReportErrorHandler called with parameters: errorCheck {error}')
+    
+    errorTitle = 'Cannot Create Excel Document'
+    errorMsg = ''
+    
+    if(errorCheck[0] == 1): 
+        self.logger.debug('Please select at least one author')
+        errorMsg += 'Please Select a least one author in the Client Info Section\n'
+
+    if(errorCheck[1] == 1): 
+        self.logger.debug('Please enter a client name')
+        errorMsg += 'Please Enter a Client Name\n'
+
+    showErrorDialog(self, errorTitle, errorMsg)
+
+
 
 #******************************************************************
 #   Table Functions 

@@ -32,11 +32,12 @@ def loadReportDialog(self):
         return 'Cancel'
     
 def showErrorDialog(self, errorTitle, errorMsg, detailedErrorMsg=None):
-    self.logger.info('Entering showErrorDialog')
-    self.logger.error(errorTitle)
-    self.logger.error(errorMsg)
+    logger.info('Entering showErrorDialog with parameters:')
+    logger.error(f'errorTitle: {errorTitle}')
+    logger.error(f'errorMsg: {errorMsg}')
         
     msg = QMessageBox()
+    msg.setFixedWidth(400)
     msg.setIcon(QMessageBox.Information)
 
     msg.setText(errorTitle)

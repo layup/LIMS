@@ -243,8 +243,11 @@ class DatabaseTableView():
 
         self.footerWidget.nextBtn.clicked.connect(self.handle_next_page)
         self.footerWidget.prevBtn.clicked.connect(self.handle_prev_page)
-        self.footerWidget.QSpinBox.valueChanged.connect(lambda newValue: self.handle_spinBox_change(newValue))
-        self.footerWidget.QComboBox.currentIndexChanged.connect(lambda newIndex: self.handle_row_filter_change(newIndex))
+        self.footerWidget.QSpinBox.valueChanged.connect(self.handle_spinBox_change)
+        self.footerWidget.QComboBox.currentIndexChanged.connect(self.handle_row_filter_change)
+        
+        #self.footerWidget.QSpinBox.valueChanged.connect(lambda newValue: self.handle_spinBox_change(newValue))
+        #self.footerWidget.QComboBox.currentIndexChanged.connect(lambda newIndex: self.handle_row_filter_change(newIndex))
                 
     def init_table(self): 
         # Define table columns

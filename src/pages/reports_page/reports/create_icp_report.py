@@ -16,7 +16,8 @@ from modules.widgets.dialogs import createdReportDialog
 from pages.reports_page.excel.create_icp_excel import createIcpReport
 from pages.reports_page.reports.report_utils import (
     loadClientInfo,  formatReportTable, handleTableChange, populateTableRow, 
-    disconnect_all_slots, populateSamplesContainer, updateReport 
+    disconnect_all_slots, populateSamplesContainer, updateReport, createExcelErrorCheck,
+    retrieveParamComment
 ) 
 
 
@@ -272,6 +273,10 @@ def icpReportHandler(self, elements, limits, totalSamples, reportNum):
     self.logger.info('Entering icpReportHandler with parameters: ')
     self.logger.info(f'reportNum   : {reportNum}')
     self.logger.info(f'totalSamples: {totalSamples}') 
+
+    
+    if(createExcelErrorCheck(self)): 
+        return 
     
     elements = {item[0]: [item[1], item[2]]for item in elements}
     

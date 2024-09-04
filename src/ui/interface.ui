@@ -837,6 +837,10 @@ First Instacnce of QWidget within the stack
 	height:20px;
 } 
 
+#chmSearchBtn3::hover {
+	background-color: rgb(107, 108, 108);
+} 
+
 /******************************************************************
 /	CHM Reports Info Tab   
 /******************************************************************/
@@ -887,11 +891,14 @@ First Instacnce of QWidget within the stack
 #chmEditWidget {
 	background-color: #323a47;
 	border-radius: 10px;
+	border: 1px solid #30333b; 
 } 
 
 #chmTopMenu1 {
 
 } 
+
+
 
 #chmTopMenu1 QPushButton {
 	height:20px; 
@@ -1533,7 +1540,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1598,7 +1605,7 @@ margin: 0;
                   <item>
                    <layout class="QVBoxLayout" name="historyLayout">
                     <property name="topMargin">
-                     <number>5</number>
+                     <number>0</number>
                     </property>
                     <property name="bottomMargin">
                      <number>0</number>
@@ -2356,7 +2363,7 @@ margin: 0;
            <item>
             <widget class="QTabWidget" name="icpTabWidget">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="icpHistory">
               <attribute name="title">
@@ -3538,13 +3545,13 @@ p, li { white-space: pre-wrap; }
                            <number>0</number>
                           </property>
                           <property name="topMargin">
-                           <number>2</number>
+                           <number>0</number>
                           </property>
                           <property name="rightMargin">
                            <number>0</number>
                           </property>
                           <property name="bottomMargin">
-                           <number>2</number>
+                           <number>0</number>
                           </property>
                           <item>
                            <widget class="QPushButton" name="chmAddItemBtn">
@@ -3603,7 +3610,7 @@ p, li { white-space: pre-wrap; }
                           <item>
                            <widget class="QPushButton" name="chmSearchBtn1">
                             <property name="enabled">
-                             <bool>false</bool>
+                             <bool>true</bool>
                             </property>
                             <property name="text">
                              <string>Search </string>
@@ -3619,7 +3626,7 @@ p, li { white-space: pre-wrap; }
                              </size>
                             </property>
                             <property name="placeholderText">
-                             <string>Search CHM database</string>
+                             <string>Search JobNum</string>
                             </property>
                            </widget>
                           </item>
@@ -3638,7 +3645,7 @@ p, li { white-space: pre-wrap; }
                          <property name="minimumSize">
                           <size>
                            <width>122</width>
-                           <height>22</height>
+                           <height>26</height>
                           </size>
                          </property>
                         </widget>
@@ -3655,6 +3662,9 @@ p, li { white-space: pre-wrap; }
                        </size>
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_64">
+                       <property name="spacing">
+                        <number>-1</number>
+                       </property>
                        <property name="leftMargin">
                         <number>0</number>
                        </property>
@@ -3710,156 +3720,190 @@ p, li { white-space: pre-wrap; }
                         </widget>
                        </item>
                        <item>
-                        <widget class="QWidget" name="chmEditWidget" native="true">
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
+                        <widget class="QWidget" name="widget_52" native="true">
                          <property name="maximumSize">
                           <size>
                            <width>340</width>
                            <height>16777215</height>
                           </size>
                          </property>
-                         <layout class="QVBoxLayout" name="verticalLayout_59">
+                         <layout class="QVBoxLayout" name="verticalLayout_61">
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
                           <item>
-                           <widget class="QWidget" name="widget_34" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_13">
-                             <item>
-                              <widget class="QLabel" name="label_53">
-                               <property name="text">
-                                <string>Job Number</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_36" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_16">
-                             <item>
-                              <widget class="QLabel" name="label_54">
-                               <property name="text">
-                                <string>Sample Number</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_2"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_37" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_28">
-                             <item>
-                              <widget class="QLabel" name="label_56">
-                               <property name="text">
-                                <string>Tests Name</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_3"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_39" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_29">
-                             <item>
-                              <widget class="QLabel" name="label_57">
-                               <property name="text">
-                                <string>Tests Value</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_4"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_44" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_33">
-                             <item>
-                              <widget class="QLabel" name="label_61">
-                               <property name="text">
-                                <string>Standard Value</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_5"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_47" native="true">
-                            <layout class="QVBoxLayout" name="verticalLayout_35">
-                             <item>
-                              <widget class="QLabel" name="label_64">
-                               <property name="text">
-                                <string>Unit Value</string>
-                               </property>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QLineEdit" name="lineEdit_6"/>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
-                          <item>
-                           <spacer name="verticalSpacer_9">
-                            <property name="orientation">
-                             <enum>Qt::Vertical</enum>
-                            </property>
-                            <property name="sizeHint" stdset="0">
+                           <widget class="QWidget" name="chmEditWidget" native="true">
+                            <property name="minimumSize">
                              <size>
-                              <width>20</width>
-                              <height>140</height>
+                              <width>0</width>
+                              <height>0</height>
                              </size>
                             </property>
-                           </spacer>
-                          </item>
-                          <item>
-                           <widget class="QWidget" name="widget_20" native="true">
-                            <layout class="QHBoxLayout" name="horizontalLayout_63">
-                             <property name="leftMargin">
-                              <number>0</number>
-                             </property>
-                             <property name="topMargin">
-                              <number>0</number>
-                             </property>
-                             <property name="rightMargin">
-                              <number>0</number>
-                             </property>
-                             <property name="bottomMargin">
-                              <number>0</number>
-                             </property>
+                            <property name="maximumSize">
+                             <size>
+                              <width>340</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_59">
                              <item>
-                              <widget class="QPushButton" name="ChmTestCancelBtn">
-                               <property name="text">
-                                <string>Cancel Changes</string>
-                               </property>
+                              <widget class="QWidget" name="widget_34" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_13">
+                                <item>
+                                 <widget class="QLabel" name="label_53">
+                                  <property name="text">
+                                   <string>Job Number</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmJobNumLine"/>
+                                </item>
+                               </layout>
                               </widget>
                              </item>
                              <item>
-                              <widget class="QPushButton" name="pushButton_2">
-                               <property name="text">
-                                <string>Save Changes</string>
+                              <widget class="QWidget" name="widget_36" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_16">
+                                <item>
+                                 <widget class="QLabel" name="label_54">
+                                  <property name="text">
+                                   <string>Sample Number</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmSampleNumLine"/>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="widget_37" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_28">
+                                <item>
+                                 <widget class="QLabel" name="label_56">
+                                  <property name="text">
+                                   <string>Tests Name</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmTestsNameLine"/>
+                                </item>
+                                <item>
+                                 <widget class="QComboBox" name="chmTestsNameCombo">
+                                  <property name="minimumSize">
+                                   <size>
+                                    <width>0</width>
+                                    <height>30</height>
+                                   </size>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="widget_39" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_29">
+                                <item>
+                                 <widget class="QLabel" name="label_57">
+                                  <property name="text">
+                                   <string>Tests Value</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmTestsValueLine"/>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="widget_44" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_33">
+                                <item>
+                                 <widget class="QLabel" name="label_61">
+                                  <property name="text">
+                                   <string>Standard Value</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmStandardValueLine"/>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="widget_47" native="true">
+                               <layout class="QVBoxLayout" name="verticalLayout_35">
+                                <item>
+                                 <widget class="QLabel" name="label_64">
+                                  <property name="text">
+                                   <string>Unit Value</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QLineEdit" name="chmUnitValueLine"/>
+                                </item>
+                               </layout>
+                              </widget>
+                             </item>
+                             <item>
+                              <spacer name="verticalSpacer_10">
+                               <property name="orientation">
+                                <enum>Qt::Vertical</enum>
                                </property>
+                               <property name="sizeHint" stdset="0">
+                                <size>
+                                 <width>20</width>
+                                 <height>40</height>
+                                </size>
+                               </property>
+                              </spacer>
+                             </item>
+                             <item>
+                              <widget class="QWidget" name="widget_20" native="true">
+                               <layout class="QHBoxLayout" name="horizontalLayout_63">
+                                <property name="leftMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="topMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="rightMargin">
+                                 <number>0</number>
+                                </property>
+                                <property name="bottomMargin">
+                                 <number>0</number>
+                                </property>
+                                <item>
+                                 <widget class="QPushButton" name="ChmTestCancelBtn">
+                                  <property name="text">
+                                   <string>Cancel Changes</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                                <item>
+                                 <widget class="QPushButton" name="ChmTestSaveBtn">
+                                  <property name="text">
+                                   <string>Save Changes</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
                               </widget>
                              </item>
                             </layout>
@@ -3872,11 +3916,6 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                    </layout>
-                  </item>
-                  <item>
-                   <widget class="QWidget" name="editContainerWidget" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_8"/>
-                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -4623,7 +4662,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QPushButton" name="chmSearchBtn3">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Search</string>
@@ -4633,52 +4672,18 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="chmSearchLine3"/>
                         </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="temp3" native="true">
-                       <layout class="QVBoxLayout" name="verticalLayout_4">
-                        <property name="leftMargin">
-                         <number>12</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>5</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>12</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>12</number>
-                        </property>
                         <item>
                          <widget class="QWidget" name="widget_12" native="true">
-                          <layout class="QHBoxLayout" name="horizontalLayout_14">
-                           <property name="leftMargin">
-                            <number>0</number>
-                           </property>
+                          <layout class="QVBoxLayout" name="verticalLayout_60">
                            <property name="topMargin">
-                            <number>5</number>
+                            <number>0</number>
                            </property>
                            <property name="rightMargin">
                             <number>0</number>
                            </property>
                            <property name="bottomMargin">
-                            <number>5</number>
+                            <number>0</number>
                            </property>
-                           <item>
-                            <spacer name="horizontalSpacer_11">
-                             <property name="orientation">
-                              <enum>Qt::Horizontal</enum>
-                             </property>
-                             <property name="sizeHint" stdset="0">
-                              <size>
-                               <width>40</width>
-                               <height>20</height>
-                              </size>
-                             </property>
-                            </spacer>
-                           </item>
                            <item>
                             <widget class="QPushButton" name="chmAddNewTests">
                              <property name="enabled">
@@ -4698,6 +4703,24 @@ p, li { white-space: pre-wrap; }
                           </layout>
                          </widget>
                         </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="temp3" native="true">
+                       <layout class="QVBoxLayout" name="verticalLayout_4">
+                        <property name="leftMargin">
+                         <number>12</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>12</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>12</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>12</number>
+                        </property>
                         <item>
                          <widget class="QTreeWidget" name="chmTestTree">
                           <column>
@@ -4896,7 +4919,7 @@ p, li { white-space: pre-wrap; }
                             <widget class="QLineEdit" name="chmDisplayName"/>
                            </item>
                            <item row="0" column="0">
-                            <widget class="QLabel" name="label_92">
+                            <widget class="QLabel" name="chmTestsReportNameLabel">
                              <property name="font">
                               <font>
                                <weight>75</weight>
@@ -6119,8 +6142,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>45</width>
-                       <height>16</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -7477,6 +7500,9 @@ QPushButton::hover {
                     </item>
                     <item>
                      <widget class="QPushButton" name="calcHardnessBtn">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="text">
                        <string>Calculate Hardness</string>
                       </property>
@@ -7484,8 +7510,11 @@ QPushButton::hover {
                     </item>
                     <item>
                      <widget class="QPushButton" name="updateDistilBtn">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="text">
-                       <string>Update Distil</string>
+                       <string>Recalc Distil Factor</string>
                       </property>
                      </widget>
                     </item>

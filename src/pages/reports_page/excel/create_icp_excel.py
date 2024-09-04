@@ -181,22 +181,6 @@ def insertIcpComment(ws, footerComment, pageLocation):
     insertSignature(ws, pageLocation, [3,6])
 
 
-def insertComments(ws, pageLocation): 
-
-    comments = { 
-        "SD":  'SD    = standard devotion;       Standard Recovery = primary or secondary reference material', 
-        'STD': 'STD  = secondary standard calibrated to primary standard reference material', 
-        'ND':  'ND   = none is detected;          n/a = not applicable'
-    }
-    
-    for i, (key,value) in enumerate(comments.items()): 
-        temp = ws.cell(row = pageLocation+i, column=1)
-        temp.value = value
-        
-    pageLocation+=5; 
-    
-    return pageLocation; 
-
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
     logger.info('Entering insertIcpTests')
     counter = pageLocation; 
