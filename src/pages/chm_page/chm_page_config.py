@@ -21,7 +21,7 @@ def on_chmTabWidget_currentChanged(self, index):
     if(index == 0): # Database 
         self.ui.headerTitle.setText('Chemistry Tests Database'); 
         self.ui.headerDesc.setText(''); 
-        self.ui.editContainerWidget.setVisible(False)
+        #self.ui.editContainerWidget.setVisible(False)
         self.ui.chmEditWidget.setVisible(False)
 
     if(index == 1): # Input Data 

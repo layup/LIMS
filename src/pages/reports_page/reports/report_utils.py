@@ -139,7 +139,7 @@ def retrieveAuthorInfo(self, authorName1, authorName2):
         
     return authorsInfo
     
-def retrieveParamComment(self, reportType, paramType): 
+def retrieveFooterComment(self, reportType, paramType): 
 
     try: 
         paramNum = getParameterNum(self.tempDB, paramType)
@@ -151,14 +151,15 @@ def retrieveParamComment(self, reportType, paramType):
         if(reportType == 'CHM'): 
             try: 
                 footerComment = getChmReportFooter(self.tempDB, paramNum)
-                return footerComment
+                
+                return footerComment.split('\n')
             except Exception as e: 
                 return ''
         
         if(reportType == 'ICP'): 
             try: 
                 footerComment = getIcpReportFooter(self.tempDB, paramNum)
-                return footerComment
+                return footerComment.split('\n')
             except Exception as e: 
                 return ''
         
@@ -167,9 +168,29 @@ def retrieveParamComment(self, reportType, paramType):
 #******************************************************************
 def createExcelErrorCheck(self): 
     self.logger.info('Entering createExcelErrorCheck')
+    
+    
+    # 
+    try:  
+        # Check if the data files are not empty 
+        if(self.ui.dataTable.rowCount() == 0): 
+            raise EmptyDataTableError("Data table is empty. Cannot create Excel file.") 
+    
+    except EmptyDataTableError as error:
+        print(error)
+        self.logger.error('Data table is empty. Cannot create Excel file') 
+        showErrorDialog(self, 'Cannot create report', f'Data table is empty. Cannot create excel file for Job: {self.jobNum}')
+        return 
+    
+    except Exception as e:
+        print("Unexpected error:", e) 
+        return 
 
+    
     errorCheck = [0,0,0]
-       
+      
+    #TODO: make sure the names are both different for authors
+    
     #check if at least one author is selected
     if(self.ui.authorOneDropDown.currentIndex() > 0 or self.ui.authorTwoDropDown.currentIndex() > 0): 
         authorOne = self.ui.authorOneDropDown.currentText()
@@ -190,13 +211,6 @@ def createExcelErrorCheck(self):
         return True 
     else: 
         return False
-
-def chmExcelErrorCheck(self): 
-    pass; 
-
-def icpExcelErrorCheck(self): 
-    pass; 
-
 
 def excelErrorHandler(self, errorCheck): 
     self.logger.info('ReportErrorHandler called with parameters: errorCheck {error}')

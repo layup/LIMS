@@ -126,7 +126,7 @@ def chmTableEditRow(self, row):
     #TODO: have a drop down for the chmTestsNameLine list
     sideWidgetNames = ['chmJobNumLine', 'chmSampleNumLine', 'chmTestsNameLine', 'chmTestsValueLine', 'chmStandardValueLine', 'chmUnitValueLine']
 
-    for col in range(self.table.columnCount() -1): 
+    for col in range(self.table.columnCount() -2): 
         value = self.table.item(row, col).text()
         self.editWidget.findChild(QWidget, sideWidgetNames[col]).setText(value) 
     
@@ -165,15 +165,15 @@ def chmTestsSaveProcess(self, row, new_data):
     save_result = save_confirmation_dialog(self)
     
     if(save_result): 
-        # Save the Database 
-    
-
         # Update the table row
         updateRowValues(self.ui.chmInputTable, row, new_data)
+        
+        # Save update to database
+        
  
     
 def updateRowValues(table, row, new_data): 
-    for col in range(table.columnCount() -1): 
+    for col in range(table.columnCount() -2): 
         table.item(row, col).setText(new_data[col])
 
         
@@ -283,7 +283,7 @@ class DatabaseTableModel(QObject):
 
     def fetch_data(self) -> list:
         #TODO: redo this and add the creation date 
-        machineDataQuery = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData ORDER BY creationDate DESC LIMIT ? OFFSET ?'
+        machineDataQuery = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue, creationDate FROM chemTestsData ORDER BY creationDate DESC LIMIT ? OFFSET ?'
         offSet = (self.current_page -1) * self.total_rows
         
         self.db.execute(machineDataQuery, (self.total_rows, offSet,))  # Pass offset as a single value
@@ -306,7 +306,7 @@ class DatabaseTableModel(QObject):
             self.total_pages = self.get_total_rows_filter(jobNum)
             offSet = (self.current_page -1) * self.total_rows
             
-            inquiry = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData WHERE jobNum LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
+            inquiry = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue, creationDate  FROM chemTestsData WHERE jobNum LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
             self.filtered_data = list(self.db.query(inquiry,('%' + jobNum + '%', self.total_rows, offSet)))
             
             if(self.filtered_data): 
@@ -358,7 +358,7 @@ class DatabaseTableView(QObject):
             
     def setup_table(self): 
         # Define table columns 
-        column_headers = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Standard Value', 'Unit Value', 'Actions']
+        column_headers = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Standard Value', 'Unit Value', 'Upload Date' , 'Actions']
         
         self.table.setColumnCount(len(column_headers))
         self.table.setHorizontalHeaderLabels(column_headers)
@@ -377,9 +377,10 @@ class DatabaseTableView(QObject):
         self.table.setColumnWidth(3, TABLE_COL_SMALL)
         self.table.setColumnWidth(4, TABLE_COL_SMALL)
         self.table.setColumnWidth(5, TABLE_COL_SMALL)
+        self.table.setColumnWidth(6, TABLE_COL_SMALL)
 
         # Set the last column to stretch
-        self.table.horizontalHeader().setSectionResizeMode(6, QHeaderView.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(7, QHeaderView.Stretch)
 
     def populate_table(self): 
         # Get the init data to populate table 
@@ -419,11 +420,15 @@ class DatabaseTableView(QObject):
          
                     if(testName): 
                         item = QTableWidgetItem(testName[0][0])
-                        item.setTextAlignment(Qt.AlignCenter)       
+                        item.setTextAlignment(Qt.AlignCenter)     
+                        
+                if(col == 6): 
+                    if(data[col] == None): 
+                        item.setText('N/A'); 
                 
                 self.table.setItem(row ,col ,item) 
                 
-            actionRow = 6 
+            actionRow = 7 
             actionWidget = createActionWidget(self, row)
             self.table.setCellWidget(row, actionRow, actionWidget)
 

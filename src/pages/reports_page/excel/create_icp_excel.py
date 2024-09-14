@@ -6,7 +6,7 @@ from modules.utils.excel_utils import *
 from modules.utils.pickle_utils import load_pickle
 
 
-def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unitType, limitElements, limits, footerComment): 
+def createIcpReport(clientInfo, sampleNames, authorsInfo, jobNum,  sampleData, testInfo, unitType, limitElements, limits, footerComment): 
     
     #TODO: missing the report type that will get called into this thing 
     #TODO: determine how far out the longest thing is 
@@ -16,16 +16,17 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     #TODO: factor that into the size insertion 
 
     logger.info('Entering createIcpReport with parameters: ')
-    logger.info(f'jobNum     : {repr(jobNum)}')
-    logger.info(f'clientInfo : {clientInfo}')
-    logger.info(f'sampleNames: {sampleNames}')
-    logger.info(f'sampleData : {sampleData}')
-    logger.info(f'testInfo   : {testInfo}')
-    logger.info(f'unitType   : {unitType}')
-    logger.info(f'limits     : {limits}')
-    logger.info(f'limitElements: {limitElements}')
+    logger.info(f'*jobNum        : {repr(jobNum)}')
+    logger.info(f'*clientInfo    : {clientInfo}')
+    logger.info(f'*authorsInfo   : {repr(authorsInfo)}')
+    logger.info(f'*footerComment : {repr(footerComment)}')
+    logger.info(f'*sampleNames   : {sampleNames}')
+    logger.info(f'*sampleData    : {sampleData}')
+    logger.info(f'*testInfo      : {testInfo}') #duplicate can remove? 
+    logger.info(f'*unitType      : {unitType}')
+    logger.info(f'*limits        : {limits}')
+    logger.info(f'*limitElements : {limitElements}')
 
-        
     temp = load_pickle('data.pickle') 
     exportPath = temp['reportsPath']
 
@@ -47,67 +48,40 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
     ws = wb.active
     
     pageSetup(ws);    
+    
     reportTitle = 'ICP REPORT'
     createFooters(ws, reportTitle, jobNum); 
 
-    ws = createHeader(ws, clientInfo, 'D')
+    ws = insertClientInfo(ws, clientInfo, 'D')
+    
     ws.column_dimensions['A'].width = 20 #120px 
     ws.column_dimensions['H'].width = 19 
     ws.print_title_rows = '1:8' # the first two rows
     
-    #determine how many rows the sample name will take 
-    sampleSections = []
-    samplePlacement = []    
-    selectedNames = []
-        
-    currentWord = ''
-    temp = []
-    
-    #determine how many sample sections we will need 
-    for key in sampleData: 
-        selectedNames.append(key)
-    
-    #can only display 4 at a time 
-    logger.info('!------ GENERATING SAMPLE NAME ------!')
-    for i, sampleNum in enumerate(selectedNames, start=1): 
-        sampleName = sampleNames[sampleNum]
-        condensedName = " ".join(sampleName.split())
-        currentWord += " " + str(i) + ") " + condensedName + " "
-        temp.append(sampleNum)
+    #TODO: clean this up or deal with the sample names from the previous function
+    temp = sampleData.keys()
+    common_items = {key: value for key, value in sampleNames.items() if key in temp}
 
-        if(i % 4 == 0): 
-            sampleSections.append(currentWord)
-            samplePlacement.append(temp)
-            currentWord = ""
-            temp = []
-        
-    if(len(temp) != 0): 
-        sampleSections.append(currentWord)
-        samplePlacement.append(temp)
-        currentWord = ""
-        temp = [] 
-            
-    logger.info('Sample Placement: ', samplePlacement)
-    logger.info('Sample Sections: ', sampleSections)
+    sampleSections, samplePlacement = generateSampleHeaderNames(ws, common_items)
     
     totalTests = len(testInfo)
     totalPages = len(samplePlacement)
     
     totalCols = 8 
     pageSize = 61; 
+    
     pageLocation = 9; 
     usedSamples = 0; 
     
     #FIXME: include the length of the comments 
     totalSamples = len(sampleData.keys())
     
-    logger.info('Total Samples: ', totalSamples);
+    logger.info(f'Total Samples: {totalSamples}');
     formatRows(ws, totalSamples, totalCols, pageSize)
 
     for currentPage in range(totalPages): 
-        
         sampleAmount = len(samplePlacement[currentPage])
-        logger.info('Sample Amount: ', sampleAmount);
+        logger.info(f'SampleAmount: {sampleAmount}'); 
         
         #first page information 
         if(currentPage == 0): 
@@ -117,68 +91,56 @@ def createIcpReport(clientInfo, sampleNames, jobNum,  sampleData, testInfo, unit
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             if(totalPages > 1): 
-                comment = ws.cell(row=pageLocation, column=1)
-                comment.value = 'Continued on next page ....'
-                comment.font = Font(bold=True, size=9, name="Times New Roman")
+                insertNextPageComment(ws, pageLocation)
             else: 
-                insertIcpComment(ws, footerComment, pageLocation)
+                insertIcpDocumentEnd(ws, pageLocation, footerComment, authorsInfo)
                   
         else: 
             pageLocation = (61 * currentPage) - (8 * (currentPage-1)) + 1 
-            logger.info('Starting Location: ', pageLocation) 
+            logger.info(f'Starting Location: {pageLocation}') 
+            
             pageLocation = insertSampleName(ws, pageLocation, sampleSections[currentPage], totalCols)
             pageLocation = insertTestTitles(ws, pageLocation, sampleAmount, usedSamples, 1, totalCols) 
             pageLocation = insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement[currentPage], sampleData, limitRef) 
             
             if((currentPage+1) == totalPages): 
-                insertIcpComment(ws, footerComment, pageLocation)
+                insertIcpDocumentEnd(ws, pageLocation, footerComment, authorsInfo)
                 
             else: 
-                comment = ws.cell(row=pageLocation, column=1)
-                comment.value = 'Continued on next page ....'
-                comment.font = Font(bold=True, size=9, name="Times New Roman")
+                insertNextPageComment(ws, pageLocation)
         
         usedSamples += sampleAmount; 
     
     maxWidth = ws.max_column 
-    logger.info(f'The width of the worksheet is {maxWidth} columns')
-    logger.info('Current Page location: ', pageLocation); 
+    logger.debug(f'The width of the worksheet is {repr(maxWidth)} columns')
+    logger.debug(f'Ending Page location is: {pageLocation}'); 
     
     fileName = 'W' + str(jobNum) + ".001" 
     filePath = os.path.join(exportPath, fileName)
-    logger.info('Export Path: ', filePath)
 
-    # Create the directory if it doesn't exist
-    #if not os.path.exists(exportPath):
-    #    os.makedirs(exportPath)
- 
+    logger.info(f'Excel Report Created: {repr(fileName)}')
+    logger.info(f'Exporting excel report to: {repr(filePath)}')
+
     wb.save(filePath)
 
-    logger.info('ICP Report Created')
-    print('ICP Report Created')
-    
     return filePath, fileName
 
-
-def insertIcpComment(ws, footerComment, pageLocation): 
-    for (i, value) in enumerate(footerComment):
-        comment = ws.cell(row=pageLocation, column=1)
-        comment.value = value
-        comment.font = Font(size=9, name="Times New Roman") 
-        pageLocation+=1; 
-    '''     
-    additionalComments = [
-        'Comments:', 
-        'All constituents tested meet Canadian and B.C drinking water standards.'
-    ]
-
-    for currentComment in additionalComments: 
-        comment = ws.cell(row=pageLocation, column=1)
-        comment.value = currentComment 
-        pageLocation+=1; 
-    '''
+#******************************************************************
+#   Icp Excel Helper Functions 
+#******************************************************************
+    
+def insertIcpDocumentEnd(ws, pageLocation, footerComment, authorsInfo): 
+    logger.info(f'Entering insertIcpComment')
+    
+    pageLocation = insertComment(ws, pageLocation, footerComment)
     pageLocation +=2; 
-    insertSignature(ws, pageLocation, [3,6])
+
+    if(len(authorsInfo) > 1): 
+        # two authors selected
+        insertSignature(ws,pageLocation, [3,6], authorsInfo)
+    else:
+        # one author selected
+        insertSignature(ws,pageLocation, [6], authorsInfo) 
 
 
 def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlacement, sampleData, limitRef): 
@@ -211,8 +173,8 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
     #inserts the sample values, unitType, limits and comments 
     for currentCol, sample in enumerate(samplePlacement, start=3): 
         
-        print(currentCol, sample)
-        print(f'**Sample: {sample}, Column: {currentCol}')
+        logger.debug(f'{currentCol}: {currentCol}' )
+        logger.debug(f'*Sample: {sample}, Column: {currentCol}')
         
         for j in range(0, totalTests+2): 
             currentSample = ws.cell(row=counter+j, column=currentCol)        
@@ -225,7 +187,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
             comment.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
             
             currentVal = sampleData[sample][j]
-            print(j, currentVal)
+            logger.debug(f'{j}: {currentVal}' )
 
             if(floatCheck(currentVal)): 
                 currentVal = float(currentVal) 
@@ -276,7 +238,20 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
                 
     sampleLocation += 1 
     pageLocation += totalTests;  
+ 
+    pageLocation = insertAdditionalTestsColumns(ws, pageLocation)
+    
+    # add bottom border 
+    for i in range(1,9): 
+        bottomBorder = ws.cell(row=pageLocation, column=i)
+        bottomBorder.border = Border(top=thinBorder)
+            
+    pageLocation +=1; 
+    
+    return pageLocation; 
 
+def insertAdditionalTestsColumns(ws, pageLocation):
+    
     additionalTestsColumns = [1,2,7,8]
     
     for current in additionalTestsColumns: 
@@ -286,7 +261,7 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
         if(current != 8): 
             temp.border = Border(right=thinBorder)
         else: 
-            #TODO: add different comments basedp m the hardness 
+            #TODO: add different comments based m the hardness 
             temp.value = '0-75 mg/L = soft'
             temp.alignment = Alignment(horizontal='left', vertical='center', indent=1)   
         
@@ -323,11 +298,4 @@ def insertIcpTests(ws, pageLocation, totalTests, testInfo, unitType, samplePlace
             
     pageLocation+=1; 
     
-    for i in range(1,9): 
-        bottomBorder = ws.cell(row=pageLocation, column=i)
-        bottomBorder.border = Border(top=thinBorder)
-            
-    pageLocation +=1; 
-    
-    return pageLocation; 
-
+    return pageLocation

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1619</width>
-    <height>889</height>
+    <width>1621</width>
+    <height>890</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1540,7 +1540,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -3475,7 +3475,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -4625,6 +4625,13 @@ p, li { white-space: pre-wrap; }
                     </layout>
                    </widget>
                   </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="sideEditLayout">
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                   </layout>
+                  </item>
                  </layout>
                 </widget>
                 <widget class="QWidget" name="chmTestsInfoTab2">
@@ -5019,29 +5026,6 @@ p, li { white-space: pre-wrap; }
                          </widget>
                         </item>
                        </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="widget_41" native="true">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>200</height>
-                        </size>
-                       </property>
-                       <widget class="QLabel" name="label_63">
-                        <property name="geometry">
-                         <rect>
-                          <x>180</x>
-                          <y>80</y>
-                          <width>60</width>
-                          <height>16</height>
-                         </rect>
-                        </property>
-                        <property name="text">
-                         <string>Tests</string>
-                        </property>
-                       </widget>
                       </widget>
                      </item>
                      <item>
@@ -5466,7 +5450,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>4</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -6142,8 +6126,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>45</width>
+                       <height>16</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -7580,7 +7564,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1619</width>
+     <width>1621</width>
      <height>22</height>
     </rect>
    </property>
@@ -7628,8 +7612,8 @@ QPushButton::hover {
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>309</x>
-     <y>777</y>
+     <x>251</x>
+     <y>855</y>
     </hint>
     <hint type="destinationlabel">
      <x>244</x>
@@ -7644,12 +7628,12 @@ QPushButton::hover {
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>244</x>
-     <y>777</y>
+     <x>251</x>
+     <y>855</y>
     </hint>
     <hint type="destinationlabel">
-     <x>58</x>
-     <y>399</y>
+     <x>51</x>
+     <y>421</y>
     </hint>
    </hints>
   </connection>
@@ -7676,7 +7660,7 @@ QPushButton::hover {
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>47</x>
+     <x>39</x>
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
@@ -7712,7 +7696,7 @@ QPushButton::hover {
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>47</x>
+     <x>39</x>
      <y>348</y>
     </hint>
    </hints>
@@ -7740,8 +7724,8 @@ QPushButton::hover {
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>42</x>
-     <y>157</y>
+     <x>39</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
      <x>140</x>
@@ -7776,8 +7760,8 @@ QPushButton::hover {
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>46</x>
-     <y>104</y>
+     <x>39</x>
+     <y>132</y>
     </hint>
    </hints>
   </connection>
@@ -7820,8 +7804,8 @@ QPushButton::hover {
    <slot>setHidden(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>777</y>
+     <x>39</x>
+     <y>855</y>
     </hint>
     <hint type="destinationlabel">
      <x>31</x>
@@ -7836,8 +7820,8 @@ QPushButton::hover {
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>43</x>
-     <y>777</y>
+     <x>39</x>
+     <y>855</y>
     </hint>
     <hint type="destinationlabel">
      <x>188</x>

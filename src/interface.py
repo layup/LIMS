@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1619, 889)
+        MainWindow.resize(1621, 890)
         MainWindow.setMinimumSize(QtCore.QSize(1200, 600))
         MainWindow.setStyleSheet("/******************************************************************\n"
 "/    Global QComboBox Style \n"
@@ -887,11 +887,14 @@ class Ui_MainWindow(object):
 "#chmEditWidget {\n"
 "    background-color: #323a47;\n"
 "    border-radius: 10px;\n"
+"    border: 1px solid #30333b; \n"
 "} \n"
 "\n"
 "#chmTopMenu1 {\n"
 "\n"
 "} \n"
+"\n"
+"\n"
 "\n"
 "#chmTopMenu1 QPushButton {\n"
 "    height:20px; \n"
@@ -1206,7 +1209,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_54.setContentsMargins(12, 0, 12, 0)
         self.verticalLayout_54.setObjectName("verticalLayout_54")
         self.historyLayout = QtWidgets.QVBoxLayout()
-        self.historyLayout.setContentsMargins(-1, 5, -1, 0)
+        self.historyLayout.setContentsMargins(-1, 0, -1, 0)
         self.historyLayout.setObjectName("historyLayout")
         self.reportsHeaderWidget = QtWidgets.QWidget(self.chemistyTab)
         self.reportsHeaderWidget.setMinimumSize(QtCore.QSize(0, 0))
@@ -1892,7 +1895,7 @@ class Ui_MainWindow(object):
         self.widget_32 = QtWidgets.QWidget(self.chmTopMenu1)
         self.widget_32.setObjectName("widget_32")
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout(self.widget_32)
-        self.horizontalLayout_13.setContentsMargins(0, 2, 0, 2)
+        self.horizontalLayout_13.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_13.setSpacing(8)
         self.horizontalLayout_13.setObjectName("horizontalLayout_13")
         self.chmAddItemBtn = QtWidgets.QPushButton(self.widget_32)
@@ -1927,7 +1930,7 @@ class Ui_MainWindow(object):
         self.label_50.setObjectName("label_50")
         self.horizontalLayout_56.addWidget(self.label_50)
         self.comboBox_2 = QtWidgets.QComboBox(self.chmTopMenu1)
-        self.comboBox_2.setMinimumSize(QtCore.QSize(122, 22))
+        self.comboBox_2.setMinimumSize(QtCore.QSize(122, 26))
         self.comboBox_2.setObjectName("comboBox_2")
         self.horizontalLayout_56.addWidget(self.comboBox_2)
         self.chmDatabaseLayout.addWidget(self.chmTopMenu1)
@@ -2001,6 +2004,10 @@ class Ui_MainWindow(object):
         self.chmTestsNameLine = QtWidgets.QLineEdit(self.widget_37)
         self.chmTestsNameLine.setObjectName("chmTestsNameLine")
         self.verticalLayout_28.addWidget(self.chmTestsNameLine)
+        self.chmTestsNameCombo = QtWidgets.QComboBox(self.widget_37)
+        self.chmTestsNameCombo.setMinimumSize(QtCore.QSize(0, 30))
+        self.chmTestsNameCombo.setObjectName("chmTestsNameCombo")
+        self.verticalLayout_28.addWidget(self.chmTestsNameCombo)
         self.verticalLayout_59.addWidget(self.widget_37)
         self.widget_39 = QtWidgets.QWidget(self.chmEditWidget)
         self.widget_39.setObjectName("widget_39")
@@ -2053,11 +2060,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_64.addWidget(self.widget_52)
         self.chmDatabaseLayout.addWidget(self.widget_51)
         self.horizontalLayout_61.addLayout(self.chmDatabaseLayout)
-        self.editContainerWidget = QtWidgets.QWidget(self.chmDataTab)
-        self.editContainerWidget.setObjectName("editContainerWidget")
-        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.editContainerWidget)
-        self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.horizontalLayout_61.addWidget(self.editContainerWidget)
         self.chmTabWidget.addTab(self.chmDataTab, "")
         self.chmInputTab = QtWidgets.QWidget()
         self.chmInputTab.setObjectName("chmInputTab")
@@ -2292,6 +2294,9 @@ class Ui_MainWindow(object):
         item_0 = QtWidgets.QTreeWidgetItem(self.inputDataTree)
         self.verticalLayout_32.addWidget(self.inputDataTree)
         self.horizontalLayout_8.addWidget(self.chmRecentlyAdd)
+        self.sideEditLayout = QtWidgets.QVBoxLayout()
+        self.sideEditLayout.setObjectName("sideEditLayout")
+        self.horizontalLayout_8.addLayout(self.sideEditLayout)
         self.chmTabWidget.addTab(self.chmInputTab, "")
         self.chmTestsInfoTab2 = QtWidgets.QWidget()
         self.chmTestsInfoTab2.setObjectName("chmTestsInfoTab2")
@@ -2800,7 +2805,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_70.addWidget(self.widget_38)
         self.toolBox.addItem(self.page_2, "")
         self.Authors = QtWidgets.QWidget()
-        self.Authors.setGeometry(QtCore.QRect(0, 0, 1335, 636))
+        self.Authors.setGeometry(QtCore.QRect(0, 0, 924, 338))
         self.Authors.setObjectName("Authors")
         self.horizontalLayout_67 = QtWidgets.QHBoxLayout(self.Authors)
         self.horizontalLayout_67.setObjectName("horizontalLayout_67")
@@ -3393,9 +3398,11 @@ class Ui_MainWindow(object):
         self.reloadDataBtn.setObjectName("reloadDataBtn")
         self.horizontalLayout_60.addWidget(self.reloadDataBtn)
         self.calcHardnessBtn = QtWidgets.QPushButton(self.tabSectionWidget)
+        self.calcHardnessBtn.setEnabled(False)
         self.calcHardnessBtn.setObjectName("calcHardnessBtn")
         self.horizontalLayout_60.addWidget(self.calcHardnessBtn)
         self.updateDistilBtn = QtWidgets.QPushButton(self.tabSectionWidget)
+        self.updateDistilBtn.setEnabled(False)
         self.updateDistilBtn.setObjectName("updateDistilBtn")
         self.horizontalLayout_60.addWidget(self.updateDistilBtn)
         spacerItem23 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -3416,7 +3423,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.MainBodyContainer)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1619, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1621, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -3436,11 +3443,11 @@ class Ui_MainWindow(object):
         self.actionUpload_ISP_Files.setObjectName("actionUpload_ISP_Files")
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(3)
         self.historyTabWidget.setCurrentIndex(0)
-        self.icpTabWidget.setCurrentIndex(1)
-        self.chmTabWidget.setCurrentIndex(0)
-        self.SettingsTab.setCurrentIndex(1)
+        self.icpTabWidget.setCurrentIndex(0)
+        self.chmTabWidget.setCurrentIndex(1)
+        self.SettingsTab.setCurrentIndex(4)
         self.generalToolBox.setCurrentIndex(1)
         self.toolBox.setCurrentIndex(1)
         self.toolBox_3.setCurrentIndex(0)

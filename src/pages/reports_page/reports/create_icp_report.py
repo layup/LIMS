@@ -17,7 +17,7 @@ from pages.reports_page.excel.create_icp_excel import createIcpReport
 from pages.reports_page.reports.report_utils import (
     loadClientInfo,  formatReportTable, handleTableChange, populateTableRow, 
     disconnect_all_slots, populateSamplesContainer, updateReport, createExcelErrorCheck,
-    retrieveParamComment
+    retrieveFooterComment, retrieveAuthorInfo
 ) 
 
 
@@ -270,34 +270,69 @@ def dilutionConversion(machineList, sample, symbol, dilution):
 
 @pyqtSlot()  
 def icpReportHandler(self, elements, limits, totalSamples, reportNum): 
-    self.logger.info('Entering icpReportHandler with parameters: ')
-    self.logger.info(f'reportNum   : {reportNum}')
-    self.logger.info(f'totalSamples: {totalSamples}') 
-
+    #FIXME: adjust based on the sample information
+    #FIXME: adjust the limits 
+    #FIXME: adjust the unit amount 
     
+    self.logger.info('Entering icpReportHandler with parameters: ')
+    self.logger.info(f'reportNum    : {reportNum}')
+    self.logger.info(f'totalSamples : {totalSamples}') 
+    self.logger.info(f'elements     : {elements}') 
+    self.logger.info(f'limits       : {limits}') 
+
+    totalTests = len(elements)
+
+    elements = {item[0]: [item[1], item[2]]for item in elements}
+    elementNames =  [item[0] for item in elements.values()]
+
     if(createExcelErrorCheck(self)): 
         return 
     
-    elements = {item[0]: [item[1], item[2]]for item in elements}
+    # Format and retrieve the necessary information to create excel reports 
+    authorsInfo = retrieveAuthorInfo(self, self.ui.authorOneDropDown.currentText(), self.ui.authorTwoDropDown.currentText())
+    footerComment = retrieveFooterComment(self, 'ICP', self.parameter)
+    sampleData = retrieveSampleData(self, totalTests, totalSamples)
+    unitType = retrieveUnitType(self, totalTests)
+    limits = retrieveLimits(self, elements, reportNum) 
     
-    self.logger.info('*Elements') 
-    for key, value in elements.items():
-        self.logger.info(key, value) 
+    try: 
+        self.logger.info('Preparing to create ICP Report')
+        filePath, fileName = createIcpReport(self.clientInfo, self.sampleNames, authorsInfo, self.jobNum, sampleData, elementNames, unitType, elementNames, limits, footerComment)
+        createdReportDialog(self, fileName)
         
-    #FIXME: adjust based on the sample information
-    #FIXME: adjust the limits 
-    #FIXME: adjust the unit amount  
+        jobCreatedNum = 1 
+        self.logger.info(f'ICP Report Creation Successful: jobCreated: {jobCreatedNum}')  
+            
+    except Exception as e: 
+        print(e)
+        
+        jobCreatedNum = 0; 
+        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
+        
+
+    if(jobCreatedNum == 1): 
+        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.reportNum)
+
+
+def retrieveLimits(self, elements, reportNum): 
+    #LAZY FIX 
+    limitQuery2 = 'SELECT elementNum, lowerLimit, upperLimit, sideComment, unitType FROM icpLimits WHERE parameterNum = ?'
+    limits = self.tempDB.query(limitQuery2, (reportNum,))  
+    limits = [[elements[item[0]][0], item[1], item[2],item[3], item[4]] for item in limits]
+
+    return limits
+
+def retrieveSampleData(self, totalTests, totalSamples):
+    self.logger.info('Entering retrieveSampleData with parameters: totalTests: {totalTests}, totalSamples: {totalSamples}')
     
     initialColumns = 6; 
-    totalTests = len(elements)
     totalAdditionalRows = 2 
-    sampleData = {}
-    unitType = []
-    elementNames =  [item[0] for item in elements.values()]
     
+    sampleData = {}
+     
     #FIXME: have something determine the lower values of the things 
+    
     for col in range(initialColumns, totalSamples + initialColumns): 
-        #print(col)
         currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
         jobValues = []
         for row in range(totalTests + totalAdditionalRows): 
@@ -309,8 +344,15 @@ def icpReportHandler(self, elements, limits, totalSamples, reportNum):
                 
                 
         sampleData[currentJob] = jobValues
-        #print(currentJob, sampleData[currentJob])
-        
+        self.logger.debug(f'Current Job: {currentJob}, Data: {sampleData[currentJob]}')
+
+    return sampleData
+
+def retrieveUnitType(self, totalTests): 
+    self.logger.info('Entering retrieveUnitType with parameters: totalTests: {totalTests}')
+
+    unitType = []
+    
     for i in range(totalTests): 
         try: 
             currentUnitType = self.ui.dataTable.item(i, 2)
@@ -320,56 +362,6 @@ def icpReportHandler(self, elements, limits, totalSamples, reportNum):
         except Exception as e: 
             self.logger.error(f'{e}')
             unitType.append('')
-    
- 
-    self.logger.debug('*Limits')
-    for key, value in limits.items(): 
-        self.logger.debug(key, value)
-        
-    self.logger.debug('*Sample Data')
-    for key, value in sampleData.items(): 
-        self.logger.debug(key, value)
-    
-    self.logger.debug(f'Unit Type: {unitType}')
 
-    #LAZY FIX 
-    limitQuery2 = 'SELECT elementNum, lowerLimit, upperLimit, sideComment, unitType FROM icpLimits WHERE parameterNum = ?'
-    limits = self.tempDB.query(limitQuery2, (reportNum,))  
-    limits = [[elements[item[0]][0], item[1], item[2],item[3], item[4]] for item in limits]
-    
-    #elementNames = elementsWithLimits 
-    
-    #load the footer comment 
-    footerComments = icpGenerateFooterComment(self.tempDB, self.parameter)
-    
-    self.logger.info('Preparing to create ICP Report')
-    try: 
-        filePath, fileName = createIcpReport(self.clientInfo, self.sampleNames, self.jobNum, sampleData, elementNames, unitType, elementNames, limits, footerComments)
-        createdReportDialog(self, fileName)
-        
-        jobCreatedNum = 1 
-        self.logger.info(f'ICP Report Creation Successful: jobCreated: {jobCreatedNum}')  
-            
-    except: 
-        #TODO: debating purring the error here so it's more clean 
-        jobCreatedNum = 0; 
-        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
-        
-    if(jobCreatedNum == 1): 
-        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.reportNum)
-
-def icpGenerateFooterComment(database, parameterName):
-    logger.info('Entering icpGenerateFooterComment with parameter: parameterName: {parameterName}')
-    paramNum = getParameterNum(database, parameterName)
-    footerComment = getIcpReportFooter(database, paramNum)
-    
-    logger.debug(f'paramNum: {paramNum} footerComment: {footerComment}') 
-    
-    if(footerComment): 
-        #footerList = '\n'.join(footerComment)
-        footerComment = footerComment.split('\n')  
-    
-        return footerComment
-    else: 
-        return ''
-
+    self.logger.debug(f'Returning UnitType: {unitType}')
+    return unitType

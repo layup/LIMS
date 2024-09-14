@@ -45,3 +45,5 @@ def hardnessCalc(calcium, magnesium, dilution):
     magnesium = float(magnesium) * float(dilution)
     
     return round(calcium * 2.497 + calcium * 4.11, 1)
+
+

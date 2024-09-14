@@ -4,6 +4,7 @@ from base_logger import logger
 from modules.utils.excel_utils import *
 from modules.utils.pickle_utils import load_pickle
 
+
 def createChmReport(clientInfo, jobNum, authorsInfo, reportComment, sampleNames, sampleData, testInfo, unitType, recovery):
     logger.info(f'Entering CreateChmReport with parameters:')
     logger.info(f'*jobNum       : {repr(jobNum)}') 
@@ -36,7 +37,7 @@ def createChmReport(clientInfo, jobNum, authorsInfo, reportComment, sampleNames,
     #TODO: determine how far out the longest thing is 
     #FIXME: check out for none issue when they appear
     
-    ws = createHeader(ws, clientInfo, 'D')
+    ws = insertClientInfo(ws, clientInfo, 'D')
     ws.column_dimensions['A'].width = 20 #120px 
     ws.column_dimensions['H'].width = 19
     ws.print_title_rows = '1:8' # the first two row
@@ -45,27 +46,15 @@ def createChmReport(clientInfo, jobNum, authorsInfo, reportComment, sampleNames,
     pageSize = 61    
     #pageSize = 56; 
  
-    sampleSections = []
-    samplePlacement = []
-    currentWord = ''
-    temp = []
-    
     totalSamples = len(sampleData.keys())
     logger.debug(f'Total Samples: {totalSamples}')
     
     #FIXME: so page amounts change based on column width, so takes in how many pages we want 
     formatRows(ws, totalSamples, totalCols, pageSize);
     
-    #can only display 4 at a time 
-    currentWord = ""
-    temp = []
-    
     logger.info('Preparing to generate sample header names ')
     sampleSections, samplePlacement = generateSampleHeaderNames(ws, sampleNames)
     
-    logger.debug(f'Sample Placement: {samplePlacement}')
-    logger.debug(f'Sample Sections: {sampleSections}')
-
     allocatedSpace = 20; 
     
     testSize = len(testInfo)
@@ -100,26 +89,24 @@ def createChmReport(clientInfo, jobNum, authorsInfo, reportComment, sampleNames,
             
         logger.debug(f'Page Location: {pageLocation}')
         
-        #last page 
         if(currentPage+1 == totalPages): 
             logger.debug("Last Page")
             remainingSamples = totalSampleSections - counter; 
             
             for i in range(remainingSamples): 
-                logger.info('Preparing to insert Sample Names')
                 pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
-                logger.info('Preparing to insert Test Titles')
                 pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
-                logger.info('Preparing to insert Test Information')
                 pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)
                 
                 if(i+1 == remainingSamples): 
-                    logger.info('Preparing to insert comments and signature')
-                    #pageLocation = insertComments(ws, pageLocation)  
-                    pageLocation = insertComments2(ws, pageLocation)
+                    pageLocation = insertComment(ws, pageLocation, reportComment)
                     pageLocation+=2; 
-                    insertSignature(ws, pageLocation, [3,6])
-                        
+                    
+                    if(len(authorsInfo) > 1): 
+                        insertSignature(ws,pageLocation, [3,6], authorsInfo)
+                    else:
+                        insertSignature(ws,pageLocation, [6], authorsInfo) 
+
                 counter+=1; 
                 usedSamples += 4;
         
@@ -127,18 +114,12 @@ def createChmReport(clientInfo, jobNum, authorsInfo, reportComment, sampleNames,
         else: 
             logger.debug('Not last page')
             for i in range(totalTablesWithComments): 
-                logger.info('Preparing to insert Sample Names')
                 pageLocation = insertSampleName(ws, pageLocation, sampleSections[counter], totalCols)
-                logger.info('Preparing to insert Test Titles')
                 pageLocation = insertTestTitles(ws,pageLocation, sampleAmount, usedSamples, 0, totalCols)
-                logger.info('Preparing to insert Test Information')
                 pageLocation = insertTestInfo(ws,pageLocation, testInfo, samplePlacement[counter], sampleData, totalTests, unitType, recovery)   
                 
                 if(i+1 == totalTablesWithComments): 
-                    logger.info('Preparing to insert continued to next page...')
-                    comment = ws.cell(row=pageLocation, column=1)
-                    comment.value = 'continued on next page....'
-                    comment.font = Font(bold=True, size=9, name="Times New Roman")  
+                    insertNextPageComment(ws, pageLocation)
                     
                 counter+=1; 
                 usedSamples += 4; 

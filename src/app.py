@@ -3,7 +3,7 @@ import pickle
 
 from assets import resource_rc
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel)
+from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel, QMessageBox)
 
 from modules.constants import REPORTS_TYPE 
 from modules.dbManager import Database 
@@ -54,11 +54,9 @@ class MainWindow(QMainWindow):
 
         self.connect_client_info_signals()
         
-
     def init_status_bar(self): 
         self.statusBar().addWidget(QLabel("Message to the right end"), 1)
         self.statusBar().showMessage('MB LABS');  
-
 
     def connect_client_info_signals(self):
         self.ui.clientName_1.textChanged.connect(lambda text: self.on_client_info_changed('clientName', text))
@@ -83,34 +81,44 @@ class MainWindow(QMainWindow):
    #******************************************************************
    #    Menu Buttons 
    #******************************************************************   
-    def on_reportsBtn1_toggled(self): 
+    @pyqtSlot()
+    def on_reportsBtn1_clicked(self): 
         self.change_index(0) 
-    
-    def on_reportsBtn2_toggled(self):
+        
+    @pyqtSlot()
+    def on_reportsBtn2_clicked(self):
         self.change_index(0)
 
-    def on_createReportBtn1_toggled(self):
+    @pyqtSlot()
+    def on_createReportBtn1_clicked(self):
         self.change_index(1)
-        
-    def on_createReportBtn2_toggled(self):
+           
+    @pyqtSlot()    
+    def on_createReportBtn2_clicked(self):
         self.change_index(1)
-
-    def on_icpBtn1_toggled(self):
+           
+    @pyqtSlot()
+    def on_icpBtn1_clicked(self):
         self.change_index(2)
-        
-    def on_icpBtn2_toggled(self):
+           
+    @pyqtSlot()
+    def on_icpBtn2_clicked(self):
         self.change_index(2)
-        
-    def on_gsmsBtn1_toggled(self):
+           
+    @pyqtSlot()
+    def on_gsmsBtn1_clicked(self):
          self.change_index(3)
-    
-    def on_gsmsBtn2_toggled(self):
+           
+    @pyqtSlot()
+    def on_gsmsBtn2_clicked(self):
          self.change_index(3)
-     
-    def on_settingBtn1_toggled(self):
+            
+    @pyqtSlot()
+    def on_settingBtn1_clicked(self):
          self.change_index(4)
-    
-    def on_settingBtn2_toggled(self):
+           
+    @pyqtSlot()
+    def on_settingBtn2_clicked(self):
          self.change_index(4)
          
    #******************************************************************
@@ -119,20 +127,26 @@ class MainWindow(QMainWindow):
     def change_index(self, index): 
         self.logger.info(f'Entering change_index with index: {index}')
         self.previous_index = self.ui.stackedWidget.currentIndex() 
-        self.ui.stackedWidget.setCurrentIndex(index)
+
+        if self.previous_index == 5 and not show_switch_page_dialog(self):
+            return  # Don't switch if user cancels
+        
+        self.ui.stackedWidget.setCurrentIndex(index) 
     
     def on_stackedWidget_currentChanged(self, index):
         self.logger.info(f"Stack Widget Switched to Index: {index}")
+        self.logger.info(f'previous_index: {self.previous_index}')
 
         btn_list = self.ui.LeftMenuSubContainer.findChildren(QPushButton) \
                     + self.ui.LeftMenuContainerMini.findChildren(QPushButton)
         
         #FIXME: issue that arises when the active creation setting is thing 
         for btn in btn_list:
-            #if index in [1,2,3,4]:
-            #    btn.setAutoExclusive(False)
-            #    btn.setChecked(False)
-            btn.setAutoExclusive(True)
+            if index in [5,6]:
+                btn.setAutoExclusive(False)
+                btn.setChecked(False)
+            else: 
+                btn.setAutoExclusive(True) # Ensure only one button can be checked at a time
 
         self.ui.headerWidget.show()
                    
@@ -332,3 +346,13 @@ class LocalPreferences:
 
 
 
+def show_switch_page_dialog(self):
+    reply = QMessageBox.question(
+        self,
+        "Confirm Switch",
+        "Are you sure you want to switch pages? Unsaved changes will be lost.",
+        QMessageBox.Yes | QMessageBox.No,
+        QMessageBox.No  # Default button
+    )
+
+    return reply == QMessageBox.Yes  # Return True if user confirms

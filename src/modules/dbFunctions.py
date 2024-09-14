@@ -12,8 +12,44 @@ def isValidDatabase(database_path):
         print
         return False
 
+        
 #******************************************************************
-#    CHM  Queries/Commands
+#    Table: Tests
+#****************************************************************** 
+
+def getAllChmTestsInfo3(db): 
+    try: 
+        query = 'SELECT * FROM Tests WHERE testName NOT LIKE "%ICP%" ORDER BY testNum'    
+        tests = db.query(query)    
+        return tests 
+
+    except Exception as e: 
+        print(f'An error occurred: {e}')
+        return None 
+        
+                
+def getTestsName(db, testNum): 
+    try: 
+        query = 'SELECT testName FROM Tests WHERE testNum = ?'
+        result = db.query(query, (testNum, ))
+        return result 
+        
+    except Exception as e: 
+        print(e)
+        return None;
+
+def getTestsTextName(db, testNum): 
+    try: 
+        query = 'SELECT benchChemName FROM Tests WHERE testNum = ?'
+        result = db.query(query, (testNum, ))
+        return result[0][0] 
+        
+    except Exception as e: 
+        print(e)
+        return None; 
+
+#******************************************************************
+#    Table: chemTestsInfo 
 #****************************************************************** 
 
 def getAllChmTestsInfo(db): 
@@ -36,69 +72,6 @@ def getAllChmTestsInfo2(db):
         print(f'An error occurred: {e}')
         return None 
 
-def getAllChmTestsInfo3(db): 
-    try: 
-        query = 'SELECT * FROM Tests WHERE testName NOT LIKE "%ICP%" ORDER BY testNum'    
-        tests = db.query(query)    
-        return tests 
-
-    except Exception as e: 
-        print(f'An error occurred: {e}')
-        return None 
-        
-
-def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum): 
-    try: 
-        query = 'INSERT INTO chemTestsData (sampleNum, testNum, testValue, standardValue, unitValue, jobNum) VALUES (?, ?, ?, ?, ?, ?)'
-        db.execute(query, (sampleNum, testNum, testValue, standardValue, unitValue, jobNum, ))
-        db.commit()
-
-    except sqlite3.IntegrityError as e:
-        print(e) 
-    except Exception as e: 
-        print(e)
-
-        
-def getChmTestData(db, sampleNum, testNum): 
-    try: 
-        query = 'SELECT * FROM chemTestsData WHERE sampleNum = ? and testNum = ?'
-        result = db.query(query, (sampleNum, testNum))
-        return result 
-    
-    except Exception as e: 
-        print(e)
-        return None 
-
-def getAllChmTestsData(db):
-    try: 
-        query = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData'
-        results = db.query(query)
-        return results
-
-    except Exception as e: 
-        print(e)
-
-        
-def getTestsName(db, testNum): 
-    try: 
-        query = 'SELECT testName FROM Tests WHERE testNum = ?'
-        result = db.query(query, (testNum, ))
-        return result 
-        
-    except Exception as e: 
-        print(e)
-        return None;
-
-def getTestsTextName(db, testNum): 
-    try: 
-        query = 'SELECT benchChemName FROM Tests WHERE testNum = ?'
-        result = db.query(query, (testNum, ))
-        return result[0][0] 
-        
-    except Exception as e: 
-        print(e)
-        return None; 
-
 def getTestsInfo(db, textName): 
     try: 
         #query = 'SELECT testNum, testName, benchMicroname, displayName, recoveryValue, recoveryValue FROM Tests WHERE benchMicroName = ?'
@@ -109,10 +82,64 @@ def getTestsInfo(db, textName):
     except Exception as e: 
         print(e)
         return None; 
+ 
+#******************************************************************
+#    Table: ChemTestsData 
+#****************************************************************** 
+
+def addChmTestData(db, sampleNum, testNum, testValue, standardValue, unitValue, jobNum, date): 
+    try: 
+        query = 'INSERT INTO chemTestsData (sampleNum, testNum, testValue, standardValue, unitValue, jobNum, creationDate) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        db.execute(query, (sampleNum, testNum, testValue, standardValue, unitValue, jobNum, date, ))
+        db.commit()
+
+    except sqlite3.IntegrityError as e:
+        print(e) 
+    except Exception as e: 
+        print(e)
+
+def getChmTestData(db, sampleNum, testNum): 
+    try: 
+        query = 'SELECT * FROM chemTestsData WHERE sampleNum = ? and testNum = ?'
+        result = db.query(query, (sampleNum, testNum))
+        return result 
+    
+    except Exception as e: 
+        print(e)
+        return None 
+
+def checkChmTestsExist(db, sampleNum, testNum, jobNum): 
+    try:
+        query = f"SELECT EXISTS(SELECT 1 FROM chemTestsData WHERE sampleNum = ? AND testNum = ? AND jobNum = ?)"
+        db.execute(query, (sampleNum, testNum, jobNum))
+        result = db.fetchone()[0]
+        return result
+        
+    except Exception as e: 
+        print(e) 
+        return None
+    
+
+def getAllChmTestsData(db):
+    try: 
+        query = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue FROM chemTestsData'
+        results = db.query(query)
+        return results
+
+    except Exception as e: 
+        print(e)
+
+def updateChmTestData(db, sampleNum, testNum, testValue, unitType, unitValue, jobNum): 
+    try: 
+        pass; 
+    
+    except Exception as e: 
+        print(e)
+        return None; 
 
 #******************************************************************
-#   ICP Queries/Commands 
-#****************************************************************** 
+#    Table: icpElements 
+#******************************************************************
 
 #TODO: deal with it on the report side of things
 def getIcpElements(db): 
@@ -125,6 +152,17 @@ def getIcpElements(db):
         print(f'[ERROR]: {e}')
         return None
 
+def getIcpElements2(db): 
+    try: 
+        query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
+        definedElements = db.query(query)    
+        return definedElements 
+        
+    except Exception as e: 
+        print(f'[ERROR]: {e}')
+        return None 
+
+
 def getIcpElementsList(db):  
     try: 
         query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
@@ -133,7 +171,6 @@ def getIcpElementsList(db):
     except Exception as error: 
         print(f'[ERROR]: {error}')
         return None
-
 
 def getIcpElementInfo(db, elementNum): 
     try: 
@@ -144,6 +181,10 @@ def getIcpElementInfo(db, elementNum):
     except Exception as e: 
         print(f'[ERROR]: {e}')
         return None
+
+#******************************************************************
+#    Table: icpLimits  
+#******************************************************************
 
 def getIcpElementLimits(db, elementNum): 
     try: 
@@ -156,18 +197,6 @@ def getIcpElementLimits(db, elementNum):
         print(f'[ERROR]: {e}')
         return None
     
-
-def getIcpElements2(db): 
-
-    try: 
-        query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
-        definedElements = db.query(query)    
-        return definedElements 
-        
-    except Exception as e: 
-        print(f'[ERROR]: {e}')
-        return None 
-    
 def getIcpLimitResults(database, parameters):
     try: 
         query = 'SELECT elementNum, unitType, lowerLimit, upperLimit, sideComment FROM icpLimits WHERE parameterNum = ?'
@@ -177,6 +206,23 @@ def getIcpLimitResults(database, parameters):
     except Exception as e: 
         print(e)  
         return None 
+
+def updateIcpLimits(db, reportNum, elementNum, data ): 
+    try: 
+        unitType = data[0]
+        lowerLimit = data[1]
+        upperLimit = data[2]
+        sideComment = data[3]
+        
+        query = 'INSERT OR REPLACE INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment) VALUES (?, ?, ? , ?, ?, ?)'
+        db.execute(query, (reportNum, elementNum, unitType, lowerLimit, upperLimit, sideComment, ))
+        db.commit()
+    except Exception as e: 
+        print(e)
+
+#******************************************************************
+#    Table: icpData  
+#******************************************************************
     
 def getIcpMachineData(database, jobNumber): 
     try: 
@@ -187,17 +233,6 @@ def getIcpMachineData(database, jobNumber):
     except Exception as e: 
         print(e)  
         return None 
-
-def addIcpElement(db): 
-    pass; 
-        
-
-def updateIcpElement(db): 
-    pass; 
-
-
-def deleteIcpElement(db): 
-    pass; 
 
 
 def getReportNum(db, reportName): 
@@ -234,10 +269,8 @@ def getIcpFooterComment(db, reportNum, elementNum):
         print(f'[ERROR]: {e}')
         return None; 
 
-
-
 #******************************************************************
-#    ICP Reports  
+#   table: icpReports
 #****************************************************************** 
 
 def addIcpReportFooter(db, parameterNum, footerComment): 
@@ -260,8 +293,9 @@ def getIcpReportFooter(db, parameterNum):
         return None; 
 
 #******************************************************************
-#    CHEM Reports  
+#    table: chemReports 
 #****************************************************************** 
+
 def addChmReportFooter(db, parameterNum, footerComment): 
     try: 
         query = 'INSERT OR REPLACE INTO chemReports (parameterNum, footerComment) VALUES (?, ?)'
@@ -281,9 +315,8 @@ def getChmReportFooter(db, parameterNum):
         print(f'[ERROR]: {e}')
         return None; 
 
-     
 #******************************************************************
-#   Author Commands  
+#   table: authors
 #****************************************************************** 
 
 def getAuthorInfo(db, authorName): 
@@ -295,66 +328,6 @@ def getAuthorInfo(db, authorName):
         except Exception as e: 
             print(e) 
             return None 
-
-#******************************************************************
-#    Settings Options 
-#****************************************************************** 
-
-def getAllParameters(db): 
-    try: 
-        query = 'SELECT * FROM parameters'  
-        results = list(db.query(query))
-        return results
-        
-    except Exception as e: 
-        print(e)
-        return None 
-
-def getParameterNum(db, parameterName): 
-    try: 
-        query = 'SELECT parameterNum FROM parameters WHERE parameterName = ?'
-        result = db.query(query, (parameterName,))[0][0]
-        return result
-     
-    except Exception as e: 
-        print(e)
-        return None; 
-
-def getParameterName(db, paramNum): 
-    logger.debug(f"getParameterName called with db={db} and paramNum={paramNum}")
-
-    try: 
-        query = 'SELECT parameterName FROM parameters WHERE parameterNum = ?'  
-        result = db.query(query, (paramNum,))[0][0]
-        return result
-    except Exception as e: 
-        print(e)
-        return None 
-    
-def addParameter(db, parameterName):
-    try:
-        query = 'INSERT INTO parameters (parameterName) VALUES (?)'
-        db.execute(query, (parameterName,))
-        db.commit()
-    except Exception as e:
-        print(e)
-
-def deleteParameter(db, parameterNumber):
-    try:
-        query = 'DELETE FROM parameters WHERE parameterNumber = ?'
-        db.execute(query, (parameterNumber,))
-        db.commit()
-    except Exception as e:
-        print(e)
-
-def updateParameter(db, parameterNumber, parameterName):
-    try:
-        query = 'UPDATE parameters SET parameterName = ? WHERE parameterNumber = ?'
-        db.execute(query, (parameterName, parameterNumber))
-        db.commit()
-    except Exception as e:
-        print(e)
-
 
 def getAllAuthors(db): 
     try: 
@@ -407,7 +380,62 @@ def updateAuthor(db, authorNum, authorName, authorPosition):
     except Exception as e: 
         print(e)
      
+#******************************************************************
+#    table: parameters 
+#****************************************************************** 
 
+def getAllParameters(db): 
+    try: 
+        query = 'SELECT * FROM parameters'  
+        results = list(db.query(query))
+        return results
+        
+    except Exception as e: 
+        print(e)
+        return None 
+
+def getParameterNum(db, parameterName): 
+    try: 
+        query = 'SELECT parameterNum FROM parameters WHERE parameterName = ?'
+        result = db.query(query, (parameterName,))[0][0]
+        return result
+     
+    except Exception as e: 
+        print(e)
+        return None; 
+
+def getParameterName(db, paramNum): 
+    try: 
+        query = 'SELECT parameterName FROM parameters WHERE parameterNum = ?'  
+        result = db.query(query, (paramNum,))[0][0]
+        return result
+    except Exception as e: 
+        print(e)
+        return None 
+    
+def addParameter(db, parameterName):
+    try:
+        query = 'INSERT INTO parameters (parameterName) VALUES (?)'
+        db.execute(query, (parameterName,))
+        db.commit()
+    except Exception as e:
+        print(e)
+
+def deleteParameter(db, parameterNumber):
+    try:
+        query = 'DELETE FROM parameters WHERE parameterNumber = ?'
+        db.execute(query, (parameterNumber,))
+        db.commit()
+    except Exception as e:
+        print(e)
+
+def updateParameter(db, parameterNumber, parameterName):
+    try:
+        query = 'UPDATE parameters SET parameterName = ? WHERE parameterNumber = ?'
+        db.execute(query, (parameterName, parameterNumber))
+        db.commit()
+    except Exception as e:
+        print(e)
     
 #******************************************************************
 #    Report Queries

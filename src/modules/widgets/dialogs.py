@@ -64,6 +64,20 @@ def createdReportDialog(self, fileName):
     msg.setStandardButtons(QMessageBox.Ok )
     
     msg.exec_()
+
+def saveMessageDialog(self, title='Overwrite Database', message='Are you sure you want to overwrite data?'): 
+    msgBox = QMessageBox()  
+    msgBox.setText(title);
+    msgBox.setInformativeText(message);
+    msgBox.setIcon(QMessageBox.Question)
+    msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+    msgBox.setDefaultButton(QMessageBox.Save);
+    x = msgBox.exec_() 
+    
+    if(x == QMessageBox.Yes): 
+        return True
+    if(x == QMessageBox.No):
+        return False 
      
 
 ## Change QPushButton Checkable status when stackedWidget index changed
@@ -86,7 +100,7 @@ def messageBox(self):
         pass 
             
 
-def deleteBox(self, title, message, action):
+def deleteBox(self, title, message, action=None):
     msgBox = QMessageBox()  
     msgBox.setText(title);
     msgBox.setInformativeText(message);
@@ -121,7 +135,23 @@ def replaceError(self,sampleName):
 #    CHM Dialog 
 #******************************************************************
     
+def duplicateSampleOverrideDialog(jobNum, sampleNum):
     
+    msgBox = QMessageBox()  
+    msgBox.setText("Duplicate Sample");
+    duplicateMsg = f"Would you like to overwrite existing sample {jobNum}-{sampleNum}"
+    msgBox.setInformativeText(duplicateMsg);
+    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel);
+    msgBox.setDefaultButton(QMessageBox.Yes);
+    
+    x = msgBox.exec_()
+    
+    if(x == QMessageBox.Yes): 
+        return True
+
+    if(x == QMessageBox.No): 
+        return False
+
 
 #******************************************************************
 #    File  

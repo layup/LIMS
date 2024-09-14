@@ -19,6 +19,10 @@ thinBorder = Side(border_style="thin", color="000000")
 doubleBorder = Side(border_style='double', color="000000")
 
 
+#******************************************************************
+#   Excel Document Formatting
+#******************************************************************
+
 def pageSetup(ws): 
     logger.info('Entering pageSetup')
     # set the default view to page layout
@@ -65,10 +69,14 @@ def formatRows(ws, totalSamples, totalCols, pageSize):
         for cell in row:
             cell.font = defaultFont 
             ws.row_dimensions[cell.row].height = (row_height_pixels * window_conversion)
-
-
+            
+#******************************************************************
+#   General Functions
+#******************************************************************
 def generateSampleHeaderNames(ws, sampleNames): 
     logger.info(f'Entering generateSampleHeaderNames with parameters: {sampleNames}')
+
+    displayLimit = 4 
     
     sampleSections = []
     samplePlacement = []
@@ -81,7 +89,7 @@ def generateSampleHeaderNames(ws, sampleNames):
         currentWord += " " + str(i) + ") " + stripedWord + " "
         temp.append(key)
 
-        if(i % 4 == 0): 
+        if(i % displayLimit == 0): 
             print(currentWord)
             sampleSections.append(currentWord)
             samplePlacement.append(temp)
@@ -92,8 +100,15 @@ def generateSampleHeaderNames(ws, sampleNames):
         sampleSections.append(currentWord)
         samplePlacement.append(temp) 
 
-        
+    logger.debug(f'Returning the values')
+    logger.debug(f'Sample Placement: {samplePlacement}')
+    logger.debug(f'Sample Sections: {sampleSections}')
+
     return sampleSections, samplePlacement 
+
+#******************************************************************
+#   Excel Insertion Functions 
+#******************************************************************
 
 def createFooters(ws, title, jobNumber): 
     logger.info(f'Entering createFooters with parameters: title:{title}, jobNumber: {jobNumber}')
@@ -124,7 +139,7 @@ def createFooters(ws, title, jobNumber):
     ws.evenFooter.right.text ='&BMail:&B PO BOX 2103 Stn Main \n Sidney, B.C, V8L 356'
     
 
-def createHeader(ws, clientInfo, column2): 
+def insertClientInfo(ws, clientInfo, column2): 
     logger.info('Entering createHeader')
     
     ws['A1'] = clientInfo['clientName']
@@ -149,19 +164,6 @@ def createHeader(ws, clientInfo, column2):
     
     return ws 
      
-def nextPage(curVal, curPage): 
-    #minue 9 for each iteration that we increase 
-    pageEnds = [47]
-    
-    for i in range(10):
-        pageEnds.append(pageEnds[i] + 37)
-        
-    if(curVal > pageEnds[curPage]): 
-        print('FALSE')
-        return False 
-    else: 
-        print("TRUE")
-        return True; 
 
 def insertSampleName(ws, row, sampleSection, totalRows): 
     logger.info(f'Entering insertSampleName with parameters: row: {row}, totalRows: {totalRows}, sampleSection: {sampleSection}')
@@ -175,7 +177,7 @@ def insertSampleName(ws, row, sampleSection, totalRows):
     return row + 3; 
     
 def insertTestTitles(ws, pageLocation, totalSamples, startVal, reportType, totalCols): 
-    logger.info(f'Entering insertTestTitles')
+    logger.info(f'Entering insertTestTitles with parameters: pageLocation: {pageLocation}, totalSamples: {totalSamples}, startVal: {startVal}, totalCols: {totalCols}')
     
     tests = ws.cell(row=pageLocation, column=1)
     if(reportType == 0):
@@ -306,81 +308,26 @@ def insertTestInfo(ws, pageLocation, testInfo, samplePlacement, sampleData, tota
     
     return pageLocation; 
 
-def insertIcpComment(ws, footerComment, pageLocation): 
-    logger.info(f'Entering insertIcpComment')
-    for (i, value) in enumerate(footerComment):
-        comment = ws.cell(row=pageLocation, column=1)
-        comment.value = value
-        comment.font = Font(size=9, name="Times New Roman") 
-        pageLocation+=1; 
-        
-    '''     
-    additonalComments = [
-        'Comments:', 
-        'All constituents tested meet Canadian and B.C drinking water standards.'
-    ]
 
-    for currentComment in additonalComments: 
-        comment = ws.cell(row=pageLocation, column=1)
-        comment.value = currentComment 
-        pageLocation+=1; 
-    '''
+def insertComment(ws, pageLocation, comment): 
+    logger.info(f'Entering insertComments with parameters: pageLocation: {repr(pageLocation)}, comment: {repr(comment)}')
     
-    pageLocation +=2; 
-    insertSignature(ws, pageLocation, [3,6])
-
-def insertComments(ws, pageLocation): 
-    logger.info(f'Entering insertComments with parameters: pageLocation: {repr(pageLocation)}')
-
-    comments = { 
-        "SD":  'SD    = standard deviation;       Standard Recovery = primary or secondary reference material', 
-        'STD': 'STD  = secondary standard calibrated to primary standard reference material', 
-        'ND':  'ND   = none is detected;          n/a = not applicable'
-    }
-    
-    for i, (key,value) in enumerate(comments.items()): 
-        temp = ws.cell(row = pageLocation+i, column=1)
-        temp.value = value
-        
-    pageLocation+=5; 
-    return pageLocation; 
-
-def insertComments2(ws, pageLocation, comment): 
-    commentArray = comment.splitlines()
-    
-    for i, commentLine in enumerate(commentArray): 
-        temp = ws.cell(row = pageLocation+i, column=1)
+    for i, commentLine in enumerate(comment): 
+        temp = ws.cell(row = pageLocation, column=1)
         temp.value = commentLine 
-        
-    pageLocation +=5; 
+        pageLocation+=1; 
+
     return pageLocation
 
-
-#TODO: get the proper info from the database
-def insertSignature(ws, pageLocation, startColumn): 
-    logger.info(f'Entering insertSignature with parameters: pageLocation:{repr(pageLocation)}, startColumn: {repr(startColumn)}')
-    
-    names = [
-        'R. Bilodeau', 
-        'H. Hartmann'
-    ]
-    positions = [
-        'Analytical Chemist',
-        'Sr Analytical Chemist'
-    ]
-    
-    for i, col in enumerate(startColumn): 
-        scientistName = ws.cell(row=pageLocation, column=col) 
-        scientistPosition = ws.cell(row=pageLocation+1, column=col)
-        
-        scientistName.value = names[i]
-        scientistPosition.value = positions[i]
-        
-        for j in range(2): 
-            signatureLine = ws.cell(row=pageLocation, column=col+j)
-            signatureLine.border = Border(top=thinBorder)
-
-def insertSignature2(ws, pageLocation:int , startColumn: int, authorsInto: list) -> int: 
+def insertNextPageComment(ws, pageLocation): 
+    logger.info('Preparing to insert continued to next page...')
+    comment = ws.cell(row=pageLocation, column=1)
+    comment.value = 'continued on next page....'
+    comment.font = Font(bold=True, size=9, name="Times New Roman")  
+   
+   
+def insertSignature(ws, pageLocation:int , startColumn: int, authorsInto: list) -> int: 
+    logger.info(f'Entering insertSignature2 with param: pageLocation:{repr(pageLocation)}, startColum: {repr(startColumn)}, authorsInfo: {repr(authorsInto)}')
     
     authorNames = []
     authorRoles = []
@@ -390,9 +337,16 @@ def insertSignature2(ws, pageLocation:int , startColumn: int, authorsInto: list)
         authorRoles.append(author[2])
         
     for i, col in enumerate(startColumn): 
-        pass; 
+        scientistNamePos = ws.cell(row=pageLocation, column=col)
+        scientistRolePos = ws.cell(row=pageLocation+1, column=col)
         
+        scientistNamePos.value = authorNames[i]
+        scientistRolePos.value = authorRoles[i]
         
+        for j in range(2): 
+            signatureLine = ws.cell(row=pageLocation, column=col+j)
+            signatureLine.border = Border(top=thinBorder)
+
         
 def significantFiguresConvert(value): 
     if(value >= 100): 
@@ -406,6 +360,7 @@ def significantFiguresConvert(value):
     
     return value; 
 
+#TODO: move this into logic
 def floatCheck(s):
     try:
         float(s)

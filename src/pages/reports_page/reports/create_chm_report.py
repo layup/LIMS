@@ -17,7 +17,7 @@ from pages.reports_page.reports.chm_report_models import chemReportSampleData, c
 from pages.reports_page.reports.report_utils import (
     loadClientInfo,  formatReportTable, disconnect_all_slots, populateSamplesContainer, 
     populateReportAuthorDropdowns, EmptyDataTableError, updateReport, handleTableChange,
-    createExcelErrorCheck, retrieveAuthorInfo, retrieveParamComment
+    createExcelErrorCheck, retrieveAuthorInfo, retrieveFooterComment
 )
 
 #******************************************************************
@@ -158,45 +158,45 @@ def chmInitialize(self, table, rowCount):
 def chmReportHandler(self, columnLength,  tests):
     self.logger.info(f'Entering chmReportHandler with parameters: columnLength: {columnLength}, tests: {tests}')
     
-    totalSamples = len(self.sampleNames)
     totalTests = len(tests)
-    
-    sampleData = {}
-    unitType = []
-    recovery = []
-    displayNames = []
  
-    try:  
-        # Check if the data files are not empty 
-        if(self.ui.dataTable.rowCount() == 0): 
-            raise EmptyDataTableError("Data table is empty. Cannot create Excel file.") 
-    
-    except EmptyDataTableError as error:
-        print(error)
-        self.logger.error('Data table is empty. Cannot create Excel file') 
-        showErrorDialog(self, 'Cannot create report', f'Data table is empty. Cannot create excel file for Job: {self.jobNum}')
-        return 
-    
-    except Exception as e:
-        print("Unexpected error:", e) 
-        return 
-
-    
-    # General Error Checking before creating excel document 
     if(createExcelErrorCheck(self)): 
         return 
     
-    # Retrieve the authors info     
     authorsInfo = retrieveAuthorInfo(self, self.ui.authorOneDropDown.currentText(), self.ui.authorTwoDropDown.currentText())
-    print(authorsInfo)
+    footerComment = retrieveFooterComment(self, 'CHM', self.parameter)
+    sampleData = retrieveSampleInputData(self, columnLength, totalTests)
+    displayNames, recovery, unitType = retrieveTestsInfo(self, totalTests, tests)
     
-    # Retrieve the report bottom comment 
-    reportComment = retrieveParamComment(self, 'CHM', self.parameter)
-    print(reportComment)
+    try: 
+        self.logger.info('Preparing to create CHM Report')
+        filePath, fileName = createChmReport(self.clientInfo, self.jobNum, authorsInfo, footerComment, self.sampleNames, sampleData, displayNames, unitType, recovery) 
+        createdReportDialog(self, fileName)
+        
+        jobCreatedNum = 1 
+        self.logger.info(f'CHM Report Creation Successful: jobCreated: {jobCreatedNum}')  
+            
+    except Exception as e:
+        jobCreatedNum = 0; 
+        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
+        print(e);  
+        
+    #TODO: can move into on excel file 
+    if(jobCreatedNum == 1): 
+        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.reportNum)
+        
+
+    # TODO: Save the other client info 
+    # TODO: Authors, client info, samples name. sample data 
+    # TODO: can save the data through matching the rows 
     
     
-    # Retrieve the Sample Input Data 
-    self.logger.info('retrieving sample input data')
+def retrieveSampleInputData(self, columnLength, totalTests): 
+    self.logger.info(f'Entering retrieveSampleInputData with parameters: columnLength: {columnLength}, totalTests: {totalTests}')
+    totalSamples = len(self.sampleNames)
+
+    sampleData = {}
+    
     for col in range(columnLength, totalSamples + columnLength): 
         currentJob = self.ui.dataTable.horizontalHeaderItem(col).text()
         
@@ -212,7 +212,16 @@ def chmReportHandler(self, columnLength,  tests):
         sampleData[currentJob] = jobValues
         self.logger.debug(f'Current Job: {currentJob}, Data: {sampleData[currentJob]}')
         
-    # Retrieve the Tests Info 
+    return sampleData
+     
+
+def retrieveTestsInfo(self, totalTests, tests): 
+    self.logger.info(f'Entering retrieveTestsInfo with parameters: totalTests: {repr(totalTests)}, tests: {repr(tests)}')
+
+    displayNames = []
+    recovery = []
+    unitType = []
+    
     for row in range(totalTests): 
         try: 
             testsName = self.ui.dataTable.item(row, 1).text()
@@ -234,24 +243,4 @@ def chmReportHandler(self, columnLength,  tests):
         except: 
             recovery.append('')   
             
-    self.logger.info('Preparing to create CHM Report')
-    try: 
-        filePath, fileName = createChmReport(self.clientInfo, self.jobNum, authorsInfo, reportComment, self.sampleNames, sampleData, displayNames, unitType, recovery) 
-        createdReportDialog(self, fileName)
-        
-        jobCreatedNum = 1 
-        self.logger.info(f'CHM Report Creation Successful: jobCreated: {jobCreatedNum}')  
-            
-    except: 
-        #TODO: debating purring the error here so it's more clean 
-        jobCreatedNum = 0; 
-        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
-        
-    if(jobCreatedNum == 1): 
-        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.reportNum)
-        
-
-    # TODO: Save the other client info 
-    # TODO: Authors, client info, samples name. sample data 
-    # TODO: can save the data through matching the rows 
-
+    return displayNames, recovery, unitType
