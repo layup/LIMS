@@ -12,6 +12,7 @@ from modules.dbFunctions import getTestsName
 from modules.constants import  TABLE_ROW_HEIGHT, TABLE_COL_SMALL, TABLE_COL_MED
 from modules.widgets.dialogs import deleteBox
 from modules.widgets.TableFooterWidget import TableFooterWidget
+from modules.widgets.SideEditWidget import SideEditWidget
 
 #******************************************************************
 #    Chemistry Database Section 
@@ -41,6 +42,24 @@ def chm_database_setup(self):
     #self.ui.ChmTestSaveBtn.clicked.connect(lambda: chmTestsSaveClicked(self));
     # Import/Export Signals 
     # Export - export all/page 
+
+def sideEditSetup(self): 
+    # Side Edit Widget Setup
+
+    # Get the list of parameters and allowed unit types
+    self.ui.sideEditWidget2 = SideEditWidget() 
+    
+    self.ui.sideEditLayout.addWidget(self.ui.sideEditWidget1) #only valid for layouts
+    self.ui.sideEditWidget2.setVisible(False)
+
+    parameterType, unitType = getParameterAndUnitTypes(self.tempDB)
+    self.ui.sideEditWidget2.set_drop_down(parameterType, unitType) 
+    self.ui.sideEditWidget2.set_combo_disabled(True)
+    
+    #self.ui.sideEditWidget2.cancel_clicked.connect(lambda: sideEditCancelBtnClicked(self))
+    #self.ui.sideEditWidget2.cancelBtn.clicked.connect(lambda: sideEditCancelBtnClicked(self))
+    #self.ui.sideEditWidget2.save_clicked.connect(lambda tests_info, tree_item: sideEditSaveBtnClicked(self, tests_info, tree_item))
+
 
 
 def createActionWidget(self, row): 
@@ -169,7 +188,7 @@ def chmTestsSaveProcess(self, row, new_data):
         updateRowValues(self.ui.chmInputTable, row, new_data)
         
         # Save update to database
-        
+
  
     
 def updateRowValues(table, row, new_data): 
@@ -306,7 +325,7 @@ class DatabaseTableModel(QObject):
             self.total_pages = self.get_total_rows_filter(jobNum)
             offSet = (self.current_page -1) * self.total_rows
             
-            inquiry = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue, creationDate  FROM chemTestsData WHERE jobNum LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
+            inquiry = 'SELECT jobNum, sampleNum, testNum, testValue, standardValue, unitValue, creationDate FROM chemTestsData WHERE jobNum LIKE ? ORDER BY creationDate DESC LIMIT ? OFFSET ?' 
             self.filtered_data = list(self.db.query(inquiry,('%' + jobNum + '%', self.total_rows, offSet)))
             
             if(self.filtered_data): 

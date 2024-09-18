@@ -47,7 +47,7 @@ def sideEditSetup(self):
     
     self.ui.sideEditLayout.addWidget(self.ui.sideEditWidget1) #only valid for layouts
     self.ui.sideEditWidget1.setVisible(False)
-    
+
     parameterType, unitType = getParameterAndUnitTypes(self.tempDB)
     self.ui.sideEditWidget1.set_drop_down(parameterType, unitType) 
     self.ui.sideEditWidget1.set_combo_disabled(True)
@@ -71,8 +71,6 @@ def sideEditSaveBtnClicked(self, new_data, item):
     
     # check if any data is different 
     
-    
-    
     jobName = new_data[0] + '-' + new_data[1]
     result = saveMessageDialog(self, 'Overwrite Data?', f'Are you sure you want overwrite existing data for {jobName}?')
 
@@ -82,7 +80,7 @@ def sideEditSaveBtnClicked(self, new_data, item):
             item.setText(col, new_data[col])
         
         # update database
-        query = 'UPDATE chemTestsData SET testName = ? '
+        query = 'UPDATE chemTestsData SET testVal = ?, standard = ? WHERE '
         
     
     
