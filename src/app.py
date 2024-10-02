@@ -2,7 +2,7 @@ import os
 import pickle
 
 from assets import resource_rc
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QTimer, QDateTime
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel, QMessageBox)
 
 from modules.constants import REPORTS_TYPE 
@@ -50,13 +50,41 @@ class MainWindow(QMainWindow):
         icpSetup(self)
         chemistrySetup(self)
 
-        self.statusBar().showMessage('MB LABS')
-
+            
+        self.init_status_bar()
+    
         self.connect_client_info_signals()
-        
+
     def init_status_bar(self): 
-        self.statusBar().addWidget(QLabel("Message to the right end"), 1)
-        self.statusBar().showMessage('MB LABS');  
+        # Create QLabel for the left side
+        self.left_label = QLabel("Left Section")
+
+        # Create QLabel for the right side
+        self.right_label = QLabel("Right Section")
+
+        # Create QLabel for left side
+        self.time_label = QLabel()
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(1000)  # Update every second (1000 ms)
+        
+        # Add the left label using addWidget (aligns to the left)
+        self.ui.statusbar.addWidget(self.time_label)
+
+        # Add the right label using addPermanentWidget (aligns to the right)
+        self.ui.statusbar.addPermanentWidget(self.right_label)
+
+    def update_time(self): 
+        # Get the current time and date
+        current_time = QDateTime.currentDateTime()
+
+        # Format the time and date as a string
+        time_text = current_time.toString("dd MMM yyyy | hh:mm:ss AP")
+
+        # Update the QLabel to display the time
+        self.time_label.setText(time_text)
+        
 
     def connect_client_info_signals(self):
         self.ui.clientName_1.textChanged.connect(lambda text: self.on_client_info_changed('clientName', text))

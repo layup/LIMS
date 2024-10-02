@@ -9,7 +9,7 @@ from PyQt5.uic import loadUi
 class SideEditWidget(QWidget): 
 
     cancel_clicked = pyqtSignal(bool)
-    save_clicked = pyqtSignal(list, QTreeWidgetItem)
+    save_clicked = pyqtSignal(list, object)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -21,6 +21,7 @@ class SideEditWidget(QWidget):
         # Load UI elements
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "ui", 'chmTestsEditSideWidget.ui')    
+         
         self.ui = loadUi(file_path, self) 
         
         # Load general setup 
@@ -42,7 +43,7 @@ class SideEditWidget(QWidget):
         self.jobNum.setValidator(int_validator)
         self.sampleNum.setValidator(int_validator)
         self.testsVal.setValidator(float_validator)
-        self.standard.setValidator(int_validator)
+        self.standard.setValidator(float_validator)
         
         # set the limit to characters allowed in line edit 
         self.jobNum.setMaxLength(6)
@@ -71,8 +72,7 @@ class SideEditWidget(QWidget):
         # enable/disable combobox editing
         self.testsNameCombo.setDisabled(self.disabled)
         self.unitValCombo.setDisabled(self.disabled)
-       
-  
+     
        
     def set_combo_widget(self, widget, itemName): 
         try: 
@@ -95,7 +95,7 @@ class SideEditWidget(QWidget):
 
         testNum = getParameterTypeNum(self.testsNameCombo)
         
-        return [jobNum, sampleNum, testsName, testsVal, standardVal, unitVal, testNum]
+        return [jobNum, sampleNum, testsName, testsVal, unitVal, standardVal, testNum]
 
     def clear_data(self): 
         self.jobNum.clear()
@@ -121,11 +121,14 @@ class SideEditWidget(QWidget):
         self.save_clicked.emit(result, self.item);
 
 
-class parameterItem: 
-    def __init__(self,testNum, testName): 
-        self.testNum = testNum
-        self.testName = testName 
+       
+def hideSideEditWidget(widget): 
+    
+    # Clear the data 
+    widget.clear_data()
 
+    # set not visible
+    widget.setVisible(False) 
         
 def getParameterTypeNum(comboBox): 
     

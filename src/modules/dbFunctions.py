@@ -36,6 +36,7 @@ def getTestsName(db, testNum):
         
     except Exception as e: 
         print(e)
+
         return None;
 
 def getTestsTextName(db, testNum): 
@@ -47,6 +48,7 @@ def getTestsTextName(db, testNum):
     except Exception as e: 
         print(e)
         return None; 
+
 
 #******************************************************************
 #    Table: chemTestsInfo 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1621</width>
-    <height>890</height>
+    <height>896</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -64,6 +64,13 @@
 	background-color:rgb(66, 78, 101)
 }
 
+QStatusBar {
+	padding: 5px; 
+} 
+
+QStatusBar QLabel {
+	padding: 2px 10px; 
+}
 
 
 /******************************************************************
@@ -3475,7 +3482,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -3669,7 +3676,7 @@ p, li { white-space: pre-wrap; }
                         <number>0</number>
                        </property>
                        <property name="topMargin">
-                        <number>0</number>
+                        <number>20</number>
                        </property>
                        <property name="rightMargin">
                         <number>0</number>
@@ -3678,46 +3685,56 @@ p, li { white-space: pre-wrap; }
                         <number>5</number>
                        </property>
                        <item>
-                        <widget class="QTableWidget" name="chmInputTable">
-                         <property name="styleSheet">
-                          <string notr="true"/>
+                        <layout class="QVBoxLayout" name="verticalLayout_16">
+                         <property name="leftMargin">
+                          <number>0</number>
                          </property>
-                         <row>
-                          <property name="text">
-                           <string>1</string>
-                          </property>
-                         </row>
-                         <row>
-                          <property name="text">
-                           <string>2</string>
-                          </property>
-                         </row>
-                         <column>
-                          <property name="text">
-                           <string>test</string>
-                          </property>
-                         </column>
-                         <column>
-                          <property name="text">
-                           <string>test</string>
-                          </property>
-                         </column>
-                         <column>
-                          <property name="text">
-                           <string>test2</string>
-                          </property>
-                         </column>
-                         <item row="0" column="0">
-                          <property name="text">
-                           <string>test</string>
-                          </property>
+                         <item>
+                          <widget class="QTableWidget" name="chmInputTable">
+                           <property name="styleSheet">
+                            <string notr="true"/>
+                           </property>
+                           <row>
+                            <property name="text">
+                             <string>1</string>
+                            </property>
+                           </row>
+                           <row>
+                            <property name="text">
+                             <string>2</string>
+                            </property>
+                           </row>
+                           <column>
+                            <property name="text">
+                             <string>test</string>
+                            </property>
+                           </column>
+                           <column>
+                            <property name="text">
+                             <string>test</string>
+                            </property>
+                           </column>
+                           <column>
+                            <property name="text">
+                             <string>test2</string>
+                            </property>
+                           </column>
+                           <item row="0" column="0">
+                            <property name="text">
+                             <string>test</string>
+                            </property>
+                           </item>
+                           <item row="0" column="1">
+                            <property name="text">
+                             <string>test2</string>
+                            </property>
+                           </item>
+                          </widget>
                          </item>
-                         <item row="0" column="1">
-                          <property name="text">
-                           <string>test2</string>
-                          </property>
+                         <item>
+                          <widget class="QTableView" name="chmTableView"/>
                          </item>
-                        </widget>
+                        </layout>
                        </item>
                        <item>
                         <widget class="QWidget" name="widget_52" native="true">
@@ -3740,175 +3757,6 @@ p, li { white-space: pre-wrap; }
                           <property name="bottomMargin">
                            <number>0</number>
                           </property>
-                          <item>
-                           <widget class="QWidget" name="chmEditWidget" native="true">
-                            <property name="minimumSize">
-                             <size>
-                              <width>0</width>
-                              <height>0</height>
-                             </size>
-                            </property>
-                            <property name="maximumSize">
-                             <size>
-                              <width>340</width>
-                              <height>16777215</height>
-                             </size>
-                            </property>
-                            <layout class="QVBoxLayout" name="verticalLayout_59">
-                             <item>
-                              <widget class="QWidget" name="widget_34" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_13">
-                                <item>
-                                 <widget class="QLabel" name="label_53">
-                                  <property name="text">
-                                   <string>Job Number</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmJobNumLine"/>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_36" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_16">
-                                <item>
-                                 <widget class="QLabel" name="label_54">
-                                  <property name="text">
-                                   <string>Sample Number</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmSampleNumLine"/>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_37" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_28">
-                                <item>
-                                 <widget class="QLabel" name="label_56">
-                                  <property name="text">
-                                   <string>Tests Name</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmTestsNameLine"/>
-                                </item>
-                                <item>
-                                 <widget class="QComboBox" name="chmTestsNameCombo">
-                                  <property name="minimumSize">
-                                   <size>
-                                    <width>0</width>
-                                    <height>30</height>
-                                   </size>
-                                  </property>
-                                 </widget>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_39" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_29">
-                                <item>
-                                 <widget class="QLabel" name="label_57">
-                                  <property name="text">
-                                   <string>Tests Value</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmTestsValueLine"/>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_44" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_33">
-                                <item>
-                                 <widget class="QLabel" name="label_61">
-                                  <property name="text">
-                                   <string>Standard Value</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmStandardValueLine"/>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_47" native="true">
-                               <layout class="QVBoxLayout" name="verticalLayout_35">
-                                <item>
-                                 <widget class="QLabel" name="label_64">
-                                  <property name="text">
-                                   <string>Unit Value</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QLineEdit" name="chmUnitValueLine"/>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                             <item>
-                              <spacer name="verticalSpacer_10">
-                               <property name="orientation">
-                                <enum>Qt::Vertical</enum>
-                               </property>
-                               <property name="sizeHint" stdset="0">
-                                <size>
-                                 <width>20</width>
-                                 <height>40</height>
-                                </size>
-                               </property>
-                              </spacer>
-                             </item>
-                             <item>
-                              <widget class="QWidget" name="widget_20" native="true">
-                               <layout class="QHBoxLayout" name="horizontalLayout_63">
-                                <property name="leftMargin">
-                                 <number>0</number>
-                                </property>
-                                <property name="topMargin">
-                                 <number>0</number>
-                                </property>
-                                <property name="rightMargin">
-                                 <number>0</number>
-                                </property>
-                                <property name="bottomMargin">
-                                 <number>0</number>
-                                </property>
-                                <item>
-                                 <widget class="QPushButton" name="ChmTestCancelBtn">
-                                  <property name="text">
-                                   <string>Cancel Changes</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                                <item>
-                                 <widget class="QPushButton" name="ChmTestSaveBtn">
-                                  <property name="text">
-                                   <string>Save Changes</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                               </layout>
-                              </widget>
-                             </item>
-                            </layout>
-                           </widget>
-                          </item>
                          </layout>
                         </widget>
                        </item>

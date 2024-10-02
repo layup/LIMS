@@ -10,11 +10,10 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 from modules.dbFunctions import (getChmTestData, addChmTestData, checkChmTestsExist)
 from modules.constants import CHM_REPORT
+from modules.utils.chm_utils import getParameterAndUnitTypes, getParameterTypeNum, parameterItem
 from modules.utils.logic_utils import is_real_number
 from modules.widgets.dialogs import showErrorDialog, duplicateSampleOverrideDialog, deleteBox, saveMessageDialog
-from modules.widgets.SideEditWidget import SideEditWidget
-
-
+from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 
 #******************************************************************
 #   General Functions 
@@ -52,18 +51,12 @@ def sideEditSetup(self):
     self.ui.sideEditWidget1.set_drop_down(parameterType, unitType) 
     self.ui.sideEditWidget1.set_combo_disabled(True)
     
-    self.ui.sideEditWidget1.cancel_clicked.connect(lambda: sideEditCancelBtnClicked(self))
-    self.ui.sideEditWidget1.cancelBtn.clicked.connect(lambda: sideEditCancelBtnClicked(self))
+    #self.ui.sideEditWidget1.cancel_clicked.connect(lambda: sideEditCancelBtnClicked(self))
+    self.ui.sideEditWidget1.cancelBtn.clicked.connect(lambda: hideSideEditWidget(self.ui.sideEditWidget1))
     self.ui.sideEditWidget1.save_clicked.connect(lambda tests_info, tree_item: sideEditSaveBtnClicked(self, tests_info, tree_item))
 
     
-def sideEditCancelBtnClicked(self): 
-    
-    # Clear the data 
-    self.ui.sideEditWidget1.clear_data()
 
-    # set not visible
-    self.ui.sideEditWidget1.setVisible(False) 
     
 def sideEditSaveBtnClicked(self, new_data, item):
     print(f'Entering sideEditSaveBtnClicked with parameters: data: {new_data}, row: {item}') 
@@ -82,7 +75,6 @@ def sideEditSaveBtnClicked(self, new_data, item):
         # update database
         query = 'UPDATE chemTestsData SET testVal = ?, standard = ? WHERE '
         
-    
     
         
 def formatQLineEdits(self): 
@@ -127,17 +119,6 @@ def populateNewEntry(self):
 
     self.ui.gcmsUnitVal.addItems(unitTypes)
     
-    
-def getParameterAndUnitTypes(database): 
-    query = 'SELECT testNum, testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
-    results = database.query(query) 
-    
-    unitTypes =  ['TCU', 'ug/L', 'mg/g']
-   
-    # Convert results into readable 
-    parameterTypes = [parameterItem(item[0], item[1]) for item in results]
-
-    return parameterTypes, unitTypes 
     
             
 @pyqtSlot()    
@@ -416,23 +397,3 @@ class TreeActionWidget(QWidget):
     def on_delete_clicked(self):
         # Emit signal to trigger delete action in main window
         self.delete_clicked.emit(self.item)
-
-    
-#******************************************************************
-#    Chemistry Input Data Classes 
-#*****************************************************************
-
-class parameterItem: 
-    def __init__(self,testNum, testName): 
-        self.testNum = testNum
-        self.testName = testName 
-
-        
-def getParameterTypeNum(comboBox): 
-    
-    index = comboBox.currentIndex()
-    if index >= 0:
-        item = comboBox.itemData(index)
-        if isinstance(item, parameterItem):
-            return item.testNum
-    return None
