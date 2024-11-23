@@ -1,16 +1,15 @@
-
 __author__ = "Tommy Lay"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
 import sys
-import PyQt5 
+import PyQt5
 
 from app import MainWindow
-from base_logger import logger 
+from base_logger import logger
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5 import QtWidgets, QtCore  
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QTimer
 
 from modules.widgets.SplashScreenWidget import SplashScreen
@@ -22,17 +21,17 @@ if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
 if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
     PyQt5.QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
-    
-def setup_logging(): 
+
+def setup_logging():
 
     logger_level_meaning = {
-        10: 'DEBUG', 
-        20: 'INFO', 
-        30: 'WARNING', 
-        40: 'ERROR', 
+        10: 'DEBUG',
+        20: 'INFO',
+        30: 'WARNING',
+        40: 'ERROR',
         50: 'CRITICAL'
-    } 
-    
+    }
+
     print('*Starting Program')
     print(f'*Logging Level: {logger_level_meaning[logger.level]}')
     print(f"*Logger Propagation: {logger.propagate}")
@@ -51,10 +50,9 @@ if __name__ == "__main__":
     splash = SplashScreen()
     splash.show()
 
-    
     QTimer.singleShot(1000, lambda: show_main_window())
-    
-    #TODO: load in all of the settings prior  
+
+    #TODO: load in all of the settings prior
     def show_main_window():
         # Create and show the main window
         window = MainWindow(logger)
@@ -62,8 +60,7 @@ if __name__ == "__main__":
 
         # Finish the splash screen
         splash.finish(window)
-        
-    sys.exit(app.exec_())
-    
 
-    
+    sys.exit(app.exec_())
+
+

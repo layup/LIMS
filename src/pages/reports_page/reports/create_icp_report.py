@@ -302,12 +302,14 @@ def icpReportHandler(self, elements, limits, totalSamples, reportNum):
         
         jobCreatedNum = 1 
         self.logger.info(f'ICP Report Creation Successful: jobCreated: {jobCreatedNum}')  
+        self.right_status_label.setText(f'Successfully Created ICP Report: {self.jobNum}')
             
     except Exception as e: 
         print(e)
         
         jobCreatedNum = 0; 
-        self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
+        self.logger.warning(f'ICP Report Creation Failed: jobCreated: {jobCreatedNum}')
+        self.right_status_label.setText(f'Failed to create ICP Report: {self.jobNum}')
         
 
     if(jobCreatedNum == 1): 

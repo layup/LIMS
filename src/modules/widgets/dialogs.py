@@ -74,9 +74,9 @@ def saveMessageDialog(self, title='Overwrite Database', message='Are you sure yo
     msgBox.setDefaultButton(QMessageBox.Save);
     x = msgBox.exec_() 
     
-    if(x == QMessageBox.Yes): 
+    if(x == QMessageBox.Save): 
         return True
-    if(x == QMessageBox.No):
+    if(x == QMessageBox.Cancel):
         return False 
      
 

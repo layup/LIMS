@@ -38,16 +38,15 @@ def icp_history_setup(self):
     self.ui.icpSearchBtn1.clicked.connect(lambda: self.icpTableView.handle_search_text(self.ui.icpSearchLine1.text()))
     self.ui.icpSearchLine1.returnPressed.connect(lambda: self.icpTableView.handle_search_text(self.ui.icpSearchLine1.text()))
     
-    self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.tempDB))
-
+    self.ui.icpUploadBtn.clicked.connect(lambda: on_icpUploadBtn_clicked(self.tempDB, self.right_status_label))
 
 @pyqtSlot()
-def on_icpUploadBtn_clicked(database): 
+def on_icpUploadBtn_clicked(database, right_status_label): 
     logger.info('[SIGNAL]: on_icpUploadBtn_clicked')
     
     fileLocation = openFile()
     logger.debug(f'fileLocation: {fileLocation}')
-    icp_upload(fileLocation, database) 
+    icp_upload(fileLocation, database, right_status_label) 
 
 
 @pyqtSlot()
@@ -251,7 +250,7 @@ class DatabaseTableView():
                 
     def init_table(self): 
         # Define table columns
-        column_headers = ['Sample Number', 'Job Number', 'Machine Type', 'File Location', 'Upload Date', 'Actions'] 
+        column_headers = ['Sample Number', 'Job Number', 'Machine Type', 'File Name', 'Upload Date', 'Actions'] 
         
         self.table.setColumnCount(len(column_headers))
         self.table.setHorizontalHeaderLabels(column_headers)

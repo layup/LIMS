@@ -175,10 +175,17 @@ def chmReportHandler(self, columnLength,  tests):
         
         jobCreatedNum = 1 
         self.logger.info(f'CHM Report Creation Successful: jobCreated: {jobCreatedNum}')  
+
+        # Set the bottom right status bar
+        self.right_status_label.setText(f'Successfully Created CHM Report: {self.jobNum}')
             
     except Exception as e:
         jobCreatedNum = 0; 
         self.logger.warning(f'CHM Report Creation Failed: jobCreated: {jobCreatedNum}')
+        
+        # Set the bottom right status bar
+        self.right_status_label.setText(f'Failed to create CHM Report: {self.jobNum}')
+
         print(e);  
         
     #TODO: can move into on excel file 

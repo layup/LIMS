@@ -18,14 +18,26 @@ from PyQt5.QtWidgets import (QFileDialog, QPushButton, QTableWidgetItem,
 from modules.utils.pickle_utils import load_pickle
 
     
-def icp_upload(filePath, db): 
+#TODO: make sure we can have a way to determine if we have a correct file
+#TODO: have status label that we successfully upload a file   
+def icp_upload(filePath, db, statusLabel): 
     logger.info('Entering icp_upload with filePath: {filePath}')
 
     logger.info('Scanning File... ')
+    
     if(filePath.endswith('.txt')):
-        icpMethod1(filePath, db)
+        try: 
+            icpMethod1(filePath, db)
+
+
+        except error as e: 
+            print(e)
+            
     elif(filePath.endswith('.xlsx')):
-        icpMethod2(filePath, db)
+        try: 
+            icpMethod2(filePath, db)
+        except error as e: 
+            print(e)
     else: 
         print("Not valid file type")
     return; 
@@ -33,14 +45,14 @@ def icp_upload(filePath, db):
 #TODO: sort by name  
 #read line by line and just add the line instead 
 #FIXME: tracking the icpData is wrong as well 
-#TODO: insert try catch block 
+
 def icpMethod1(filePath, db): 
-    logger.info('Entering icpMethod1 txt filetype detected')
+    logger.info('Entering icpMethod1 with parameters: filePath: {filePath}')
+    logger.info('Method 1: TXT filetype detected')
 
     file1 = open(filePath, 'r')
     baseName = os.path.basename(filePath)
     fname = baseName.split('.txt')[0]
-    #remove extension 
 
     logger.debug('FileName: ', fname)
     
@@ -166,7 +178,7 @@ def icpMethod1(filePath, db):
                 db.execute(sql, (key,jobNum,baseName, tempData, todayDate))
                 db.commit()
                 
-        return jobNumber,jobData
+        return jobNumber, jobData
     else: 
         return False; 
 
@@ -174,15 +186,16 @@ def icpMethod1(filePath, db):
 #scans thought all the text files and finds all the different sample types and the ISP and CHM files     
 #TODO: insert try catch block 
 def icpMethod2(filePath, db): 
-    logger.info('Entering icpMethod1 xlsx filetype detected')
+    logger.info('Entering icpMethod2 with parameters: filePath: {filePath}')
+    logger.info('Method 2: xlsx fileType detected')
+
     wb = openpyxl.load_workbook(filePath)
     sheets = wb.sheetnames 
     
     baseName = os.path.basename(filePath)
     fname = baseName.split('.xlsx')[0]
     
-    print('Method 2')
-    print('FileName: ', fname)
+    logger.debug('FileName: ', fname)
 
     newName = fname + '_formatted'  + '.xlsx'
     loadPath = load_pickle('data.pickle') 
@@ -239,6 +252,8 @@ def icpMethod2(filePath, db):
     # Format the machine data 
     formatMachineData(ws, selectedRows, elementColumns, newPath)
     
+    
+    #TODO: create a view label for when we upload this 
     return; 
 
 def formatMachineData(ws, selectedRows, elementColumns, newPath): 

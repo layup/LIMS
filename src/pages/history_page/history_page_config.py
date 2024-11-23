@@ -17,7 +17,7 @@ from pages.reports_page.create_report_page import createReportPage
 def historyPageSetup(self): 
     self.logger.info(f'Entering historyPageSetup ...')
     
-    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Date Created', 'Status', 'Action']
+    historyHeaders = ['Job Number', 'Report Type', 'Parameter', 'Dilution Factor', 'Creation Date', 'Status', 'Action']
     frontHistoryHeaders = ['Job Number', 'Client Name', 'Creation Date', 'Status']
 
     formatHistoryDatabaseTable(self.ui.reportsTable , historyHeaders)
@@ -37,6 +37,7 @@ def historyPageSetup(self):
     self.ui.reportsTable.doubleClicked.connect(lambda index: on_table_double_clicked(index))
     self.ui.reportsSearchBtn.clicked.connect(lambda: on_reportsSearchBtn_clicked(self)) 
     self.ui.reportsSearchLine.returnPressed.connect(lambda: on_reportsSearchBtn_clicked(self))
+    self.ui.createReportBtn.clicked.connect(lambda: self.change_index(1))
     
 
 def formatHistoryDatabaseTable(table, headers, tooltips=None): 
@@ -140,6 +141,12 @@ def loadReportsPage(self, searchValue=None):
         return None
 
     return results
+
+
+def actionButtons(): 
+    
+    pass;
+
 
 @pyqtSlot()
 def on_reportsSearchBtn_clicked(self): 
