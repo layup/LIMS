@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1328</width>
-    <height>892</height>
+    <width>1545</width>
+    <height>947</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,10 +23,6 @@
    <string notr="true">/******************************************************************
 /	Global QComboBox Style 
 /******************************************************************/
-
-#verticalLayout_16 {
-	background-color:red; 
-} 
 
 #QComboBox {
 	padding:2px;
@@ -124,7 +120,6 @@ QTabWidget {
 	border:none; 
 }
 
- 
 QTabWidget &gt; QWidget &gt; QWidget{
 	background-color: #363f4d; /* apply the background within tabs */ 
 	border-top: 1px solid #30333b; 
@@ -989,10 +984,7 @@ First Instacnce of QWidget within the stack
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">QPushButton {
-	font-size: 14px
-}
-</string>
+    <string notr="true"/>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
@@ -1135,7 +1127,7 @@ First Instacnce of QWidget within the stack
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="gsmsBtn2">
+        <widget class="QPushButton" name="chmBtn2">
          <property name="minimumSize">
           <size>
            <width>10</width>
@@ -1410,7 +1402,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="gsmsBtn1">
+           <widget class="QPushButton" name="chmBtn1">
             <property name="text">
              <string>CHM Tools </string>
             </property>
@@ -1430,7 +1422,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="settingBtn1">
+           <widget class="QPushButton" name="settingsBtn1">
             <property name="text">
              <string>Settings</string>
             </property>
@@ -1544,7 +1536,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1587,7 +1579,7 @@ margin: 0;
               <item>
                <widget class="QTabWidget" name="historyTabWidget">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="chemistyTab">
                  <attribute name="title">
@@ -1615,151 +1607,6 @@ margin: 0;
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QWidget" name="reportsHeaderWidget" native="true">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>50</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true"/>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_5">
-                       <property name="spacing">
-                        <number>0</number>
-                       </property>
-                       <property name="leftMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>5</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>5</number>
-                       </property>
-                       <item>
-                        <widget class="QWidget" name="widget_20" native="true">
-                         <property name="minimumSize">
-                          <size>
-                           <width>100</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <layout class="QHBoxLayout" name="horizontalLayout_14">
-                          <property name="leftMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="topMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="bottomMargin">
-                           <number>0</number>
-                          </property>
-                          <item>
-                           <widget class="QPushButton" name="createReportBtn">
-                            <property name="minimumSize">
-                             <size>
-                              <width>102</width>
-                              <height>22</height>
-                             </size>
-                            </property>
-                            <property name="text">
-                             <string>Create Report</string>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QWidget" name="reportsSearchWidget" native="true">
-                         <layout class="QHBoxLayout" name="horizontalLayout_11">
-                          <property name="spacing">
-                           <number>0</number>
-                          </property>
-                          <property name="leftMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="topMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="rightMargin">
-                           <number>30</number>
-                          </property>
-                          <property name="bottomMargin">
-                           <number>0</number>
-                          </property>
-                          <item>
-                           <widget class="QPushButton" name="reportsSearchBtn">
-                            <property name="minimumSize">
-                             <size>
-                              <width>101</width>
-                              <height>22</height>
-                             </size>
-                            </property>
-                            <property name="text">
-                             <string>Search</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLineEdit" name="reportsSearchLine">
-                            <property name="minimumSize">
-                             <size>
-                              <width>201</width>
-                              <height>22</height>
-                             </size>
-                            </property>
-                            <property name="text">
-                             <string/>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QWidget" name="reportsFilterWidget" native="true">
-                         <layout class="QHBoxLayout" name="horizontalLayout_54">
-                          <property name="leftMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="topMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="rightMargin">
-                           <number>0</number>
-                          </property>
-                          <property name="bottomMargin">
-                           <number>0</number>
-                          </property>
-                          <item>
-                           <widget class="QLabel" name="label_28">
-                            <property name="text">
-                             <string>Filter By</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QComboBox" name="reportsCombo"/>
-                          </item>
-                         </layout>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
                      <widget class="QWidget" name="reportsTableWidget" native="true">
                       <property name="styleSheet">
                        <string notr="true"/>
@@ -1780,6 +1627,79 @@ margin: 0;
                        <property name="bottomMargin">
                         <number>0</number>
                        </property>
+                       <item>
+                        <widget class="QWidget" name="reportsHeaderWidget" native="true">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>0</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>50</height>
+                          </size>
+                         </property>
+                         <property name="styleSheet">
+                          <string notr="true"/>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout_5">
+                          <property name="spacing">
+                           <number>0</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>0</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>0</number>
+                          </property>
+                          <item>
+                           <widget class="QWidget" name="widget_8" native="true">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>0</height>
+                             </size>
+                            </property>
+                            <layout class="QVBoxLayout" name="verticalLayout_8">
+                             <property name="leftMargin">
+                              <number>0</number>
+                             </property>
+                             <property name="topMargin">
+                              <number>5</number>
+                             </property>
+                             <property name="rightMargin">
+                              <number>0</number>
+                             </property>
+                             <property name="bottomMargin">
+                              <number>0</number>
+                             </property>
+                             <item>
+                              <widget class="QPushButton" name="createReportBtn">
+                               <property name="minimumSize">
+                                <size>
+                                 <width>102</width>
+                                 <height>22</height>
+                                </size>
+                               </property>
+                               <property name="text">
+                                <string>Create Report</string>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
                        <item>
                         <widget class="QTableWidget" name="reportsTable">
                          <property name="minimumSize">
@@ -1895,78 +1815,31 @@ margin: 0;
                  <attribute name="title">
                   <string>Front History</string>
                  </attribute>
-                 <layout class="QHBoxLayout" name="horizontalLayout_57">
+                 <layout class="QVBoxLayout" name="verticalLayout_13">
+                  <property name="leftMargin">
+                   <number>12</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>12</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
-                   <widget class="QWidget" name="widget_8" native="true">
-                    <layout class="QVBoxLayout" name="verticalLayout_45">
-                     <item>
-                      <widget class="QLabel" name="label_46">
+                   <layout class="QVBoxLayout" name="frontHistoryVerticalLayout">
+                    <item>
+                     <widget class="QTableWidget" name="frontHistoryTableWidget">
+                      <column>
                        <property name="text">
-                        <string>TextLabel</string>
+                        <string>test</string>
                        </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QTableWidget" name="frontDeskTable">
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <row>
-                        <property name="text">
-                         <string>New Row</string>
-                        </property>
-                       </row>
-                       <column>
-                        <property name="text">
-                         <string>New Column</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>New Column</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>New Column</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>New Column</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>New Column</string>
-                        </property>
-                       </column>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
+                      </column>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
                 </widget>
@@ -2345,9 +2218,7 @@ margin: 0;
                     </size>
                    </property>
                    <property name="font">
-                    <font>
-                     <pointsize>-1</pointsize>
-                    </font>
+                    <font/>
                    </property>
                    <property name="mouseTracking">
                     <bool>false</bool>
@@ -2465,87 +2336,6 @@ margin: 0;
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QWidget" name="icpSearchWidget" native="true">
-                      <property name="minimumSize">
-                       <size>
-                        <width>400</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_55">
-                       <property name="spacing">
-                        <number>0</number>
-                       </property>
-                       <property name="leftMargin">
-                        <number>20</number>
-                       </property>
-                       <property name="topMargin">
-                        <number>0</number>
-                       </property>
-                       <property name="rightMargin">
-                        <number>20</number>
-                       </property>
-                       <property name="bottomMargin">
-                        <number>0</number>
-                       </property>
-                       <item>
-                        <widget class="QPushButton" name="icpSearchBtn1">
-                         <property name="text">
-                          <string>Search</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QLineEdit" name="icpSearchLine1">
-                         <property name="minimumSize">
-                          <size>
-                           <width>201</width>
-                           <height>22</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="maxLength">
-                          <number>10</number>
-                         </property>
-                         <property name="placeholderText">
-                          <string>Search Job Number</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_60">
-                      <property name="text">
-                       <string>FILTER BY</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="filterComboBox">
-                      <property name="minimumSize">
-                       <size>
-                        <width>122</width>
-                        <height>26</height>
-                       </size>
-                      </property>
-                      <property name="currentText">
-                       <string>Filter_by</string>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>Filter_by</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -2630,7 +2420,7 @@ margin: 0;
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>350</width>
+                   <width>200</width>
                    <height>16777215</height>
                   </size>
                  </property>
@@ -2710,21 +2500,7 @@ margin: 0;
                       </widget>
                      </item>
                      <item>
-                      <widget class="QListWidget" name="definedElements">
-                       <property name="font">
-                        <font>
-                         <pointsize>13</pointsize>
-                        </font>
-                       </property>
-                       <property name="styleSheet">
-                        <string notr="true"/>
-                       </property>
-                       <item>
-                        <property name="text">
-                         <string>Aluminium</string>
-                        </property>
-                       </item>
-                      </widget>
+                      <widget class="QListWidget" name="definedElements"/>
                      </item>
                     </layout>
                    </widget>
@@ -2828,10 +2604,9 @@ margin: 0;
                       </widget>
                      </item>
                      <item row="0" column="0">
-                      <widget class="QLabel" name="icpElementNameHeader">
+                      <widget class="QLabel" name="icpElementNameHeader_2">
                        <property name="font">
                         <font>
-                         <pointsize>16</pointsize>
                          <weight>75</weight>
                          <bold>true</bold>
                         </font>
@@ -2965,16 +2740,15 @@ margin: 0;
                       </widget>
                      </item>
                      <item row="0" column="1">
-                      <widget class="QLabel" name="label_48">
+                      <widget class="QLabel" name="label_28">
                        <property name="font">
                         <font>
-                         <pointsize>13</pointsize>
                          <weight>75</weight>
                          <bold>true</bold>
                         </font>
                        </property>
                        <property name="text">
-                        <string> Defined Limits</string>
+                        <string>Defined Limits</string>
                        </property>
                       </widget>
                      </item>
@@ -3271,13 +3045,7 @@ margin: 0;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QListWidget" name="reportsList">
-                    <property name="font">
-                     <font>
-                      <pointsize>13</pointsize>
-                     </font>
-                    </property>
-                   </widget>
+                   <widget class="QListWidget" name="reportsList"/>
                   </item>
                  </layout>
                 </widget>
@@ -4684,13 +4452,12 @@ p, li { white-space: pre-wrap; }
                          <widget class="QLabel" name="chmTestsNameHeader">
                           <property name="font">
                            <font>
-                            <pointsize>15</pointsize>
                             <weight>75</weight>
                             <bold>true</bold>
                            </font>
                           </property>
                           <property name="text">
-                           <string>TESTS NAME</string>
+                           <string>TextLabel</string>
                           </property>
                          </widget>
                         </item>
@@ -5012,13 +4779,7 @@ p, li { white-space: pre-wrap; }
                       </widget>
                      </item>
                      <item>
-                      <widget class="QListWidget" name="chmReportList">
-                       <property name="font">
-                        <font>
-                         <pointsize>13</pointsize>
-                        </font>
-                       </property>
-                      </widget>
+                      <widget class="QListWidget" name="chmReportList"/>
                      </item>
                     </layout>
                    </widget>
@@ -5072,7 +4833,6 @@ p, li { white-space: pre-wrap; }
                          <widget class="QLabel" name="chmReportNameLabel">
                           <property name="font">
                            <font>
-                            <pointsize>16</pointsize>
                             <weight>75</weight>
                             <bold>true</bold>
                            </font>
@@ -5330,8 +5090,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1052</width>
-                       <height>571</height>
+                       <width>1269</width>
+                       <height>626</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5666,7 +5426,7 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolBox" name="toolBox">
                     <property name="currentIndex">
-                     <number>1</number>
+                     <number>0</number>
                     </property>
                     <widget class="QWidget" name="page_2">
                      <property name="geometry">
@@ -6131,6 +5891,9 @@ p, li { white-space: pre-wrap; }
                    <property name="text">
                     <string>W123456</string>
                    </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
                   </widget>
                  </item>
                  <item row="1" column="0">
@@ -6150,6 +5913,9 @@ p, li { white-space: pre-wrap; }
                   <widget class="QLabel" name="clientNameHeader">
                    <property name="text">
                     <string>Text Label</string>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                    </property>
                   </widget>
                  </item>
@@ -6207,6 +5973,9 @@ p, li { white-space: pre-wrap; }
                    <property name="text">
                     <string>textLabel</string>
                    </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
                   </widget>
                  </item>
                  <item row="2" column="0">
@@ -6226,6 +5995,9 @@ p, li { white-space: pre-wrap; }
                   <widget class="QLabel" name="parameterHeader">
                    <property name="text">
                     <string>TextLabel</string>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                    </property>
                   </widget>
                  </item>
@@ -6258,6 +6030,9 @@ p, li { white-space: pre-wrap; }
                    <property name="text">
                     <string>TextLabel</string>
                    </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
                   </widget>
                  </item>
                  <item row="1" column="0">
@@ -6277,6 +6052,9 @@ p, li { white-space: pre-wrap; }
                   <widget class="QLabel" name="factorHeader">
                    <property name="text">
                     <string>textLabel</string>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                    </property>
                   </widget>
                  </item>
@@ -6405,7 +6183,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -7255,6 +7033,16 @@ QWidget#dataEntryBody {
                   </item>
                  </layout>
                 </widget>
+                <widget class="QWidget" name="comments">
+                 <attribute name="title">
+                  <string>Comments</string>
+                 </attribute>
+                </widget>
+                <widget class="QWidget" name="preview">
+                 <attribute name="title">
+                  <string>Preview</string>
+                 </attribute>
+                </widget>
                </widget>
               </item>
               <item>
@@ -7347,18 +7135,27 @@ QPushButton::hover {
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>13</pointsize>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Calculate Hardness</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="updateDistilBtn">
-                      <property name="enabled">
-                       <bool>false</bool>
+                     <widget class="QPushButton" name="pushButton">
+                      <property name="font">
+                       <font>
+                        <pointsize>13</pointsize>
+                        <weight>50</weight>
+                        <bold>false</bold>
+                       </font>
                       </property>
                       <property name="text">
-                       <string>Recalc Distil Factor</string>
+                       <string>Reset Distillation</string>
                       </property>
                      </widget>
                     </item>
@@ -7424,7 +7221,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1328</width>
+     <width>1545</width>
      <height>22</height>
     </rect>
    </property>
@@ -7498,9 +7295,9 @@ QPushButton::hover {
    </hints>
   </connection>
   <connection>
-   <sender>gsmsBtn2</sender>
+   <sender>chmBtn2</sender>
    <signal>toggled(bool)</signal>
-   <receiver>gsmsBtn1</receiver>
+   <receiver>chmBtn1</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -7516,7 +7313,7 @@ QPushButton::hover {
   <connection>
    <sender>settingsBtn2</sender>
    <signal>toggled(bool)</signal>
-   <receiver>settingBtn1</receiver>
+   <receiver>settingsBtn1</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -7530,9 +7327,9 @@ QPushButton::hover {
    </hints>
   </connection>
   <connection>
-   <sender>gsmsBtn1</sender>
+   <sender>chmBtn1</sender>
    <signal>toggled(bool)</signal>
-   <receiver>gsmsBtn2</receiver>
+   <receiver>chmBtn2</receiver>
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -7546,7 +7343,7 @@ QPushButton::hover {
    </hints>
   </connection>
   <connection>
-   <sender>settingBtn1</sender>
+   <sender>settingsBtn1</sender>
    <signal>toggled(bool)</signal>
    <receiver>settingsBtn2</receiver>
    <slot>setChecked(bool)</slot>

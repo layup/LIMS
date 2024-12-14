@@ -49,7 +49,6 @@ def getTestsTextName(db, testNum):
         print(e)
         return None;
 
-
 #******************************************************************
 #    Table: chemTestsInfo
 #******************************************************************
@@ -147,14 +146,8 @@ def updateChmTestsData(db, sample_num, test_num, job_num, test_value, standard_v
     # Prepare the SQL UPDATE query
     sql_update_query = """
         UPDATE chemTestsData
-        SET
-            testValue = ?,        -- New value for testValue
-            standardValue = ?,    -- New value for standardValue
-            unitValue = ?         -- New value for unitValue (no comma here)
-        WHERE
-            sampleNum = ? AND
-            testNum = ? AND
-            jobNum = ?
+        SET testValue = ?, standardValue = ?,unitValue = ?
+        WHERE sampleNum = ? AND testNum = ? AND jobNum = ?
     """
 
      # Values to update
@@ -202,6 +195,7 @@ def deleteChmTestDataItem(db, sampleNum, testNum, jobNum):
 #******************************************************************
 #    Table: icpElements
 #******************************************************************
+
 
 #TODO: deal with it on the report side of things
 def getIcpElements(db):
@@ -598,3 +592,31 @@ def getFrontHistory(db):
 
     jobNumbers = db.fetchall()
     return  [item[0] for item in jobNumbers]
+
+
+class HistoryDatabaseManager:
+    pass;
+
+
+
+class TableManager:
+    def __init__(self, db_connection, table_name):
+        self.db = db_connection
+        self.table_name = table_name
+
+
+class IcpManager:
+    def __init__(self, db_connection):
+        pass;
+
+class IcpElementsManager:
+    pass;
+
+class IcpReportManger:
+    pass;
+
+class IcpLimitManager:
+    pass;
+
+class SettingsManager:
+    pass;

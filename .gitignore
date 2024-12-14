@@ -4,3 +4,4 @@
 #ignore build folders 
 build/
 dist/
+log/ 

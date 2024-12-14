@@ -7,6 +7,13 @@
 ICP_REPORT = 1
 CHM_REPORT = 2
 
+REPORTS = {
+    'ICP': 1,
+    'CHM': 2,
+    1: 'ICP',
+    2: 'CHM'
+}
+
 REPORTS_TYPE = ['','CHM','ICP']
 REPORT_NUM = {
     'ICP': 1,

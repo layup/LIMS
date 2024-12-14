@@ -18,6 +18,8 @@ class TableFooterWidget(QWidget):
 
         self.ui = loadUi(file_path, self)  # Pass 'self' as parent
 
+
+
     def load_data(self, current_page, limit, total_pages):
         self.current_page = current_page
         self.limit = limit
