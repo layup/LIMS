@@ -4,9 +4,9 @@ from base_logger import logger
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import  QHeaderView, QTableWidgetItem, QSpacerItem, QSizePolicy
 
-from pages.reports_page.chm.chm_report_items import chemReportSampleItem, chemReportTestItem
+from pages.reports_page.chm.chm_report_items import chmReportSampleItem, chmReportTestItem
 
-class ChemReportView(QObject):
+class ChmReportView(QObject):
 
     tableItemChangeEmit = pyqtSignal(QTableWidgetItem)
     createExcelEmit = pyqtSignal()
@@ -54,7 +54,7 @@ class ChemReportView(QObject):
     def update_table_tests(self, test_info):
         logger.info('Entering update_table_tests')
         for row, (key, current_test) in enumerate(test_info.items()):
-            if(isinstance(current_test, chemReportTestItem)):
+            if(isinstance(current_test, chmReportTestItem)):
                 logger.debug(f'row: {row} item: {current_test.__repr__()}')
                 self.add_table_item(row, 0, current_test.testName)
                 self.add_table_item(row, 1, current_test.textName)

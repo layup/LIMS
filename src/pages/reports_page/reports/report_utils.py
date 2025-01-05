@@ -7,10 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QT
 
 from modules.constants import REPORT_STATUS, REPORT_NAME
 from modules.dialogs.basic_dialogs import error_dialog
-from modules.dbFunctions import (
-    getAllAuthorNames, getJobStatus, updateJobStatus, getAuthorInfo, getParameterNum,
-    getChmReportFooter, getIcpReportFooter
-)
+from modules.dbFunctions import ( getJobStatus, updateJobStatus)
 from modules.widgets.SampleNameWidget import SampleNameWidget
 
 
@@ -18,38 +15,68 @@ from modules.widgets.SampleNameWidget import SampleNameWidget
 #   General Functions
 #******************************************************************
 
+def populate_author_dropdown(self):
+    logger.info('Entering populate_author_dropdown')
 
-
-
-def populateReportAuthorDropdowns(self):
-    #TODO: have some error checking and deal with the loading section
-    authorsList = [item[0] for item in getAllAuthorNames(self.tempDB)]
-    authorsList.insert(0, '')
-
+    # clear existing author info
     self.ui.authorOneDropDown.clear()
     self.ui.authorTwoDropDown.clear()
 
-    self.ui.authorOneDropDown.addItems(authorsList)
-    self.ui.authorTwoDropDown.addItems(authorsList)
+    # add blank nap place holders
+    self.ui.authorOneDropDown.addItem('')
+    self.ui.authorTwoDropDown.addItem('')
 
-def disconnect_all_slots(obj):
-    logger.info('Entering disconnect_all_slots')
-    while True:
-        try:
-            if(isinstance(obj, QPushButton)):
-                obj.clicked.disconnect()
-            if(isinstance(obj, QTableWidget)):
-                obj.itemChanged.disconnect()
-        except TypeError:
-            break
+    for author_id, author_info in self.authors_manager.get_authors().items():
+        full_name = author_info.full_name
+
+        self.ui.authorOneDropDown.addItem(full_name, author_id)
+        self.ui.authorTwoDropDown.addItem(full_name, author_id)
+
+#TODO: error handle if they are both the same name
+def get_selected_report_authors(self):
+    logger.info('Entering get_selected_report_authors')
+
+    authors = []
+
+    # get the current index
+    index_one = self.ui.authorOneDropDown.currentIndex()
+    index_two = self.ui.authorTwoDropDown.currentIndex()
+
+    if(index_one >= 1):
+        author_id_one = self.ui.authorOneDropDown.itemData(index_one)
+        author_info_one = self.authors_manager.get_author_info(author_id_one)
+
+        if(author_info_one):
+            authors.append(author_info_one)
+
+    if(index_two >= 1):
+        author_id_two = self.ui.authorTwoDropDown.itemData(index_two)
+        author_info_two = self.authors_manager.get_author_info(author_id_two)
+
+        if(author_info_two):
+            authors.append(author_info_two)
+
+    logger.info(f'authors: {authors}')
+
+    return authors
+
+def get_report_footer_comment(report_manager, param_id: int, report_type: int):
+    logger.info('Entering get_report_footer_comment')
+
+    footer_comment = report_manager.get_footer_message(param_id, report_type)
+
+    if(footer_comment):
+       return footer_comment.split('\n')
+
+    return ''
 
 def updateReport(statusWidget, database, jobNum, reportNum):
-    logger.info(f'Entering updateReport')
+    logger.info(f'Entering updateReport with jobNum: {jobNum}, reportNum: {reportNum}')
     try:
         jobStatus = getJobStatus(database, jobNum, reportNum)
         logger.debug(f'Checking current job status: : {jobStatus}')
 
-        if(jobStatus == 0):
+        if(jobStatus == 0 or jobStatus is None):
             completeJobStatusNum = 1
             logger.info("Preparing to update job status")
             updateJobStatus(database, jobNum, reportNum, completeJobStatusNum)
@@ -61,51 +88,12 @@ def updateReport(statusWidget, database, jobNum, reportNum):
         logger.error(f'Could not update Report Status for {(repr(jobNum))}')
         print(error)
 
-def retrieveAuthorInfo(self, authorName1, authorName2):
-    authorsInfo = []
-
-    if(authorName1 != ''):
-        authorInfo1 = getAuthorInfo(self.tempDB, authorName1)
-        self.logger.debug(f'authorInfo1: {authorInfo1}')
-        authorsInfo.append(authorInfo1)
-
-    if(authorName2 != ''):
-        authorInfo2 = getAuthorInfo(self.tempDB, authorName2)
-        self.logger.debug(f'authorInfo2: {authorInfo2}')
-        authorsInfo.append(authorInfo2)
-
-    return authorsInfo
-
-def retrieveFooterComment(self, reportType, paramType):
-
-    try:
-        paramNum = getParameterNum(self.tempDB, paramType)
-    except Exception as e:
-        print(e)
-        return ''
-
-    if(paramNum):
-        if(reportType == 'CHM'):
-            try:
-                footerComment = getChmReportFooter(self.tempDB, paramNum)
-
-                return footerComment.split('\n')
-            except Exception as e:
-                return ''
-
-        if(reportType == 'ICP'):
-            try:
-                footerComment = getIcpReportFooter(self.tempDB, paramNum)
-                return footerComment.split('\n')
-            except Exception as e:
-                return ''
 
 #******************************************************************
 #   Error Handling
 #******************************************************************
 def createExcelErrorCheck(self):
     self.logger.info('Entering createExcelErrorCheck')
-
 
     #
     try:
@@ -122,7 +110,6 @@ def createExcelErrorCheck(self):
     except Exception as e:
         print("Unexpected error:", e)
         return
-
 
     errorCheck = [0,0,0]
 
@@ -164,7 +151,6 @@ def excelErrorHandler(self, errorCheck):
         errorMsg += 'Please Enter a Client Name\n'
 
     error_dialog(errorTitle, errorMsg)
-
 
 
 #******************************************************************
@@ -254,76 +240,6 @@ def populateSamplesContainer(layout, sampleNames):
 def updateSampleNames(sampleNames, textChange, key):
     sampleNames[key] = textChange;
     print(f'Update Sample Name: {sampleNames}')
-
-#******************************************************************
-#   Client Info Functions
-#******************************************************************
-
-def loadClientInfo(self):
-    logger.info('Entering loadClientInfo')
-
-    # Set the header parameter
-    self.ui.jobNum.setText("W" + self.jobNum)
-    self.ui.clientNameHeader.setText(self.clientInfo['clientName'])
-    self.ui.parameterHeader.setText(self.parameter);
-    self.ui.reportTypeHeader.setText(self.reportType);
-
-    self.ui.factorHeader.setText(str(self.dilution))
-
-    # Set the client Info
-    self.ui.clientName_1.setText(self.clientInfo['clientName'])
-    self.ui.date_1.setText(self.clientInfo['date'])
-    self.ui.time_1.setText(self.clientInfo['time'])
-    self.ui.attention_1.setText(self.clientInfo['attn'])
-    self.ui.addy1_1.setText(self.clientInfo['addy1'])
-    self.ui.addy2_1.setText(self.clientInfo['addy2'])
-    self.ui.addy3_1.setText(self.clientInfo['addy3'])
-    self.ui.sampleType1_1.setText(self.clientInfo['sampleType1'])
-    self.ui.sampleType2_1.setText(self.clientInfo['sampleType2'])
-    self.ui.totalSamples_1.setText(self.clientInfo['totalSamples'])
-    self.ui.recvTemp_1.setText(self.clientInfo['recvTemp'])
-    self.ui.tel_1.setText(self.clientInfo['tel'])
-    self.ui.email_1.setText(self.clientInfo['email'])
-    self.ui.fax_1.setText(self.clientInfo['fax'])
-    self.ui.payment_1.setText(self.clientInfo['payment'])
-
-    logger.info('Populated loadClientInfo')
-
-
-def load_client_info(self, client_info=None):
-    logger.info("Entering load_client_info")
-
-    # Set the header parameters
-    self.ui.jobNum.setText(f"W{self.jobNum}")
-    self.ui.clientNameHeader.setText(self.clientInfo.get('clientName', ''))
-    self.ui.parameterHeader.setText(self.parameter)
-    self.ui.reportTypeHeader.setText(self.reportType)
-    self.ui.factorHeader.setText(str(self.dilution))
-
-    # Define a mapping of UI elements to client info fields
-    field_mapping = {
-        self.ui.clientName_1: "clientName",
-        self.ui.date_1: "date",
-        self.ui.time_1: "time",
-        self.ui.attention_1: "attn",
-        self.ui.addy1_1: "addy1",
-        self.ui.addy2_1: "addy2",
-        self.ui.addy3_1: "addy3",
-        self.ui.sampleType1_1: "sampleType1",
-        self.ui.sampleType2_1: "sampleType2",
-        self.ui.totalSamples_1: "totalSamples",
-        self.ui.recvTemp_1: "recvTemp",
-        self.ui.tel_1: "tel",
-        self.ui.email_1: "email",
-        self.ui.fax_1: "fax",
-        self.ui.payment_1: "payment",
-    }
-
-    # Populate client info fields
-    for widget, field in field_mapping.items():
-        widget.setText(self.clientInfo.get(field, ""))
-
-    logger.info("Populated Client")
 
 
 #******************************************************************

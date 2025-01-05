@@ -35,7 +35,7 @@ class DatabaseManager:
         self.connection.close()
 
     def execute(self, sql, params=None):
-        self.logger.debug(f"Executing SQL: {sql} with params: {params}")
+        #self.logger.debug(f"Executing SQL: {sql} with params: {params}")
         self.cursor.execute(sql, params or ())
 
     def fetchall(self):
@@ -45,7 +45,7 @@ class DatabaseManager:
         return self.cursor.fetchone()
 
     def query(self, sql, params=None):
-        self.logger.debug(f"Query SQL: {sql} with params: {params}")
+        #self.logger.debug(f"Query SQL: {sql} with params: {params}")
         self.cursor.execute(sql, params or ())
         return self.fetchall()
 

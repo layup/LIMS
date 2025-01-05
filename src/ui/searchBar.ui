@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>956</width>
-    <height>45</height>
+    <width>821</width>
+    <height>58</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -152,7 +152,20 @@ QComboBox::drop-down {
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="filters"/>
+    <widget class="QComboBox" name="filters">
+     <property name="minimumSize">
+      <size>
+       <width>122</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>22</height>
+      </size>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

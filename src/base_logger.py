@@ -1,5 +1,5 @@
 import logging
-from logging.handlers import RotatingFileHandler 
+from logging.handlers import RotatingFileHandler
 
 
 path = 'log/'
@@ -14,5 +14,5 @@ handler = RotatingFileHandler(f'{path}{fileName}', maxBytes=10*1024*1024, backup
 handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
 
-logger.info(f"Logging started with filename: {fileName}, level: {logger.level}")
+logger.warning(f"Logging started with filename: {fileName}, level: {logger.level}")
 

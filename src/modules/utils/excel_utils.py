@@ -164,7 +164,6 @@ def insertClientInfo(ws, clientInfo, column2):
 
     return ws
 
-
 def insertSampleName(ws, row, sampleSection, totalRows):
     logger.info(f'Entering insertSampleName with parameters: row: {row}, totalRows: {totalRows}, sampleSection: {sampleSection}')
     temp = ws.cell(row=row, column=1)

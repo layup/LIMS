@@ -2,6 +2,8 @@ import re
 
 from base_logger import logger
 
+from modules.utils.logic_utils import remove_control_characters
+
 def processClientInfo(jobNum, fileLocation):
     logger.info(f'Entering processClientInfo with jobNum: {jobNum}')
 
@@ -30,7 +32,7 @@ def processClientInfo(jobNum, fileLocation):
     testsSection = 37;
     totalPageCounter = 0;
 
-    if(fileLocation == None):
+    if(fileLocation is None):
         logger.info('Completed Processing Client Info returning info')
         logger.info(f'Client Information Dictionary: {clientInfoDict}')
         logger.info(f'Sample Names: {repr(sampleNames)}')
@@ -86,11 +88,12 @@ def processClientInfo(jobNum, fileLocation):
 
     #process type sampleTests
     for key,value in sampleTests.items():
-        testLists = [x.strip() for x in value.split(',')]
-        sampleTests[key] = testLists
+        #testLists = [x.strip() for x in value.split(',')]
 
-    logger.info('Exiting processClientInfo and returning')
-    logger.info(f'Client Information Dictionary: ')
+        # remove ASCII characters
+        testLists = [remove_control_characters(x.strip()) for x in value.split(',')]
+
+        sampleTests[key] = testLists
 
     for key, value in clientInfoDict.items():
         logger.info(f'*{key}: {repr(value)}')
@@ -100,6 +103,7 @@ def processClientInfo(jobNum, fileLocation):
     logger.info(f'*sampleTests: {sampleTests}')
 
     return clientInfoDict, sampleNames, sampleTests;
+
 
 
 def process_client_info_text(lineNumber, line, clientInfoDict):

@@ -5,13 +5,12 @@ from datetime import date
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import (QHBoxLayout, QMessageBox, QPushButton, QTreeWidgetItem, QWidget)
+from PyQt5.QtWidgets import (QHBoxLayout, QMessageBox, QPushButton, QTreeWidgetItem, QWidget, QComboBox)
 
 from base_logger import logger
 from modules.constants import CHM_REPORT, MED_COL, SMALL_COL
 from modules.dialogs.basic_dialogs import save_or_cancel_dialog
-from modules.dbFunctions import (addChmTestData, checkChmTestsExist,deleteChmTestDataItem, getChmTestData,updateChmTestsData)
-from modules.utils.chm_utils import (getParameterAndUnitTypes,getParameterTypeNum, parameterItem)
+from modules.dbFunctions import (addChmTestData, checkChmTestsExist,deleteChmTestDataItem, getChmTestData, updateChmTestsData)
 from modules.utils.logic_utils import is_real_number
 from modules.dialogs.basic_dialogs import yes_or_no_dialog, error_dialog
 from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
@@ -24,24 +23,22 @@ from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 #TODO: duplication error
 #TODO: center all of the table items
 def chm_input_tab_setup(self):
-    self.logger.info(f'Entering chmInputSectionSetup')
+    self.logger.info(f'Entering chm_input_tab_setup')
 
-    sideEditSetup(self)
+    side_edit_setup(self)
+    new_entry_section_setup(self)
 
     clear_all_input_sections(self, True)
-
     format_line_edits(self)
     format_recently_added_tree(self.ui.inputDataTree)
 
-    populateNewEntry(self)
-
-    # Input Data Page Signals
+    # Signals
     self.ui.chmProceedBtn.clicked.connect(lambda: on_chmProceedBtn_clicked(self))
-    self.ui.chmInputClearBtn.clicked.connect(lambda: on_chmClearBtn_clicked(self))
+    self.ui.chmInputClearBtn.clicked.connect(lambda: clear_all_input_sections(self, False))
     self.ui.chmAddTestsBtn.clicked.connect(lambda:on_chmSampleDataAdd_clicked(self))
 
-def sideEditSetup(self):
-    # Side Edit Widget Setup
+def side_edit_setup(self):
+    logger.info('Entering side_edit_setup')
 
     # Get the list of parameters and allowed unit types
     self.ui.sideEditWidget1 = SideEditWidget()
@@ -49,13 +46,35 @@ def sideEditSetup(self):
     self.ui.sideEditLayout.addWidget(self.ui.sideEditWidget1) #only valid for layouts
     self.ui.sideEditWidget1.setVisible(False)
 
-    parameterType, unitType = getParameterAndUnitTypes(self.tempDB)
-    self.ui.sideEditWidget1.set_drop_down(parameterType, unitType)
+    test_names = self.tests_manager.get_test_by_type('C')
+    unit_names = self.units_manager.get_unit_names()
+
+    self.ui.sideEditWidget1.set_drop_down(test_names, unit_names)
     self.ui.sideEditWidget1.set_combo_disabled(True)
 
-    #self.ui.sideEditWidget1.cancel_clicked.connect(lambda: sideEditCancelBtnClicked(self))
+    # Signals
     self.ui.sideEditWidget1.cancelBtn.clicked.connect(lambda: hideSideEditWidget(self.ui.sideEditWidget1))
     self.ui.sideEditWidget1.save_clicked.connect(lambda tests_info, tree_item: sideEditSaveBtnClicked(self, tests_info, tree_item))
+
+def new_entry_section_setup(self):
+    self.logger.info('Entering populate_new_entry_section')
+
+    # remove all existing tests from the database
+    self.ui.gcmsTests.clear()
+    self.ui.gcmsUnitVal.clear()
+
+    # add empty front place holders
+    self.ui.gcmsTests.addItem('')
+    self.ui.gcmsUnitVal.addItem('')
+
+    test_names = self.tests_manager.get_test_by_type('C')
+    unit_names = self.units_manager.get_unit_names()
+
+    # add the rest of the list items
+    self.ui.gcmsUnitVal.addItems(unit_names)
+
+    for item in test_names:
+        self.ui.gcmsTests.addItem(item.test_name, userData=item.test_id)
 
 
 ###################################################################
@@ -75,9 +94,9 @@ def on_chmProceedBtn_clicked(self):
 
     errorCheckList = [0,0,0]
 
-    errorCheckList[0] = 0 if (standards != '' and is_real_number(standards)) else 1;
-    errorCheckList[1] = 0 if units != '' else 1;
-    errorCheckList[2] = 0 if testName != '' else 1;
+    errorCheckList[0] = 0 if (standards != '' and is_real_number(standards)) else 1
+    errorCheckList[1] = 0 if units != '' else 1
+    errorCheckList[2] = 0 if testName != '' else 1
 
     if(sum(errorCheckList) == 0):
         enable_enter_values_section(self, True)
@@ -88,17 +107,15 @@ def on_chmProceedBtn_clicked(self):
         NewEntryErrorDisplay(self, errorCheckList)
 
 
-def on_chmClearBtn_clicked(self):
-    clear_all_input_sections(self, False)
-
-
 @pyqtSlot()
 def on_chmSampleDataAdd_clicked(self):
     self.logger.info('Entering on_chmSampleDataAdd_clicked ')
 
     standards, units, testName = get_current_entry_values(self)
     jobNum, sampleNum, sampleVal = get_current_entered_values(self)
-    testNum = getParameterTypeNum(self.ui.gcmsTests)
+
+    index = self.ui.gcmsTests.currentIndex()
+    testNum = self.ui.gcmsTests.itemData(index, role=Qt.UserRole)
 
     edit_data = [jobNum, sampleNum, testName, sampleVal, units];
 
@@ -112,7 +129,6 @@ def on_chmSampleDataAdd_clicked(self):
 
     #FIXME: problem arises if reading something to an existing list we can't then delete it afterwords
     if(sum(errorCheckList) == 0):
-        inputTree = self.ui.inputDataTree #remove this bs
         todaysDate = date.today()
 
         existingDataCheck = checkChmTestsExist(self.tempDB, sampleNum, testNum, jobNum)
@@ -120,24 +136,23 @@ def on_chmSampleDataAdd_clicked(self):
         if(existingDataCheck):
             title = 'Duplicate Sample'
             duplicate_msg = f"Would you like to overwrite existing sample {jobNum}-{sampleNum}"
-
             response = yes_or_no_dialog(title, duplicate_msg)
 
             if(response):
                 addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
 
-                matchingItem = checkMatchingTreeItems(inputTree, sampleNum)
+                matchingItem = checkMatchingTreeItems(self.ui.inputDataTree, sampleNum)
+
                 if not matchingItem:
-                    addInputTreeItem(self, inputTree, sampleNum, testName, sampleVal, units, standards, jobNum)
+                    add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, jobNum)
 
                 clear_samples_input(self)
-
-            if(response == False):
+            else:
                 clear_samples_input(self)
 
         else:
             addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
-            addInputTreeItem(self, inputTree, sampleNum, testName, sampleVal, units, standards, jobNum)
+            add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, jobNum)
             clear_samples_input(self)
     else:
         self.logger.error(f'errorCheckList: {errorCheckList}')
@@ -170,16 +185,13 @@ def save_error_handling(self, new_data, item):
     new_unitType = new_data[4]
     new_standard = new_data[5]
 
-    print(new_data)
-    print(f'{old_jobNum}, {old_sampleNum}')
-
     testNum = new_data[6]
-    todaysDate = date.today()
+    #todaysDate = date.today()
 
     old_jobName = old_jobNum + '-' + old_sampleNum
     new_jobName = new_data[0] + '-' + new_data[1]
 
-    print(f'Old JobNum: {old_jobName}, new_jobName: {new_jobName}')
+    logger.info(f'Old JobNum: {old_jobName}, new_jobName: {new_jobName}')
 
     #TODO: problem what if that data already exists in the table
     if(old_jobNum != new_jobNum or old_sampleNum != new_sampleNum):
@@ -233,32 +245,6 @@ def save_error_handling(self, new_data, item):
             for col in enumerate(new_data):
                 item.setText(col, new_data[col])
 
-
-
-
-
-def populateNewEntry(self):
-    self.logger.info('Entering populateNewEntry')
-
-    # Clear all the items in the QComboboxes
-    self.ui.gcmsTests.clear()
-    self.ui.gcmsUnitVal.clear()
-
-    clear_active_values_section(self)
-
-    parameterTypes, unitTypes = getParameterAndUnitTypes(self.tempDB)
-    parameterTypes.insert(0, '')
-    unitTypes.insert(0, '')
-
-    for item in parameterTypes:
-        if isinstance(item, parameterItem):
-            self.ui.gcmsTests.addItem(item.testName, userData=item)
-        else:
-            self.ui.gcmsTests.addItem('')
-
-    self.ui.gcmsUnitVal.addItems(unitTypes)
-
-
 def NewEntryErrorDisplay(self, errorCheckList):
     errorTitle = 'Cannot Proceed with CHM Process'
     errorMsg = ''
@@ -271,7 +257,6 @@ def NewEntryErrorDisplay(self, errorCheckList):
         errorMsg += 'Please Select a Tests\n'
 
     error_dialog(errorTitle, errorMsg)
-
 
 def addingSampleDataErrorDisplay(self, errorList):
 
@@ -381,10 +366,12 @@ def clear_all_input_sections(self, clearTable=False):
 #  Action Function and Classes
 #******************************************************************
 
-def addInputTreeItem(self, treeWidget, sampleNum, testName, sampleVal, units, standards, jobNum):
-    logger.info('Entering addInputTreeItem')
+def add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, jobNum):
+    logger.info('Entering add_input_tree_item')
 
-    topItem = QTreeWidgetItem(treeWidget)
+    tree_widget = self.ui.inputDataTree
+
+    topItem = QTreeWidgetItem(tree_widget)
 
     topItem.setText(0, jobNum)
     topItem.setText(1, sampleNum)
@@ -398,30 +385,28 @@ def addInputTreeItem(self, treeWidget, sampleNum, testName, sampleVal, units, st
     topItem.setTextAlignment(4, Qt.AlignCenter)
     topItem.setTextAlignment(5, Qt.AlignCenter)
 
-    row_index = treeWidget.indexOfTopLevelItem(topItem)
+    row_index = tree_widget.indexOfTopLevelItem(topItem)
 
     actionWidget = TreeActionWidget(row_index, topItem)
-    actionWidget.edit_clicked.connect(lambda tree_item: editTreeRowClicked(self, tree_item));
-    actionWidget.delete_clicked.connect(lambda tree_item: deleteTreeRowClicked(self, tree_item))
+    actionWidget.edit_clicked.connect(lambda tree_item: handle_edit_clicked(self, tree_item));
+    actionWidget.delete_clicked.connect(lambda tree_item: handle_delete_clicked(self, tree_item))
 
-    treeWidget.setItemWidget(topItem, 6, actionWidget)
+    tree_widget.setItemWidget(topItem, 6, actionWidget)
 
+def handle_edit_clicked(self, item):
 
-def editTreeRowClicked(self, item):
     row_index = self.ui.inputDataTree.indexOfTopLevelItem(item)
+    data = [item.text(i) for i in range(6)]
 
     self.logger.debug(f"Edit clicked for row: {row_index}")
-
-    data = [item.text(i) for i in range(6)]
     self.logger.debug(f'Current Tree Item: {data}')
 
     self.ui.sideEditWidget1.setVisible(True)
-    # Set the data
     self.ui.sideEditWidget1.set_data(data)
     self.ui.sideEditWidget1.set_item(item)
 
 
-def deleteTreeRowClicked(self, item):
+def handle_delete_clicked(self, item):
     row_index = self.ui.inputDataTree.indexOfTopLevelItem(item)
 
     self.logger.debug(f"Delete clicked for row: {row_index}")
@@ -442,7 +427,6 @@ def deleteTreeRowClicked(self, item):
         self.ui.inputDataTree.takeTopLevelItem(row_index)
 
         # Delete Item from database
-
 
 # TODO: might have to move this into other functions so I can read it better lol
 class TreeActionWidget(QWidget):

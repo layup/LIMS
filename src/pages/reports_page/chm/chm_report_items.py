@@ -1,6 +1,6 @@
 from base_logger import logger
 
-class chemReportTestItem:
+class chmReportTestItem:
     def __init__(self, testNum=None, testName=None, textName=None, displayName=None, unitType=None, recovery=None):
         self.testNum = testNum
         self.testName = testName
@@ -18,7 +18,7 @@ class chemReportTestItem:
                 f"unitType={self.unitType!r}),"
                 f"recovery={self.recovery!r})")
 
-class chemReportSampleItem:
+class chmReportSampleItem:
     def __init__(self, jobNum, sampleNum, sampleName):
         self.jobNum = jobNum
         self.sampleNum = sampleNum

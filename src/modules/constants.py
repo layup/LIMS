@@ -57,27 +57,6 @@ LARGE_COL = 340
 
 TREE_ROW_HEIGHT     = 20
 
-
-SAMPLETYPES = [
-    '1um wound fiter',
-    'sediment',
-    'agar plates',
-    'clams',
-    'compost',
-    'drinking water',
-    'effluent',
-    'filters(s)',
-    'fish',
-    'food',
-    'ore',
-    'other',
-    'paint',
-    'saltwater',
-    'soil',
-    'swab',
-    'water',
-]
-
 FILTER_BY = [
     'Sample Number',
     'JobNunmber',

@@ -9,17 +9,21 @@ class IcpReportView(QObject):
 
     tableItemChangeEmit = pyqtSignal(QTableWidgetItem)
 
-    def __init__(self,  table):
+    hardnessBtnClicked = pyqtSignal()
+    reloadBtnClicked = pyqtSignal()
+
+    def __init__(self,  table, reload_btn, hardness_btn):
         super().__init__()
 
         self.table = table
 
-        self.reset_btn = None
-        self.calculate_dilution = None
-        self.calculate_hardness = None
+        self.reload_btn = reload_btn
+        self.hardness_btn = hardness_btn
 
         self.samples_start = 6
 
+        self.reload_btn.clicked.connect(self.reloadBtnClicked.emit)
+        self.hardness_btn.clicked.connect(self.hardnessBtnClicked.emit)
         self.table.itemChanged.connect(self.item_changed_handler)
 
     def item_changed_handler(self, item):
@@ -155,10 +159,9 @@ class IcpReportView(QObject):
 
                     hardness_row = self.table.rowCount() - 2
 
-                    if(sample_hardness != ''):
-                        self.add_table_item(hardness_row, col_index, sample_hardness)
-                    else:
-                        self.add_table_item(hardness_row, col_index, 'HARD')
+                    self.add_table_item(hardness_row, col_index, sample_hardness)
+
+
 
 def is_string_int(value):
     """Check if the string can be converted to an integer."""

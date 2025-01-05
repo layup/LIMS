@@ -123,7 +123,7 @@ def get_chem_tests_count(db):
     return results[0][0]
 
 def get_tests_name(db, test_id):
-    logger.info('Entering get_tests_name')
+
     query = '''
         SELECT testName
         FROM Tests

@@ -3,7 +3,6 @@ import json
 from base_logger import logger
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
-from modules.dbFunctions import getIcpElementsList, getIcpLimitResults
 from modules.utils.logic_utils import is_float
 
 from pages.reports_page.icp.icp_report_items import IcpReportSampleItem, IcpReportElementsItem
@@ -18,13 +17,14 @@ from pages.reports_page.icp.icp_report_items import IcpReportSampleItem, IcpRepo
 
 class IcpReportModel(QObject):
 
-    def __init__(self,  db, jobNum, paramNum, dilution, sample_names):
+    def __init__(self,  db, jobNum, paramNum, dilution, elements_manager, sample_names):
         super().__init__()
         self.db = db
         self.jobNum = jobNum
         self.paramNum = paramNum
         self.dilution = dilution
         self.sample_names = sample_names
+        self.elements_manager = elements_manager
 
         # element_symbol = element_num
         self.symbol_num = {}
@@ -33,44 +33,42 @@ class IcpReportModel(QObject):
         self.elements_info = {}
         self.samples = {}
 
+
     def get_element_nums(self):
         return self.elements_info.keys()
 
     def init_elements(self):
         logger.info('Entering get_elements_info')
 
-        #TODO: work on the joining two tables
-        # get the basic elements info such as their name, num, symbols
-        elements = getIcpElementsList(self.db)
-        elements_limits = getIcpLimitResults(self.db, self.paramNum)
+        for element_id, element in  self.elements_manager.get_elements().items():
 
-        # create the basic element items (name, num, symbol)
-        for element in elements:
-            element_num = element[0]
-            element_name = element[1]
-            element_symbol = element[2]
+            #element_id = element.element_id
+            element_name = element.name
+            element_symbol = element.symbol
 
-            self.elements_info[element_num] = IcpReportElementsItem(element_name, element_num, element_symbol)
-            self.symbol_num[element_symbol] = element_num
+            self.elements_info[element_id] = IcpReportElementsItem(element_name, element_id, element_symbol)
+            self.symbol_num[element_symbol] = element_id
 
             # define the placement of the item
             self.element_row_nums.append(element_symbol)
 
-        # load in data about the elements for specific parameter number
-        if(elements_limits):
-            for element_num, limits in elements_limits.items():
-                unit_type = limits[0]
-                upper_limit = limits[1]
-                lower_limit = limits[2]
-                side_comment = limits[3]
+            # load in data about the elements for specific parameter number
+            limit_item = self.elements_manager.get_limits_item(element_id, self.paramNum)
 
-                if(element_num in self.elements_info):
-                    self.elements_info[element_num].add_limits(unit_type, lower_limit, upper_limit, side_comment)
+            if(limit_item):
+                lower_limit = limit_item.lower_limit
+                upper_limit = limit_item.upper_limit
+                unit_type = limit_item.unit
+                side_comment = limit_item.side_comment
+
+                self.elements_info[element_id].add_limits(unit_type, lower_limit, upper_limit, side_comment)
+
 
     def export_elements_info(self):
         logger.info('Entering export_elements_info')
 
         element_names = []
+        element_symbols = []
         element_limits_info = []
         element_units = []
 
@@ -78,6 +76,7 @@ class IcpReportModel(QObject):
 
         for element_num, element_item in self.elements_info.items():
             element_name = element_item.element_name
+            element_symbol = element_item.element_symbol
             lower_limit = element_item.lower_limit
             upper_limit = element_item.upper_limit
             side_comment = element_item.comment
@@ -86,21 +85,30 @@ class IcpReportModel(QObject):
             element_names.append(element_name)
             element_limits_info.append([element_name, lower_limit, upper_limit, side_comment, unit])
             element_units.append(unit)
+            element_symbols.append(element_symbol)
             #element_limits[element_num] = [element_item.unit_type, element_item.upper_limit, element_item.lower_limit, element_item.side_comment]
 
-        return element_names, element_limits_info, element_units
+        return element_names, element_symbols, element_limits_info, element_units
 
-    def export_sample_data(self):
+    def export_samples_data(self, row_count):
         logger.info('Entering export_sample_data')
 
-        print(self.symbol_num)
-        print(self.element_row_nums)
+        export_list = {}
 
-        sample_data = {}
+        for sample_name, sample_info in self.samples.items():
+            sample_data = sample_info.get_data()
 
-        for sample_name, sample_item in self.samples.items():
-            pass;
+            export_sample_data = []
 
+            for row in range(row_count):
+                if(row in sample_data):
+                    export_sample_data.append(sample_data[row])
+                else:
+                    export_sample_data.append('ND')
+
+            export_list[sample_name] = export_sample_data
+
+        return export_list
 
     def init_samples(self):
         logger.info('Entering init_samples')
@@ -113,6 +121,7 @@ class IcpReportModel(QObject):
 
     def load_samples_data(self):
         logger.info('Entering load_samples_data')
+        logger.debug(self.symbol_num)
 
         # retrieve machine data from database
         machine_data = get_machine_data(self.db, self.jobNum)
@@ -136,7 +145,7 @@ class IcpReportModel(QObject):
                         self.samples[sample_name].add_data(row, diluted_value)
 
                     else:
-                        logger.error(f'{element_name} not in self.symbol_num')
+                        logger.error(f'{element_name.lower()} not in self.symbol_num')
             else:
                 logger.error(f'{sample_name} not in self.samples')
 
@@ -145,9 +154,15 @@ class IcpReportModel(QObject):
     def calculate_sample_hardness(self):
         logger.info('Entering calculate_sample_hardness')
 
+        logger.debug(self.symbol_num)
+        logger.debug(self.element_row_nums)
+
         for sample_name, sample_item in self.samples.items():
-            calcium_row = self.symbol_num['ca']
-            magnesium_row = self.symbol_num['mg']
+            #calcium_row = self.symbol_num['ca']
+            #magnesium_row = self.symbol_num['mg']
+
+            calcium_row = self.element_row_nums.index('ca')
+            magnesium_row = self.element_row_nums.index('mg')
 
             logger.debug(f'calcium_row: {calcium_row}, magnesium_row: {magnesium_row}')
 
@@ -156,7 +171,9 @@ class IcpReportModel(QObject):
                 magnesium_value = sample_item.data[magnesium_row]
 
                 sample_item.hardness = calculate_hardness(calcium_value, magnesium_value)
+                print(sample_item.hardness)
             else:
+                sample_item.hardness = 'Uncal'
                 logger.info(f"{sample_name} doesn't have the ca or mg element defined")
 
         return self.samples
@@ -175,12 +192,20 @@ class IcpReportModel(QObject):
                 return value
 
 def calculate_hardness(calcium, magnesium):
+    logger.info(f'Entering calculate_hardness with calcium: {calcium}, magnesium: {magnesium}')
 
-    # don't need to multiply it by the dilution since we done it the previous step, but we get a more accurate value when calculate it after
-    calcium = float(calcium)
-    magnesium = float(magnesium)
+    try:
+        # don't need to multiply it by the dilution since we done it the previous step, but we get a more accurate value when calculate it after
+        calcium = float(calcium)
+        magnesium = float(magnesium)
 
-    return round(calcium * 2.497 + calcium * 4.11, 1)
+        total = (calcium * 2.497) + (magnesium * 4.118)
+        logger.info(f'total: {total}')
+
+        return round(total, 1)
+    except Exception as e:
+
+        return 'Uncal'
 
 def get_machine_data(db, jobNum):
     try:

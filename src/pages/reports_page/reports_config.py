@@ -6,46 +6,19 @@ from base_logger import logger
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 from modules.constants import REPORTS_TYPE, REPORT_NUM, REPORT_STATUS
-from modules.dbFunctions import getReportNum, checkJobExists, addNewJob, updateJob, getJobStatus,getAllParameters
+from modules.dbFunctions import checkJobExists, addNewJob, updateJob, getJobStatus
 from modules.dialogs.basic_dialogs import okay_dialog, error_dialog, yes_no_cancel_dialog
+from modules.dialogs.create_report import CreateReport
 from modules.utils.text_utils import processClientInfo
 from modules.utils.file_utils import scanForTXTFolders
 
-from pages.reports_page.reports.report_utils import clearDataTable, populateReportAuthorDropdowns, clearLayout
-from pages.reports_page.reports.create_icp_report import icpReportLoader
+from pages.reports_page.reports.report_utils import clearDataTable, populate_author_dropdown, clearLayout
+#from pages.reports_page.reports.create_icp_report import icpReportLoader
 from pages.reports_page.chm.chm_report_setup import chm_report_setup
 from pages.reports_page.icp.icp_report_setup import icp_report_setup
 
 #FIXME: should defs be storing everything as testNums instead of testNames
 #FIXME: jobs: parameter: store as parameterNum
-
-'''
-    1. refactor the database so everything is code based and have more union joins
-    2. put all of my database functions into classes for easier calls
-    3. refactors global variables into classes
-'''
-
-
-'''
-    new database classes
-    Front
-        - front history
-    Settings
-        - authors
-        - parameters
-        - test
-        - settings info
-    Jobs
-        - history
-    ICP
-        - elements
-        - limits
-        - reports
-        - machine info
-    CHM
-        - entered test info
-        - machine info
-'''
 
 
 ###################################################################
@@ -56,8 +29,10 @@ from pages.reports_page.icp.icp_report_setup import icp_report_setup
 def general_reports_setup(self):
     logger.info('Entering general_reports_setup')
 
+    self.create_report = CreateReport(self.parameters_manager)
+    self.create_report.process_data.connect(lambda data: handle_create_new_job(self, data))
+
     create_report_page_setup(self)
-    reports_page_setup(self)
 
 def create_report_page_setup(self):
     logger.info('Entering create_report_page_setup')
@@ -87,17 +62,86 @@ def create_report_page_setup(self):
     for reportName, reportNum in report_type.items():
         self.ui.reportType.addItem(reportName, reportNum)
 
-    paramResults = sorted(getAllParameters(self.tempDB))
     self.ui.paramType.addItem('', None)
-
-    for paramNum, paramName in paramResults:
-        self.ui.paramType.addItem(paramName, paramNum)
+    for param_id, param_item in self.parameters_manager.get_params():
+        self.ui.paramType.addItem(param_item.param_name, param_id)
 
     # Connect signals
     self.ui.NextSection.clicked.connect(lambda: create_new_job(self))
 
-def reports_page_setup(self):
-    pass;
+def handle_create_new_job(self, data):
+    logger.info(f'Entering handle_create_new_job with data: {data}')
+
+    jobNum, report_id, param_id, dilution = data
+
+    dilution = 1 if (dilution == '' or dilution is None) else dilution
+
+    # scan for file path in the folder
+    text_file_path = scanForTXTFolders(jobNum)
+
+    # Error checking section
+    error_checks = validate_report_inputs(jobNum, report_id, param_id, text_file_path)
+
+    if(sum(error_checks) == 0):
+        logger.info('Error Checks Passed')
+
+        currentDate = date.today()
+        currentStatus = 0
+
+        self.jobNum = jobNum
+        #TODO: fix this
+        self.reportType = 'TEMP'
+        self.parameter = param_id
+        self.dilution = dilution
+        self.reportNum =report_id
+
+        job_exists_check = checkJobExists(self.tempDB, jobNum, self.reportNum)
+
+        # process the .txt file and get the necessary information
+        # TODO: need to have these in self since i've build so much of the excel on that
+        self.clientInfo, self.sampleNames, self.sampleTests = processClientInfo(jobNum, text_file_path)
+
+        if(job_exists_check is None):
+            logger.info('Job does not exist')
+
+            # create new job entry into the database
+            addNewJob(self.tempDB, jobNum, self.reportNum, param_id, dilution, currentStatus, currentDate)
+        else:
+            logger.info('Job does exist')
+
+            title = f'Report {jobNum} Already Exists'
+            message = 'Would you like to load existing report or overwrite report?'
+            overwrite_status = yes_no_cancel_dialog(title, message)
+
+            if(not overwrite_status):
+                return
+
+            #TODO: maybe watch for what No does
+            if(overwrite_status == 'Cancel' or overwrite_status == 'No'):
+                return
+
+            # update the job entry database section
+            updateJob(self.tempDB, jobNum, self.reportNum, param_id, dilution, currentStatus, currentDate)
+
+            # load in the status of not generated
+            self.ui.statusHeaderLabel.setText(REPORT_STATUS[currentStatus])
+
+        try:
+            # Prepare the layout based on if it is ICP or CHM Report
+            prepare_report_layout_config(self, self.reportNum, text_file_path)
+
+        except Exception as error:
+            logger.error(error)
+            error_dialog('Error Creating Report', f'Could not create report {self.jobNum}')
+            print(error)
+            return
+
+        # Switch the index of items
+        self.ui.reportsTab.setCurrentIndex(0)
+        self.ui.stackedWidget.setCurrentIndex(5)
+
+    else:
+        report_error_handler(error_checks)
 
 
 def create_new_job(self):
@@ -150,7 +194,7 @@ def create_new_job(self):
             message = 'Would you like to load existing report or overwrite report?'
             overwrite_status = yes_no_cancel_dialog(title, message)
 
-            if(overwrite_status != True):
+            if(not overwrite_status):
                 return
 
             #TODO: maybe watch for what No does
@@ -164,7 +208,6 @@ def create_new_job(self):
             self.ui.statusHeaderLabel.setText(REPORT_STATUS[currentStatus])
 
         try:
-
             # Prepare the layout based on if it is ICP or CHM Report
             prepare_report_layout_config(self, self.reportNum, text_file_path)
 
@@ -223,6 +266,7 @@ def open_existing_job(self, existing_data):
             try:
                 self.ui.statusHeaderLabel.setText(REPORT_STATUS[job_status])
             except Exception as error:
+                logger.error(error)
                 self.ui.statusHeaderLabel.setText(job_status)
 
             # Prepare to load the data for either CHM or ICP report
@@ -253,13 +297,13 @@ def prepare_report_layout_config(self, reportNum, filePath):
     load_client_text_file(self, filePath)
 
     # Populate drop down authors
-    populateReportAuthorDropdowns(self)
+    populate_author_dropdown(self)
 
     # clear the layout, clear the table, clear the widget samples
     clearDataTable(self.ui.dataTable)
+
     clearLayout(self.ui.samplesContainerLayout_2)
 
-    #TODO: disconnect the signals
 
     #TODO: could move all of the btns into their own thing
     if(reportNum == 1):
@@ -272,8 +316,11 @@ def prepare_report_layout_config(self, reportNum, filePath):
         self.ui.createChmReportBtn.setVisible(False)
         self.ui.icpDataField.show()
 
+        #TODO: clean this up a bit better
+        sampleTests, sampleNames = process_icp_tests_names(self)
+
         #icpReportLoader(self)
-        icp_report_setup(self)
+        icp_report_setup(self, sampleTests, sampleNames)
 
     if(reportNum == 2):
         logger.info('Preparing CHM report Configuration')
@@ -288,6 +335,31 @@ def prepare_report_layout_config(self, reportNum, filePath):
         # load in all the necessary information before switching pages
         chm_report_setup(self)
 
+def process_icp_tests_names(self):
+    logger.info('Entering process_icp_tests_names')
+
+    approved = {}
+
+    element_symbols = self.elements_manager.get_element_symbols()
+
+    for sample_name, tests in self.sampleTests.items():
+        icp_tests = []
+
+        for test in tests:
+            # Check if item has icp or contained within element_symbols
+            if('icp' in test.lower() or test.lower() in element_symbols):
+                icp_tests.append(test)
+
+        if(len(icp_tests) > 0):
+            approved[sample_name] = icp_tests
+            logger.info(f'{sample_name}, {icp_tests}')
+
+    new_names_list = {key: self.sampleNames[key] for key in self.sampleNames if key in approved}
+
+    for key, value in new_names_list.items():
+        logger.info(f'{key}, {value}')
+
+    return approved, new_names_list
 
 ###################################################################
 #    Error Handling
@@ -305,7 +377,6 @@ def validate_report_inputs(jobNum, reportType, parameter, textFileExists):
         0 if parameter != '' else 1,
         0 if textFileExists != '' and textFileExists else 1,
     ]
-
 
 def report_error_handler(error_checks):
     logger.info('report_error_handler called with parameters: error_checks {error_checks}')
@@ -371,7 +442,6 @@ def load_report_header_info(self, jobNum, clientName, parameter, reportType, dil
         self.ui.statusHeaderLabel.setText(status)
     else:
         self.ui.statusHeaderLabel.setText('N/A')
-
 
 def load_client_info(self, client_info=None):
     logger.info("Entering load_client_info")

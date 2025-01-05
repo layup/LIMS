@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import (
 from modules.dialogs.basic_dialogs import yes_or_no_dialog, save_or_cancel_dialog
 from modules.dbFunctions import getTestsName, deleteChmTestDataItem, updateChmTestsData
 from modules.constants import  TABLE_ROW_HEIGHT, TABLE_COL_SMALL, TABLE_COL_MED
-from modules.utils.chm_utils import getParameterAndUnitTypes, getParameterTypeNum, parameterItem
 from modules.widgets.SideEditWidget import SideEditWidget2, hideSideEditWidget
 from modules.widgets.TableFooterWidget import TableFooterWidget
 
@@ -37,7 +36,7 @@ def chem_history_tab_setup(self):
     self.history_view = HistoryView(self.ui.chmInputTable, self.ui.sideEditWidget2, self.ui.footerWidget, self.ui.chmSearchLine1, self.ui.chmSearchBtn1, self.ui.chemHistoryFilter)
     self.history_controller = HistoryController(self.history_model, self.history_view)
 
-    # connect signal to swtich page
+    # connect signal to switch page
     self.ui.chmAddItemBtn.clicked.connect(lambda: self.ui.chmTabWidget.setCurrentIndex(1))
 
 
@@ -53,7 +52,6 @@ def history_filters_setup(self):
     self.ui.chemHistoryFilter.addItems(filter_names)
     self.ui.chemHistoryFilter.setCurrentIndex(6)
 
-
 def history_footer_setup(self):
     logger.info('Entering history_footer_setup')
     self.ui.footerWidget = TableFooterWidget()
@@ -68,7 +66,6 @@ def history_table_setup(table):
     table.setColumnCount(len(column_headers))
     table.setHorizontalHeaderLabels(column_headers)
     table.horizontalHeader().setStretchLastSection(True)
-
 
     # Show the vertical rows
     table.verticalHeader().setVisible(True)
@@ -103,17 +100,7 @@ def side_edit_setup(self):
     # Add our widget to the correct layout
     self.ui.horizontalLayout_64.addWidget(self.ui.sideEditWidget2)
 
-    parameterType, unitType = getParameterAndUnitTypes2(self.tempDB)
-    self.ui.sideEditWidget2.loads_tests(parameterType, unitType)
+    test_names = self.tests_manager.get_test_by_type('C')
+    unit_names = self.units_manager.get_unit_names()
 
-
-def getParameterAndUnitTypes2(database):
-    query = 'SELECT testNum, testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
-    results = database.query(query)
-
-    unitTypes =  ['TCU', 'ug/L', 'mg/g']
-
-    # Convert results into readable
-    parameterTypes = [(item[0], item[1]) for item in results]
-
-    return parameterTypes, unitTypes
+    self.ui.sideEditWidget2.loads_tests(test_names, unit_names)

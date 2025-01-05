@@ -52,7 +52,6 @@ def screen_resolution_adjust(app):
     screen_size = screen.size()
     width, height = screen_size.width(), screen_size.height()
 
-
     # Set font size based on screen resolution
     font_size = 10  # Default font size
     if width <= 1280:
@@ -62,6 +61,8 @@ def screen_resolution_adjust(app):
 
     # set the default font and font size for the whole application
     font = QFont("Arial", font_size)
+
+
     app.setFont(font)
 
 if __name__ == "__main__":

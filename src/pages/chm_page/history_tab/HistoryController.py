@@ -36,6 +36,7 @@ class HistoryController:
         self.model.page_sizes = valid_rows;
         self.view.footer.set_valid_rows(valid_rows)
 
+
         # load in the initial data
         data = self.model.load_items(limit=self.model.page_size , offset=self.model.off_set)
         total_pages = self.model.calculate_total_pages()
@@ -43,6 +44,7 @@ class HistoryController:
         # update database
         self.view.update_table(data)
         self.view.update_footer(total_pages=total_pages)
+
 
     def handle_cancel_btn(self):
         logger.info('Entering handle_cancel_btn')

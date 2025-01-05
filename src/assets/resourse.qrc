@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/history_icon.svg</file>
+    <file>icons/search_icon.png</file>
+    <file>icons/upload_icon.png</file>
+    <file>icons/add_icon.png</file>
+    <file>icons/edit_icon.png</file>
+    <file>icons/write_icon.png</file>
     <file>icons/file-earmark-plus.svg</file>
     <file>icons/document.png</file>
     <file>icons/file.png</file>

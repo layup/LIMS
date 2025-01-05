@@ -21,7 +21,8 @@ def yes_or_no_dialog(title: str, message: str):
     msgBox.setText(title)
     msgBox.setInformativeText(message)
     msgBox.setIcon(QMessageBox.Question)
-    msgBox.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    msgBox.setDefaultButton(QMessageBox.Yes)
     x = msgBox.exec_()
 
     if(x == QMessageBox.Yes):

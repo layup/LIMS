@@ -172,7 +172,12 @@ class HistoryView(QObject):
 
     def sort_table(self, index):
 
-        if(index in [1, 6]):
+        logger.info(f'Entering sort_table with index: {index}')
+        print(f'index type: {type(index)}, index: {index}')
+
+
+        # issue with sorting column 1
+        if(index in [0, 1, 6]):
             self.table.sortItems(index, Qt.DescendingOrder)
         else:
             self.table.sortItems(index)

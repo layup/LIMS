@@ -54,10 +54,15 @@ class SideEditWidget2(QWidget):
         self.testsNameCombo.clear()
         self.unitValCombo.clear()
 
-        for testNum, testName in tests:
-            self.testsNameCombo.addItem(testName)
+
+        for test_item in tests:
+            test_id = test_item.test_id
+            test_name = test_item.test_name
+
+            self.testsNameCombo.addItem(test_name)
             index = self.testsNameCombo.count() -1
-            self.testsNameCombo.setItemData(index, testNum)
+            self.testsNameCombo.setItemData(index, test_id)
+
 
         self.unitValCombo.addItems(units)
 
@@ -92,7 +97,6 @@ class SideEditWidget2(QWidget):
 
         self.row_item_list = row_item_list
         self.model_item = model_item
-
 
     def get_job_info(self):
 
@@ -154,7 +158,8 @@ class SideEditWidget(QWidget):
 
     def set_drop_down(self, parameterTypes, unitTypes):
         for item in parameterTypes:
-            self.testsNameCombo.addItem(item.testName, userData=item)
+
+            self.testsNameCombo.addItem(item.test_name, userData=item.test_id)
 
         self.unitValCombo.addItems(unitTypes)
 
@@ -200,7 +205,8 @@ class SideEditWidget(QWidget):
         standardVal = self.standard.text()
         unitVal = self.unitValCombo.currentText()
 
-        testNum = getParameterTypeNum(self.testsNameCombo)
+        index = self.testsNameCombo.currentIndex()
+        testNum = str(self.testsNameCombo.itemData(index, role=Qt.UserRole))
 
         return [jobNum, sampleNum, testsName, testsVal, unitVal, standardVal, testNum]
 

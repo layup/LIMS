@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
 from modules.utils.logic_utils import is_float
 
-class ChemReportController(QObject):
+class ChmReportController(QObject):
 
     def __init__(self, model, view, sample_names):
         super().__init__()

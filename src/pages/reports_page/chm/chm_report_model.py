@@ -1,11 +1,12 @@
 from base_logger import logger
 
 from modules.dbFunctions import getTestsName, getTestsInfo
-from modules.utils.logic_utils import removeIllegalCharacters, is_float
+from modules.utils.logic_utils import removeIllegalCharacters, is_float, remove_control_characters
 
-from pages.reports_page.chm.chm_report_items import chemReportSampleItem, chemReportTestItem
 
-class ChemReportModel:
+from pages.reports_page.chm.chm_report_items import chmReportSampleItem, chmReportTestItem
+
+class ChmReportModel:
     def __init__(self, db, jobNum, dilution, sampleTests):
         self.db = db
         self.jobNum = jobNum
@@ -23,7 +24,7 @@ class ChemReportModel:
         # define all of the sample items
         for sample_name, sample_tests in self.sampleTests.items():
             job_num, sample_num = sample_name.split('-')
-            self.samples[sample_name] = chemReportSampleItem(job_num, sample_num, sample_name)
+            self.samples[sample_name] = chmReportSampleItem(job_num, sample_num, sample_name)
 
     def get_lists(self):
         return get_tests_results(self.db, self.jobNum, self.sampleTests);
@@ -104,7 +105,8 @@ class ChemReportModel:
 
             row = self.test_row_info.get(testNum)
 
-            if(row):
+            if(row or row == 0):
+                logger.debug('big if buddy')
                 self.samples[sampleName].add_data(row, testValue, recovery, unit)
 
     def update_sample(self, sampleName, testNum, testVal):
@@ -137,18 +139,20 @@ class ChemReportModel:
                 self.testsNums.append(testNum)
                 self.test_row_info[testNum] = row
 
-            self.tests[row] = chemReportTestItem(testNum, testName, textName, displayName, unit)
+            self.tests[row] = chmReportTestItem(testNum, testName, textName, displayName, unit)
         else:
             logger.info(f'No test_data found for {text_name}')
-            self.tests[row] =  chemReportTestItem(textName=text_name)
-
+            self.tests[row] =  chmReportTestItem(textName=text_name)
 
 
 # find what the user has enter for the tests already
 def get_tests_results(db, jobNum, sample_tests):
+    logger.info('Entering get_tests_results')
 
     testsQuery = 'SELECT * FROM chemTestsData WHERE JobNum = ?'
     test_results = db.query(testsQuery, (jobNum,))
+
+    logger.info(test_results)
 
     # retrieve data from .txt file and user entered
     chem_tests_list = []
@@ -156,7 +160,7 @@ def get_tests_results(db, jobNum, sample_tests):
     # examine the .txt items
     for _, tests_list in sample_tests.items():
         for current_test in tests_list:
-            current_test = removeIllegalCharacters(str(current_test))
+            current_test = remove_control_characters(str(current_test))
             if(current_test not in chem_tests_list and 'ICP' not in current_test):
                 chem_tests_list.append(current_test)
 
@@ -164,10 +168,10 @@ def get_tests_results(db, jobNum, sample_tests):
     if(test_results):
         for item in test_results:
             test_num = item[1]
-            tests_name = get_test_text_name(db, test_num)
+            test_name = get_test_text_name(db, test_num)
 
-            if(tests_name not in chem_tests_list):
-                chem_tests_list.append(tests_name)
+            if(test_name not in chem_tests_list):
+                chem_tests_list.append(test_name)
 
     return chem_tests_list, test_results
 

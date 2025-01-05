@@ -14,7 +14,6 @@ class ViewIcpData(QDialog):
         self.db =db
         self.current_item = current_item
 
-
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "ui", 'icpViewDataDialog.ui')
         loadUi(file_path, self)
@@ -23,12 +22,17 @@ class ViewIcpData(QDialog):
         self.saveBtn.clicked.connect(lambda: print('save button clicked'))
         self.cancelBtn.clicked.connect(self.close)
 
+        self.init_table()
+        self.init_data()
+
+
+    def init_table(self):
         headers = ['Element Symbol', 'Element Value']
 
         self.tableWidget.setColumnCount(len(headers))
         self.tableWidget.setHorizontalHeaderLabels(headers)
 
-        self.init_data()
+        self.tableWidget.setColumnWidth(1, 200)
 
     def init_data(self):
         jobNum = str(self.current_item.jobNum)
@@ -49,17 +53,15 @@ class ViewIcpData(QDialog):
         self.tableWidget.horizontalHeader().setVisible(True)
         self.tableWidget.verticalHeader().setVisible(False)
 
-
         for row, (symbol, value) in enumerate(data.items()):
-            print(row, symbol, value)
+            print(row, symbol, value, type(value))
             element_item = QTableWidgetItem(symbol)
             element_item.setFlags(element_item.flags() & ~Qt.ItemIsEditable)
 
-            element_value = QTableWidgetItem(value)
+            element_value = QTableWidgetItem(str(value))
 
             self.tableWidget.setItem(row, 0, element_item)
             self.tableWidget.setItem(row, 1, element_value)
-
 
     def handle_save(self):
         pass;
