@@ -3,15 +3,6 @@ import sqlite3
 from base_logger import logger
 
 
-def isValidDatabase(database_path):
-    try:
-        conn = sqlite3.connect(database_path)
-        conn.close()
-        return True
-    except sqlite3.DatabaseError:
-        print
-        return False
-
 
 #******************************************************************
 #    Table: Tests
@@ -82,17 +73,6 @@ def getAllChmTestsInfo2(db):
     except Exception as e:
         print(f'An error occurred: {e}')
         return None
-
-def getTestsInfo(db, textName):
-    try:
-        #query = 'SELECT testNum, testName, benchMicroname, displayName, recoveryValue, recoveryValue FROM Tests WHERE benchMicroName = ?'
-        query = 'SELECT * FROM chemTestsInfo WHERE textName = ?'
-        result = db.query(query, (textName, ))
-        return result[0]
-
-    except Exception as e:
-        print(e)
-        return None;
 
 #******************************************************************
 #    Table: ChemTestsData

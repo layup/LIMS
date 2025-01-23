@@ -21,11 +21,11 @@ from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 
 #TODO: takes in the values from the
 #TODO: duplication error
-#TODO: center all of the table items
 def chm_input_tab_setup(self):
     self.logger.info(f'Entering chm_input_tab_setup')
 
     side_edit_setup(self)
+    input_tree_setup(self)
     new_entry_section_setup(self)
 
     clear_all_input_sections(self, True)
@@ -36,6 +36,21 @@ def chm_input_tab_setup(self):
     self.ui.chmProceedBtn.clicked.connect(lambda: on_chmProceedBtn_clicked(self))
     self.ui.chmInputClearBtn.clicked.connect(lambda: clear_all_input_sections(self, False))
     self.ui.chmAddTestsBtn.clicked.connect(lambda:on_chmSampleDataAdd_clicked(self))
+
+
+def input_tree_setup(self):
+
+    self.ui.inputDataTree.setHeaderLabels(["Job Number", "Sample #", 'Parameter Name', 'Value', 'Unit', '% Recovery', 'Action'])
+
+    self.ui.inputDataTree.setColumnWidth(0, 120)
+    self.ui.inputDataTree.setColumnWidth(1, 80)
+    self.ui.inputDataTree.setColumnWidth(2, 200)
+    self.ui.inputDataTree.setColumnWidth(4, 80)
+    self.ui.inputDataTree.setColumnWidth(5, 80)
+
+    header = self.ui.inputDataTree.header()
+    header.setDefaultAlignment(Qt.AlignCenter)
+
 
 def side_edit_setup(self):
     logger.info('Entering side_edit_setup')
@@ -66,25 +81,33 @@ def new_entry_section_setup(self):
     # add empty front place holders
     self.ui.gcmsTests.addItem('')
     self.ui.gcmsUnitVal.addItem('')
+    self.ui.chm_selected_units.addItem('')
 
     test_names = self.tests_manager.get_test_by_type('C')
     unit_names = self.units_manager.get_unit_names()
 
     # add the rest of the list items
     self.ui.gcmsUnitVal.addItems(unit_names)
+    self.ui.chm_selected_units.addItems(unit_names)
+
 
     for item in test_names:
         self.ui.gcmsTests.addItem(item.test_name, userData=item.test_id)
+
 
 
 ###################################################################
 #   Signal Functions
 ###################################################################
 
-def sideEditSaveBtnClicked(self, new_data, item):
-    self.logger.info(f'Entering sideEditSaveBtnClicked with parameters: data: {new_data}, row: {item}')
+def sideEditSaveBtnClicked(self, save_data, item):
+    self.logger.info(f'Entering sideEditSaveBtnClicked with parameters: save_data: {save_data}, row: {item}')
 
-    save_error_handling(self, new_data, item)
+    new_data = save_data[:-1]
+    param_id = save_data[-1]
+    unit_id = None
+
+    save_error_handling(self, new_data, param_id, item)
 
 
 @pyqtSlot()
@@ -103,6 +126,11 @@ def on_chmProceedBtn_clicked(self):
         self.ui.gcmsStandardValShow.setText(standards)
         self.ui.gcmsUnitValShow.setText(units)
         self.ui.gcmsTestsShow.setText(testName)
+
+        # set the unit combobox
+        current_index = self.ui.gcmsUnitVal.currentIndex()
+        self.ui.chm_selected_units.setCurrentIndex(current_index)
+
     else:
         NewEntryErrorDisplay(self, errorCheckList)
 
@@ -112,18 +140,18 @@ def on_chmSampleDataAdd_clicked(self):
     self.logger.info('Entering on_chmSampleDataAdd_clicked ')
 
     standards, units, testName = get_current_entry_values(self)
-    jobNum, sampleNum, sampleVal = get_current_entered_values(self)
+    jobNum, sampleNum, selected_unit, sampleVal = get_current_entered_values(self)
 
     index = self.ui.gcmsTests.currentIndex()
     testNum = self.ui.gcmsTests.itemData(index, role=Qt.UserRole)
 
-    edit_data = [jobNum, sampleNum, testName, sampleVal, units];
+    edit_data = [jobNum, sampleNum, testName, sampleVal, selected_unit]
 
     errorCheckList = [0,0,0]
 
     errorCheckList[0] = 0 if (jobNum != '' and is_real_number(jobNum)) else 1;
-    errorCheckList[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1;
-    errorCheckList[2] = 0 if sampleVal != '' else 1;
+    errorCheckList[1] = 0 if (sampleNum != '' and is_real_number(sampleNum)) else 1
+    errorCheckList[2] = 0 if sampleVal != '' else 1
 
     self.logger.debug(f'Input Data Info: {jobNum}-{sampleNum}: {sampleVal}')
 
@@ -139,20 +167,20 @@ def on_chmSampleDataAdd_clicked(self):
             response = yes_or_no_dialog(title, duplicate_msg)
 
             if(response):
-                addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
+                addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, selected_unit, jobNum, todaysDate)
 
                 matchingItem = checkMatchingTreeItems(self.ui.inputDataTree, sampleNum)
 
                 if not matchingItem:
-                    add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, jobNum)
+                    add_input_tree_item(self, sampleNum, testName, sampleVal, selected_unit, standards, jobNum)
 
                 clear_samples_input(self)
             else:
                 clear_samples_input(self)
 
         else:
-            addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
-            add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, jobNum)
+            addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, selected_unit, jobNum, todaysDate)
+            add_input_tree_item(self, sampleNum, testName, sampleVal, selected_unit, standards, jobNum)
             clear_samples_input(self)
     else:
         self.logger.error(f'errorCheckList: {errorCheckList}')
@@ -172,7 +200,7 @@ def checkMatchingTreeItems(treeWidget, targetText):
 # General Functions
 #******************************************************************
 
-def save_error_handling(self, new_data, item):
+def save_error_handling(self, new_data, param_id, item):
 
     self.logger.info('Entering save_error_handling')
 
@@ -185,9 +213,6 @@ def save_error_handling(self, new_data, item):
     new_unitType = new_data[4]
     new_standard = new_data[5]
 
-    testNum = new_data[6]
-    #todaysDate = date.today()
-
     old_jobName = old_jobNum + '-' + old_sampleNum
     new_jobName = new_data[0] + '-' + new_data[1]
 
@@ -195,7 +220,7 @@ def save_error_handling(self, new_data, item):
 
     #TODO: problem what if that data already exists in the table
     if(old_jobNum != new_jobNum or old_sampleNum != new_sampleNum):
-        existing_data_check = checkChmTestsExist(self.tempDB, new_sampleNum, testNum, new_jobNum)
+        existing_data_check = checkChmTestsExist(self.tempDB, new_sampleNum, param_id, new_jobNum)
 
         if(existing_data_check):
             response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want overwrite existing data for {new_jobName} and delete data for {old_jobName} ')
@@ -203,21 +228,18 @@ def save_error_handling(self, new_data, item):
             if(response):
                 try:
                     # delete the old job
-                    deletedRows = deleteChmTestDataItem(self.tempDB, old_sampleNum, testNum, old_jobNum)
+                    delete_rows = deleteChmTestDataItem(self.tempDB, old_sampleNum, param_id, old_jobNum)
 
                     # update the existing data with the new data
-                    updatedRows = updateChmTestsData(self.tempDB, new_sampleNum, testNum, new_jobNum, new_sampleVal, new_standard, new_unitType)
+                    update_rows = updateChmTestsData(self.tempDB, new_sampleNum, param_id, new_jobNum, new_sampleVal, new_standard, new_unitType)
 
                     # update table info
-
-                    for col in enumerate(new_data):
-                        item.setText(col, new_data[col])
+                    for col, data in enumerate(new_data):
+                        item.setText(col, data)
 
                 except Exception as e:
+                    logger.warning(f'Error while trying to update_row, {e}')
                     print(e)
-
-                    # upload old data back to database
-                    # error message
 
         else:
             response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want save {new_jobName} and delete {old_jobNum} ?')
@@ -225,14 +247,15 @@ def save_error_handling(self, new_data, item):
             if(response):
 
                 # delete old data
-                deletedRows = deleteChmTestDataItem(self.tempDB, old_sampleNum, testNum, old_jobNum)
+                delete_rows = deleteChmTestDataItem(self.tempDB, old_sampleNum, param_id, old_jobNum)
 
                 # add new data
                 #addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
 
                 # update the table info
-                for col in enumerate(new_data):
-                    item.setText(col, new_data[col])
+                for col, data in enumerate(new_data):
+
+                    item.setText(col, data)
 
     else:
         response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want overwrite existing data for {new_jobName}?')
@@ -241,16 +264,16 @@ def save_error_handling(self, new_data, item):
             # update the database
             #updateChmTestsData()
 
-            # update table info
-            for col in enumerate(new_data):
-                item.setText(col, new_data[col])
+            for col, data in enumerate(new_data):
+                item.setText(col, data)
+
 
 def NewEntryErrorDisplay(self, errorCheckList):
     errorTitle = 'Cannot Proceed with CHM Process'
     errorMsg = ''
 
     if(errorCheckList[0] == 1):
-        errorMsg += 'Please Enter a Valid Standard Number\n'
+        errorMsg += 'Please Enter a Valid Percent Recovery\n'
     if(errorCheckList[1] == 1):
         errorMsg += 'Please Select a Unit\n'
     if(errorCheckList[2] == 1):
@@ -322,8 +345,9 @@ def get_current_entered_values(self):
     jobNum     = self.ui.gcmsTestsJobNum.text().strip()
     sampleNum   = self.ui.gcmsTestsSample.text().strip()
     sampleVal   = self.ui.gcmsTestsVal.text().strip()
+    units       = self.ui.chm_selected_units.currentText()
 
-    return jobNum, sampleNum, sampleVal
+    return jobNum, sampleNum, units, sampleVal
 
 def enable_enter_values_section(self, status):
     logger.info(f'Entering enable_enter_values_section with parameter: status {repr(status)}')
@@ -336,10 +360,16 @@ def clear_samples_input(self):
     self.ui.gcmsTestsSample.clear()
     self.ui.gcmsTestsVal.clear()
 
+    # update and set the current index
+    current_index = self.ui.gcmsUnitVal.currentIndex()
+    self.ui.chm_selected_units.setCurrentIndex(current_index)
+
 def clear_enter_values_section(self):
     self.ui.gcmsTestsJobNum.clear()
     self.ui.gcmsTestsSample.clear()
     self.ui.gcmsTestsVal.clear()
+
+    self.ui.chm_selected_units.setCurrentIndex(0)
 
 def clear_active_values_section(self):
     self.ui.gcmsTestsShow.clear()

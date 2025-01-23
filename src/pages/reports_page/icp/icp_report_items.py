@@ -1,23 +1,6 @@
 from base_logger import logger
 
 
-class IcpReportTestItem:
-    def __init__(self, testNum=None, testName=None, textName=None, displayName=None, unitType=None, recovery=None):
-        self.testNum = testNum
-        self.testName = testName
-        self.textName = textName
-        self.displayName = displayName
-        self.unitType = unitType
-        self.recovery = None;
-
-    def __repr__(self):
-        return (f"chemReportTestItem(testNum={self.testNum!r}, "
-                f"testName={self.testName!r}, "
-                f"textName={self.textName!r}, "
-                f"displayName={self.displayName!r}, "
-                f"unitType={self.unitType!r}),"
-                f"recovery={self.recovery!r})")
-
 class IcpReportElementsItem:
     def __init__(self, name, num, symbol):
         self.element_name = name
@@ -27,6 +10,7 @@ class IcpReportElementsItem:
         self.lower_limit = ''
         self.upper_limit = ''
         self.comment = ''
+        self.footer = ''
 
     def __repr__(self):
             return (f"IcpReportElementsItem(name={self.element_name}, "
@@ -34,11 +18,12 @@ class IcpReportElementsItem:
                     f"unit={self.unit}, lower_limit={self.lower_limit}, "
                     f"upper_limit={self.upper_limit}, comment={self.comment})")
 
-    def add_limits(self, unit, lower, upper, comment):
+    def add_limits(self, unit, lower, upper, comment, footer):
         self.unit = unit
         self.lower_limit = lower
         self.upper_limit = upper
         self.comment = comment
+        self.footer = footer
 
 class IcpReportSampleItem:
     def __init__(self, jobNum, sampleNum, sampleName, hardness ='', ph = ''):
@@ -49,6 +34,7 @@ class IcpReportSampleItem:
         self.ph = ph
 
         # Data consists of data[testNum] = [value, recovery, unitType]
+        # data[row] = value
         self.data = {}
 
         #TODO: not sure about having this
@@ -79,3 +65,6 @@ class IcpReportSampleItem:
 
     def get_hardness(self):
         return self.hardness
+
+    def get_ph(self):
+        return self.ph

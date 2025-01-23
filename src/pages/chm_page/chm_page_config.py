@@ -23,6 +23,7 @@ def on_chmTabWidget_currentChanged(self, index):
     if(index == 0): # Database
         self.ui.headerTitle.setText('Chemistry Input Tests Database');
         self.ui.headerDesc.setText('');
+        self.history_controller.update_view()
 
     if(index == 1): # Input Data
         self.ui.headerTitle.setText('Chemistry Data Entry');

@@ -3,8 +3,8 @@ from base_logger import logger
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import (
-    QCompleter, QAbstractItemView, QHeaderView, QTableWidgetItem, QPushButton, QWidget,
-    QHBoxLayout
+    QCompleter, QAbstractItemView, QHeaderView,
+    QTableWidgetItem, QPushButton, QWidget, QHBoxLayout
 )
 
 from pages.history_page.lab_section.lab_history_item import LabHistoryItem;

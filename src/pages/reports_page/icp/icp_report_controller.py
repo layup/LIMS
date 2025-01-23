@@ -19,6 +19,7 @@ class IcpReportController(QObject):
         self.view.tableItemChangeEmit.connect(self.handle_table_change)
         self.view.reloadBtnClicked.connect(self.handle_reload_btn)
         self.view.hardnessBtnClicked.connect(self.handle_hardness_btn)
+        self.view.reportsTabChangeEmit.connect(self.handle_reports_tab)
 
     def handle_hardness_btn(self):
         self.model.calculate_sample_hardness()
@@ -52,6 +53,8 @@ class IcpReportController(QObject):
         self.view.update_table_elements(elements_info, self.model.dilution)
         self.view.update_table_samples(samples_info)
 
+        self.view.update_table_comments(elements_info)
+
         # update dilution values
 
         # calculate hardness
@@ -61,15 +64,48 @@ class IcpReportController(QObject):
 
         self.loaded = True;
 
+    def handle_reports_tab(self, index):
+        logger.info(f'Entering handle_reports_tab with index: {index}')
+
+        if(index == 3):
+
+            for row, element_symbol in enumerate(self.model.element_row_nums):
+
+                element_num = self.model.symbol_num[element_symbol]
+                upper_limit = self.model.elements_info[element_num].upper_limit
+
+                logger.info(f'row: {row}, symbol: {repr(element_symbol)}, num: {element_num}, upper_limit: {upper_limit}')
+
+                if(upper_limit):
+                    status = self.get_max_element_value(row, upper_limit)
+                    new_status = 'True' if status else 'False'
+
+                    self.view.update_comments_status(row, new_status)
+
+
+    def get_max_element_value(self, row, upper_limit):
+
+        for sample_name, sample_info in self.model.samples.items():
+
+            if(row in sample_info.data):
+                current_val = sample_info.data[row]
+
+                if(is_float(current_val)):
+
+                    if(float(current_val) >= float(upper_limit)):
+
+                        return True
+        return False
+
     def handle_table_change(self, item):
-        logger.info('Entering handle_table_change')
 
         if(self.loaded):
             try:
-                logger.debug(f'row: {item.row()}, col: {item.column()}, text: {item.text()}')
                 row = item.row()
                 col = item.column()
                 new_data = item.text()
+
+                logger.debug(f'row: {row}, col: {col}, new_data: {new_data}')
 
                 if(col > 5):
                     sample_name = self.view.table.horizontalHeaderItem(col).text()
@@ -92,6 +128,9 @@ class IcpReportController(QObject):
 
         row_count = self.view.table.rowCount()
         sample_data = self.model.export_samples_data(row_count)
+        extra_data = self.model.export_samples_extra()
+
+        logger.info(f'extra_data: {extra_data}')
 
         for sample_name, data in sample_data.items():
             logger.info(f'{sample_name}, {data}')
@@ -121,3 +160,11 @@ class IcpReportController(QObject):
             sample_data[job_name] = job_values
 
         return sample_data
+
+
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False

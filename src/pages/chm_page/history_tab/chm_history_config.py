@@ -47,7 +47,7 @@ def chem_history_tab_setup(self):
 def history_filters_setup(self):
     logger.info('Entering history_filters_setup')
 
-    filter_names = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Unit Value', 'Standard', 'Upload Date']
+    filter_names = ['Job Num', 'Sample Num', 'Tests Name', 'Test Value', 'Unit Value', '% Recovery', 'Upload Date']
 
     self.ui.chemHistoryFilter.addItems(filter_names)
     self.ui.chemHistoryFilter.setCurrentIndex(6)
@@ -61,7 +61,7 @@ def history_table_setup(table):
     logger.info('Entering history_table_setup')
 
     # Define table columns
-    column_headers = ['Job Number', 'Sample Number', 'Tests Name', 'Test Value', 'Unit Value', 'Standard Value', 'Upload Date' , 'Actions']
+    column_headers = ['Job Num', 'Sample Num', 'Tests Name', 'Test Value', 'Unit Value', '% Recovery', 'Upload Date' , 'Actions']
 
     table.setColumnCount(len(column_headers))
     table.setHorizontalHeaderLabels(column_headers)

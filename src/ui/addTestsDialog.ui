@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
-    <height>540</height>
+    <width>550</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>460</width>
-    <height>540</height>
+    <width>550</width>
+    <height>400</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>460</width>
-    <height>540</height>
+    <width>550</width>
+    <height>400</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,20 +28,10 @@
   <property name="styleSheet">
    <string notr="true">
 
-#headerText {
+#title {
 	font:bold; 
 } 
 
-QLabel {
-
-	min-width: 120px; 
-	max-width: 120px; 
-}
-
-QPlainTextEdit {
-	min-height:180px; 
-	max-height:180px; 
-} 
 
 QPushButton { 
 	min-width: 100px; 
@@ -64,11 +54,11 @@ QPushButton {
    <property name="bottomMargin">
     <number>5</number>
    </property>
-   <item>
+   <item alignment="Qt::AlignHCenter">
     <widget class="QWidget" name="widget_7" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_7">
       <item>
-       <widget class="QLabel" name="headerText">
+       <widget class="QLabel" name="title">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -78,23 +68,35 @@ QPushButton {
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_2" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="topMargin">
-       <number>5</number>
-      </property>
-      <property name="bottomMargin">
-       <number>5</number>
-      </property>
+    <widget class="QWidget" name="widget_8" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_4">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Display Name</string>
+         <string>Test Name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="displayNameEdit">
+       <widget class="QLineEdit" name="test_name">
         <property name="placeholderText">
          <string>Enter the display name</string>
         </property>
@@ -114,13 +116,25 @@ QPushButton {
       </property>
       <item>
        <widget class="QLabel" name="label_2">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
          <string>Text File Name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="textNameEdit">
+       <widget class="QLineEdit" name="text_name">
         <property name="placeholderText">
          <string>Name that will appear on text file</string>
         </property>
@@ -130,8 +144,8 @@ QPushButton {
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_5" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+    <widget class="QWidget" name="widget_2" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="topMargin">
        <number>5</number>
       </property>
@@ -139,36 +153,30 @@ QPushButton {
        <number>5</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Unit Type</string>
+         <string>Report Display Name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="UnitTypeBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget_6" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="topMargin">
-       <number>5</number>
-      </property>
-      <property name="bottomMargin">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Default Standard</string>
+       <widget class="QLineEdit" name="display_name">
+        <property name="placeholderText">
+         <string>Enter the display name</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="StandardBox"/>
       </item>
      </layout>
     </widget>
@@ -184,21 +192,15 @@ QPushButton {
        </widget>
       </item>
       <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit">
+       <widget class="QLineEdit" name="comment">
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>0</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>150</height>
-         </size>
-        </property>
         <property name="placeholderText">
-         <string>Comment that will appear next to the tests in final report</string>
+         <string>appears on the side comment section of report</string>
         </property>
        </widget>
       </item>
@@ -237,7 +239,7 @@ QPushButton {
       <item>
        <widget class="QPushButton" name="saveBtn">
         <property name="text">
-         <string>Save Tests</string>
+         <string>Save</string>
         </property>
        </widget>
       </item>

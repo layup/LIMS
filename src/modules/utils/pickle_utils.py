@@ -1,6 +1,9 @@
-import pickle 
+import pickle
 
 from base_logger import logger
+
+
+#TODO: delete this
 
 def save_pickle(dictionaryName):
     logger.info(f'Entering save_pickle with parameter: dictionaryName: {repr(dictionaryName)}')
@@ -20,4 +23,3 @@ def load_pickle(filename):
     except Exception as ex:
         print("Error during unpickling object (Possibly unsupported):", ex)
         logger.error(ex)
-        

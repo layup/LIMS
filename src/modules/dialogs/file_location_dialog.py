@@ -10,14 +10,13 @@ from modules.utils.file_utils import openFile, getFileLocation;
 class FileLocationDialog(QDialog):
     def __init__(self, preferences, parent=None):
         super().__init__()
-        # Load the UI of the Dialog
+
+        self.preferences = preferences
+        self.temp_paths = self.preferences.paths.copy()
+
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "ui", 'FileLocationDialog.ui')
         loadUi(file_path, self)
-
-        self.preferences = preferences
-
-        self.tempPaths = self.preferences.values().copy()
 
         # set up the initial text Names
         self.setupItems('TXTDirLocation', self.line1)
@@ -48,24 +47,21 @@ class FileLocationDialog(QDialog):
 
     @pyqtSlot()
     def browseForFile(self, pathName, lineItem):
-        fileLocation = openFile()
-        print(f'file location: {fileLocation}')
-        self.tempPaths[pathName] = fileLocation
-        lineItem.setText(fileLocation)
+        file_location = openFile()
+        print(f'file_location: {file_location}')
+
+        self.temp_paths[pathName] = file_location
+        lineItem.setText(file_location)
 
     @pyqtSlot()
     def browseForFolder(self, pathName, lineItem):
-        folderLocation = getFileLocation()
-        print(f'Folder Location: {folderLocation}')
-        self.tempPaths[pathName] = folderLocation
-        lineItem.setText(folderLocation)
+        folder_location = getFileLocation()
+        print(f'folder_location: {folder_location}')
 
+        self.temp_paths[pathName] = folder_location
+        lineItem.setText(folder_location)
 
     @pyqtSlot()
     def saveButtonClicked(self):
-
-        for key, value in self.tempPaths.items():
-            print(f'Updating: {key}: {value}')
-            self.preferences.update(key, value)
-
+        self.preferences.update_paths(self.temp_paths)
         self.close()

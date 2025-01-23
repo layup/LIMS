@@ -62,6 +62,13 @@ class IcpHistoryModel:
 
         return self.total_pages
 
+    #TODO: fix this maybe or something
+    def print_batch(self, batch_name):
+        query = 'SELECT sampleName FROM icpData WHERE batchName = ?'
+
+        results = self.db.query(query, (batch_name, ))
+        return results
+
 
 def get_jobs(db, limit, offset):
     query = '''

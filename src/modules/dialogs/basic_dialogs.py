@@ -55,7 +55,7 @@ def okay_dialog(title: str, message: str):
     msg.exec_()
 
 def error_dialog(title: str, message: str, detailed_msg=None):
-    logger.info('Entering error_dialog with title: {title}')
+    logger.info(f'Entering error_dialog with title: {title}')
 
     msg = QMessageBox()
     msg.setFixedWidth(400)

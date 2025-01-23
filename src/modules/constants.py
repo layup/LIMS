@@ -42,9 +42,9 @@ CHM_FILTER = ['Upload Date, ']
 #******************************************************************
 
 TABLE_ROW_HEIGHT    = 23
-TABLE_COL_SMALL     = 140
-TABLE_COL_MED       = 240
-TABLE_COL_LARGE     = 340
+TABLE_COL_SMALL     = 90
+TABLE_COL_MED       = 140
+TABLE_COL_LARGE     = 240
 
 SMALL_COL = 140
 MED_COL = 240

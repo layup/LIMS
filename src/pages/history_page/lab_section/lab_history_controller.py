@@ -49,6 +49,7 @@ class LabHistoryController(QObject):
         self.view.search.filters.setCurrentIndex(4);
 
 
+
     def handle_open_btn(self, current_item):
         logger.info(f'Entering handle_open_btn with updated_data: {current_item}')
 

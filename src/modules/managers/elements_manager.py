@@ -5,17 +5,18 @@ from base_logger import logger
 
 class ElementLimits:
 
-    def __init__(self, param_id, unit, lower_limit, upper_limit, side_comment):
+    def __init__(self, param_id, unit, lower_limit, upper_limit, side_comment, footer_comment):
         self.param_id = param_id
         self.unit = unit
         self.lower_limit = lower_limit
         self.upper_limit = upper_limit
         self.side_comment = side_comment
+        self.footer_comment = footer_comment
 
     def __repr__(self):
         return f"ElementLimits(param_id={self.param_id}, unit='{self.unit}', " \
                f"lower_limit={self.lower_limit}, upper_limit={self.upper_limit}, " \
-               f"side_comment='{self.side_comment}')"
+               f"side_comment='{self.side_comment}, footer_comment={self.footer_comment}')"
 
 class ElementItem:
     def __init__(self, element_id, name, symbol):
@@ -41,7 +42,6 @@ class ElementsManager:
 
     def __init__(self, db):
         self.db = db
-
         self.elements = {}
 
         self.init_setup()
@@ -65,16 +65,15 @@ class ElementsManager:
             if not limits:
                 continue
 
-            for param_id, _ , unit_type, lower_limit, upper_limit, side_comment in limits:
-                element_item.limits[param_id] = ElementLimits(param_id, unit_type, lower_limit, upper_limit, side_comment)
+            for param_id, _ , unit_type, lower_limit, upper_limit, side_comment, footer_comment in limits:
+                element_item.limits[param_id] = ElementLimits(param_id, unit_type, lower_limit, upper_limit, side_comment, footer_comment)
 
         for key, value in self.elements.items():
             logger.info(f'{key}: {value.__repr__}')
 
-
     def load_all_elements(self):
         try:
-            query = 'SELECT * FROM icpElements'
+            query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
             results = self.db.query(query)
             return results
 
@@ -195,7 +194,6 @@ class ElementsManager:
             logger.error(e)
             return None
 
-
     def update_element(self, element_id, name, symbol):
         logger.info(f'Entering update_element with element_id: {element_id}, symbol: {symbol}, name: {name}')
 
@@ -226,30 +224,31 @@ class ElementsManager:
             logger.error(f'{e}')
             return None
 
-    def insert_or_update_limits(self, param_id, element_id, unit_type, lower_limit, upper_limit, side_comment):
+    def insert_or_update_limits(self, param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, footer):
         logger.info(f"Entering insert_or_update_limits with arguments: "
                     f"param_id={param_id}, element_id={element_id}, "
                     f"unit_type='{unit_type}', lower_limit={lower_limit}, "
-                    f"upper_limit={upper_limit}, side_comment='{side_comment}'")
+                    f"upper_limit={upper_limit}, side_comment='{side_comment}'"
+                    f"footer={footer}")
 
         try:
             if(element_id in self.elements):
                 if param_id in self.elements[element_id].limits:
                     # already exists so just update
-                    query = 'UPDATE icpLimits SET unitType=?, lowerLimit=?, upperLimit=?, sideComment=? WHERE parameterNum=? AND elementNum=?'
-                    self.db.execute(query, (unit_type, lower_limit, upper_limit, side_comment, param_id, element_id, ))
+                    query = 'UPDATE icpLimits SET unitType=?, lowerLimit=?, upperLimit=?, sideComment=?, footerComment=? WHERE parameterNum=? AND elementNum=?'
+                    self.db.execute(query, (unit_type, lower_limit, upper_limit, side_comment, footer,  param_id, element_id, ))
                     self.db.commit()
 
                 else:
                     # doesn't already exist so create the thing
-                    query = 'INSERT INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment) VALUES (?, ?, ?, ?, ?, ?)'
-                    self.db.execute(query, (param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, ))
+                    query = 'INSERT INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment, footerComment) VALUES (?, ?, ?, ?, ?, ?)'
+                    self.db.execute(query, (param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, footer, ))
                     self.db.commit()
 
                 rows_affected = self.db.cursor.rowcount
 
                 if rows_affected > 0:
-                    self.elements[element_id].limits[param_id] = ElementLimits(param_id, unit_type, lower_limit, upper_limit, side_comment)
+                    self.elements[element_id].limits[param_id] = ElementLimits(param_id, unit_type, lower_limit, upper_limit, side_comment, footer)
 
                 return rows_affected
 

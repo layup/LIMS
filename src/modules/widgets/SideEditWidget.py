@@ -109,9 +109,6 @@ class SideEditWidget2(QWidget):
         return [testNum, testVal, standard, unit]
 
 
-
-
-
 class SideEditWidget(QWidget):
 
     cancel_clicked = pyqtSignal(bool)
@@ -184,7 +181,7 @@ class SideEditWidget(QWidget):
 
         # enable/disable combobox editing
         self.testsNameCombo.setDisabled(self.disabled)
-        self.unitValCombo.setDisabled(self.disabled)
+        #self.unitValCombo.setDisabled(self.disabled)
 
 
     def set_combo_widget(self, widget, itemName):

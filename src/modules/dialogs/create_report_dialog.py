@@ -2,7 +2,7 @@ import os
 
 from PyQt5 import uic
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtGui import QIntValidator, QDoubleValidator, QValidator
 from PyQt5.QtWidgets import QDialog
 
 
@@ -23,6 +23,9 @@ class CreateReport(QDialog):
         self.cancelBtn.clicked.connect(self.close)
         self.proceedBtn.clicked.connect(self.handle_proceed_btn)
 
+        self.proceedBtn.setDefault(True)
+
+
         self.setup()
 
     def setup(self):
@@ -37,7 +40,7 @@ class CreateReport(QDialog):
         }
 
         # set the validators for the Line Edits
-        self.jobNum.setValidator(int_validator)
+        self.jobNum.setValidator(IntValidator(self))
         self.dilution.setValidator(decimal_validator)
 
         # set the max lengths
@@ -48,9 +51,9 @@ class CreateReport(QDialog):
             self.reportType.addItem(reportName, reportNum)
 
         self.parameter.addItem('', None)
+
         for param_id, param_item in self.parameters_manager.get_params():
             self.parameter.addItem(param_item.param_name, param_id)
-
 
     def start(self):
         self.jobNum.clear()
@@ -58,7 +61,6 @@ class CreateReport(QDialog):
 
         self.reportType.setCurrentIndex(0)
         self.parameter.setCurrentIndex(0)
-
 
         self.exec()
 
@@ -75,4 +77,17 @@ class CreateReport(QDialog):
         self.process_data.emit([jobNum, report_id, param_id, dilution])
 
 
+
+class IntValidator(QValidator):
+    def validate(self, text, pos):
+
+        #print(text, pos)
+
+        try:
+            int(text)
+            return QValidator.Acceptable, text, pos
+        except ValueError:
+            # Extract only digits from the input
+            text = ''.join(char for char in text if char.isdigit())
+            return QValidator.Intermediate, text, pos
 

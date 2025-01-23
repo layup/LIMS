@@ -35,7 +35,7 @@ def handle_param_item_selected(self):
         param_id = selected_item.data(Qt.UserRole)
 
         # Set the report Name Label
-        self.ui.icpReportNameLabel.setText(f'[{param_id}] {param_name.upper()}')
+        self.ui.icpReportNameLabel_2.setText(f'[{param_id}] {param_name.upper()}')
 
         load_icp_footer_message(self, param_id)
 

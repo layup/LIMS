@@ -4,7 +4,7 @@ from pages.icp_page.history_tab.icp_history_config import icp_history_setup
 from pages.icp_page.report_tab.icp_reports_config import icp_report_section_setup
 
 
-def icpSetup(self):
+def icp_setup(self):
     self.logger.info('Entering icpSetup')
 
     icp_history_setup(self)
@@ -17,7 +17,7 @@ def icpSetup(self):
 def on_icpTabWidget_currentChanged(self, index):
     self.logger.info(f'Entering on_icpTabWidget_currentChanged with index: {index}')
 
-    if(index == 0): #History
+    if(index == 0): # History
         self.ui.headerTitle.setText('ICP Database')
         self.ui.headerDesc.setText('')
 
@@ -26,9 +26,8 @@ def on_icpTabWidget_currentChanged(self, index):
 
         totalElements = self.elements_manager.get_total_elements()
         self.ui.headerDesc.setText(f"Total Defined Elements: {totalElements}")
-        #loadDefinedElements(self)
 
-    if(index == 2): #  Reports Info
+    if(index == 2): # Reports Info
         self.ui.headerTitle.setText('ICP Reports Information')
         self.ui.headerDesc.setText('')
 

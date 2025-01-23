@@ -1,11 +1,13 @@
 
+from datetime import datetime
 from base_logger import logger
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
+from modules.dialogs.text_dialog import TextFileDisplayDialog
 from modules.utils.file_utils import openFile
-from pages.icp_page.icp_upload import icp_upload
 
+from pages.icp_page.icp_upload import icp_upload
 from pages.icp_page.history_tab.icp_history_item import IcpHistoryItem
 
 class IcpHistoryController(QObject):
@@ -25,6 +27,7 @@ class IcpHistoryController(QObject):
         self.view.filterChanged.connect(self.handle_filter_change)
         self.view.searchTextEmit.connect(self.handle_search)
         self.view.openBtnClicked.connect(self.handle_open_btn)
+        self.view.printBtnClicked.connect(self.handle_print_btn)
 
         self.view.nextPageClicked.connect(self.handle_next_page)
         self.view.prevPageClicked.connect(self.handle_prev_page)
@@ -52,6 +55,25 @@ class IcpHistoryController(QObject):
         self.view.update_table(data)
         self.view.update_footer(total_pages=total_pages)
 
+    def handle_print_btn(self, file_name):
+        logger.info('Entering handle_print_btn')
+
+        temp_file_name = 'batch_jobs.txt'
+        todaysDate = datetime.today().date()
+
+        samples = self.model.print_batch(file_name)
+
+        with open(temp_file_name, 'w') as file:
+            file.write(f'Batch Name: {file_name}\n')
+            file.write(f'Date: {todaysDate}\n')
+            file.write('\n')
+
+            for sample in samples:
+                file.write(f'{sample[0]} \n')
+
+        dialog = TextFileDisplayDialog(temp_file_name)
+        dialog.exec_()
+
     def handle_upload_btn(self):
         logger.info('Entering handle_upload_btn')
 
@@ -59,12 +81,13 @@ class IcpHistoryController(QObject):
         logger.debug(f'fileLocation: {fileLocation}')
         icp_upload(fileLocation, self.model.db)
 
+        # update the table for the data
         self.update_view()
 
     def handle_open_btn(self, current_item):
         logger.info(f'Entering handle_open_btn with updated_data: {current_item}')
 
-        print(current_item.__repr__())
+        print(current_item.__repr__)
 
         self.openReport.emit(current_item)
 

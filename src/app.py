@@ -1,27 +1,15 @@
 import os
-import pickle
 
 from interface import *
 from assets import resource_rc
 
-from PyQt5.QtCore import pyqtSlot, QTimer, QDateTime
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel, QMessageBox)
 
-from modules.constants import REPORTS_TYPE
 from modules.dialogs.basic_dialogs import yes_or_no_dialog
-from modules.dialogs.create_report import CreateReport
 from modules.utils.apply_drop_shadow_effect import apply_drop_shadow_effect
-from modules.utils.file_utils import openFile
 from modules.dialogs.file_location_dialog import FileLocationDialog
 
-# Page setup imports
-from pages.reports_page.reports_config import general_reports_setup
-from pages.reports_page.reports.report_utils import deleteAllSampleWidgets
-from pages.icp_page.icp_page_config import  icpSetup, on_icpTabWidget_currentChanged
-from pages.chm_page.chm_page_config import chemistrySetup, on_chmTabWidget_currentChanged
-from pages.settings_page.settings_page_config import settingsSetup
-from pages.history_page.history_page_config import history_page_setup, set_total_outgoing_jobs
-
+# setup up managers
 from modules.managers.authors_manager import AuthorsManager
 from modules.managers.client_info_manager import ClientInfoManager
 from modules.managers.database_manager import DatabaseManager
@@ -33,8 +21,14 @@ from modules.managers.elements_manager import ElementsManager
 from modules.managers.units_manager import UnitManager
 from modules.managers.footers_manager import FootersManager
 from modules.managers.navigation_manager import NavigationManager
+from modules.managers.file_paths_manager import FilePathsManager
 
-#TODO: include yaml for config and file locations
+# Page setup imports
+from pages.reports_page.reports_config import general_reports_setup
+from pages.reports_page.reports.report_utils import deleteAllSampleWidgets
+from pages.icp_page.icp_page_config import  icp_setup, on_icpTabWidget_currentChanged
+from pages.chm_page.chm_page_config import chemistrySetup, on_chmTabWidget_currentChanged
+from pages.history_page.history_page_config import history_page_setup, set_total_outgoing_jobs
 
 class MainWindow(QMainWindow):
 
@@ -108,26 +102,17 @@ class MainWindow(QMainWindow):
 
         # Load page setup functions
         general_reports_setup(self)
-        settingsSetup(self)
         history_page_setup(self)
-        icpSetup(self)
+        icp_setup(self)
         chemistrySetup(self)
 
     def manager_setup(self):
 
-        #TODO: can load this stuff prior and have the app spinning and loading stuff
         # state managers
         self.status_bar_manager = StatusBarManager(self.ui.statusbar)
         self.client_manager = ClientInfoManager(self.ui.reportsUserInfoWidget)
         self.toolbar_manager = ToolbarManager(self.ui.toolBar)
-
-        self.toolbar_manager.action_name.connect(self.handle_toolbar_action)
-
         self.navigation_manager = NavigationManager(self.ui.navigationTree)
-        self.navigation_manager.stack_change.connect(self.change_index)
-        self.navigation_manager.icp_tab_change.connect(self.ui.icpTabWidget.setCurrentIndex)
-        self.navigation_manager.chm_tab_change.connect(self.ui.chmTabWidget.setCurrentIndex)
-        self.navigation_manager.report_tab_change.connect(self.ui.historyTabWidget.setCurrentIndex)
 
         # shared database tables managers
         self.units_manager = UnitManager(self.tempDB)
@@ -141,31 +126,50 @@ class MainWindow(QMainWindow):
 
         # chm database table manager
 
-    def handle_toolbar_action(self,action_name):
+        # manager signals
+        self.toolbar_manager.action_name.connect(self.handle_toolbar_action)
+        self.navigation_manager.stack_change.connect(self.change_index)
+        self.navigation_manager.icp_tab_change.connect(self.ui.icpTabWidget.setCurrentIndex)
+        self.navigation_manager.chm_tab_change.connect(self.ui.chmTabWidget.setCurrentIndex)
+        self.navigation_manager.report_tab_change.connect(self.ui.historyTabWidget.setCurrentIndex)
+
+    def handle_toolbar_action(self, action_name):
+        self.logger.info(f'Entering handle_toolbar_action with action_name: {action_name}')
 
         if(action_name == 'create'):
-            #dialog = CreateReport(self.parameters_manager)
             self.create_report.start()
+
+        if(action_name == 'edit'):
+            pass
+
+        if(action_name == 'search'):
+            self.change_index(0)
+            self.ui.historyTabWidget.setCurrentIndex(0)
+
+        if( action_name == "upload"):
+            self.icp_history_controller.handle_upload_btn()
+
+        if(action_name == 'write'):
+            self.change_index(3)
+            self.ui.chmTabWidget.setCurrentIndex(1)
+
+        if(action_name == 'settings'):
+            pass
 
 
     def load_database(self, max_attempts=3):
-        self.logger.info("Entering load_database function")
+        self.logger.info("Entering load_database")
 
-        # self.paths = load_pickle('data.pickle')
-        self.preferences = LocalPreferences('data.pickle')
-        preferences = self.preferences.values()
-
-        self.logger.debug('Preferences Items')
-        for key, value in preferences.items():
-            self.logger.debug(f'Database Path Name: {key}, Path: {value}')
+        self.preferences = FilePathsManager()
 
         for attempt in range(max_attempts):
             self.logger.debug(f'Attempt: {attempt}')
 
             try:
-                self.db = DatabaseManager(self.preferences.get('databasePath'))
-                self.tempDB = DatabaseManager(self.preferences.get('temp_backend_path')) # harry backend database
-                self.officeDB = DatabaseManager(self.preferences.get('officeDbPath'))  # front end database
+                # set the default databases
+                self.db = DatabaseManager(self.preferences.get_path('databasePath'))
+                self.tempDB = DatabaseManager(self.preferences.get_path('temp_backend_path')) # harry backend database
+                self.officeDB = DatabaseManager(self.preferences.get_path('officeDbPath'))  # front end database
                 return
 
             except Exception as error:
@@ -174,11 +178,6 @@ class MainWindow(QMainWindow):
                 if attempt == max_attempts-1:
                     self.logger.warning("Max attempts reached. Unable to connect to databases.")
                     return
-
-                # TODO: remove this later
-                #tempLocation = openFile()
-                #print(f'Temp Location: {tempLocation}')
-                #self.preferences.update('temp_backend_path', tempLocation)
 
                 # Dialog popup to load the necessary database Information for the user
                 dialog = FileLocationDialog(self.preferences)
@@ -214,7 +213,6 @@ class MainWindow(QMainWindow):
 
     def on_client_info_changed(self, field_name, text):
         self.clientInfo[field_name] = text;
-
 
     #TODO: deal with this
     def on_tab_pressed1(self):
@@ -272,34 +270,4 @@ class MainWindow(QMainWindow):
         self.ui.reportType.setCurrentIndex(0)
         self.ui.paramType.setCurrentIndex(0)
         self.ui.dilutionInput.setText('')
-
-class LocalPreferences:
-    def __init__(self, path='preferences.pkl'):
-        self.path = path
-        self.load()
-
-    def load(self):
-        try:
-            with open(self.path, 'rb') as file:
-                self.preferences = pickle.load(file)
-        except (FileNotFoundError, EOFError):
-            self.preferences = {}
-
-    def values(self):
-        return self.preferences
-
-    def update(self,name, value):
-        self.preferences[name] = value
-        self.save()
-
-    def get(self, value):
-        return self.preferences[value]
-
-    def remove(self, value):
-        del self.preferences[value]
-
-    def save(self):
-        with open(self.path, 'wb') as file:
-            pickle.dump(self.preferences, file)
-
 

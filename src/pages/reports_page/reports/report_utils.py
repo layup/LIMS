@@ -32,6 +32,9 @@ def populate_author_dropdown(self):
         self.ui.authorOneDropDown.addItem(full_name, author_id)
         self.ui.authorTwoDropDown.addItem(full_name, author_id)
 
+    # set the default to author number 1
+    self.ui.authorOneDropDown.setCurrentIndex(1)
+
 #TODO: error handle if they are both the same name
 def get_selected_report_authors(self):
     logger.info('Entering get_selected_report_authors')

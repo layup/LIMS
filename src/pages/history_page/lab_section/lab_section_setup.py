@@ -33,6 +33,7 @@ def lab_section_setup(self):
 
     # Connect Signals
     self.chem_history_controller.openReport.connect(lambda job_item :open_btn_pressed(self, job_item))
+    self.ui.createReportBtn.clicked.connect(self.create_report.start)
 
 
 def lab_table_setup(table, headers):

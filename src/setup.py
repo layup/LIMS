@@ -3,7 +3,6 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import sys
-import os
 
 from app import MainWindow
 from base_logger import logger
@@ -38,7 +37,7 @@ def setup_logging():
     print(f'*Logging Level: {logger_level_meaning[logger.level]}')
     print(f"*Logger Propagation: {logger.propagate}")
 
-    logger.info(f'Display Settings')
+    logger.info('Display Settings')
     logger.info(f"Using AA_EnableHighDpiScaling : {QApplication.testAttribute(Qt.AA_EnableHighDpiScaling)}")
     logger.info(f"Using AA_UseHighDpiPixmaps    : {QApplication.testAttribute(Qt.AA_UseHighDpiPixmaps)}")
 
@@ -55,7 +54,7 @@ def screen_resolution_adjust(app):
     # Set font size based on screen resolution
     font_size = 10  # Default font size
     if width <= 1280:
-        font_size = 8  # Smaller font for lower resolution
+        font_size = 10  # Smaller font for lower resolution
     elif width >= 1920:
         font_size = 13  # Larger font for high resolution
 

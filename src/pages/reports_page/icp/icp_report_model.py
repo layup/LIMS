@@ -25,6 +25,7 @@ class IcpReportModel(QObject):
         self.dilution = dilution
         self.sample_names = sample_names
         self.elements_manager = elements_manager
+        self.comments_manager = None;
 
         # element_symbol = element_num
         self.symbol_num = {}
@@ -32,7 +33,6 @@ class IcpReportModel(QObject):
 
         self.elements_info = {}
         self.samples = {}
-
 
     def get_element_nums(self):
         return self.elements_info.keys()
@@ -60,8 +60,9 @@ class IcpReportModel(QObject):
                 upper_limit = limit_item.upper_limit
                 unit_type = limit_item.unit
                 side_comment = limit_item.side_comment
+                footer_comment = limit_item.footer_comment
 
-                self.elements_info[element_id].add_limits(unit_type, lower_limit, upper_limit, side_comment)
+                self.elements_info[element_id].add_limits(unit_type, lower_limit, upper_limit, side_comment, footer_comment)
 
 
     def export_elements_info(self):
@@ -72,8 +73,6 @@ class IcpReportModel(QObject):
         element_limits_info = []
         element_units = []
 
-        #element_limits = {}
-
         for element_num, element_item in self.elements_info.items():
             element_name = element_item.element_name
             element_symbol = element_item.element_symbol
@@ -81,9 +80,10 @@ class IcpReportModel(QObject):
             upper_limit = element_item.upper_limit
             side_comment = element_item.comment
             unit = element_item.unit
+            footer = element_item.footer
 
             element_names.append(element_name)
-            element_limits_info.append([element_name, lower_limit, upper_limit, side_comment, unit])
+            element_limits_info.append([element_name, lower_limit, upper_limit, side_comment, unit, footer])
             element_units.append(unit)
             element_symbols.append(element_symbol)
             #element_limits[element_num] = [element_item.unit_type, element_item.upper_limit, element_item.lower_limit, element_item.side_comment]
@@ -109,6 +109,16 @@ class IcpReportModel(QObject):
             export_list[sample_name] = export_sample_data
 
         return export_list
+
+    def export_samples_extra(self):
+
+        export_list = {}
+
+        for sample_name, sample_info in self.samples.items():
+            export_list[sample_name] = [sample_info.ph, sample_info.hardness]
+
+        return export_list
+
 
     def init_samples(self):
         logger.info('Entering init_samples')

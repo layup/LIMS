@@ -8,14 +8,17 @@ from pages.reports_page.icp.icp_report_items import IcpReportSampleItem, IcpRepo
 class IcpReportView(QObject):
 
     tableItemChangeEmit = pyqtSignal(QTableWidgetItem)
+    reportsTabChangeEmit = pyqtSignal(int)
 
     hardnessBtnClicked = pyqtSignal()
     reloadBtnClicked = pyqtSignal()
 
-    def __init__(self,  table, reload_btn, hardness_btn):
+    def __init__(self,  table, comment_table, reports_tab, reload_btn, hardness_btn):
         super().__init__()
 
         self.table = table
+        self.comment_table = comment_table
+        self.reports_tab = reports_tab
 
         self.reload_btn = reload_btn
         self.hardness_btn = hardness_btn
@@ -25,6 +28,7 @@ class IcpReportView(QObject):
         self.reload_btn.clicked.connect(self.reloadBtnClicked.emit)
         self.hardness_btn.clicked.connect(self.hardnessBtnClicked.emit)
         self.table.itemChanged.connect(self.item_changed_handler)
+        self.reports_tab.currentChanged.connect(self.reportsTabChangeEmit)
 
     def item_changed_handler(self, item):
         self.tableItemChangeEmit.emit(item)
@@ -47,12 +51,18 @@ class IcpReportView(QObject):
        # additional_rows = ['Hardness', 'pH']
        # symbol_name = ['CaC0₃', '']
        # unit_type = ['ug/L', '']
+        #TODO: soil doesn't have hardness and ph
 
         additional_rows = ['pH', 'Hardness']
         symbol_name = ['', 'CaC0₃']
         unit_type = ['',  'ug/L']
 
         self.table.setRowCount(row_count + len(additional_rows))
+
+        self.comment_table.setRowCount(row_count)
+
+        for row in range(self.comment_table.rowCount()):
+            self.comment_table.setRowHeight(row, 22)
 
         # Set all the sample items to be center and adds an item to all the blank
         for col in range(2, self.table.columnCount()):
@@ -70,7 +80,6 @@ class IcpReportView(QObject):
             self.add_table_item(current_row, 2, unit_type[index])
 
     def add_table_item(self, row, col, value):
-        logger.info('Entering add_table_item')
 
         item = QTableWidgetItem(str(value) if value is not None else '')
 
@@ -83,11 +92,20 @@ class IcpReportView(QObject):
 
         self.table.setItem(row, col, item)
 
+    def add_comment_item(self, row, col, value):
+
+        item = QTableWidgetItem(str(value) if value is not None else '')
+
+        item.setFlags(item.flags() | ~Qt.ItemIsEditable)
+
+        if(col == 1):
+            item.setTextAlignment(Qt.AlignCenter)
+
+        self.comment_table.setItem(row, col, item)
+
     def update_table_elements(self, elements, dilution):
         logger.info('Entering update_table_elements')
         logger.info(f'dilution: {dilution}')
-
-        logger.info(f'elements')
 
         element_row_nums = []
 
@@ -110,6 +128,19 @@ class IcpReportView(QObject):
                 self.add_table_item(row, 5, 1)
 
         return element_row_nums
+
+    def update_table_comments(self, elements):
+        logger.info('Entering update_comments_table')
+
+        for row, (element_num, element_item) in enumerate(elements.items()):
+            if(isinstance(element_item, IcpReportElementsItem)):
+                self.add_comment_item(row, 0, element_item.element_name)
+                self.add_comment_item(row, 1, 'N/A')
+                self.add_comment_item(row, 2, element_item.footer)
+
+    def update_comments_status(self, row, status):
+        self.add_comment_item(row, 1, status)
+
 
     def update_table_samples(self, samples_info):
         logger.info('Entering update_table_samples')

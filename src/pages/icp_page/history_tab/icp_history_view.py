@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
 from PyQt5.QtWidgets import (
     QCompleter, QAbstractItemView, QHeaderView, QTableWidgetItem, QPushButton, QWidget,
-    QHBoxLayout
+    QHBoxLayout, QSpacerItem, QSizePolicy
 )
 
 from pages.icp_page.history_tab.icp_history_item import IcpHistoryItem
@@ -13,6 +13,7 @@ class IcpHistoryView(QObject):
 
     uploadBtnClicked = pyqtSignal()
     openBtnClicked = pyqtSignal(IcpHistoryItem)
+    printBtnClicked = pyqtSignal(str)
 
     nextPageClicked = pyqtSignal()
     prevPageClicked = pyqtSignal()
@@ -52,7 +53,7 @@ class IcpHistoryView(QObject):
         # Bring the vertical scroll bar back to the top
         self.table.verticalScrollBar().setValue(0)
 
-        row_height = 24;
+        row_height = 28;
         total_items = len(data)
         self.table.setRowCount(total_items)
 
@@ -86,18 +87,27 @@ class IcpHistoryView(QObject):
 
     def create_open_btn(self, row, col, current_item):
 
-        # Create widget container
-        widget_container = QWidget()
+        # Create button widget
+        button_widget = QWidget()
+        layout = QHBoxLayout()
+        button_widget.setLayout(layout)
 
         open_btn = QPushButton("View Sample")
-        other_btn = QPushButton('View Job')
+        print_btn = QPushButton('Print Batch')
+        spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         open_btn.setFixedSize(120,18)
-        open_btn.setFixedSize(120,18)
+        print_btn.setFixedSize(120,18)
 
         open_btn.clicked.connect(lambda: self.openBtnClicked.emit(current_item))
+        print_btn.clicked.connect(lambda: self.printBtnClicked.emit(current_item.fileName))
 
-        self.table.setCellWidget(row, col, open_btn)
+        layout.addWidget(open_btn)
+        layout.addWidget(print_btn)
+        layout.addItem(spacer)
+        layout.setContentsMargins(2, 0, 0, 0)  # Remove margins
+
+        self.table.setCellWidget(row, col, button_widget)
 
     def sort_table(self, index):
         if(index in [0,1,4]):

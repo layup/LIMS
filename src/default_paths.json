@@ -1,0 +1,9 @@
+{
+    "ispDataUploadPath": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/data/uploadData",
+    "databasePath": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/database/ISP.db",
+    "TXTDirLocation": "/Users/layup/Downloads/MB_LABS/TXT files ",
+    "reportsPath": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/reports",
+    "officeDbPath": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[04] Front Desk Intake App /python/database/clients.db",
+    "preferencesPath": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/database/settings.db",
+    "temp_backend_path": "/Users/layup/Documents/[02] Work/[01] Projects/[01] Project MB Labs /[01] Development /[03] Harry App/database/chemistry.db"
+}

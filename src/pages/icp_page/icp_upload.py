@@ -1,7 +1,6 @@
 import csv
 import os
 import re
-import numpy
 import json
 import openpyxl
 import string
@@ -11,183 +10,213 @@ from copy import copy
 from datetime import date
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QFileDialog, QPushButton, QTableWidgetItem,
-    QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip, QGraphicsDropShadowEffect
-)
+from PyQt5.QtWidgets import (QFileDialog, QPushButton, QTableWidgetItem, QTableWidget , QVBoxLayout, QDialog,  QSizePolicy, QSizeGrip )
 
-from modules.utils.pickle_utils import load_pickle
+from modules.dialogs.basic_dialogs import error_dialog
+from modules.utils.file_utils import get_path_from_json
 
+#TODO: edit how the dialogs look for this
 
-#TODO: make sure we can have a way to determine if we have a correct file
-#TODO: have status label that we successfully upload a file
-def icp_upload(filePath, db):
-    logger.info('Entering icp_upload with filePath: {filePath}')
+def icp_upload(file_path, db):
+    logger.info(f'Entering icp_upload with file_path: {file_path}')
 
-    logger.info('Scanning File... ')
+    upload_methods = {
+        '.txt': process_txt_file,
+        '.xlsx': process_xlsx_file,
+        '.csv': process_csv_file,
+    }
 
-    if(filePath.endswith('.txt')):
+    # Get the file extension using os.path.splitext
+    file_extension = os.path.splitext(file_path)[1].lower()
+
+    upload_method = upload_methods.get(file_extension)
+
+    if upload_method:
         try:
-            icpMethod1(filePath, db)
-
-
+            upload_method(db, file_path)
         except Exception as e:
-            print(e)
+            logger.error(f'Error uploading file: {e}')
+            error_dialog('Error Uploading File', f'There was an error uploading file: {file_path}')
 
-    elif(filePath.endswith('.xlsx')):
-        try:
-            icpMethod2(filePath, db)
-        except Exception as e:
-            print(e)
     else:
-        print("Not valid file type")
-    return;
+        logger.warning(f'Invalid file type: {file_path}')
+        error_dialog('Error Uploading File', f'Invalid file type: {file_extension}')
 
-#TODO: sort by name
-#read line by line and just add the line instead
-#FIXME: tracking the icpData is wrong as well
+def process_csv_file(db, file_path):
+    logger.info(f'Entering process_csv_file with file_path:{file_path}')
 
-def icpMethod1(filePath, db):
-    logger.info('Entering icpMethod1 with parameters: filePath: {filePath}')
-    logger.info('Method 1: TXT filetype detected')
+    base_name = os.path.basename(file_path)
+    file_name, _ = os.path.splitext(base_name)
+    new_name = f'{file_name}.csv'
 
-    file1 = open(filePath, 'r')
-    baseName = os.path.basename(filePath)
-    fname = baseName.split('.txt')[0]
+    output_path = get_path_from_json('default_paths.json', 'ispDataUploadPath')
+    new_path = os.path.join(copy(output_path), new_name)
 
-    logger.debug('FileName: ', fname)
+    job_numbers, sample_numbers = [], []
+    job_data, element_data = {}, {}
 
-    Lines = file1.readlines()
+    current_job = ''
 
-    startingLine = 'Date Time Label Element Label (nm) Conc %RSD Unadjusted Conc Intensity %RSD'
-    headers = ['Sample', 'Analyze', 'Element', 'HT', ' ', 'units', 'rep', ' ', ' ']
+    with open(file_path, 'r') as csv_file:
+        reader = csv.reader(csv_file)
 
-    startingPosition = []
-    endPosition = []
-    count = 0
+        for row_index, row in enumerate(reader):
+            if(row_index >= 4):
+                label_name = row[0]
+                date_time = row[2]
+                element = row[4]
+                unadj_data = row[6]
+                concent_data = row[7]
+                unit = row[8]
 
-    # Strips the newline character
-    for line in Lines:
+                # make sure that this is a sample
+                # FIXME: had some files that appear liked '130088-3 fe etc' in the csv column, fix that seems strange
+                if(re.search('\d{6}-\d{1,2}$', label_name)):
 
-        #print("Line{}: {}".format(count, line.strip()))
-        if(line.strip() == startingLine):
-            startingPosition.append(count)
+                    sample_numbers.append([label_name, row_index, element, unadj_data])
 
-        if(re.search('([1-9]|[1-9][0-9]) of ([1-9]|[1-9][0-9])$', line)):
-            endPosition.append(count)
 
-        count += 1
+                    if(current_job == ''):
+                       current_job = label_name
 
-    #update headers
-    headerUpdate = Lines[startingPosition[0] + 1];
-    headerUpdate = headerUpdate.split()
-    headers[7] = headerUpdate[0]
-    headers[8] = headerUpdate[1]
+                    elif(current_job != label_name):
+                        job_data[current_job] = element_data
+                        element_data = {}
+                        current_job = label_name
 
-    newName = fname + '.csv'
-    loadPath = load_pickle('data.pickle')
-    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName)
+                    element_data[element] = unadj_data
+                    job_number = label_name.split('-')[0]
 
-    logger.info('Writing CSV File: {}'.format(newPath))
+                    if(job_number not in job_numbers):
+                        job_numbers.append(job_number)
 
-    f = open(newPath, 'w')
-    writer = csv.writer(f)
-    writer.writerow(headers)
 
-    spiltLengths = []
+        job_data[current_job] = element_data
 
-    jobNumbers = []
-    jobData = {}
+    for key, value in job_data.items():
+        logger.debug(key, value )
 
-    elementData = {}
-    currentJob = ''
+    save_status = viewIcpTable(file_path, sample_numbers, reportType=1)
+    logger.info(f"save_status: {repr(save_status)}")
 
-    sampleNumbers = []
-
-    #TODO: missing the last row
-    for start in startingPosition:
-        running = True;
-        counter = 1;
-
-        while(running):
-
-            currentLine = Lines[start + counter]
-
-            if(re.search('([1-9]|[1-9][0-9]) of ([1-9]|[1-9][0-9])$', currentLine)):
-                break;
-
-            counter += 1;
-
-            splitLine = currentLine.split()
-            spiltLengths.append(len(splitLine))
-
-            if(re.search('\d{6}-\d{1,2}', splitLine[2])):
-                temp = []
-                temp.append(splitLine[2])
-                temp.append(1)
-                temp.append(splitLine[3])
-                temp.append(1)
-                temp.append(splitLine[6])
-                temp.append('mg/L')
-                temp.append(1)
-                temp.append(splitLine[0])
-                temp.append(splitLine[1])
-
-                sampleNumbers.append([splitLine[2], start+counter, splitLine[3], splitLine[6]])
-
-                if(currentJob == ''):
-                    currentJob = splitLine[2]
-
-                elif(currentJob != splitLine[2]):
-                    jobData[currentJob] = elementData
-                    elementData = {}
-                    currentJob = splitLine[2]
-
-                elementData[splitLine[3]] = splitLine[6]
-
-                jobNumber = splitLine[2].split('-')[0]
-                if(jobNumber not in jobNumbers):
-                    jobNumbers.append(jobNumber)
-
-                if(temp):
-                    writer.writerow(temp)
-
-        jobData[currentJob] = elementData
-
-    spiltLengths = numpy.array(spiltLengths)
-    unique, counts = numpy.unique(spiltLengths, return_counts=True)
-
-    f.close()
-    file1.close()
-
-    #TODO: factor in a way to show all the things and the lines where duplicates are
-    logger.debug(f'SampleNumbers: {sampleNumbers}')
-    logger.debug(f'JobData: {jobData}')
-
-    save = viewIcpTable(filePath, sampleNumbers, 1)
-    logger.info(f"Save Status: {repr(save)}")
-
-    #save to database
-    if(save):
-        for (key, value) in jobData.items():
+    if(save_status):
+        for (key, value) in job_data.items():
             jobNum = key.split('-')[0]
-            todayDate = date.today()
+            today_date = date.today()
+            package_data = json.dumps(value)
 
-            tempData = json.dumps(value)
             if(key):
                 sql = 'INSERT OR REPLACE INTO icpData values(?, ?, ?, ?, ?, 1)'
-                db.execute(sql, (key,jobNum,baseName, tempData, todayDate))
+                db.execute(sql, (key, jobNum, base_name, package_data, today_date))
                 db.commit()
 
-        return jobNumber, jobData
-    else:
-        return False;
+        return job_numbers, job_data
 
+    return False
+
+
+#TODO: sort by name
+def process_txt_file(db, file_path):
+    logger.info(f'Entering process_txt_file with file_path: {file_path}')
+
+    base_name = os.path.basename(file_path)
+    file_name, _ = os.path.splitext(base_name)
+    new_name = f'{file_name}.csv'
+
+    starting_line = 'Date Time Label Element Label (nm) Conc %RSD Unadjusted Conc Intensity %RSD'
+    headers = ['Sample', 'Analyze', 'Element', 'HT', ' ', 'units', 'rep', 'Date', 'Time']
+
+    output_path = get_path_from_json('default_paths.json', 'ispDataUploadPath')
+    new_path = os.path.join(copy(output_path), new_name)
+
+    writer = csv.writer(open(new_path, 'w'))
+    writer.writerow(headers)
+
+    job_numbers, sample_numbers = [], []
+    job_data, element_data = {}, {}
+
+    current_job = ''
+
+    with open(file_path, 'r') as file1:
+        lines = file1.readlines()
+
+        processing_data = False
+
+        for i, line in enumerate(lines):
+            if(processing_data):
+
+                if(re.search('([1-9]|[1-9][0-9]) of ([1-9]|[1-9][0-9])$', line)):
+                    processing_data = False
+                    continue
+
+                split_line = line.split()
+
+                if(re.search('\d{6}-\d{1,2}', split_line[2])):
+                    sample_date = split_line[0]
+                    sample_time = split_line[1]
+                    sample_name = split_line[2]
+                    element = split_line[3]
+                    value = split_line[6]
+
+                    sample_numbers.append([sample_name, i, element, value])
+
+                    if(len(split_line) > 14):
+                        unit = split_line[8].strip('()')
+                    else:
+                        unit = split_line[7].strip('()')
+
+                    row = [sample_name, 1, element, 1, value, unit, 1, sample_date, sample_time]
+
+                    #logger.info(split_line)
+                    #logger.info(f'{row}, {len(split_line)}')
+
+                    if(current_job == ''):
+                       current_job = sample_name
+
+                    elif(current_job != sample_name):
+                        job_data[current_job] = element_data
+                        element_data = {}
+                        current_job = sample_name
+
+                    element_data[element] = value
+                    job_number = sample_name.split('-')[0]
+
+                    if(job_number not in job_numbers):
+                        job_numbers.append(job_number)
+
+                    writer.writerow(row)
+
+            # next line where the information begin
+            if(line.strip() == starting_line):
+                processing_data = True
+
+    job_data[current_job] = element_data
+
+    logger.debug(f'sample_numbers: {sample_numbers}')
+    logger.debug(f'job_data: {job_data}')
+
+    save_status = viewIcpTable(file_path, sample_numbers, reportType=1)
+    logger.info(f"save_status: {repr(save_status)}")
+
+    if(save_status):
+        for (key, value) in job_data.items():
+            jobNum = key.split('-')[0]
+            today_date = date.today()
+            package_data = json.dumps(value)
+
+            if(key):
+                sql = 'INSERT OR REPLACE INTO icpData values(?, ?, ?, ?, ?, 1)'
+                db.execute(sql, (key,jobNum, base_name, package_data, today_date))
+                db.commit()
+
+        return job_numbers, job_data
+
+    return False
 
 #scans thought all the text files and finds all the different sample types and the ISP and CHM files
 #TODO: insert try catch block
-def icpMethod2(filePath, db):
-    logger.info('Entering icpMethod2 with parameters: filePath: {filePath}')
-    logger.info('Method 2: xlsx fileType detected')
+def process_xlsx_file(db, filePath):
+    logger.info('Entering process_xlsx_file with parameters: filePath: {filePath}')
 
     wb = openpyxl.load_workbook(filePath)
     sheets = wb.sheetnames
@@ -195,11 +224,12 @@ def icpMethod2(filePath, db):
     baseName = os.path.basename(filePath)
     fname = baseName.split('.xlsx')[0]
 
-    logger.debug('FileName: ', fname)
+    logger.debug(f'FileName: ', fname)
 
     newName = fname + '_formatted'  + '.xlsx'
-    loadPath = load_pickle('data.pickle')
-    newPath = os.path.join(copy(loadPath['ispDataUploadPath']), newName)
+
+    file_path = get_path_from_json('default_paths.json', 'ispDataUploadPath')
+    newPath = os.path.join(copy(file_path), newName)
 
     ws = wb[sheets[0]]
 
@@ -338,6 +368,9 @@ def viewIcpTable(filePath, data, reportType):
 #******************************************************************
 #    Classes
 #******************************************************************
+
+
+
 class icpTableView(QDialog):
     def __init__(self, filePath, data, reportType):
         super().__init__()
@@ -387,6 +420,9 @@ class icpTableView(QDialog):
         layout.addWidget(save_button)
 
         self.setLayout(layout)
+
+    def load_data(self):
+        pass;
 
 
     def save_and_close(self):

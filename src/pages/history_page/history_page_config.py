@@ -13,11 +13,6 @@ def history_page_setup(self):
     # set the default tab to the chem tab
     self.ui.historyTabWidget.setCurrentIndex(0)
 
-    #TODO: load in the initial data for both
-
-    # if change to the current page then we can load data?
-
-   # self.ui.historyTabWidget.currentChange(lambda arguments : print(f'History Tab Section changed to {arguments}'))
 
 def set_total_outgoing_jobs(self):
     query = '''

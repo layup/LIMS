@@ -39,6 +39,7 @@ def connect_icp_signals(self):
     self.ui.reportTypeDropdown.activated.connect(lambda index: handle_parameter_change(self, index))
     self.ui.definedElements.currentRowChanged.connect(lambda: handle_selected_element_change(self))
     self.ui.icpElementTreeWidget.currentItemChanged.connect(lambda tree_item: handle_tree_change(self, tree_item))
+    self.ui.icpElementTreeWidget.clicked.connect(lambda tree_item: handle_tree_change(self, tree_item))
 
     self.ui.deleteCompBtn.clicked.connect(lambda: handle_delete_btn_clicked(self))
     self.ui.addElementBtn.clicked.connect(lambda: handle_add_elements_btn_clicked(self))
@@ -104,11 +105,20 @@ def validators_setup(self):
 
 def elements_tree_setup(self):
 
-    headers = self.ui.icpElementTreeWidget.header()
-    headers.setDefaultAlignment(Qt.AlignCenter)
+
+    icp_tree_headers = ['Report ID', 'Parameter','Lower Limit', 'Upper Limit', 'Unit', 'Comment']
+
+    self.ui.icpElementTreeWidget.setHeaderLabels(icp_tree_headers)
+
+    #headers = self.ui.icpElementTreeWidget.header()
+
+    #headers.setDefaultAlignment(Qt.AlignCenter)
 
     # set the widths
-    self.ui.icpElementTreeWidget.setColumnWidth(1, 250)
+    self.ui.icpElementTreeWidget.setColumnWidth(0, 80)
+    self.ui.icpElementTreeWidget.setColumnWidth(1, 100)
+    self.ui.icpElementTreeWidget.setColumnWidth(2, 100)
+    self.ui.icpElementTreeWidget.setColumnWidth(3, 100)
 
 ###################################################################
 #    Helper Functions
@@ -131,6 +141,7 @@ def clear_element_limits(self):
     self.ui.upperLimit.clear()
     self.ui.unitType.clear()
     self.ui.RightSideComment.clear()
+    self.ui.icpElementFooterComment.clear()
 
 def clear_report_tree_cols(tree_widget):
     logger.info('Entering clear_report_tree_cols')
@@ -199,15 +210,16 @@ def set_element_tree_limits(self, element_id):
                 lower_limit = limits_info.lower_limit
                 upper_limit = limits_info.upper_limit
                 unit_type = limits_info.unit
+                footer = limits_info.footer_comment
 
                 current_item.setData(2, Qt.DisplayRole, lower_limit)
                 current_item.setData(3, Qt.DisplayRole, upper_limit)
                 current_item.setData(4, Qt.DisplayRole, unit_type)
+                current_item.setData(5, Qt.DisplayRole, footer)
+
 
 def save_defined_limits(self, param_id, element_id):
     logger.info(f'Entering save_defined_limits with param_id: {param_id}, element_id: {element_id} ')
-
-    lower_limit, upper_limit, unit_type, side_comment = get_defined_limits_text(self)
 
     # check if any of the data is different before updating the database
     changed_status = check_limit_difference(self, param_id, element_id)
@@ -215,8 +227,8 @@ def save_defined_limits(self, param_id, element_id):
     logger.debug(f'changed_status: {changed_status}')
 
     if(changed_status):
-        lower_limit, upper_limit, unit_type, side_comment = get_defined_limits_text(self)
-        update_status = self.elements_manager.insert_or_update_limits( param_id, element_id, unit_type, lower_limit, upper_limit, side_comment)
+        lower_limit, upper_limit, unit_type, side_comment, footer = get_defined_limits_text(self)
+        update_status = self.elements_manager.insert_or_update_limits( param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, footer)
 
         if(update_status):
             # update the element tree (reloading all the info again but is quick )
@@ -257,11 +269,12 @@ def get_defined_limits_text(self):
     lower_limit = self.ui.lowerLimit.text()
     upper_limit = self.ui.upperLimit.text()
     unit_type = self.ui.unitType.text()
-    side_comment = self.ui.RightSideComment.toPlainText()
+    side_comment = self.ui.RightSideComment.text()
+    footer_comment = self.ui.icpElementFooterComment.toPlainText()
 
-    logger.debug(f'lower_limit: {lower_limit}, upper_limit: {upper_limit}, unit_type:{unit_type}, side_comment:{side_comment}')
+    logger.debug(f'lower_limit: {lower_limit}, upper_limit: {upper_limit}, unit_type:{unit_type}, side_comment:{side_comment}, footer: {footer_comment}')
 
-    return lower_limit, upper_limit, unit_type, side_comment
+    return lower_limit, upper_limit, unit_type, side_comment, footer_comment
 
 def check_limit_difference(self, param_id, element_id):
     logger.info(f'Entering check_limit_difference param_id: {param_id}, element_id: {element_id}')
@@ -273,10 +286,11 @@ def check_limit_difference(self, param_id, element_id):
         existing_upper_limit = limit_item.upper_limit
         existing_unit_type = limit_item.unit
         existing_side_comment = limit_item.side_comment
+        existing_footer = limit_item.footer_comment
 
-        lower_limit, upper_limit, unit_type, side_comment = get_defined_limits_text(self)
+        lower_limit, upper_limit, unit_type, side_comment, footer_comment = get_defined_limits_text(self)
 
-        return existing_lower_limit != lower_limit or existing_upper_limit != upper_limit or existing_unit_type != unit_type or existing_side_comment != side_comment
+        return existing_lower_limit != lower_limit or existing_upper_limit != upper_limit or existing_unit_type != unit_type or existing_side_comment != side_comment or existing_footer != footer_comment
 
     # means limit_item doesn't exist so not in the database yet
     return True
@@ -385,18 +399,20 @@ def handle_cancel_btn_clicked(self):
                 upper_limit = limits_info.upper_limit
                 unit_type = limits_info.unit
                 side_comment = limits_info.side_comment
+                footer_comment = limits_info.footer_comment
 
                 self.ui.lowerLimit.setText(str(lower_limit))
                 self.ui.upperLimit.setText(str(upper_limit))
                 self.ui.unitType.setText(unit_type)
-                self.ui.RightSideComment.setPlainText(side_comment)
+                self.ui.RightSideComment.setText(side_comment)
+                self.ui.icpElementFooterComment.setPlainText(footer_comment)
 
         self.ui.elements_name_header.setText(f'[{element_id}] {element_name.capitalize()}')
 
 def handle_save_btn_clicked(self):
     logger.info('Entering handle_save_btn_clicked')
 
-    current_tree_item = self.ui.icpElementTreeWidget.currentItem()
+    current_tree_item = self.ui.icpElementTreeWidget.selectedItems()
     current_list_item = self.ui.definedElements.currentItem()
 
     if not current_list_item:
@@ -408,7 +424,8 @@ def handle_save_btn_clicked(self):
 
     # Save defined limits if both tree and list items are selected
     if current_tree_item:
-        param_id = current_tree_item.data(0, Qt.UserRole)
+        print('SAVING VALID')
+        param_id = current_tree_item[0].data(0, Qt.UserRole)
         save_defined_limits(self, param_id, element_id)
 
     # Save basic information regardless of tree item selection
@@ -434,9 +451,14 @@ def handle_parameter_change(self, index):
 def handle_tree_change(self, tree_item):
     logger.info('Entering handle_tree_change')
 
+    if(self.ui.definedElements.currentItem() is None):
+        print('no defined elements selected')
+        return
+
     # clear existing limit QLineEdit
     clear_element_limits(self)
 
+    tree_item = self.ui.icpElementTreeWidget.currentItem()
     tree_row = self.ui.icpElementTreeWidget.indexOfTopLevelItem(tree_item)
     list_row = self.ui.definedElements.currentRow()
 
@@ -459,8 +481,10 @@ def handle_tree_change(self, tree_item):
                 upper_limit = limits_info.upper_limit
                 unit_type = limits_info.unit
                 side_comment = limits_info.side_comment
+                footer_comment = limits_info.footer_comment
 
                 self.ui.lowerLimit.setText(str(lower_limit))
                 self.ui.upperLimit.setText(str(upper_limit))
                 self.ui.unitType.setText(unit_type)
-                self.ui.RightSideComment.setPlainText(side_comment)
+                self.ui.RightSideComment.setText(side_comment)
+                self.ui.icpElementFooterComment.setPlainText(footer_comment)

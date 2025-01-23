@@ -36,12 +36,12 @@ class ToolbarManager(QObject):
         self.toolbar.setIconSize(QSize(36, 36))
 
         # define the actions
-        create_action = QAction(QIcon('assets/icons/add_icon.png'), 'create new report item', self.toolbar)
-        edit_action = QAction(QIcon('assets/icons/edit_icon.svg'), 'modify existing report', self.toolbar)
-        search_action = QAction(QIcon('assets/icons/search_icon.png'), 'search for report', self.toolbar)
+        create_action = QAction(QIcon('assets/icons/add_icon.png'), 'Create New Report', self.toolbar)
+        edit_action = QAction(QIcon('assets/icons/edit_icon.svg'), 'Modify Existing Report', self.toolbar)
+        search_action = QAction(QIcon('assets/icons/search_icon.png'), 'Search for Report', self.toolbar)
         upload_action = QAction(QIcon('assets/icons/upload_icon.png'), 'upload ICP data', self.toolbar)
         write_action = QAction(QIcon('assets/icons/write_icon.png'), 'write CHM data', self.toolbar)
-        settings_action = QAction(QIcon('assets/icons/settings_icon.png'), 'write CHM data', self.toolbar)
+        settings_action = QAction(QIcon('assets/icons/settings_icon.png'), 'Settings', self.toolbar)
 
         # save the actions
         self.actions['create'] = create_action
