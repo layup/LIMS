@@ -8,10 +8,9 @@ from openpyxl.worksheet.page import PageMargins, PrintOptions
 from openpyxl.utils import get_column_letter
 
 from modules.utils.file_utils import get_path_from_json
+from modules.utils.logic_utils import is_float
 
-from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence_by_words
-
-
+from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence_by_words, significant_figures_convert
 
 '''
     Sₒ: standard deviation at zero analyze concentration; method detection limit is generally considered to be 3x So value
@@ -90,7 +89,7 @@ class ChmExcelReport(ExcelReports):
 
         self.ws.print_options = PrintOptions(horizontalCentered=True, verticalCentered=False)
 
-        # set custom page margins
+        # set custom page margins (narrow page margins)
         self.ws.page_margins = PageMargins(
             left=0.7,
             right=0.7,
@@ -228,13 +227,13 @@ class ChmExcelReport(ExcelReports):
             self.insert_signature(page_location, insert_author_cols, self.authors)
             return
 
-        next_page = False
+        insert_next_page = False
 
         # check if need to insert onto next page since no room for extra comments
         if((remaining_page_size - total_extra_comment_rows) < 6):
             self.insert_signature(page_location, insert_author_cols, self.authors)
 
-            next_page = True
+            insert_next_page = True
             current_page += 1
             next_page_start = (self.page_size * current_page) - (header_size * (current_page-1)) + 1
             page_location = next_page_start
@@ -249,7 +248,7 @@ class ChmExcelReport(ExcelReports):
                 comment_row.value = line
                 page_location+=1
 
-        if(not next_page):
+        if(not insert_next_page):
             page_location += 2
             self.insert_signature(page_location, insert_author_cols, self.authors)
 
@@ -271,7 +270,7 @@ class ChmExcelReport(ExcelReports):
             self.set_cell_value_with_format(counter, 1, test_name, Alignment(horizontal='left', vertical='center'), Border(right=self.thin_border_style) )
             self.set_cell_value_with_format(counter, 2, self.units[i])
             self.set_cell_value_with_format(counter, 7, 'ND') # Lab Blank
-            self.set_cell_value_with_format(counter, 8, self.so[i]) # So Value
+            self.set_cell_value_with_format(counter, 8, self.so[i] if not is_float(self.so[i]) else significant_figures_convert(float(self.so[i]))) # So Value
             self.set_cell_value_with_format(counter, 9, self.recovery[i])
             self.set_cell_value_with_format(counter, 10, side_comment, Alignment(horizontal='left', vertical='center', indent=1), Border(left=self.thin_border_style))
             counter += 1
@@ -298,12 +297,15 @@ class ChmExcelReport(ExcelReports):
                 test_val = convert_to_float(current_results[row])
                 upper_limit = convert_to_float(self.upper_limits[row])
 
+                # add the row to the list that will trigger ending comments
                 if(row not in self.extra_comment_rows):
                     if(isinstance(upper_limit, float) and isinstance(test_val, float)):
                         if(test_val > upper_limit):
                             self.extra_comment_rows.append(row)
 
-                current_sample.value = test_val
+
+                current_sample.value = significant_figures_convert(test_val) if is_float(test_val) else test_val
+
                 current_sample.border = self.thin_side_border
 
         page_location += total_tests

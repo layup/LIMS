@@ -7,7 +7,7 @@ from openpyxl.styles import Font, Alignment, borders, Border, Side
 from modules.utils.logic_utils import is_float
 from modules.utils.file_utils import get_path_from_json
 
-from pages.reports_page.reports.ExcelReports import ExcelReports
+from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence_by_words
 
 #TODO: set the upper limit comments
 #TODO: not scanning the entering in client info
@@ -317,9 +317,8 @@ class IcpExcelReport(ExcelReports):
         cells['symbol_cell'].border = self.thin_right_border
         cells['unit_cell'].border = self.thin_side_border
 
-
     def determine_extra_comments(self):
-        logger.info(f'Entering determine_extra_comments')
+        logger.info('Entering determine_extra_comments')
         logger.info(f'footer_comments: {self.footer_comments}')
 
         total_extra_comment_rows = 1
@@ -360,7 +359,6 @@ class IcpExcelReport(ExcelReports):
 
         logger.info(f'comment_rows: {comments_rows_length}')
 
-        temp = page_location + 6 #comment, line, line, line, name, position
 
         insert_author_cols = [3,6] if len(self.authors) > 1 else [6]
 
@@ -378,29 +376,24 @@ class IcpExcelReport(ExcelReports):
         #TODO: check if there is room to insert the comment here
 
         current_page_length = (current_page +1) * self.page_size
-        expected_length = temp + comments_rows_length
+        author_length = 6
+        expected_length = page_location + author_length + comments_rows_length
 
         logger.info(f'expected_length: {expected_length}, current_page_length: {current_page_length}')
 
-        insert_next_page = False #TODO: rename this variable
+        insert_next_page = False
 
         if(expected_length >= current_page_length):
-
             page_location += 1
-
             self.insert_signature(page_location, insert_author_cols, self.authors)
 
-            #insert comments on next page
             page_location = (self.page_size * (current_page + 1) + 1 )
-            total_rows = (self.page_size * (current_page + 2))
-
-            logger.info(f'new start: {page_location}')
-
             insert_next_page = True
+            logger.info(f'new_page: {page_location}, insert_next_page: {insert_next_page}')
 
         comment_row = self.ws.cell(row=page_location, column=1)
         comment_row.value = 'Comments:'
-        page_location += 1;
+        page_location += 1
 
         for comment in extra_comments:
             for line in comment:
@@ -412,24 +405,6 @@ class IcpExcelReport(ExcelReports):
             page_location += 2
 
             self.insert_signature(page_location, insert_author_cols, self.authors)
-
-def split_sentence_by_words(sentence, max_chars_per_line=140):
-    words = sentence.split()
-    lines = []
-    current_line = ""
-
-    for word in words:
-
-        if len(current_line) + len(word) + 1 <= max_chars_per_line:  # +1 for the space
-            current_line += word + " "
-        else:
-            lines.append(current_line.strip())  # Add the current line to the list
-            current_line = word + " "  # Start a new line with the current word
-
-    if current_line:  # Add the last line if it's not empty
-        lines.append(current_line.strip())
-
-    return lines
 
 def hardness_levels_comment(max_val):
     if(max_val <= 75):

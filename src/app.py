@@ -3,6 +3,8 @@ import os
 from interface import *
 from assets import resource_rc
 
+from dotenv import find_dotenv, load_dotenv
+
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel, QMessageBox)
 
 from modules.dialogs.basic_dialogs import yes_or_no_dialog
@@ -12,7 +14,7 @@ from modules.dialogs.file_location_dialog import FileLocationDialog
 # setup up managers
 from modules.managers.authors_manager import AuthorsManager
 from modules.managers.client_info_manager import ClientInfoManager
-from modules.managers.database_manager import DatabaseManager
+from modules.managers.database_manager import DatabaseManager, PostgresDatabaseManager
 from modules.managers.tests_manager import TestManager
 from modules.managers.toolbar_manager import ToolbarManager
 from modules.managers.status_manager import StatusBarManager
@@ -162,6 +164,28 @@ class MainWindow(QMainWindow):
 
         self.preferences = FilePathsManager()
 
+        # find the path
+        dotenv_path = find_dotenv()
+
+        load_dotenv(dotenv_path)
+
+        HOST = os.getenv('HOST')
+        DATABASE = os.getenv('DATABASE')
+        USERNAME = os.getenv('USERNAME')
+        PASSWORD = os.getenv('PASSWORD')
+
+
+        self.logger.info(f'HOST: {HOST}')
+        self.logger.info(f'DATABASE: {DATABASE}')
+        self.logger.info(f'USERNAME: {USERNAME}')
+        self.logger.info(f'PASSWORD: {PASSWORD}')
+
+        self.logger.info('Testing PostgresSQL Connection')
+        self.post_db = PostgresDatabaseManager(host=HOST, database=DATABASE, user=USERNAME, password=PASSWORD)
+
+        testing_post(self.post_db)
+
+
         for attempt in range(max_attempts):
             self.logger.debug(f'Attempt: {attempt}')
 
@@ -182,6 +206,7 @@ class MainWindow(QMainWindow):
                 # Dialog popup to load the necessary database Information for the user
                 dialog = FileLocationDialog(self.preferences)
                 dialog.exec_()
+
 
     #******************************************************************
     #    Signal Connections
@@ -271,3 +296,14 @@ class MainWindow(QMainWindow):
         self.ui.paramType.setCurrentIndex(0)
         self.ui.dilutionInput.setText('')
 
+
+
+def testing_post(db_manager):
+    print('testing_post')
+
+    try:
+        results = db_manager.query('SELECT * FROM my_test_table')
+        print(f'results: {results}')
+
+    except Exception as e:
+        print(f'failed: {e}')

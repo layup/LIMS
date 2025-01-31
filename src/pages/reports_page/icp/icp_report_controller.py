@@ -82,7 +82,6 @@ class IcpReportController(QObject):
 
                     self.view.update_comments_status(row, new_status)
 
-
     def get_max_element_value(self, row, upper_limit):
 
         for sample_name, sample_info in self.model.samples.items():
@@ -160,7 +159,6 @@ class IcpReportController(QObject):
             sample_data[job_name] = job_values
 
         return sample_data
-
 
 def is_float(string):
     try:

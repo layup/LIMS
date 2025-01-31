@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2053</width>
-    <height>1310</height>
+    <width>1200</width>
+    <height>1667</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1352,7 +1352,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -4785,7 +4785,7 @@ p, li { white-space: pre-wrap; }
                          <widget class="QTreeWidget" name="chm_test_tree">
                           <property name="maximumSize">
                            <size>
-                            <width>500</width>
+                            <width>800</width>
                             <height>16777215</height>
                            </size>
                           </property>
@@ -5215,8 +5215,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>1793</width>
-                       <height>978</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5871,8 +5871,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>45</width>
-                       <height>16</height>
+                       <width>100</width>
+                       <height>30</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6737,35 +6737,7 @@ p, li { white-space: pre-wrap; }
                          <height>200</height>
                         </size>
                        </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout_63">
-                        <item>
-                         <widget class="QTableWidget" name="tableWidget">
-                          <column>
-                           <property name="text">
-                            <string>New Column</string>
-                           </property>
-                          </column>
-                          <column>
-                           <property name="text">
-                            <string>Show Tests</string>
-                           </property>
-                          </column>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_2">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
+                       <layout class="QHBoxLayout" name="horizontalLayout_63"/>
                       </widget>
                      </item>
                     </layout>
@@ -7389,7 +7361,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2053</width>
+     <width>1200</width>
      <height>22</height>
     </rect>
    </property>

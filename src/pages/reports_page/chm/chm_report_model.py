@@ -138,7 +138,8 @@ class ChmReportModel:
                 if(row in sample_data):
                     export_sample_data.append(sample_data[row])
                 else:
-                    export_sample_data.append('ND')
+                    # when row item is blank
+                    export_sample_data.append('---')
 
             export_list[sample_name] = export_sample_data
 
@@ -213,4 +214,3 @@ def get_test_text_name(db, testNum):
 
     except Exception as e:
         print(e)
-        return None

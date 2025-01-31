@@ -52,6 +52,99 @@ def process_csv_file(db, file_path):
     output_path = get_path_from_json('default_paths.json', 'ispDataUploadPath')
     new_path = os.path.join(copy(output_path), new_name)
 
+
+    with open(file_path, 'r') as csv_file:
+        reader = csv.reader(csv_file)
+
+        for row_index, row in enumerate(reader):
+            if(row_index == 0):
+                row_length = len(row)
+
+                if(row_length == 1):
+                    return process_machine_csv_file(db, file_path, base_name)
+
+                if(row_length > 2):
+                    return process_edited_csv_file(db, file_path, base_name)
+
+def process_machine_csv_file(db, file_path, base_name):
+    logger.info(f'Entering process_machine_csv_file with file_path: {file_path}')
+
+    symbols = []
+
+    job_numbers, sample_numbers = [], []
+
+    job_data = {}
+
+    with open(file_path, 'r') as csv_file:
+        reader = csv.reader(csv_file)
+
+        element_data = {}
+
+        for row_index, row in enumerate(reader):
+
+            if(row_index == 1):
+                symbols = get_element_symbols(row[6:])
+
+            if(row_index >= 2):
+                label_name = row[0]
+
+                if(re.search(r'\d{6}-\d{1,2}$', label_name)):
+                    for col, value in enumerate(row[6:]):
+
+                        element_symbol = symbols[col]
+                        job_number = label_name.split('-')[0]
+
+                        if(job_number not in job_numbers):
+                            job_numbers.append(job_number)
+
+                        sample_numbers.append([label_name, row_index, element_symbol, value])
+                        element_data[element_symbol] = value
+
+                    job_data[label_name] = element_data
+
+
+    for key, value in job_data.items():
+        logger.debug(f'{key}, {value}')
+
+    save_status = viewIcpTable(file_path, sample_numbers, reportType=1)
+    logger.debug(f"save_status: {repr(save_status)}")
+
+    if(save_status):
+        for (key, value) in job_data.items():
+            jobNum = key.split('-')[0]
+            today_date = date.today()
+            package_data = json.dumps(value)
+
+            if(key):
+                sql = 'INSERT OR REPLACE INTO icpData values(?, ?, ?, ?, ?, 1)'
+                db.execute(sql, (key, jobNum, base_name, package_data, today_date))
+                db.commit()
+
+        return job_numbers, job_data
+
+def get_element_symbols(symbols):
+
+    element_symbols = []
+
+    for symbol in symbols:
+        symbol_split = symbol.split()
+
+        element_symbols.append(symbol_split[0])
+
+    logger.debug(f'{element_symbols}')
+
+    return element_symbols
+
+def process_edited_csv_file(db, file_path, base_name):
+    logger.info(f'Entering process_edited_csv_file with file_path: {file_path}')
+
+    base_name = os.path.basename(file_path)
+    file_name, _ = os.path.splitext(base_name)
+    new_name = f'{file_name}.csv'
+
+    output_path = get_path_from_json('default_paths.json', 'ispDataUploadPath')
+    new_path = os.path.join(copy(output_path), new_name)
+
     job_numbers, sample_numbers = [], []
     job_data, element_data = {}, {}
 
@@ -61,6 +154,9 @@ def process_csv_file(db, file_path):
         reader = csv.reader(csv_file)
 
         for row_index, row in enumerate(reader):
+
+            logger.info(f'row: {row_index}, {row}')
+
             if(row_index >= 4):
                 label_name = row[0]
                 date_time = row[2]

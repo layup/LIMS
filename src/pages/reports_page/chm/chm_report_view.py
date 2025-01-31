@@ -32,15 +32,12 @@ class ChmReportView(QObject):
     def tab_changed_handler(self, row):
         self.reportsTabChangeEmit.emit(row)
 
-
     def item_changed_handler(self, item):
         self.tableItemChangeEmit.emit(item)
 
     def clear_table(self):
         self.table.clearContents()
         self.table.setRowCount(0)
-
-
 
     def set_row_count(self, row_count):
 
@@ -149,7 +146,8 @@ class ChmReportView(QObject):
 
             self.table.setCellWidget(row, action_col, remove_btn)
 
-
+    def update_comments_status(self, row, status):
+        self.add_comment_item(row, 3, status)
 
 
     def apply_dilution_factor(self, factor):

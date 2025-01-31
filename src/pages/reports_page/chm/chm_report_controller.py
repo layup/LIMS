@@ -53,14 +53,18 @@ class ChmReportController(QObject):
         self.loaded = True
 
     def handle_hide_row(self, row):
-        logger.info(f'Entering handle_hide_row with row: {row}')
+        logger.info(f'Entering handle_hide_row  wite row: {row}')
+
         self.view.table.setRowHidden(row, True)
 
         self.model.hidden_rows[row] = 1
 
+        self.view.update_comments_status(row, 'Hidden')
+
         logger.info(f'hidden_rows: {self.model.hidden_rows}')
 
     def handle_table_change(self, item):
+
 
         if(self.loaded):
             if(item):
@@ -105,8 +109,27 @@ class ChmReportController(QObject):
 
                 upper_limit = test_info.upper_limit
 
+                logger.info(f'row: {row}, upper_limit: {upper_limit} ')
+
                 if(upper_limit):
-                    pass
+                    status = self.get_max_element_value(row, upper_limit)
+                    new_status = 'True' if status else 'False'
+                    self.view.update_comments_status(row, new_status)
+
+    def get_max_element_value(self, row, upper_limit):
+
+        for sample_name, sample_info in self.model.samples.items():
+
+            if(row in sample_info.data):
+                current_val = sample_info.data[row]
+
+                if(is_float(current_val)):
+
+                    if(float(current_val) >= float(upper_limit)):
+
+                        return True
+        return False
+
 
     def export_data(self):
         logger.info('Entering export_data')
@@ -128,6 +151,8 @@ class ChmReportController(QObject):
         return sample_data, display_names, recovery_vals, units, so_vals, hidden_rows
 
     def export_comments(self):
+        logger.info('Entering export_comments')
+
         return self.model.export_comments_data()
 
     def get_sample_data_from_table(self):

@@ -86,13 +86,13 @@ class TestManager:
 
         try:
             # If search_query is an integer (or can be converted to an integer)
-            search_query = int(search_query)
-            return {key: value for key, value in tests.items() if value.test_id == search_query}
+            int_search_query = int(search_query)
+            return {key: value for key, value in tests.items() if str(value.test_id).startswith(search_query)}
         except ValueError:
             # If search_query is not an integer, assume it's a string
             return {key: value for key, value in tests.items()
-                if (value.test_name and value.test_name.lower().startswith(search_query))
-                or (value.chem_name and value.chem_name.lower().startswith(search_query))
+                if (value.test_name and value.test_name.lower().startswith(search_query.lower()))
+                or (value.chem_name and value.chem_name.lower().startswith(search_query.lower()))
             }
 
     def get_tests_by_text(self, text_name):

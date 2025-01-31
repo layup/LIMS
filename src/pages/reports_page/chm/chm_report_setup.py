@@ -125,7 +125,7 @@ def handle_create_chem_btn(self):
         logger.info(f'Preparing to create CHM Report {self.jobNum}')
 
         chm_excel_manager = ChmExcelReport(client_info, self.jobNum, author_names, side_comments, extra_comments, footer_comment, self.sampleNames, sample_data, display_name, units, recovery_vals, so_vals, upper_limits, hidden_rows)
-        filePath, fileName = chm_excel_manager.create_report()
+        file_path, fileName = chm_excel_manager.create_report()
 
         okay_dialog(title = f'Success Created CHM Report: {self.jobNum}', message= f'CHM Report Creation Successful File: {fileName}')
 
@@ -134,9 +134,15 @@ def handle_create_chem_btn(self):
 
         updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.report_id)
 
+
+    except PermissionError:
+        logger.error("Permission denied to delete")
+        error_dialog(title = f'Failed to create CHM Report: {self.jobNum}', message = 'Unable to create Excel file. An existing copy may be open in another application')
+
     except Exception as e:
         error_details = traceback.format_exc()
         logger.error(f"CHM Report Creation Error: {e}\nDetails:\n{error_details}")
 
-        error_dialog(title = f'Failed to create CHM Report: {self.jobNum}', message = 'CHM Report Creation Error')
+        error_dialog(title = f'Failed to create CHM Report: {self.jobNum}', message = 'Report generation failed due to an unexpected error.')
         self.status_bar_manager.update_status_bar(f'Failed to create CHM Report: {self.jobNum}')
+

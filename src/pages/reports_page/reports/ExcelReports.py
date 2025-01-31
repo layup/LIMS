@@ -315,7 +315,7 @@ class ExcelReports:
 
         if(self.report_type == 1): # ICP Report
             titles = {
-                1: 'ELements',
+                1: 'Elements',
                 2: 'Symbols',
                 7: 'Units',
                 8: 'Maximum Limits'
@@ -327,7 +327,7 @@ class ExcelReports:
                 2: 'Units',
                 7: 'Lab Blank',
                 8: 'Sₒ',
-                9: 'Recovery',
+                9: '% Recovery',
                 10: 'Maximum Limits',
             }
 
@@ -340,7 +340,7 @@ class ExcelReports:
         for col, col_name in titles.items():
 
             if(col in [start_col, last_col]):
-                self.set_cell_value_with_alignment(page_location, col, col_name , Alignment(horizontal='left', vertical='center'))
+                self.set_cell_value_with_alignment(page_location, col, col_name , Alignment(horizontal='left', vertical='center', indent=1))
 
             else:
                 cell = self.set_cell_value_with_alignment(page_location, col, col_name)
@@ -444,6 +444,7 @@ class ExcelReports:
     def save_excel(self, file_path):
 
         # remove existing file so can write
+        
         if os.path.exists(file_path):
             os.remove(file_path)
 
@@ -468,3 +469,15 @@ def split_sentence_by_words(sentence, max_chars_per_line=140):
         lines.append(current_line.strip())
 
     return lines
+
+def significant_figures_convert(value):
+    if(value >= 100):
+        return (f'{value:.0f}')
+    if(value >=10):
+        return (f'{value:.1f}')
+    if(value >= 1):
+        return (f'{value:.2f}')
+    if(value < 1):
+        return (f'{value:.3f}')
+
+    return value
