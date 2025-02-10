@@ -7,7 +7,6 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QHeaderView, QDialog, QPushButton, QAbstractItemView, QTableWidgetItem, QCompleter
 
 from modules.constants import TABLE_ROW_HEIGHT, REPORT_NAME, REPORT_STATUS
-from modules.dbFunctions import searchJobsList, getAllJobsList, getAllJobNumbersList, getFrontHistory
 from modules.dialogs.open_job_dialog import OpenJobDialog
 from modules.widgets.TableFooterWidget import TableFooterWidget
 from modules.widgets.BasicSearchBar import BasicSearchBar
@@ -27,7 +26,7 @@ def lab_section_setup(self):
     lab_search_setup(self, headers)
     lab_footer_setup(self)
 
-    self.chem_history_model = LabHistoryModel(self.tempDB)
+    self.chem_history_model = LabHistoryModel(self.tempDB, self.parameters_manager, self.jobs_manager)
     self.chem_history_view = LabHistoryView(self.ui.reportsTable, self.lab_history_footer, self.lab_history_search)
     self.chem_history_controller = LabHistoryController(self.chem_history_model, self.chem_history_view)
 
@@ -77,7 +76,7 @@ def lab_search_setup(self, headers):
 def historySearchSetup(self):
     self.logger.info(f'Entering historyPageSetup')
     # Get the all of the jobNums for the completer
-    jobList = getAllJobNumbersList(self.tempDB)
+    jobList = self.jobs_manager.get_all_jobs()
     jobList_as_strings = [str(item) for item in jobList]
 
     # Sets the completers

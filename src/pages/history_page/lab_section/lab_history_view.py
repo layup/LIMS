@@ -138,6 +138,6 @@ def get_param_name(param_id, param_names):
     #logger.info(f'Param Names Keys: {list(param_names.keys())}, Key Types: {[type(key) for key in param_names.keys()]}')
 
     if(param_id in param_names):
-        return param_names[param_id]
+        return param_names[param_id].param_name
 
     return param_id

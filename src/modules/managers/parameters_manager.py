@@ -64,7 +64,7 @@ class ParametersManager:
     def add_params(self, param_name):
         logger.info(f'Entering add_params with param_name: {param_name}')
         try:
-            query = 'INSERT INTO parameters (parameterNum) values (?)'
+            query = 'INSERT INTO parameters (param_id) values (?)'
             self.db.execute(query, (param_name, ))
             self.db.commit()
 
@@ -89,7 +89,7 @@ class ParametersManager:
         logger.info(f'Entering remove_param with param_id: {param_id}')
 
         try:
-            query = 'DELETE FROM parameters WHERE parameterNum = ?'
+            query = 'DELETE FROM parameters WHERE param_id = ?'
             self.db.execute(query, (param_id,))
             self.db.commit()
 
@@ -124,11 +124,11 @@ class ParametersManager:
         try:
             # already exists in the thing
             if(param_id in self.parameters):
-                query = 'UPDATE parameters SET parameterName=? WHERE parameterNum = ?'
+                query = 'UPDATE parameters SET param_name=? WHERE param_id = ?'
                 self.db.execute(query, (param_name, param_id, ))
                 self.db.commit()
             else:
-                query = 'INSERT INTO parameters (parameterName) VALUES (?)'
+                query = 'INSERT INTO parameters (param_name) VALUES (?)'
                 self.db.execute(query, (param_name, ))
                 self.db.commit()
 
@@ -140,7 +140,7 @@ class ParametersManager:
             return rows_affected
 
         except sqlite3.Error as e:
-            logger.error(f"Error updating icpLimits: {e}")
+            logger.error(f"Error updating update_param: {e}")
             return None
 
         except Exception as e:

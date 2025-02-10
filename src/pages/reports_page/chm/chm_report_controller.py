@@ -1,3 +1,5 @@
+import math
+
 from base_logger import logger
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -65,7 +67,6 @@ class ChmReportController(QObject):
 
     def handle_table_change(self, item):
 
-
         if(self.loaded):
             if(item):
                 try:
@@ -104,31 +105,51 @@ class ChmReportController(QObject):
         if(index == 3):
             logger.info('Entering Comments Table')
 
+            status_row = 4
 
             for row, test_info in self.model.tests.items():
 
                 upper_limit = test_info.upper_limit
+                lower_limit = test_info.lower_limit
 
-                logger.info(f'row: {row}, upper_limit: {upper_limit} ')
+                lower_limit_status = self.get_least_element_value(row, lower_limit) if lower_limit is not None else False
+                upper_limit_status = self.get_max_element_value(row, upper_limit) if upper_limit is not None else False
 
-                if(upper_limit):
-                    status = self.get_max_element_value(row, upper_limit)
-                    new_status = 'True' if status else 'False'
-                    self.view.update_comments_status(row, new_status)
+                status = lower_limit_status or upper_limit_status
+
+                logger.debug(f'row: {row}, lower_limit_status: {lower_limit_status}, upper_limit_status: {upper_limit_status}')
+                logger.debug(f'row: {row}, status: {repr(status)}, lower_limit: {lower_limit}, upper_limit: {upper_limit}')
+
+                self.view.update_comments_status(row, str(status))
 
     def get_max_element_value(self, row, upper_limit):
+        for sample_info in self.model.samples.values():  # Iterate directly over values
+            current_val = sample_info.data.get(row)  # Use .get() to safely handle missing keys
 
-        for sample_name, sample_info in self.model.samples.items():
-
-            if(row in sample_info.data):
-                current_val = sample_info.data[row]
-
-                if(is_float(current_val)):
-
-                    if(float(current_val) >= float(upper_limit)):
-
+            if current_val is not None and is_float(current_val):  # Check for None and then float
+                try:
+                    if float(current_val) >= float(upper_limit):
                         return True
-        return False
+                except ValueError:
+                    logger.error(f"Could not convert  {type(current_val)} {current_val} to float for comparison with upper limit")
+
+        return False  # Return False if no matching value or no value greater than or equal to the upper_limit was found.
+
+    def get_least_element_value(self, row, lower_limit):
+        for sample_info in self.model.samples.values(): # Iterate directly over values
+            current_val = sample_info.data.get(row)  # Use .get() to safely handle missing keys
+
+            if current_val is not None and is_float(current_val):  # Check for None and then float
+                try:
+
+                    if float(current_val) <= float(lower_limit):
+                        logger.info(f'row: {row}, current_val: {current_val}')
+                        return True
+                except ValueError:
+                    logger.error(f"Could not convert {type(current_val)} {current_val} to float for comparison with lower limit")
+
+        return False  # Return False if no matching value or no value less than or equal to the lower_limit was found.
+
 
 
     def export_data(self):

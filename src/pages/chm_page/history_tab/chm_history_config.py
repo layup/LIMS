@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
 )
 
 from modules.dialogs.basic_dialogs import yes_or_no_dialog, save_or_cancel_dialog
-from modules.dbFunctions import getTestsName, deleteChmTestDataItem, updateChmTestsData
 from modules.constants import  TABLE_ROW_HEIGHT, TABLE_COL_SMALL, TABLE_COL_MED
 from modules.widgets.SideEditWidget import SideEditWidget2, hideSideEditWidget
 from modules.widgets.TableFooterWidget import TableFooterWidget
@@ -32,7 +31,7 @@ def chem_history_tab_setup(self):
     history_filters_setup(self)
     history_footer_setup(self)
 
-    self.history_model = HistoryModel(self.tempDB)
+    self.history_model = HistoryModel(self.tempDB, self.chm_test_data_manager)
     self.history_view = HistoryView(self.ui.chmInputTable, self.ui.sideEditWidget2, self.ui.footerWidget, self.ui.chmSearchLine1, self.ui.chmSearchBtn1, self.ui.chemHistoryFilter)
     self.history_controller = HistoryController(self.history_model, self.history_view)
 

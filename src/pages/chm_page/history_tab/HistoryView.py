@@ -99,7 +99,7 @@ class HistoryView(QObject):
                 QTableWidgetItem(str(current_item.testName)),
                 QTableWidgetItem(str(current_item.testVal)),
                 QTableWidgetItem(str(current_item.unit)),
-                QTableWidgetItem(str(current_item.standard)),
+                QTableWidgetItem(str(current_item.recovery)),
                 QTableWidgetItem(str(current_item.creation))
             ]
 
@@ -168,7 +168,7 @@ class HistoryView(QObject):
         row_items[2].setText(current_item.testName)
         row_items[3].setText(current_item.testVal)
         row_items[4].setText(current_item.unit)
-        row_items[5].setText(current_item.standard)
+        row_items[5].setText(current_item.recovery)
 
     def sort_table(self, index):
 

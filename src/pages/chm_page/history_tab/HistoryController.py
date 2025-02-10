@@ -9,8 +9,8 @@ class HistoryController:
         self.view = view
 
         self.search_query = ''
-        self.active_row_item = None;
-        self.edit_item = None;
+        self.active_row_item = None
+        self.edit_item = None
 
         self.view.filterChanged.connect(self.handle_filter_change)
 
@@ -36,7 +36,6 @@ class HistoryController:
         self.model.page_sizes = valid_rows;
         self.view.footer.set_valid_rows(valid_rows)
 
-
         # load in the initial data
         data = self.model.load_items(limit=self.model.page_size , offset=self.model.off_set)
         total_pages = self.model.calculate_total_pages()
@@ -48,9 +47,7 @@ class HistoryController:
 
     def handle_cancel_btn(self):
         logger.info('Entering handle_cancel_btn')
-
         self.handle_hide_side_edit()
-
 
     def handle_save_btn(self, updated_data):
         logger.info(f'Entering handle_save_btn with updated_data: {updated_data}')

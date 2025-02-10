@@ -8,8 +8,6 @@ from modules.dialogs.basic_dialogs import yes_or_no_dialog
 
 class TestsController(QObject):
 
-
-
     def __init__(self, model, view):
         super().__init__()
 

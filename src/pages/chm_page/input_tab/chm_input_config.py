@@ -1,6 +1,4 @@
 
-import math
-from datetime import date
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
@@ -8,9 +6,10 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import (QHBoxLayout, QMessageBox, QPushButton, QTreeWidgetItem, QWidget, QComboBox)
 
 from base_logger import logger
+
 from modules.constants import CHM_REPORT, MED_COL, SMALL_COL
+
 from modules.dialogs.basic_dialogs import save_or_cancel_dialog
-from modules.dbFunctions import (addChmTestData, checkChmTestsExist,deleteChmTestDataItem, getChmTestData, updateChmTestsData)
 from modules.utils.logic_utils import is_real_number
 from modules.dialogs.basic_dialogs import yes_or_no_dialog, error_dialog
 from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
@@ -21,8 +20,11 @@ from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 
 #TODO: takes in the values from the
 #TODO: duplication error
+#TODO: renamme those old variable names
+
+
 def chm_input_tab_setup(self):
-    self.logger.info(f'Entering chm_input_tab_setup')
+    self.logger.info('Entering chm_input_tab_setup')
 
     side_edit_setup(self)
     input_tree_setup(self)
@@ -32,13 +34,13 @@ def chm_input_tab_setup(self):
     format_line_edits(self)
     format_recently_added_tree(self.ui.inputDataTree)
 
-    # Signals
+    # Connect Signals
     self.ui.chmProceedBtn.clicked.connect(lambda: on_chmProceedBtn_clicked(self))
     self.ui.chmInputClearBtn.clicked.connect(lambda: clear_all_input_sections(self, False))
-    self.ui.chmAddTestsBtn.clicked.connect(lambda:on_chmSampleDataAdd_clicked(self))
-
+    self.ui.chmAddTestsBtn.clicked.connect(lambda: handle_add_chm_sample_btn_clicked(self))
 
 def input_tree_setup(self):
+    logger.info('Entering input_tree_setup')
 
     self.ui.inputDataTree.setHeaderLabels(["Job Number", "Sample #", 'Parameter Name', 'Value', 'Unit', '% Recovery', 'Action'])
 
@@ -67,9 +69,9 @@ def side_edit_setup(self):
     self.ui.sideEditWidget1.set_drop_down(test_names, unit_names)
     self.ui.sideEditWidget1.set_combo_disabled(True)
 
-    # Signals
+    # Connect Side Edit Btn Signals
     self.ui.sideEditWidget1.cancelBtn.clicked.connect(lambda: hideSideEditWidget(self.ui.sideEditWidget1))
-    self.ui.sideEditWidget1.save_clicked.connect(lambda tests_info, tree_item: sideEditSaveBtnClicked(self, tests_info, tree_item))
+    self.ui.sideEditWidget1.save_clicked.connect(lambda tests_info, tree_item: handle_side_item_save_btn_clicked(self, tests_info, tree_item))
 
 def new_entry_section_setup(self):
     self.logger.info('Entering populate_new_entry_section')
@@ -90,42 +92,45 @@ def new_entry_section_setup(self):
     self.ui.gcmsUnitVal.addItems(unit_names)
     self.ui.chm_selected_units.addItems(unit_names)
 
-
     for item in test_names:
         self.ui.gcmsTests.addItem(item.test_name, userData=item.test_id)
-
-
 
 ###################################################################
 #   Signal Functions
 ###################################################################
 
-def sideEditSaveBtnClicked(self, save_data, item):
-    self.logger.info(f'Entering sideEditSaveBtnClicked with parameters: save_data: {save_data}, row: {item}')
+def handle_side_item_save_btn_clicked(self, save_data, item):
+    self.logger.info(f'Entering handle_side_item_save_btn_clicked with parameters: save_data: {save_data}, row: {item}')
 
     new_data = save_data[:-1]
     param_id = save_data[-1]
     unit_id = None
 
-    save_error_handling(self, new_data, param_id, item)
+    side_save_error_handling(self, new_data, param_id, item)
 
 
 @pyqtSlot()
 def on_chmProceedBtn_clicked(self):
     self.logger.info('Entering on_chmProceedBtn_clicked')
-    standards, units, testName = get_current_entry_values(self)
+    recovery, units, testName = get_current_entry_values(self)
 
     errorCheckList = [0,0,0]
 
-    errorCheckList[0] = 0 if (standards != '' and is_real_number(standards)) else 1
+    errorCheckList[0] = 0 if (recovery != '' and is_real_number(recovery)) else 1
     errorCheckList[1] = 0 if units != '' else 1
     errorCheckList[2] = 0 if testName != '' else 1
 
     if(sum(errorCheckList) == 0):
         enable_enter_values_section(self, True)
-        self.ui.gcmsStandardValShow.setText(standards)
+        self.ui.gcmsStandardValShow.setText(recovery)
         self.ui.gcmsUnitValShow.setText(units)
         self.ui.gcmsTestsShow.setText(testName)
+
+        self.ui.chm_error_widget.hide()
+
+        if(int(recovery) < 70 or int(recovery) > 120):
+            self.ui.chm_error_widget.show()
+            self.ui.chm_error_msg.setText('WARNING: Recovery outside range')
 
         # set the unit combobox
         current_index = self.ui.gcmsUnitVal.currentIndex()
@@ -136,14 +141,14 @@ def on_chmProceedBtn_clicked(self):
 
 
 @pyqtSlot()
-def on_chmSampleDataAdd_clicked(self):
-    self.logger.info('Entering on_chmSampleDataAdd_clicked ')
+def handle_add_chm_sample_btn_clicked(self):
+    self.logger.info('Entering handle_add_chm_sample_btn_clicked ')
 
     standards, units, testName = get_current_entry_values(self)
     jobNum, sampleNum, selected_unit, sampleVal = get_current_entered_values(self)
 
     index = self.ui.gcmsTests.currentIndex()
-    testNum = self.ui.gcmsTests.itemData(index, role=Qt.UserRole)
+    test_id = self.ui.gcmsTests.itemData(index, role=Qt.UserRole)
 
     edit_data = [jobNum, sampleNum, testName, sampleVal, selected_unit]
 
@@ -157,55 +162,62 @@ def on_chmSampleDataAdd_clicked(self):
 
     #FIXME: problem arises if reading something to an existing list we can't then delete it afterwords
     if(sum(errorCheckList) == 0):
-        todaysDate = date.today()
 
-        existingDataCheck = checkChmTestsExist(self.tempDB, sampleNum, testNum, jobNum)
 
-        if(existingDataCheck):
-            title = 'Duplicate Sample'
-            duplicate_msg = f"Would you like to overwrite existing sample {jobNum}-{sampleNum}"
-            response = yes_or_no_dialog(title, duplicate_msg)
+        # check if item exists in database
+        existing_data_check = self.chm_test_data_manager.check_test_exists(jobNum, sampleNum, test_id)
+
+        if(existing_data_check):
+            response = yes_or_no_dialog('Duplicate Sample', f"Would you like to overwrite existing sample {jobNum}-{sampleNum}")
 
             if(response):
-                addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, selected_unit, jobNum, todaysDate)
+                #TODO: remove this so it updates instead of adding to ite
+                self.chm_test_data_manager.add_test(jobNum, sampleNum, test_id, sampleVal, standards, selected_unit)
+                #updated_rows = self.chm_test_data_manager.update_test(jobNum, sampleNum, test_id, sampleVal, standards, selected_unit)
 
-                matchingItem = checkMatchingTreeItems(self.ui.inputDataTree, sampleNum)
+                # check if current sample is in the existing tree
+                matching_item = check_matching_tree_items(self.ui.inputDataTree, jobNum, sampleNum)
 
-                if not matchingItem:
+                if matching_item:
+                    logger.debug(f'Found a matching_item: {matching_item}')
+                    set_input_tree_items(matching_item, jobNum, sampleNum, testName, sampleVal, units, standards)
+
+                else:
                     add_input_tree_item(self, sampleNum, testName, sampleVal, selected_unit, standards, jobNum)
 
-                clear_samples_input(self)
-            else:
-                clear_samples_input(self)
+
+            clear_samples_input(self)
 
         else:
-            addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, selected_unit, jobNum, todaysDate)
+            self.chm_test_data_manager.add_test(jobNum, sampleNum, test_id, sampleVal, standards, selected_unit)
+
             add_input_tree_item(self, sampleNum, testName, sampleVal, selected_unit, standards, jobNum)
             clear_samples_input(self)
     else:
         self.logger.error(f'errorCheckList: {errorCheckList}')
         addingSampleDataErrorDisplay(self, errorCheckList)
 
-def checkMatchingTreeItems(treeWidget, targetText):
+def check_matching_tree_items(tree_widget, job_num, sample_num):
+
+    logger.info(f'Entering check_matching_tree_items with job_num: {job_num}, sample_num: {sample_num}')
+
     # Iterate through the top-level items
-    for index in range(treeWidget.topLevelItemCount()):
-        item = treeWidget.topLevelItem(index)
-        if item.text(0) == targetText:  # Change 0 to the desired column index
+    for index in range(tree_widget.topLevelItemCount()):
+        item = tree_widget.topLevelItem(index)
+
+        logger.debug(f'item.text(0): {item.text(0)}, item.text(1): {item.text(1)}')
+
+        if item.text(0) == job_num and item.text(1) == sample_num:  # Change 0 to the desired column index
             return item
 
     return None
 
-
-#******************************************************************
-# General Functions
-#******************************************************************
-
-def save_error_handling(self, new_data, param_id, item):
+def side_save_error_handling(self, new_data, test_id, tree_item):
 
     self.logger.info('Entering save_error_handling')
 
-    old_jobNum = item.text(0)
-    old_sampleNum = item.text(1)
+    prev_job_num = tree_item.text(0)
+    prev_sample_num = tree_item.text(1)
 
     new_jobNum = new_data[0]
     new_sampleNum = new_data[1]
@@ -213,62 +225,55 @@ def save_error_handling(self, new_data, param_id, item):
     new_unitType = new_data[4]
     new_standard = new_data[5]
 
-    old_jobName = old_jobNum + '-' + old_sampleNum
+    prev_job_name = f'{prev_job_num}-{prev_sample_num}'
     new_jobName = new_data[0] + '-' + new_data[1]
 
-    logger.info(f'Old JobNum: {old_jobName}, new_jobName: {new_jobName}')
+    logger.info(f'prev_job_name: {prev_job_name}, new_jobName: {new_jobName}')
 
-    #TODO: problem what if that data already exists in the table
-    if(old_jobNum != new_jobNum or old_sampleNum != new_sampleNum):
-        existing_data_check = checkChmTestsExist(self.tempDB, new_sampleNum, param_id, new_jobNum)
+    if(prev_job_num != new_jobNum or prev_sample_num != new_sampleNum):
+
+        # check with the new info if in the database
+        existing_data_check = self.chm_test_data_manager.check_test_exists(new_jobNum, new_sampleNum, test_id)
 
         if(existing_data_check):
-            response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want overwrite existing data for {new_jobName} and delete data for {old_jobName} ')
+
+            response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want overwrite existing data for {new_jobName} and delete data for {prev_job_name} ')
+            #TODO: should I check if there is other data existing that IW ill be saving into
 
             if(response):
                 try:
                     # delete the old job
-                    delete_rows = deleteChmTestDataItem(self.tempDB, old_sampleNum, param_id, old_jobNum)
+                    deleted_row = self.chm_test_data_manager.delete_test(prev_job_num, prev_sample_num, test_id)
 
                     # update the existing data with the new data
-                    update_rows = updateChmTestsData(self.tempDB, new_sampleNum, param_id, new_jobNum, new_sampleVal, new_standard, new_unitType)
+                    #TODO: if we are deleting maybe we are adding then
+                    updated_rows = self.chm_test_data_manager.update_test(new_jobNum, new_sampleNum, test_id, new_sampleVal, new_standard, new_unitType)
 
-                    # update table info
+                    # update table tree item info
                     for col, data in enumerate(new_data):
-                        item.setText(col, data)
+                        tree_item.setText(col, data)
 
                 except Exception as e:
                     logger.warning(f'Error while trying to update_row, {e}')
-                    print(e)
-
-        else:
-            response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want save {new_jobName} and delete {old_jobNum} ?')
-
-            if(response):
-
-                # delete old data
-                delete_rows = deleteChmTestDataItem(self.tempDB, old_sampleNum, param_id, old_jobNum)
-
-                # add new data
-                #addChmTestData(self.tempDB, sampleNum, testNum, sampleVal, standards, units, jobNum, todaysDate)
-
-                # update the table info
-                for col, data in enumerate(new_data):
-
-                    item.setText(col, data)
 
     else:
         response = save_or_cancel_dialog('Overwrite Data?', f'Are you sure you want overwrite existing data for {new_jobName}?')
 
         if(response):
             # update the database
-            #updateChmTestsData()
+            updated_rows = self.chm_test_data_manager.update_test(new_jobNum, new_sampleNum, test_id, new_sampleVal, new_standard, new_unitType)
 
             for col, data in enumerate(new_data):
-                item.setText(col, data)
+                tree_item.setText(col, data)
+
+
+###################################################################
+#   Error Messages
+###################################################################
 
 
 def NewEntryErrorDisplay(self, errorCheckList):
+
     errorTitle = 'Cannot Proceed with CHM Process'
     errorMsg = ''
 
@@ -342,7 +347,7 @@ def get_current_entry_values(self):
     return standards, units, testName
 
 def get_current_entered_values(self):
-    jobNum     = self.ui.gcmsTestsJobNum.text().strip()
+    jobNum      = self.ui.gcmsTestsJobNum.text().strip()
     sampleNum   = self.ui.gcmsTestsSample.text().strip()
     sampleVal   = self.ui.gcmsTestsVal.text().strip()
     units       = self.ui.chm_selected_units.currentText()
@@ -389,6 +394,8 @@ def clear_all_input_sections(self, clearTable=False):
     clear_enter_values_section(self)
     reset_new_entry_section(self)
 
+    self.ui.chm_error_widget.hide()
+
     if(clearTable):
         self.ui.inputDataTree.clear()
 
@@ -403,17 +410,7 @@ def add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, 
 
     topItem = QTreeWidgetItem(tree_widget)
 
-    topItem.setText(0, jobNum)
-    topItem.setText(1, sampleNum)
-    topItem.setText(2, testName)
-    topItem.setText(3, sampleVal)
-    topItem.setText(4, units)
-    topItem.setText(5, standards)
-
-    topItem.setTextAlignment(1, Qt.AlignCenter)
-    topItem.setTextAlignment(3, Qt.AlignCenter)
-    topItem.setTextAlignment(4, Qt.AlignCenter)
-    topItem.setTextAlignment(5, Qt.AlignCenter)
+    set_input_tree_items(topItem, jobNum, sampleNum, testName, sampleVal, units, standards)
 
     row_index = tree_widget.indexOfTopLevelItem(topItem)
 
@@ -422,6 +419,21 @@ def add_input_tree_item(self, sampleNum, testName, sampleVal, units, standards, 
     actionWidget.delete_clicked.connect(lambda tree_item: handle_delete_clicked(self, tree_item))
 
     tree_widget.setItemWidget(topItem, 6, actionWidget)
+
+def set_input_tree_items(item, job_num, sample_num, test_name, sample_val, units, standards):
+
+    item.setText(0, job_num)
+    item.setText(1, sample_num)
+    item.setText(2, test_name)
+    item.setText(3, sample_val)
+    item.setText(4, units)
+    item.setText(5, standards)
+
+    item.setTextAlignment(1, Qt.AlignCenter)
+    item.setTextAlignment(3, Qt.AlignCenter)
+    item.setTextAlignment(4, Qt.AlignCenter)
+    item.setTextAlignment(5, Qt.AlignCenter)
+
 
 def handle_edit_clicked(self, item):
 

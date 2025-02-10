@@ -1,36 +1,36 @@
 import math
 
 from base_logger import logger
-from modules.dbFunctions import updateChmTestsData, deleteChmTestDataItem
 
 from pages.chm_page.history_tab.HistoryItem import HistoryItem
 
 # managers the data and logic
 class HistoryModel:
-    def __init__(self, db):
-        self.db = db;
+    def __init__(self, db, chm_test_data_manager):
+        self.db = db
+        self.chm_test_data_manager = chm_test_data_manager
 
         self.history_items = []
 
-        self.current_page = 1;
-        self.total_pages = 1;
+        self.current_page = 1
+        self.total_pages = 1
 
-        self.off_set = 0;
-        self.page_size = 100;
+        self.off_set = 0
+        self.page_size = 100
         self.page_sizes = []
 
     def add_item(self, item):
-        sampleNum = item[0]
-        testNum = item[1]
-        testVal = item[2]
+        sample_num = item[0]
+        test_id = item[1]
+        test_val = item[2]
         standard = item[3]
         unit = item[4]
         jobNum = item[5]
-        creationDate = item[6]
-        #TODO: get testName
-        testName = get_tests_name(self.db, testNum)
+        creation_date = item[6]
 
-        self.history_items.append(HistoryItem(jobNum, sampleNum, testNum, testName, testVal, unit, standard, creationDate))
+        test_name = self.chm_test_data_manager.find_test_name(test_id)
+
+        self.history_items.append(HistoryItem(jobNum, sample_num, test_id, test_name, test_val, unit, standard, creation_date))
 
     def total_items(self):
         return len(self.history_items)
@@ -46,10 +46,11 @@ class HistoryModel:
         self.clear_items()
 
         if(search_query == ''):
-            results = get_chem_tests(self.db, limit, offset)
+
+            results = self.chm_test_data_manager.get_limited_tests(limit, offset)
            # print(results);
         else:
-            results = search_jobs(self.db, limit, offset, search_query)
+            results = self.chm_test_data_manager.search_tests(limit, offset, search_query)
 
         for current_item in results:
             self.add_item(current_item)
@@ -60,9 +61,10 @@ class HistoryModel:
         #total pages
 
         if(search_query == ''):
-            total_items = get_chem_tests_count(self.db)
+            total_items = self.chm_test_data_manager.get_tests_count()
+
         else:
-            total_items = search_jobs_count(self.db, search_query)
+            total_items = self.chm_test_data_manager.search_tests_count(search_query)
 
         # set total pages
         self.total_pages = math.ceil(total_items / self.page_size)
@@ -72,28 +74,32 @@ class HistoryModel:
     def remove_item(self, current_item):
 
         try:
-            if(deleteChmTestDataItem(self.db, current_item.sampleNum, current_item.testNum, current_item.jobNum)):
+            deleted_row = self.chm_test_data_manager.delete_test(current_item.jobNum, current_item.sampleNum, current_item.testNum)
+
+            if(deleted_row):
 
                 self.history_items.remove(current_item)
                 return True
             else:
-                return False;
+                return False
 
         except Exception as error:
-            return False;
+            return False
 
     def update_item(self, current_item, new_data):
 
         try:
-            testNum = new_data[0]
-            testName = get_tests_name(self.db, testNum)
-            testVal = new_data[1]
+            test_id = new_data[0]
+            testName = self.chm_test_data_manager.find_test_name(test_id)
+            test_val = new_data[1]
             standard = new_data[2]
             unit = new_data[3]
 
-            if(updateChmTestsData(self.db, current_item.sampleNum, testNum, current_item.jobNum, testVal, standard, unit )):
+            updated_rows = self.chm_test_data_manager.update_test(current_item.jobNum, current_item.sampleNum, test_id, test_val, standard, unit)
 
-                current_item.side_edit_update(testNum, testName, testVal, standard, unit)
+            if(updated_rows):
+
+                current_item.side_edit_update(test_id, testName, test_val, standard, unit)
                 return True
 
             return False;
@@ -103,66 +109,3 @@ class HistoryModel:
 
             return False
 
-def get_chem_tests(db, limit, offset):
-    query = '''
-        SELECT *
-        FROM chemTestsData
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-
-    '''
-    results = db.query(query, (limit, offset))
-    return results
-
-def get_chem_tests_count(db):
-    query = '''
-        SELECT count(jobNum)
-        FROM chemTestsData
-    '''
-    results = db.query(query)
-    return results[0][0]
-
-def get_tests_name(db, test_id):
-
-    query = '''
-        SELECT testName
-        FROM Tests
-        WHERE testNum = ?
-
-    '''
-
-    results = db.query(query, (test_id, ))
-
-    return results[0][0]
-
-def search_jobs(db, limit, offset, search_query):
-    query = """
-        SELECT *
-        FROM chemTestsData
-        WHERE jobNum LIKE ?
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-    """
-
-    # Add wildcards to the search term for partial matching
-    search_term = f"{search_query}%"
-
-    # Execute the query with the search term and pagination parameters
-    results = db.query(query, (search_term, limit, offset))
-
-    return results
-
-def search_jobs_count(db, search_query):
-    query = """
-        SELECT count(jobNum)
-        FROM chemTestsData
-        WHERE jobNum LIKE ?
-    """
-
-    # Add wildcards to the search term for partial matching
-    search_term = f"{search_query}%"
-
-    # Execute the query with the search term and pagination parameters
-    results = db.query(query, (search_term, ))
-
-    return results[0][0]

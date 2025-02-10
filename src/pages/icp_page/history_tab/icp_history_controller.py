@@ -44,7 +44,7 @@ class IcpHistoryController(QObject):
 
         self.view.footer.set_valid_rows(valid_rows)
 
-        self.model.page_size = valid_rows[1]
+        self.model.page_size = valid_rows[0]
         self.view.footer.set_limit_index(1)
 
         # load in the initial data
@@ -113,7 +113,8 @@ class IcpHistoryController(QObject):
         logger.info(f'Entering handle_combobox_change with index: {index}')
 
         if(index != -1):
-            print(f'index: {index}, new_page_size: {self.model.page_sizes[index]}')
+            #print(f'index: {index}, new_page_size: {self.model.page_sizes[index]}')
+
             # update the page size
             self.model.page_size = self.model.page_sizes[index]
             # reset the current_page and offset

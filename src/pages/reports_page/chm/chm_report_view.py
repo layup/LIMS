@@ -70,7 +70,7 @@ class ChmReportView(QObject):
         item = QTableWidgetItem(str(value) if value is not None else '')
         item.setFlags(item.flags() | ~Qt.ItemIsEditable)
 
-        if(col in [1,3]):
+        if(col in [1,2,4]):
             item.setTextAlignment(Qt.AlignCenter)
 
         self.comment_table.setItem(row, col, item)
@@ -101,10 +101,11 @@ class ChmReportView(QObject):
         for row, (test_id, test_item) in enumerate(test_info.items()):
             if(isinstance(test_item, chmReportTestItem)):
                 self.add_comment_item(row, 0, test_item.textName)
-                self.add_comment_item(row, 1, test_item.upper_limit)
-                self.add_comment_item(row, 2, test_item.side_comment)
-                self.add_comment_item(row, 3, 'N/A')
-                self.add_comment_item(row, 4, test_item.footer_comment)
+                self.add_comment_item(row, 1, test_item.lower_limit)
+                self.add_comment_item(row, 2, test_item.upper_limit)
+                self.add_comment_item(row, 3, test_item.side_comment)
+                self.add_comment_item(row, 4, 'N/A')
+                self.add_comment_item(row, 5, test_item.footer_comment)
 
     def update_table_samples(self, samples_info):
         logger.info('Entering update_table_samples')
@@ -147,7 +148,10 @@ class ChmReportView(QObject):
             self.table.setCellWidget(row, action_col, remove_btn)
 
     def update_comments_status(self, row, status):
-        self.add_comment_item(row, 3, status)
+
+        status_row = 4
+
+        self.add_comment_item(row, status_row, status)
 
 
     def apply_dilution_factor(self, factor):

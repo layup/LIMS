@@ -6,7 +6,6 @@ from base_logger import logger
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 from modules.constants import REPORTS_TYPE, REPORT_NUM, REPORT_STATUS
-from modules.dbFunctions import checkJobExists, addNewJob, updateJob, getJobStatus
 from modules.dialogs.basic_dialogs import okay_dialog, error_dialog, yes_no_cancel_dialog
 from modules.dialogs.create_report_dialog import CreateReport
 from modules.utils.text_utils import processClientInfo
@@ -17,8 +16,6 @@ from pages.reports_page.reports.report_utils import clearDataTable, populate_aut
 from pages.reports_page.chm.chm_report_setup import chm_report_setup
 from pages.reports_page.icp.icp_report_setup import icp_report_setup
 
-#FIXME: should defs be storing everything as testNums instead of testNames
-#FIXME: jobs: parameter: store as parameterNum
 
 ###################################################################
 #    creating new or opening  jobs
@@ -57,7 +54,7 @@ def handle_create_new_job(self, data):
         self.parameter = param_id
         self.dilution = dilution
 
-        job_exists_check = checkJobExists(self.tempDB, jobNum, self.report_id)
+        job_exists_check = self.jobs_manager.check_job_exist(self.jobNum, self.report_id)
 
         # process the .txt file and get the necessary information
         # TODO: need to have these in self since i've build so much of the excel on that
@@ -67,7 +64,8 @@ def handle_create_new_job(self, data):
             logger.info('Job does not exist')
 
             # create new job entry into the database
-            addNewJob(self.tempDB, jobNum, self.report_id, param_id, dilution, currentStatus, currentDate)
+            self.jobs_manager.add_job(jobNum, self.report_id, param_id, dilution, currentStatus)
+
         else:
             logger.info('Job does exist')
 
@@ -83,7 +81,7 @@ def handle_create_new_job(self, data):
                 return
 
             # update the job entry database section
-            updateJob(self.tempDB, jobNum, self.report_id, param_id, dilution, currentStatus, currentDate)
+            self.jobs_manager.update_job(jobNum, self.report_id, param_id, dilution, currentStatus)
 
             # load in the status of not generated
             self.ui.statusHeaderLabel.setText(REPORT_STATUS[currentStatus])
@@ -132,7 +130,7 @@ def open_existing_job(self, existing_data):
         self.parameter = parameter
         self.dilution = dilution
 
-        job_exists_check = checkJobExists(self.tempDB, self.jobNum, self.report_id)
+        job_exists_check = self.jobs_manager.check_job_exist(self.jobNum, self.report_id)
 
         if(job_exists_check):
 
@@ -141,7 +139,7 @@ def open_existing_job(self, existing_data):
             self.clientInfo, self.sampleNames, self.sampleTests = processClientInfo(self.jobNum, text_file_location)
 
             # set the header information
-            job_status = getJobStatus(self.tempDB, self.jobNum, self.report_id)
+            job_status = self.jobs_manager.get_status(self.jobNum, self.report_id)
 
             try:
                 self.ui.statusHeaderLabel.setText(REPORT_STATUS[job_status])

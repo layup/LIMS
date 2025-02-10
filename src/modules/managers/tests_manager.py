@@ -3,7 +3,7 @@ import sqlite3
 from base_logger import logger
 
 class TestItem:
-    def __init__(self, test_id,test_name, test_type, chem_name, micro_name, display_name,  print_status, show_status, comment, footer, upper_limit, so):
+    def __init__(self, test_id,test_name, test_type, chem_name, micro_name, display_name,  print_status, show_status, comment, footer, so, lower_limit, upper_limit):
         self.test_id=test_id
         self.test_name=test_name
         self.test_type=test_type
@@ -14,6 +14,7 @@ class TestItem:
         self.show_status=show_status
         self.comment = comment
         self.footer = footer
+        self.lower_limit = lower_limit
         self.upper_limit = upper_limit
         self.so = so
 
@@ -48,10 +49,25 @@ class TestManager:
             show_status = test[7]
             comment = test[8]
             footer_comment = test[9]
-            upper_limit = test[10]
-            so = test[11]
+            so = test[10]
+            lower_limit = test[11]
+            upper_limit = test[12]
 
-            self.tests[test_id] = TestItem(test_id, test_name, test_type, chem_name, micro_name, display_name, print_status, show_status, comment, footer_comment, upper_limit, so)
+            self.tests[test_id] = TestItem(
+                test_id,
+                test_name,
+                test_type,
+                chem_name,
+                micro_name,
+                display_name,
+                print_status,
+                show_status,
+                comment,
+                footer_comment,
+                so,
+                lower_limit,
+                upper_limit
+            )
 
     def return_tests(self):
 
@@ -103,13 +119,11 @@ class TestManager:
 
         return None
 
-
-
     def get_test_by_type(self, type_name):
 
         test_list = []
 
-        #query = 'SELECT testNum, testName FROM Tests WHERE testName NOT LIKE "%ICP%" AND type = "C" ORDER BY testName ASC'
+        #query = 'SELECT test_id, test_name FROM Tests WHERE test_name NOT LIKE "%ICP%" AND type = "C" ORDER BY test_name ASC'
 
         for test_id, test_item in self.tests.items():
             if test_item.test_type == type_name:
@@ -118,18 +132,18 @@ class TestManager:
         return test_list
 
     def get_all_test(self):
-        query = 'SELECT testNum, testName, type, benchChemName, benchMicroName, displayName, printTests, showTests, comment, footer_comment, upper_limit, so FROM Tests ORDER BY LOWER(testName) ASC;'
+        query = 'SELECT test_id, test_name, type, bench_chem_name, bench_micro_name, display_name, print_tests, show_tests, comment, footer_comment, so, lower_limit, upper_limit FROM tests ORDER BY LOWER(test_name) ASC;'
 
         results = self.db.query(query)
         return results
 
-    def update_chm_test(self, test_id, test_name, text_name, display_name, upper_limit, so, printTests, showTests, side_comment, footer_comment):
+    def update_chm_test(self, test_id, test_name, text_name, display_name, lower_limit, upper_limit, so, print_tests, show_tests, side_comment, footer_comment):
         logger.info(f'Entering update_chm_test with test_id: {test_id}')
 
         try:
             if(test_id in self.tests):
-                query = 'UPDATE Tests SET testName=?, benchChemName=?, printTests=?, showTests=?, displayName=?, comment=?, footer_comment=?, upper_limit =?, so = ? WHERE testNum =?'
-                self.db.execute(query, (test_name, text_name, printTests, showTests, display_name, side_comment, footer_comment, upper_limit, so,  test_id))
+                query = 'UPDATE tests SET test_name=?, bench_chem_name=?, print_tests=?, show_tests=?, display_name=?, comment=?, footer_comment=?, lower_limit=?, upper_limit=?, so = ? WHERE test_id =?'
+                self.db.execute(query, (test_name, text_name, print_tests, show_tests, display_name, side_comment, footer_comment, lower_limit, upper_limit, so,  test_id))
                 self.db.commit()
 
                 rows_affected = self.db.cursor.rowcount
@@ -137,12 +151,13 @@ class TestManager:
                 if(rows_affected > 0):
                     self.tests[test_id].test_name = test_name
                     self.tests[test_id].chem_name = text_name
-                    self.tests[test_id].print_status = printTests
-                    self.tests[test_id].show_status = showTests
+                    self.tests[test_id].print_status = print_tests
+                    self.tests[test_id].show_status = show_tests
                     self.tests[test_id].display_name = display_name
                     self.tests[test_id].comment = side_comment
                     self.tests[test_id].footer = footer_comment
                     self.tests[test_id].upper_limit = upper_limit
+                    self.tests[test_id].lower_limit = lower_limit
                     self.tests[test_id].so = so
 
                     return rows_affected
@@ -164,7 +179,7 @@ class TestManager:
 
         try:
             if(test_id in self.tests):
-                query = 'UPDATE Tests SET showTests=? WHERE testNum =?'
+                query = 'UPDATE tests SET show_tests=? WHERE test_id =?'
                 self.db.execute(query, (status, test_id))
                 self.db.commit()
 
@@ -191,7 +206,7 @@ class TestManager:
 
         try:
             if(test_id in self.tests):
-                query = 'UPDATE Tests SET printTest=? WHERE testNum =?'
+                query = 'UPDATE tests SET printTest=? WHERE test_id =?'
                 self.db.execute(query, (status, test_id))
                 self.db.commit()
 

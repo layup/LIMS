@@ -57,7 +57,7 @@ class FootersManager:
         logger.info('Entering get_all_footer_messages')
 
         try:
-            query = 'SELECT * FROM Footers'
+            query = 'SELECT * FROM footers'
             results = self.db.query(query)
             return results
 
@@ -69,7 +69,7 @@ class FootersManager:
         logger.info(f'Entering get_footer with param_id: {param_id}, report_type: {report_type}')
 
         try:
-            query = 'SELECT * FROM Footers WHERE param_id = ? AND report_type = ?'
+            query = 'SELECT * FROM footers WHERE param_id = ? AND report_type = ?'
             results = self.db.query(query, (param_id, report_type))
             return results
 
@@ -81,7 +81,7 @@ class FootersManager:
         logger.info(f'Entering add_footers with param_id: {param_id}, report_type: {report_type}')
 
         try:
-            query = 'INSERT OR REPLACE INTO Footers (param_id, report_type, footer_message) VALUES (?, ?, ?)'
+            query = 'INSERT OR REPLACE INTO footers (param_id, report_type, footer_message) VALUES (?, ?, ?)'
 
             self.db.execute(query, (param_id, report_type, footer_message))
             self.db.commit()

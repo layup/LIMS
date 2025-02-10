@@ -63,7 +63,7 @@ class FrontHistoryModel:
 
         return self.total_pages
 
-
+#TODO: move all of these into somewhere else
 
 def get_front_history(db, limit, offset):
     query = '''

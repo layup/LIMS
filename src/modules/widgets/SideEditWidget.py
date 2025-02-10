@@ -66,10 +66,10 @@ class SideEditWidget2(QWidget):
 
         self.unitValCombo.addItems(units)
 
-    def set_tests_index(self, testNum):
+    def set_tests_index(self, test_id):
         for index in range(self.testsNameCombo.count()):
-            item_testNum = self.testsNameCombo.itemData(index)  # Get the data stored for each item
-            if item_testNum == testNum:
+            item_id = self.testsNameCombo.itemData(index)  # Get the data stored for each item
+            if item_id == test_id:
                 self.testsNameCombo.setCurrentIndex(index)  # Set the combo box to this index
                 return
 
@@ -101,12 +101,12 @@ class SideEditWidget2(QWidget):
     def get_job_info(self):
 
         current_index = self.testsNameCombo.currentIndex()
-        testNum = self.testsNameCombo.itemData(current_index)
+        test_id = self.testsNameCombo.itemData(current_index)
         testVal = self.testsVal.text()
         standard = self.standard.text()
         unit = self.unitValCombo.currentText()
 
-        return [testNum, testVal, standard, unit]
+        return [test_id, testVal, standard, unit]
 
 
 class SideEditWidget(QWidget):

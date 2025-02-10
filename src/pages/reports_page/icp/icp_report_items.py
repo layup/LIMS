@@ -33,7 +33,7 @@ class IcpReportSampleItem:
         self.hardness = hardness
         self.ph = ph
 
-        # Data consists of data[testNum] = [value, recovery, unitType]
+        # Data consists of data[test_id] = [value, recovery, unitType]
         # data[row] = value
         self.data = {}
 
@@ -51,8 +51,8 @@ class IcpReportSampleItem:
         logger.info(f'Entering add_data with row: {row}, testVal: {testVal}, recovery: {recovery}, unit: {unit}')
         self.data[row] = str(testVal)
 
-    def update_data(self, testNum, testVal):
-        self.data[testNum] = testVal
+    def update_data(self, test_id, test_val):
+        self.data[test_id] = test_val
 
     def add_diluted_data(self, row, value):
         self.diluted_data[row] = value

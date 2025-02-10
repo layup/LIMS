@@ -14,9 +14,31 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 1667)
+        MainWindow.resize(2493, 1667)
         MainWindow.setMinimumSize(QtCore.QSize(1200, 600))
-        MainWindow.setStyleSheet("/******************************************************************\n"
+        MainWindow.setStyleSheet("QScrollBar:vertical {\n"
+"    border: 1px solid #30333b;\n"
+"    background: #30333b; \n"
+"    border-radius: 5px; \n"
+"}\n"
+"QScrollBar::handle:vertical {\n"
+"    background:  #323a47; \n"
+"    border: 1px solid #30333b;\n"
+"    border-radius: 5px; \n"
+"}\n"
+"\n"
+"QScrollBar::add-line:vertical {\n"
+"    border:none; \n"
+"    background:none;\n"
+"}\n"
+"QScrollBar::sub-line:vertical {\n"
+"    border:none; \n"
+"    background:none;\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"/******************************************************************\n"
 "/    toolBar \n"
 "/******************************************************************/\n"
 "QToolBar {\n"
@@ -2037,6 +2059,19 @@ class Ui_MainWindow(object):
         self.chmInputClearBtn.setObjectName("chmInputClearBtn")
         self.verticalLayout_23.addWidget(self.chmInputClearBtn)
         self.verticalLayout_27.addWidget(self.chmActionWidget)
+        self.chm_error_widget = QtWidgets.QWidget(self.chmInputActionsWidgets)
+        self.chm_error_widget.setObjectName("chm_error_widget")
+        self.verticalLayout_45 = QtWidgets.QVBoxLayout(self.chm_error_widget)
+        self.verticalLayout_45.setObjectName("verticalLayout_45")
+        self.chm_error_msg = QtWidgets.QLabel(self.chm_error_widget)
+        font = QtGui.QFont()
+        font.setBold(False)
+        font.setWeight(50)
+        self.chm_error_msg.setFont(font)
+        self.chm_error_msg.setStyleSheet("color: red;")
+        self.chm_error_msg.setObjectName("chm_error_msg")
+        self.verticalLayout_45.addWidget(self.chm_error_msg)
+        self.verticalLayout_27.addWidget(self.chm_error_widget)
         self.chmTestsValueWidget = QtWidgets.QWidget(self.chmInputActionsWidgets)
         self.chmTestsValueWidget.setEnabled(True)
         self.chmTestsValueWidget.setMinimumSize(QtCore.QSize(100, 0))
@@ -2227,15 +2262,15 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName("gridLayout")
         self.label_81 = QtWidgets.QLabel(self.test_info_widget)
         self.label_81.setObjectName("label_81")
-        self.gridLayout.addWidget(self.label_81, 7, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_81, 8, 0, 1, 1)
         self.chm_display = QtWidgets.QComboBox(self.test_info_widget)
         self.chm_display.setObjectName("chm_display")
-        self.gridLayout.addWidget(self.chm_display, 7, 2, 1, 1)
+        self.gridLayout.addWidget(self.chm_display, 8, 2, 1, 1)
         self.chm_upper = QtWidgets.QLineEdit(self.test_info_widget)
         self.chm_upper.setObjectName("chm_upper")
         self.gridLayout.addWidget(self.chm_upper, 4, 2, 1, 1)
         spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem8, 8, 2, 1, 1)
+        self.gridLayout.addItem(spacerItem8, 9, 2, 1, 1)
         self.chm_text_name = QtWidgets.QLineEdit(self.test_info_widget)
         self.chm_text_name.setObjectName("chm_text_name")
         self.gridLayout.addWidget(self.chm_text_name, 1, 2, 1, 1)
@@ -2247,7 +2282,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.chm_test_type, 3, 2, 1, 1)
         self.chm_print = QtWidgets.QComboBox(self.test_info_widget)
         self.chm_print.setObjectName("chm_print")
-        self.gridLayout.addWidget(self.chm_print, 6, 2, 1, 1)
+        self.gridLayout.addWidget(self.chm_print, 7, 2, 1, 1)
         self.label_63 = QtWidgets.QLabel(self.test_info_widget)
         self.label_63.setObjectName("label_63")
         self.gridLayout.addWidget(self.label_63, 4, 0, 1, 1)
@@ -2268,13 +2303,19 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label_64, 1, 0, 1, 1)
         self.label_80 = QtWidgets.QLabel(self.test_info_widget)
         self.label_80.setObjectName("label_80")
-        self.gridLayout.addWidget(self.label_80, 6, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_80, 7, 0, 1, 1)
         self.chm_so = QtWidgets.QLineEdit(self.test_info_widget)
         self.chm_so.setObjectName("chm_so")
-        self.gridLayout.addWidget(self.chm_so, 5, 2, 1, 1)
+        self.gridLayout.addWidget(self.chm_so, 6, 2, 1, 1)
         self.label_53 = QtWidgets.QLabel(self.test_info_widget)
         self.label_53.setObjectName("label_53")
-        self.gridLayout.addWidget(self.label_53, 5, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_53, 6, 0, 1, 1)
+        self.label_82 = QtWidgets.QLabel(self.test_info_widget)
+        self.label_82.setObjectName("label_82")
+        self.gridLayout.addWidget(self.label_82, 5, 0, 1, 1)
+        self.chm_lower = QtWidgets.QLineEdit(self.test_info_widget)
+        self.chm_lower.setObjectName("chm_lower")
+        self.gridLayout.addWidget(self.chm_lower, 5, 2, 1, 1)
         self.gridLayout_3.addWidget(self.test_info_widget, 1, 1, 2, 1)
         self.icpFooterCommentWidget_2 = QtWidgets.QWidget(self.tests_container)
         self.icpFooterCommentWidget_2.setMinimumSize(QtCore.QSize(0, 0))
@@ -2465,7 +2506,7 @@ class Ui_MainWindow(object):
         self.generalToolBox = QtWidgets.QToolBox(self.generalTab)
         self.generalToolBox.setObjectName("generalToolBox")
         self.page_8 = QtWidgets.QWidget()
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 2233, 1335))
         self.page_8.setObjectName("page_8")
         self.label_44 = QtWidgets.QLabel(self.page_8)
         self.label_44.setGeometry(QtCore.QRect(20, 10, 91, 16))
@@ -2617,7 +2658,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtWidgets.QToolBox(self.tab_6)
         self.toolBox.setObjectName("toolBox")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 924, 160))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 2233, 1403))
         self.page_2.setObjectName("page_2")
         self.horizontalLayout_70 = QtWidgets.QHBoxLayout(self.page_2)
         self.horizontalLayout_70.setContentsMargins(12, -1, -1, -1)
@@ -2715,7 +2756,7 @@ class Ui_MainWindow(object):
         self.toolBox_3 = QtWidgets.QToolBox(self.testsTab)
         self.toolBox_3.setObjectName("toolBox_3")
         self.page = QtWidgets.QWidget()
-        self.page.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.page.setGeometry(QtCore.QRect(0, 0, 2225, 1403))
         self.page.setObjectName("page")
         self.toolBox_3.addItem(self.page, "")
         self.page_6 = QtWidgets.QWidget()
@@ -3299,6 +3340,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_60.addWidget(self.pushButton)
         spacerItem19 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_60.addItem(spacerItem19)
+        self.pushButton_3 = QtWidgets.QPushButton(self.tabSectionWidget)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.horizontalLayout_60.addWidget(self.pushButton_3)
         self.createIcpReportBtn = QtWidgets.QPushButton(self.tabSectionWidget)
         self.createIcpReportBtn.setMinimumSize(QtCore.QSize(128, 23))
         self.createIcpReportBtn.setObjectName("createIcpReportBtn")
@@ -3315,7 +3359,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.MainBodyContainer)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1200, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 2493, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -3365,11 +3409,11 @@ class Ui_MainWindow(object):
         self.historyTabWidget.setCurrentIndex(0)
         self.icpTabWidget.setCurrentIndex(1)
         self.chmTabWidget.setCurrentIndex(2)
-        self.SettingsTab.setCurrentIndex(0)
+        self.SettingsTab.setCurrentIndex(2)
         self.generalToolBox.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
         self.toolBox_3.setCurrentIndex(0)
-        self.reportsTab.setCurrentIndex(0)
+        self.reportsTab.setCurrentIndex(1)
         self.toggleMenuSmall.clicked['bool'].connect(self.LeftMenuContainerMini.setHidden) # type: ignore
         self.toggleMenuSmall.clicked['bool'].connect(self.LeftMenuContainer.setVisible) # type: ignore
         self.toggleMenuLarge.clicked['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
@@ -3523,6 +3567,7 @@ class Ui_MainWindow(object):
         self.label_66.setText(_translate("MainWindow", "% Recovery "))
         self.gcmsStandardValShow.setText(_translate("MainWindow", "Test"))
         self.chmInputClearBtn.setText(_translate("MainWindow", "Clear"))
+        self.chm_error_msg.setText(_translate("MainWindow", "Error"))
         self.label_67.setText(_translate("MainWindow", "Enter Values"))
         self.label_68.setText(_translate("MainWindow", "Job Number"))
         self.label_69.setText(_translate("MainWindow", "Sample Number"))
@@ -3556,8 +3601,9 @@ class Ui_MainWindow(object):
         self.label_64.setText(_translate("MainWindow", "Text Name"))
         self.label_80.setText(_translate("MainWindow", "Print Test"))
         self.label_53.setText(_translate("MainWindow", "So"))
+        self.label_82.setText(_translate("MainWindow", "Lower Limit"))
         self.label_57.setText(_translate("MainWindow", "Additonal Comment"))
-        self.label_60.setText(_translate("MainWindow", "* will display comment if maximum limit reached"))
+        self.label_60.setText(_translate("MainWindow", "* will display comment if upper limit or lower limit is reached"))
         self.chm_header.setText(_translate("MainWindow", "Tests Name"))
         self.pushButton_2.setText(_translate("MainWindow", "Delete Test"))
         self.chm_test_btn.setText(_translate("MainWindow", "Cancel"))
@@ -3669,6 +3715,7 @@ class Ui_MainWindow(object):
         self.reloadDataBtn.setText(_translate("MainWindow", "Reload Test Data"))
         self.calcHardnessBtn.setText(_translate("MainWindow", "Calculate Hardness"))
         self.pushButton.setText(_translate("MainWindow", "Reset Distillation"))
+        self.pushButton_3.setText(_translate("MainWindow", "Save Report"))
         self.createIcpReportBtn.setText(_translate("MainWindow", "Create ICP Report"))
         self.createChmReportBtn.setText(_translate("MainWindow", "Create CHM Report"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))

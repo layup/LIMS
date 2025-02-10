@@ -1,4 +1,3 @@
-from modules.dbFunctions import get_total_chem_info_count
 
 from pages.chm_page.history_tab.chm_history_config import chem_history_tab_setup
 from pages.chm_page.reports_tab.chm_reports_config import chm_reports_tab_setup
@@ -30,9 +29,9 @@ def on_chmTabWidget_currentChanged(self, index):
         self.ui.headerDesc.setText('');
 
     if(index == 2): # Test Info
-        totalTests = get_total_chem_info_count(self.tempDB)
+        total_test = self.chm_test_data_manager.get_total_test_count()
         self.ui.headerTitle.setText('Chemistry Tests Information');
-        self.ui.headerDesc.setText(f'Total Tests: {totalTests}');
+        self.ui.headerDesc.setText(f'Total Tests: {total_test}');
 
     if(index == 3): # Report Info
         self.ui.headerTitle.setText('Chemistry Reports Information')

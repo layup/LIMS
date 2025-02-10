@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import  QHeaderView, QTableWidgetItem, QAbstractItemView
 from modules.dialogs.basic_dialogs import okay_dialog, error_dialog
 
-from pages.reports_page.reports.report_utils import ( populateSamplesContainer, EmptyDataTableError, updateReport,
+from pages.reports_page.reports.report_utils import ( populateSamplesContainer, EmptyDataTableError, update_report_status,
     createExcelErrorCheck, get_selected_report_authors, get_report_footer_comment )
 from pages.reports_page.icp.icp_report_view import IcpReportView
 from pages.reports_page.icp.icp_report_model import IcpReportModel
@@ -25,7 +25,7 @@ def icp_report_setup(self, sampleTests, sampleNames):
     icp_comments_table_setup(self.ui.comments_table, comment_column_names)
     icp_sample_widget_setup(self.ui.samplesContainerLayout_2, sampleNames)
 
-    self.icp_report_model = IcpReportModel(self.tempDB, self.jobNum, self.parameter, self.dilution, self.elements_manager, sampleTests)
+    self.icp_report_model = IcpReportModel(self.icp_test_data_manager, self.jobNum, self.parameter, self.dilution, self.elements_manager, sampleTests)
     self.icp_report_view = IcpReportView(self.ui.dataTable, self.ui.comments_table, self.ui.reportsTab, self.ui.reloadDataBtn, self.ui.calcHardnessBtn)
     self.icp_report_controller = IcpReportController(self.icp_report_model, self.icp_report_view)
 
@@ -120,7 +120,7 @@ def handle_create_icp_btn(self, sample_names):
         self.status_bar_manager.update_status_bar(f'Successfully Created ICP Report: {self.jobNum}')
 
         # update the database with the status and info
-        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.report_id)
+        update_report_status(self, self.jobNum, self.report_id)
 
     except Exception as e:
         error_details = traceback.format_exc()

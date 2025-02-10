@@ -2,11 +2,7 @@
 from base_logger import logger
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-
-from PyQt5.QtWidgets import (
-    QCompleter, QAbstractItemView, QHeaderView, QTableWidgetItem, QPushButton, QWidget,
-    QHBoxLayout
-)
+from PyQt5.QtWidgets import (QCompleter, QAbstractItemView, QHeaderView, QTableWidgetItem, QPushButton, QWidget, QHBoxLayout)
 
 from modules.widgets.TableFooterWidget import TableFooterWidget
 from modules.widgets.BasicSearchBar import BasicSearchBar
@@ -25,12 +21,12 @@ def icp_history_setup(self):
     icp_history_footer_setup(self)
     icp_history_search_setup(self, headers)
 
-    self.icp_history_model = IcpHistoryModel(self.tempDB)
+    self.icp_history_model = IcpHistoryModel(self.db, self.icp_test_data_manager)
     self.icp_history_view = IcpHistoryView(self.ui.icpTable,  self.icp_history_footer, self.icp_history_search,  self.ui.icpUploadBtn)
     self.icp_history_controller = IcpHistoryController(self.icp_history_model, self.icp_history_view)
 
     # Connect signals
-    self.icp_history_controller.openReport.connect(lambda current_item: handle_view_report(self.tempDB, current_item))
+    self.icp_history_controller.openReport.connect(lambda current_item: handle_view_report(self, current_item))
 
 def icp_history_table_setup(table, headers):
 
@@ -40,17 +36,17 @@ def icp_history_table_setup(table, headers):
 
     table.verticalHeader().setVisible(True)
 
-    smallCol = 140
-    medCol = 240
-    bigCol = 340
+    small_col = 140
+    med_col = 240
+    big_col = 340
 
     # Set the width of the tables
-    table.setColumnWidth(0, smallCol)
-    table.setColumnWidth(1, smallCol)
-    table.setColumnWidth(2, smallCol)
-    table.setColumnWidth(3, medCol)
-    table.setColumnWidth(4, smallCol)
-    table.setColumnWidth(5, medCol)
+    table.setColumnWidth(0, small_col)
+    table.setColumnWidth(1, small_col)
+    table.setColumnWidth(2, small_col)
+    table.setColumnWidth(3, med_col)
+    table.setColumnWidth(4, small_col)
+    table.setColumnWidth(5, med_col)
 
 
 def icp_history_footer_setup(self):
@@ -66,8 +62,18 @@ def icp_history_search_setup(self, headers):
     self.icp_history_search.filters.addItems(headers)
     self.icp_history_search.filters.setCurrentIndex(0)
 
-def handle_view_report(db, current_item):
+def handle_view_report(self, current_item):
 
-    dialog = ViewIcpData(db, current_item)
+    dialog = ViewIcpData(self.icp_test_data_manager, current_item)
+    dialog.delete_item.connect(lambda self=self:handle_delete_icp_item(self))
     dialog.exec()
+
+def handle_delete_icp_item(self):
+    logger.info(f'Entering handle_delete_icp_item')
+
+    #TODO: manage when delete on other pages and etc
+
+    self.icp_history_controller.update_view()
+
+
 

@@ -1,29 +1,34 @@
 import os
+import time
 
 from interface import *
 from assets import resource_rc
-
-from dotenv import find_dotenv, load_dotenv
 
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFactory, QLabel, QMessageBox)
 
 from modules.dialogs.basic_dialogs import yes_or_no_dialog
 from modules.utils.apply_drop_shadow_effect import apply_drop_shadow_effect
 from modules.dialogs.file_location_dialog import FileLocationDialog
+from modules.dialogs.connect_server_dialog import ConnectServerDialog
 
-# setup up managers
+# setup database managers
 from modules.managers.authors_manager import AuthorsManager
 from modules.managers.client_info_manager import ClientInfoManager
-from modules.managers.database_manager import DatabaseManager, PostgresDatabaseManager
+from modules.managers.chm_test_data_manager import ChmTestManager
+from modules.managers.icp_test_data_manager import IcpTestManager
 from modules.managers.tests_manager import TestManager
-from modules.managers.toolbar_manager import ToolbarManager
-from modules.managers.status_manager import StatusBarManager
+from modules.managers.job_manager import JobManager
 from modules.managers.parameters_manager import ParametersManager
 from modules.managers.elements_manager import ElementsManager
 from modules.managers.units_manager import UnitManager
 from modules.managers.footers_manager import FootersManager
-from modules.managers.navigation_manager import NavigationManager
-from modules.managers.file_paths_manager import FilePathsManager
+
+# tools manager
+from modules.managers.tools.database_manager import DatabaseManager, PostgresDatabaseManager
+from modules.managers.tools.toolbar_manager import ToolbarManager
+from modules.managers.tools.status_manager import StatusBarManager
+from modules.managers.tools.navigation_manager import NavigationManager
+from modules.managers.tools.file_paths_manager import FilePathsManager
 
 # Page setup imports
 from pages.reports_page.reports_config import general_reports_setup
@@ -43,7 +48,9 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # load the setup
-        self.load_database()
+        # self.connect_to_server()
+        self.load_local_database()
+        #self.test_connection(self.tempDB)
         self.manager_setup()
         self.init_setup()
 
@@ -105,8 +112,9 @@ class MainWindow(QMainWindow):
         # Load page setup functions
         general_reports_setup(self)
         history_page_setup(self)
-        icp_setup(self)
+
         chemistrySetup(self)
+        icp_setup(self)
 
     def manager_setup(self):
 
@@ -117,6 +125,7 @@ class MainWindow(QMainWindow):
         self.navigation_manager = NavigationManager(self.ui.navigationTree)
 
         # shared database tables managers
+        self.jobs_manager = JobManager(self.tempDB)
         self.units_manager = UnitManager(self.tempDB)
         self.tests_manager = TestManager(self.tempDB)
         self.authors_manager = AuthorsManager(self.tempDB)
@@ -125,8 +134,10 @@ class MainWindow(QMainWindow):
 
         # icp database table manager
         self.elements_manager = ElementsManager(self.tempDB)
+        self.icp_test_data_manager = IcpTestManager(self.tempDB)
 
         # chm database table manager
+        self.chm_test_data_manager = ChmTestManager(self.tempDB)
 
         # manager signals
         self.toolbar_manager.action_name.connect(self.handle_toolbar_action)
@@ -158,32 +169,28 @@ class MainWindow(QMainWindow):
         if(action_name == 'settings'):
             pass
 
+    #******************************************************************
+    #    Database & Server
+    #******************************************************************
 
-    def load_database(self, max_attempts=3):
-        self.logger.info("Entering load_database")
+    def connect_to_server(self):
 
-        self.preferences = FilePathsManager()
-
-        # find the path
-        dotenv_path = find_dotenv()
-
-        load_dotenv(dotenv_path)
-
+        # access values from .env file
         HOST = os.getenv('HOST')
         DATABASE = os.getenv('DATABASE')
+        PORT = os.getenv('PORT')
         USERNAME = os.getenv('USERNAME')
         PASSWORD = os.getenv('PASSWORD')
 
+        self.post_db = PostgresDatabaseManager(HOST, DATABASE, PORT, USERNAME, PASSWORD)
 
-        self.logger.info(f'HOST: {HOST}')
-        self.logger.info(f'DATABASE: {DATABASE}')
-        self.logger.info(f'USERNAME: {USERNAME}')
-        self.logger.info(f'PASSWORD: {PASSWORD}')
+       # print(f'connection_status: {connection_status}')
 
-        self.logger.info('Testing PostgresSQL Connection')
-        self.post_db = PostgresDatabaseManager(host=HOST, database=DATABASE, user=USERNAME, password=PASSWORD)
 
-        testing_post(self.post_db)
+    def load_local_database(self, max_attempts=3, delay=2):
+        self.logger.info("Entering load_local_database")
+
+        self.preferences = FilePathsManager()
 
 
         for attempt in range(max_attempts):
@@ -194,6 +201,8 @@ class MainWindow(QMainWindow):
                 self.db = DatabaseManager(self.preferences.get_path('databasePath'))
                 self.tempDB = DatabaseManager(self.preferences.get_path('temp_backend_path')) # harry backend database
                 self.officeDB = DatabaseManager(self.preferences.get_path('officeDbPath'))  # front end database
+
+
                 return
 
             except Exception as error:
@@ -206,6 +215,8 @@ class MainWindow(QMainWindow):
                 # Dialog popup to load the necessary database Information for the user
                 dialog = FileLocationDialog(self.preferences)
                 dialog.exec_()
+
+                time.sleep(delay)
 
 
     #******************************************************************
@@ -307,3 +318,11 @@ def testing_post(db_manager):
 
     except Exception as e:
         print(f'failed: {e}')
+
+
+def test_connection(db):
+    try:
+        result = self.db.query('SELECT 1')
+        print(result)
+    except Exception as e:
+        print(e)

@@ -73,7 +73,7 @@ class UnitManager:
             # Check how many rows were deleted
             deleted_rows = self.db.cursor.rowcount  # Get the number of deleted rows
             if deleted_rows > 0:
-                print(f"Successfully deleted {deleted_rows} row(s) from chemTestsData.")
+                print(f"Successfully deleted {deleted_rows} row(s) from units.")
             else:
                 print("No rows were deleted (the condition may not have matched any records).")
 

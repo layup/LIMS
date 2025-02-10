@@ -6,8 +6,10 @@ from pages.history_page.lab_section.lab_history_item import LabHistoryItem
 
 # managers the data and logic
 class LabHistoryModel:
-    def __init__(self, db):
+    def __init__(self, db, parameters_manager, jobs_manager):
         self.db = db;
+        self.parameters_manager = parameters_manager
+        self.jobs_manager = jobs_manager
 
         self.history_items = []
 
@@ -24,19 +26,22 @@ class LabHistoryModel:
 
     def init_setup(self):
         logger.info('Entering init_setup')
-        self.param_names = get_parameters(self.db)
-        logger.info(f'self.param_names: {self.param_names}')
+        #self.param_names = get_parameters(self.db)
+        #logger.info(f'self.param_names: {self.param_names}')
+
+        self.param_names = self.parameters_manager.get_params()
+
 
     def add_item(self, item):
-        jobNum = item[0]
+        job_num = item[0]
         report = item[1]
         parameter = item[2]
         dilution = item[3]
-        creationDate = item[4]
+        creation_date = item[4]
         status = item[5]
 
 
-        self.history_items.append(LabHistoryItem(jobNum, report, parameter, dilution, creationDate, status))
+        self.history_items.append(LabHistoryItem(job_num, report, parameter, dilution, creation_date, status))
 
     def total_items(self):
         return len(self.history_items)
@@ -48,14 +53,16 @@ class LabHistoryModel:
         self.history_items.clear()
 
     def load_items(self, limit, offset, search_query=''):
+        logger.info(f'LabHistoryModel load_items with limit: {limit}, offset: {offset}, search_query: {search_query} ')
 
         self.clear_items()
 
         if(search_query == ''):
-            results = get_jobs(self.db, limit, offset)
-           # print(results);
+            results = self.jobs_manager.get_limited_jobs(limit, offset)
         else:
-            results = search_jobs(self.db, limit, offset, search_query)
+            results = self.jobs_manager.search_limited_jobs(limit, offset, search_query)
+
+        logger.info(f'results: {results}')
 
         for current_item in results:
             self.add_item(current_item)
@@ -66,66 +73,14 @@ class LabHistoryModel:
         #total pages
 
         if(search_query == ''):
-            total_items = get_jobs_count(self.db)
+            total_items = self.jobs_manager.get_total_jobs_count()
         else:
-            total_items = search_jobs_count(self.db, search_query)
+            total_items = self.jobs_manager.search_jobs_count(search_query)
 
         # set total pages
         self.total_pages = math.ceil(total_items / self.page_size)
 
         return self.total_pages
-
-
-def get_jobs(db, limit, offset):
-    query = '''
-        SELECT jobNum, reportNum, parameterNum, dilution, creationDate, status
-        FROM jobs
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-
-    '''
-    results = db.query(query, (limit, offset))
-    return results
-
-def get_jobs_count(db):
-    query = '''
-        SELECT count(jobNum)
-        FROM jobs
-    '''
-    results = db.query(query)
-    return results[0][0]
-
-def search_jobs(db, limit, offset, search_query):
-    query = """
-        SELECT jobNum, reportNum, parameterNum, dilution, creationDate, status
-        FROM jobs
-        WHERE jobNum LIKE ?
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-    """
-
-    # Add wildcards to the search term for partial matching
-    search_term = f"{search_query}%"
-
-    # Execute the query with the search term and pagination parameters
-    results = db.query(query, (search_term, limit, offset))
-
-    return results
-
-def search_jobs_count(db, search_query):
-    query = """
-        SELECT count(jobNum)
-        FROM jobs
-        WHERE jobNum LIKE ?
-    """
-
-    # Add wildcards to the search term for partial matching
-    search_term = f"{search_query}%"
-
-    # Execute the query with the search term and pagination parameters
-    results = db.query(query, (search_term, ))
-
-    return results[0][0]
 
 
 def get_parameters(db):

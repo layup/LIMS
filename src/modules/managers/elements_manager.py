@@ -73,17 +73,17 @@ class ElementsManager:
 
     def load_all_elements(self):
         try:
-            query = 'SELECT * FROM icpElements ORDER BY elementName ASC'
+            query = 'SELECT * FROM icp_elements ORDER BY element_name ASC'
             results = self.db.query(query)
             return results
 
         except Exception as e:
-            logger.info(f'There was an error loading in the icpElements: {e}')
+            logger.info(f'There was an error loading in the icp_elements: {e}')
             return None
 
     def load_element_limit(self, element_id):
         try:
-            query = 'SELECT * FROM icpLimits WHERE elementNum = ?'
+            query = 'SELECT * FROM icp_limits WHERE element_id = ?'
             results = self.db.query(query, (element_id,))
             return results
 
@@ -141,14 +141,14 @@ class ElementsManager:
         logger.info(f'Entering delete_element with element_id: {element_id}')
 
         try:
-            query = 'DELETE FROM icpElements WHERE elementNum = ?'
+            query = 'DELETE FROM icp_elements WHERE element_id = ?'
             self.db.execute(query, (element_id,))
             self.db.commit()
 
             # Check how many rows were deleted
             deleted_rows = self.db.cursor.rowcount  # Get the number of deleted rows
             if deleted_rows > 0:
-                logger.info(f"Successfully deleted {deleted_rows} row(s) from icpElements.")
+                logger.info(f"Successfully deleted {deleted_rows} row(s) from icp_elements.")
 
                 # Remove the item from the parameters
                 del self.elements[element_id]
@@ -159,7 +159,7 @@ class ElementsManager:
                 return None
 
         except sqlite3.Error as e:
-            logger.info(f"Error removing {element_id} from icpElements: {e}")
+            logger.info(f"Error removing {element_id} from icp_elements: {e}")
             return None
 
         except KeyError:
@@ -174,7 +174,7 @@ class ElementsManager:
         logger.info(f'Entering insert_element with name: {name}, symbol: {symbol}')
 
         try:
-            query = 'INSERT INTO icpElements (elementName, elementSymbol) VALUES (?, ?)'
+            query = 'INSERT INTO icp_elements (element_name, element_symbol) VALUES (?, ?)'
             self.db.execute(query, (name, symbol))
             self.db.commit()
 
@@ -200,7 +200,7 @@ class ElementsManager:
         try:
             if(element_id in self.elements):
 
-                query = 'UPDATE icpElements SET elementName = ?, elementSymbol = ? WHERE  elementNum=?'
+                query = 'UPDATE icp_elements SET element_name = ?, element_symbol = ? WHERE  element_id=?'
                 self.db.execute(query, (name, symbol, element_id))
                 self.db.commit()
 
@@ -235,13 +235,13 @@ class ElementsManager:
             if(element_id in self.elements):
                 if param_id in self.elements[element_id].limits:
                     # already exists so just update
-                    query = 'UPDATE icpLimits SET unitType=?, lowerLimit=?, upperLimit=?, sideComment=?, footerComment=? WHERE parameterNum=? AND elementNum=?'
+                    query = 'UPDATE icp_limits SET unitType=?, lower_limit=?, upper_limit=?, side_comment=?, footer_comment=? WHERE param_id=? AND element_id=?'
                     self.db.execute(query, (unit_type, lower_limit, upper_limit, side_comment, footer,  param_id, element_id, ))
                     self.db.commit()
 
                 else:
                     # doesn't already exist so create the thing
-                    query = 'INSERT INTO icpLimits (parameterNum, elementNum, unitType, lowerLimit, upperLimit, sideComment, footerComment) VALUES (?, ?, ?, ?, ?, ?)'
+                    query = 'INSERT INTO icp_limits (param_id, element_id, unitType, lower_limit, upper_limit, side_comment, footer_comment) VALUES (?, ?, ?, ?, ?, ?)'
                     self.db.execute(query, (param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, footer, ))
                     self.db.commit()
 
@@ -253,7 +253,7 @@ class ElementsManager:
                 return rows_affected
 
         except sqlite3.Error as e:
-            logger.error(f"Error updating icpLimits: {e}")
+            logger.error(f"Error updating icp_limits: {e}")
             return None
 
         except Exception as e:

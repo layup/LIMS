@@ -23,7 +23,7 @@ from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence
 
 class ChmExcelReport(ExcelReports):
 
-    def __init__(self, client_info, jobNum, authors, side_comments, extra_comments, comment, sample_names, sample_data, test_info, units, recovery, so, upper_limits, hidden_rows, report_type=2):
+    def __init__(self, client_info, jobNum, authors, side_comments, extra_comments, comment, sample_names, sample_data, test_info, units, recovery, so, lower_limits, upper_limits, hidden_rows, report_type=2):
         super().__init__(jobNum, report_type)
         self.authors = authors
         self.client_info = client_info
@@ -33,6 +33,7 @@ class ChmExcelReport(ExcelReports):
         self.test_info = test_info
         self.units = units
         self.recovery = recovery
+        self.lower_limits = lower_limits
         self.upper_limits = upper_limits #FIXME: currently set to None
         self.so = so
 
@@ -296,11 +297,18 @@ class ChmExcelReport(ExcelReports):
                 # Handle both numeric and string types
                 test_val = convert_to_float(current_results[row])
                 upper_limit = convert_to_float(self.upper_limits[row])
+                lower_limit = convert_to_float(self.lower_limits[row])
+
+                logger.debug(f'test_val: {test_val}, lower_limit: {lower_limit}, upper_limit: {upper_limit}')
 
                 # add the row to the list that will trigger ending comments
                 if(row not in self.extra_comment_rows):
                     if(isinstance(upper_limit, float) and isinstance(test_val, float)):
-                        if(test_val > upper_limit):
+                        if(test_val >= upper_limit):
+                            self.extra_comment_rows.append(row)
+
+                    if(isinstance(lower_limit, float) and isinstance(test_val, float)):
+                        if(test_val <= lower_limit and row not in self.extra_comment_rows):
                             self.extra_comment_rows.append(row)
 
 

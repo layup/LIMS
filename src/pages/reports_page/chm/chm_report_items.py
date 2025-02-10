@@ -1,7 +1,7 @@
 from base_logger import logger
 
 class chmReportTestItem:
-    def __init__(self, testNum=None, testName=None, textName=None, displayName=None, unitType=None, recovery=None, so=None, upper_limit=None, side_comment=None, footer_comment=None ):
+    def __init__(self, testNum=None, testName=None, textName=None, displayName=None, unitType=None, recovery=None, so=None, lower_limit=None, upper_limit=None, side_comment=None, footer_comment=None ):
         self.testNum = testNum
         self.testName = testName
         self.textName = textName
@@ -12,6 +12,7 @@ class chmReportTestItem:
         self.so = so
 
         self.upper_limit = upper_limit
+        self.lower_limit = lower_limit
         self.side_comment = side_comment
         self.footer_comment = footer_comment
 
@@ -53,8 +54,8 @@ class chmReportSampleItem:
         self.data[row] = str(testVal)
 
 
-    def update_data(self, testNum, testVal):
-        self.data[testNum] = testVal
+    def update_data(self, test_id, testVal):
+        self.data[test_id] = testVal
 
     def clear_data(self):
         self.data = {}

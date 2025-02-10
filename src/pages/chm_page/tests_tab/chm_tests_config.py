@@ -3,11 +3,39 @@ from base_logger import logger
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import  QAbstractItemView, QTreeWidgetItem
+from PyQt5.QtGui import QValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 from modules.dialogs.basic_dialogs import okay_dialog, error_dialog
 
 from pages.chm_page.tests_tab.chm_tests_view import TestsView
 from pages.chm_page.tests_tab.chm_tests_controller import TestsController
+
+
+class FloatIntValidator(QValidator):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.regex = QRegExp(r"^-?\d*(\.\d+)?$")  # Regex for floats and ints
+
+    def validate(self, input_str, pos):
+        if self.regex.exactMatch(input_str):
+            return QValidator.Acceptable, input_str, pos
+        elif input_str == "" or input_str == "-": # allow empty or just negative sign
+            return QValidator.Intermediate, input_str, pos
+        else:
+            # Check if it's almost a valid float, handle cases like "12." or "12.3."
+            if QRegExp(r"^-?\d*(\.\d*)?$").exactMatch(input_str): # Almost valid float
+                return QValidator.Intermediate, input_str, pos
+            return QValidator.Invalid, input_str, pos
+
+    def fixup(self, input_str):
+        # Remove any invalid characters to try and make it a valid number
+        # This is very basic, you can customize it further
+        cleaned_str = ""
+        for char in input_str:
+            if char.isdigit() or char == '.' or char == '-':
+                cleaned_str += char
+        return cleaned_str
 
 #******************************************************************
 #    Chemistry Tests Info
@@ -19,6 +47,7 @@ def chm_tests_tab_setup(self):
 
     tests_tree_setup(self.ui.chm_test_tree)
     dropdown_setup(self)
+    validator_setup(self)
 
     # load the initial tests data
     load_chm_tests(self)
@@ -34,7 +63,15 @@ def chm_tests_tab_setup(self):
     self.ui.chmSearchLine3.returnPressed.connect(lambda: handle_search(self))
     self.ui.clear_tests_btn.clicked.connect(lambda: load_chm_tests(self))
 
-    load_chm_tests(self)
+def validator_setup(self):
+
+    float_validator = FloatIntValidator()
+
+    self.ui.chm_lower.setValidator(float_validator)
+    self.ui.chm_upper.setValidator(float_validator)
+    self.ui.chm_so.setValidator(float_validator)
+
+
 
 def tests_tree_setup(tree):
 
@@ -82,6 +119,9 @@ def handle_test_selected(self, item):
 
     if(item):
 
+        # clear existing sample data before loading in existing info
+        clear_tests_info(self)
+
         test_id = item.text(0)
         test_name = item.text(1)
 
@@ -94,13 +134,15 @@ def handle_test_selected(self, item):
             display_name = test_info.display_name
             test_type = test_info.test_type
             upper_limit = test_info.upper_limit
+            lower_limit = test_info.lower_limit
             print_status = test_info.print_status
             show_status = test_info.show_status
             side_comment = test_info.comment
             footer_comment = test_info.footer
+            so = test_info.so
 
             update_toggle_items(self, test_type, show_status, print_status)
-            update_tests_info(self, test_id, test_name, text_name, display_name, upper_limit)
+            update_tests_info(self, test_id, test_name, text_name, display_name, lower_limit, upper_limit, so)
             update_tests_comment(self, side_comment, footer_comment)
 
             return
@@ -151,7 +193,7 @@ def update_toggle_items(self, test_type, show_status, print_status):
     except Exception as e:
         print(f'Cannot update_toggle_item {e}')
 
-def update_tests_info(self, test_id, test_name, text_name, display_name, upper_limit):
+def update_tests_info(self, test_id, test_name, text_name, display_name, lower_limit, upper_limit, so):
 
     self.ui.chm_header.setText(f'[{test_id}] {test_name}')
 
@@ -159,8 +201,16 @@ def update_tests_info(self, test_id, test_name, text_name, display_name, upper_l
     self.ui.chm_text_name.setText(text_name)
     self.ui.chm_display_name.setText(display_name)
 
+
+    if(lower_limit):
+        self.ui.chm_lower.setText(str(lower_limit))
+
     if(upper_limit):
         self.ui.chm_upper.setText(str(upper_limit))
+
+    if(so):
+        self.ui.chm_so.setText(str(so))
+
 
 def update_tests_comment(self, side_comment, footer_comment):
     self.ui.chm_side.setText(side_comment)
@@ -174,6 +224,8 @@ def clear_tests_info(self):
     self.ui.chm_text_name.clear()
     self.ui.chm_display_name.clear()
     self.ui.chm_upper.clear()
+    self.ui.chm_lower.clear()
+    self.ui.chm_so.clear()
 
     # reset the QComboBox Item
     self.ui.chm_test_type.setCurrentIndex(0)
@@ -190,6 +242,7 @@ def get_tests_info(self):
     text_name = self.ui.chm_text_name.text()
     display_name = self.ui.chm_display_name.text()
     upper_limit = self.ui.chm_upper.text()
+    lower_limit = self.ui.chm_lower.text()
     so = self.ui.chm_so.text()
 
     test_type = self.ui.chm_test_type.itemData(self.ui.chm_test_type.currentIndex(), Qt.UserRole)
@@ -199,11 +252,12 @@ def get_tests_info(self):
     side_comment = self.ui.chm_side.text()
     footer_comment = self.ui.chm_footer.toPlainText()
 
-    logger.debug(f'test_name: {test_name}, text_name: {text_name}, display_name: {display_name}, upper_limit: {upper_limit}')
+    logger.debug(f'test_name: {test_name}, text_name: {text_name}, display_name: {display_name}')
+    logger.debug(f'lower_limit: {lower_limit}, upper_limit: {upper_limit}, so: {so}')
     logger.debug(f'test_type: {test_type}, print_item: {print_item}, show_item: {show_item}')
     logger.debug(f'side_comment: {side_comment}, footer:{footer_comment}')
 
-    return [test_name, text_name, display_name, upper_limit, so, test_type, print_item, show_item, side_comment, footer_comment]
+    return [test_name, text_name, display_name, lower_limit, upper_limit, so, test_type, print_item, show_item, side_comment, footer_comment]
 
 def get_test_id(self):
 
@@ -251,15 +305,16 @@ def handle_save_btn(self):
         test_name = current_test_info[0]
         text_name = current_test_info[1]
         display_name = current_test_info[2]
-        upper_limit = current_test_info[3]
-        so = current_test_info[4]
-        test_type = current_test_info[5]
-        print_item = current_test_info[6]
-        show_item = current_test_info[7]
-        side_comment = current_test_info[8]
-        footer = current_test_info[9]
+        lower_limit = current_test_info[3]
+        upper_limit = current_test_info[4]
+        so = current_test_info[5]
+        test_type = current_test_info[6]
+        print_item = current_test_info[7]
+        show_item = current_test_info[8]
+        side_comment = current_test_info[9]
+        footer = current_test_info[10]
 
-        status = self.tests_manager.update_chm_test(test_id, test_name, text_name, display_name, upper_limit, so,  print_item, show_item, side_comment, footer)
+        status = self.tests_manager.update_chm_test(test_id, test_name, text_name, display_name, lower_limit, upper_limit, so,  print_item, show_item, side_comment, footer)
 
         if(status):
             okay_dialog('Tests Saved', f'{test_name} was saved successfully')

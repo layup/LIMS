@@ -1,10 +1,13 @@
 import math
 
+from base_logger import logger
+
 from pages.icp_page.history_tab.icp_history_item import IcpHistoryItem
 
 class IcpHistoryModel:
-    def __init__(self,db):
+    def __init__(self, db, icp_test_data_manager):
         self.db = db
+        self.icp_test_data_manager = icp_test_data_manager
 
         self.history_items = []
 
@@ -39,10 +42,10 @@ class IcpHistoryModel:
         self.clear_items()
 
         if(search_query == ''):
-            results = get_jobs(self.db, limit, offset)
-           # print(results);
+            results = self.icp_test_data_manager.get_limited_data(limit, offset)
+
         else:
-            results = search_jobs(self.db, limit, offset, search_query)
+            results = self.icp_test_data_manager.search_limited_data(limit, offset, search_query)
 
         for current_item in results:
             self.add_item(current_item)
@@ -53,9 +56,9 @@ class IcpHistoryModel:
         #total pages
 
         if(search_query == ''):
-            total_items = get_jobs_count(self.db)
+            total_items = self.icp_test_data_manager.get_total_count()
         else:
-            total_items = search_jobs_count(self.db, search_query)
+            total_items = self.icp_test_data_manager.search_data_count(search_query)
 
         # set total pages
         self.total_pages = math.ceil(total_items / self.page_size)
@@ -64,58 +67,5 @@ class IcpHistoryModel:
 
     #TODO: fix this maybe or something
     def print_batch(self, batch_name):
-        query = 'SELECT sampleName FROM icpData WHERE batchName = ?'
+        return self.icp_test_data_manager.get_samples_from_batch(batch_name)
 
-        results = self.db.query(query, (batch_name, ))
-        return results
-
-
-def get_jobs(db, limit, offset):
-    query = '''
-        SELECT sampleName, jobNum, machineNum, batchName, creationDate, data
-        FROM icpData
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-    '''
-    results = db.query(query, (limit, offset))
-    return results
-
-
-def get_jobs_count(db):
-    query = '''
-        SELECT count(jobNum)
-        FROM icpData
-    '''
-    results = db.query(query)
-    return results[0][0]
-
-
-def search_jobs(db, limit, offset, search_query):
-    query = '''
-        SELECT sampleName, jobNum, machineNum, batchName, creationDate, data
-        FROM icpData
-        WHERE sampleName LIKE ?
-        ORDER BY creationDate DESC
-        LIMIT ? OFFSET ?
-    '''
-    # Add wildcards to the search term for partial matching
-    search_term = f"{search_query}%"
-
-    # Execute the query with the search term and pagination parameters
-    results = db.query(query, (search_term, limit, offset))
-
-    return results
-
-
-def search_jobs_count(db, search_query):
-    query = '''
-        SELECT count(jobNum)
-        FROM icpData
-        WHERE jobNum LIKE ?
-    '''
-
-    search_term = f"{search_query}%"
-
-    results = db.query(query, (search_term,))
-
-    return results[0][0]

@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import  QHeaderView, QTableWidgetItem, QAbstractItemView
 from modules.dialogs.basic_dialogs import okay_dialog, error_dialog
 
 #TODO: maybe improve the SampleWidget
-from pages.reports_page.reports.report_utils import ( populateSamplesContainer, EmptyDataTableError, updateReport,
+from pages.reports_page.reports.report_utils import ( populateSamplesContainer, EmptyDataTableError, update_report_status,
     createExcelErrorCheck, get_selected_report_authors, get_report_footer_comment )
 from pages.reports_page.chm.chm_report_controller import ChmReportController
 from pages.reports_page.chm.chm_report_model import ChmReportModel
@@ -18,7 +18,7 @@ from pages.reports_page.reports.chm_excel_report import ChmExcelReport
 def chm_report_setup(self):
 
     report_column_names = ['Tests Name', 'Text Name', 'Display Name', 'Unit', '% Recovery', 'Distillation', 'So']
-    comment_column_names = ['Tests Name', 'Upper Limits', 'Side Comment', 'Display','Extra Comments']
+    comment_column_names = ['Tests Name', 'Lower Limits', 'Upper Limits', 'Side Comment', 'Display', 'Extra Comments']
 
     chm_report_table_setup(self.ui.dataTable, report_column_names, self.sampleNames)
     chm_comments_table_setup(self.ui.comments_table, comment_column_names)
@@ -27,7 +27,7 @@ def chm_report_setup(self):
     # clear out the previous information and table before starting
     clean_up_previous_chm_report(self)
 
-    self.chem_report_model = ChmReportModel(self.tempDB, self.jobNum, self.dilution, self.sampleTests, self.tests_manager)
+    self.chem_report_model = ChmReportModel(self.tests_manager, self.chm_test_data_manager, self.jobNum, self.dilution, self.sampleTests)
     self.chem_report_view = ChmReportView(self.ui.dataTable, self.ui.comments_table, self.ui.reportsTab, self.ui.createChmReportBtn)
     self.chem_report_controller = ChmReportController(self.chem_report_model, self.chem_report_view, self.sampleNames)
 
@@ -63,8 +63,9 @@ def chm_comments_table_setup(table, column_names):
     # set the column width for tables
     table.setColumnWidth(0, 100)
     table.setColumnWidth(1, 100)
-    table.setColumnWidth(2, 200)
-    table.setColumnWidth(3, 100)
+    table.setColumnWidth(2, 100)
+    table.setColumnWidth(3, 200)
+    table.setColumnWidth(4, 100)
 
     table.horizontalHeader().setStretchLastSection(True)
     table.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -109,7 +110,7 @@ def handle_create_chem_btn(self):
     logger.info('Entering handle_create_chem_btn')
 
     sample_data, display_name, recovery_vals, units, so_vals, hidden_rows = self.chem_report_controller.export_data()
-    upper_limits, side_comments, extra_comments = self.chem_report_controller.export_comments()
+    lower_limits, upper_limits, side_comments, extra_comments = self.chem_report_controller.export_comments() #TODO: can combine the limits if wanted
 
     author_names = get_selected_report_authors(self)
     footer_comment = get_report_footer_comment(self.footers_manager, self.parameter, 2)
@@ -124,7 +125,7 @@ def handle_create_chem_btn(self):
     try:
         logger.info(f'Preparing to create CHM Report {self.jobNum}')
 
-        chm_excel_manager = ChmExcelReport(client_info, self.jobNum, author_names, side_comments, extra_comments, footer_comment, self.sampleNames, sample_data, display_name, units, recovery_vals, so_vals, upper_limits, hidden_rows)
+        chm_excel_manager = ChmExcelReport(client_info, self.jobNum, author_names, side_comments, extra_comments, footer_comment, self.sampleNames, sample_data, display_name, units, recovery_vals, so_vals, lower_limits, upper_limits, hidden_rows)
         file_path, fileName = chm_excel_manager.create_report()
 
         okay_dialog(title = f'Success Created CHM Report: {self.jobNum}', message= f'CHM Report Creation Successful File: {fileName}')
@@ -132,7 +133,7 @@ def handle_create_chem_btn(self):
         self.logger.info(f'CHM Report Creation Successful: {self.jobNum}')
         self.status_bar_manager.update_status_bar(f'Success Created CHM Report: {self.jobNum}')
 
-        updateReport(self.ui.statusHeaderLabel, self.tempDB, self.jobNum, self.report_id)
+        update_report_status(self, self.jobNum, self.report_id)
 
 
     except PermissionError:

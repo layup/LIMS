@@ -1,18 +1,17 @@
 from base_logger import logger
 
-from modules.dbFunctions import getTestsName
 from modules.utils.logic_utils import removeIllegalCharacters, is_float, remove_control_characters
 
 from pages.reports_page.chm.chm_report_items import chmReportSampleItem, chmReportTestItem
 
 class ChmReportModel:
-    def __init__(self, db, jobNum, dilution, sample_tests, tests_manager):
-        self.db = db
+    def __init__(self, tests_manager, chm_test_data_manager, jobNum, dilution, sample_tests):
+        self.tests_manager = tests_manager
+        self.chm_test_data_manager = chm_test_data_manager
         self.jobNum = jobNum
         self.sample_tests = sample_tests
         self.dilution = dilution
 
-        self.tests_manager = tests_manager
 
         self.tests_ids = []
 
@@ -33,10 +32,10 @@ class ChmReportModel:
             job_num, sample_num = sample_name.split('-')
             self.samples[sample_name] = chmReportSampleItem(job_num, sample_num, sample_name)
 
-
     def get_lists(self):
         ''' return a list of all entered users tests data'''
-        return get_tests_results(self.db, self.jobNum, self.sample_tests);
+        #return get_tests_results(self.db, self.jobNum, self.sample_tests);
+        return self.chm_test_data_manager.get_tests_results(self.jobNum, self.sample_tests)
 
     def get_samples_data(self):
         return self.samples;
@@ -114,12 +113,14 @@ class ChmReportModel:
             side_comment = test_info.comment
             footer_comment = test_info.footer
             upper_limit = test_info.upper_limit
+            lower_limit = test_info.lower_limit
+
 
             if(test_id not in self.tests_ids):
                 self.tests_ids.append(test_id)
                 self.test_row_info[test_id] = row
 
-            self.tests[row] = chmReportTestItem(test_id, test_name, chem_name, display_name, unit_type, recovery, so,  upper_limit, side_comment, footer_comment)
+            self.tests[row] = chmReportTestItem(test_id, test_name, chem_name, display_name, unit_type, recovery, so,  lower_limit, upper_limit, side_comment, footer_comment)
 
         else:
             logger.info(f'No test_data found for {text_name}')
@@ -165,52 +166,16 @@ class ChmReportModel:
         logger.info('Entering export_comments_data')
 
         upper_limits = []
+        lower_limits = []
         side_comments = []
         extra_comments = []
 
         for row, tests_info in self.tests.items():
             upper_limits.append(tests_info.upper_limit)
+            lower_limits.append(tests_info.lower_limit)
             side_comments.append(tests_info.side_comment)
             extra_comments.append(tests_info.footer_comment)
 
-        return upper_limits, side_comments, extra_comments
+        return lower_limits, upper_limits, side_comments, extra_comments
 
 
-# find what the user has enter for the tests already
-def get_tests_results(db, jobNum, sample_tests):
-    logger.info('Entering get_tests_results')
-
-    testsQuery = 'SELECT * FROM chemTestsData WHERE JobNum = ?'
-    test_results = db.query(testsQuery, (jobNum,))
-
-    logger.info(test_results)
-
-    # retrieve data from .txt file and user entered
-    chem_tests_list = []
-
-    # examine the .txt items
-    for _, tests_list in sample_tests.items():
-        for current_test in tests_list:
-            current_test = remove_control_characters(str(current_test))
-            if(current_test not in chem_tests_list and 'ICP' not in current_test):
-                chem_tests_list.append(current_test)
-
-    # examine the test_names
-    if(test_results):
-        for item in test_results:
-            test_num = item[1]
-            test_name = get_test_text_name(db, test_num)
-
-            if(test_name not in chem_tests_list):
-                chem_tests_list.append(test_name)
-
-    return chem_tests_list, test_results
-
-def get_test_text_name(db, testNum):
-    try:
-        query = 'SELECT benchChemName FROM Tests WHERE testNum = ?'
-        result = db.query(query, (testNum, ))
-        return result[0][0]
-
-    except Exception as e:
-        print(e)

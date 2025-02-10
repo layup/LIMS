@@ -17,9 +17,10 @@ from pages.reports_page.icp.icp_report_items import IcpReportSampleItem, IcpRepo
 
 class IcpReportModel(QObject):
 
-    def __init__(self,  db, jobNum, paramNum, dilution, elements_manager, sample_names):
+    def __init__(self,  icp_test_data_manager, jobNum, paramNum, dilution, elements_manager, sample_names):
         super().__init__()
-        self.db = db
+
+        self.icp_test_data_manager = icp_test_data_manager
         self.jobNum = jobNum
         self.paramNum = paramNum
         self.dilution = dilution
@@ -134,7 +135,8 @@ class IcpReportModel(QObject):
         logger.debug(self.symbol_num)
 
         # retrieve machine data from database
-        machine_data = get_machine_data(self.db, self.jobNum)
+        #machine_data = get_machine_data(self.db, self.jobNum)
+        machine_data = self.icp_test_data_manager.get_machine_data(self.jobNum)
 
         # load machine sample data
         for current_item in machine_data:
@@ -216,13 +218,3 @@ def calculate_hardness(calcium, magnesium):
     except Exception as e:
 
         return 'Uncal'
-
-def get_machine_data(db, jobNum):
-    try:
-        query = 'SELECT sampleName, jobNum, machineNum, data FROM icpData WHERE jobNum = ? ORDER BY sampleName ASC'
-
-        return list(db.query(query, (jobNum,)))
-
-    except Exception as e:
-        print(e)
-        return None

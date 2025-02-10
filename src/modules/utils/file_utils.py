@@ -3,7 +3,23 @@ import re
 import json
 
 from base_logger import logger
+from dotenv import load_dotenv, dotenv_values
+
 from PyQt5.QtWidgets import QFileDialog
+
+
+def update_env_file(key, value):
+
+    # load existing .env files
+    config = dotenv_values('.env')
+
+    # update the values
+    config[key] = value
+
+    # 'w' overwrites the entire file
+    with open('.env', 'w') as f:
+        for key, value in config.items():
+            f.write(f'{key}={value}\n')
 
 
 def openFile():

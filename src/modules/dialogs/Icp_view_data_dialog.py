@@ -1,17 +1,21 @@
 import os
 import json
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QDialog, QTableWidgetItem)
 from PyQt5.uic import loadUi
 
 from modules.dialogs.basic_dialogs import yes_or_no_dialog
 
 class ViewIcpData(QDialog):
-    def __init__(self, db, current_item):
+
+    delete_item = pyqtSignal()
+
+    def __init__(self, icp_test_data_manager, current_item):
         super().__init__()
 
-        self.db = db
+        self.icp_test_data_manager = icp_test_data_manager
+
         self.current_item = current_item
 
         current_dir = os.getcwd()
@@ -39,6 +43,7 @@ class ViewIcpData(QDialog):
         self.tableWidget.setColumnWidth(1, 200)
 
     def init_data(self):
+
         jobNum = str(self.current_item.jobNum)
         fileName = self.current_item.fileName
         machine = str(self.current_item.machine)
@@ -70,7 +75,16 @@ class ViewIcpData(QDialog):
     def handle_save(self):
         print('Saving item')
 
-    def handle_delete(self):
-        status = yes_or_no_dialog(f'Delete {self.current_item.jobNum}', 'Are you sure you want to delete this test?')
 
-        print(status)
+    def handle_delete(self):
+        status = yes_or_no_dialog(f'Delete {self.current_item.sampleName}', 'Are you sure you want to delete this test?')
+
+        if(status):
+            delete_status = self.icp_test_data_manager.delete_data(self.current_item.sampleName, self.current_item.machine)
+
+            if(delete_status):
+                print('Deleting Item')
+                self.delete_item.emit()
+                self.close()
+
+            print('Could note delete item')

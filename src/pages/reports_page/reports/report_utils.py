@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTableWidget, QT
 
 from modules.constants import REPORT_STATUS, REPORT_NAME
 from modules.dialogs.basic_dialogs import error_dialog
-from modules.dbFunctions import ( getJobStatus, updateJobStatus)
 from modules.widgets.SampleNameWidget import SampleNameWidget
 
 
@@ -73,23 +72,24 @@ def get_report_footer_comment(report_manager, param_id: int, report_type: int):
 
     return ''
 
-def updateReport(statusWidget, database, jobNum, reportNum):
-    logger.info(f'Entering updateReport with jobNum: {jobNum}, reportNum: {reportNum}')
+def update_report_status(self, job_num: int, report_id: int):
+    logger.info(f'Entering update_report_status with job_num: {job_num}, report_id: {report_id}')
+
     try:
-        jobStatus = getJobStatus(database, jobNum, reportNum)
-        logger.debug(f'Checking current job status: : {jobStatus}')
+        job_status = self.jobs_manager.get_status(job_num, report_id)
 
-        if(jobStatus == 0 or jobStatus is None):
-            completeJobStatusNum = 1
-            logger.info("Preparing to update job status")
-            updateJobStatus(database, jobNum, reportNum, completeJobStatusNum)
+        if(job_status == 0 or job_status is None):
+            complete_report_status_num = 1
 
-            logger.info('Updating Header Status')
-            statusWidget.setText(REPORT_STATUS[completeJobStatusNum])
+            self.jobs_manager.update_status(job_num, report_id, complete_report_status_num)
+
+            self.ui.statusHeaderLabel.setText(REPORT_STATUS[complete_report_status_num])
 
     except Exception as error:
-        logger.error(f'Could not update Report Status for {(repr(jobNum))}')
-        print(error)
+        logger.error(f'Could not update Report Status for {(repr(job_num))}')
+
+
+
 
 
 #******************************************************************

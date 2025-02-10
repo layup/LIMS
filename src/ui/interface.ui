@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>2493</width>
     <height>1667</height>
    </rect>
   </property>
@@ -20,7 +20,29 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/******************************************************************
+   <string notr="true">QScrollBar:vertical {
+	border: 1px solid #30333b;
+	background: #30333b; 
+	border-radius: 5px; 
+}
+QScrollBar::handle:vertical {
+	background:  #323a47; 
+	border: 1px solid #30333b;
+	border-radius: 5px; 
+}
+
+QScrollBar::add-line:vertical {
+	border:none; 
+	background:none;
+}
+QScrollBar::sub-line:vertical {
+	border:none; 
+	background:none;
+}
+
+
+
+/******************************************************************
 /	toolBar 
 /******************************************************************/
 QToolBar {
@@ -3231,7 +3253,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -3316,26 +3338,6 @@ p, li { white-space: pre-wrap; }
                             </property>
                            </widget>
                           </item>
-                          <item>
-                           <widget class="QPushButton" name="chmImportBtn">
-                            <property name="enabled">
-                             <bool>false</bool>
-                            </property>
-                            <property name="text">
-                             <string>Import</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QPushButton" name="chmExportBtn">
-                            <property name="enabled">
-                             <bool>false</bool>
-                            </property>
-                            <property name="text">
-                             <string>Export</string>
-                            </property>
-                           </widget>
-                          </item>
                          </layout>
                         </widget>
                        </item>
@@ -3352,13 +3354,13 @@ p, li { white-space: pre-wrap; }
                            <number>0</number>
                           </property>
                           <property name="leftMargin">
-                           <number>20</number>
+                           <number>26</number>
                           </property>
                           <property name="topMargin">
                            <number>0</number>
                           </property>
                           <property name="rightMargin">
-                           <number>20</number>
+                           <number>26</number>
                           </property>
                           <property name="bottomMargin">
                            <number>0</number>
@@ -3966,6 +3968,28 @@ p, li { white-space: pre-wrap; }
                       </widget>
                      </item>
                      <item>
+                      <widget class="QWidget" name="chm_error_widget" native="true">
+                       <layout class="QVBoxLayout" name="verticalLayout_45">
+                        <item>
+                         <widget class="QLabel" name="chm_error_msg">
+                          <property name="font">
+                           <font>
+                            <weight>50</weight>
+                            <bold>false</bold>
+                           </font>
+                          </property>
+                          <property name="styleSheet">
+                           <string notr="true">color: red;</string>
+                          </property>
+                          <property name="text">
+                           <string>Error</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
                       <widget class="QWidget" name="chmTestsValueWidget" native="true">
                        <property name="enabled">
                         <bool>true</bool>
@@ -4544,20 +4568,20 @@ p, li { white-space: pre-wrap; }
                         <item row="1" column="1" rowspan="2">
                          <widget class="QWidget" name="test_info_widget" native="true">
                           <layout class="QGridLayout" name="gridLayout">
-                           <item row="7" column="0">
+                           <item row="8" column="0">
                             <widget class="QLabel" name="label_81">
                              <property name="text">
                               <string>Show Test</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="7" column="2">
+                           <item row="8" column="2">
                             <widget class="QComboBox" name="chm_display"/>
                            </item>
                            <item row="4" column="2">
                             <widget class="QLineEdit" name="chm_upper"/>
                            </item>
-                           <item row="8" column="2">
+                           <item row="9" column="2">
                             <spacer name="verticalSpacer">
                              <property name="orientation">
                               <enum>Qt::Vertical</enum>
@@ -4579,7 +4603,7 @@ p, li { white-space: pre-wrap; }
                            <item row="3" column="2">
                             <widget class="QComboBox" name="chm_test_type"/>
                            </item>
-                           <item row="6" column="2">
+                           <item row="7" column="2">
                             <widget class="QComboBox" name="chm_print"/>
                            </item>
                            <item row="4" column="0">
@@ -4620,22 +4644,32 @@ p, li { white-space: pre-wrap; }
                              </property>
                             </widget>
                            </item>
-                           <item row="6" column="0">
+                           <item row="7" column="0">
                             <widget class="QLabel" name="label_80">
                              <property name="text">
                               <string>Print Test</string>
                              </property>
                             </widget>
                            </item>
-                           <item row="5" column="2">
+                           <item row="6" column="2">
                             <widget class="QLineEdit" name="chm_so"/>
                            </item>
-                           <item row="5" column="0">
+                           <item row="6" column="0">
                             <widget class="QLabel" name="label_53">
                              <property name="text">
                               <string>So</string>
                              </property>
                             </widget>
+                           </item>
+                           <item row="5" column="0">
+                            <widget class="QLabel" name="label_82">
+                             <property name="text">
+                              <string>Lower Limit</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item row="5" column="2">
+                            <widget class="QLineEdit" name="chm_lower"/>
                            </item>
                           </layout>
                          </widget>
@@ -4696,7 +4730,7 @@ p, li { white-space: pre-wrap; }
                            <item>
                             <widget class="QLabel" name="label_60">
                              <property name="text">
-                              <string>* will display comment if maximum limit reached</string>
+                              <string>* will display comment if upper limit or lower limit is reached</string>
                              </property>
                             </widget>
                            </item>
@@ -5195,7 +5229,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>2</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -5215,8 +5249,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>2233</width>
+                       <height>1335</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5558,8 +5592,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>924</width>
-                       <height>160</height>
+                       <width>2233</width>
+                       <height>1403</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5871,8 +5905,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>100</width>
-                       <height>30</height>
+                       <width>2225</width>
+                       <height>1403</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6308,7 +6342,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -7313,6 +7347,13 @@ QPushButton::hover {
                      </spacer>
                     </item>
                     <item>
+                     <widget class="QPushButton" name="pushButton_3">
+                      <property name="text">
+                       <string>Save Report</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
                      <widget class="QPushButton" name="createIcpReportBtn">
                       <property name="minimumSize">
                        <size>
@@ -7361,7 +7402,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>2493</width>
      <height>22</height>
     </rect>
    </property>
