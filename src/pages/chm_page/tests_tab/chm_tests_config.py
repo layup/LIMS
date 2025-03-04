@@ -47,7 +47,7 @@ def chm_tests_tab_setup(self):
 
     tests_tree_setup(self.ui.chm_test_tree)
     dropdown_setup(self)
-    validator_setup(self)
+    line_edit_setup(self)
 
     # load the initial tests data
     load_chm_tests(self)
@@ -63,13 +63,27 @@ def chm_tests_tab_setup(self):
     self.ui.chmSearchLine3.returnPressed.connect(lambda: handle_search(self))
     self.ui.clear_tests_btn.clicked.connect(lambda: load_chm_tests(self))
 
-def validator_setup(self):
+def line_edit_setup(self):
 
     float_validator = FloatIntValidator()
 
     self.ui.chm_lower.setValidator(float_validator)
     self.ui.chm_upper.setValidator(float_validator)
     self.ui.chm_so.setValidator(float_validator)
+
+    max_string_length = 30
+    max_value_length = 20
+
+    self.ui.chm_tests_name.setMaxLength(max_string_length)
+    self.ui.chm_text_name.setMaxLength(max_string_length)
+    self.ui.chm_display_name.setMaxLength(max_string_length)
+    self.ui.chm_side.setMaxLength(max_string_length)
+
+    # restrict the values to 20 length
+    self.ui.chm_upper.setMaxLength(max_value_length)
+    self.ui.chm_lower.setMaxLength(max_value_length)
+    self.ui.chm_so.setMaxLength(max_value_length)
+
 
 
 

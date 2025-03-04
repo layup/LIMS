@@ -31,7 +31,7 @@ def chem_history_tab_setup(self):
     history_filters_setup(self)
     history_footer_setup(self)
 
-    self.history_model = HistoryModel(self.tempDB, self.chm_test_data_manager)
+    self.history_model = HistoryModel(self.chm_test_data_manager)
     self.history_view = HistoryView(self.ui.chmInputTable, self.ui.sideEditWidget2, self.ui.footerWidget, self.ui.chmSearchLine1, self.ui.chmSearchBtn1, self.ui.chemHistoryFilter)
     self.history_controller = HistoryController(self.history_model, self.history_view)
 

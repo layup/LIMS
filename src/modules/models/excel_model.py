@@ -10,7 +10,7 @@ from openpyxl.worksheet.page import PageMargins, PrintOptions
 
 from modules.managers.authors_manager import AuthorsItem
 
-class ExcelReports:
+class ExcelModel:
 
     def __init__(self, jobNum, report_type):
         self.wb = Workbook()
@@ -54,7 +54,6 @@ class ExcelReports:
         self.ws.sheet_view.view = "pageLayout"
 
         # Ensure that the scaling happens automatically
-
         self.ws.print_options = PrintOptions(horizontalCentered=True, verticalCentered=False)
 
         # set custom page margins
@@ -442,14 +441,25 @@ class ExcelReports:
             bottomBorder.border = self.thin_top_border
 
     def save_excel(self, file_path):
+        logger.info(f'Entering save_excel with file_path: {file_path}')
 
-        # remove existing file so can write
-        
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        filename, ext = os.path.splitext(file_path)
+        counter = 1
+
+        #if os.path.exists(file_path):
+            # remove existing file so can write
+            # os.remove(file_path)
+
+        while os.path.exists(file_path):
+            counter += 1
+            file_path = f'{filename}({counter}){ext}'
+
+        if(counter > 1):
+            logger.debug('There is already a file with the same name in this location')
 
         self.wb.save(file_path)
 
+        return file_path
 
 
 def split_sentence_by_words(sentence, max_chars_per_line=140):

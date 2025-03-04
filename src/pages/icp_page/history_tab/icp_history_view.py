@@ -12,7 +12,8 @@ class IcpHistoryView(QObject):
     filterChanged = pyqtSignal(int)
 
     uploadBtnClicked = pyqtSignal()
-    openBtnClicked = pyqtSignal(IcpHistoryItem)
+    view_sample_btn_clicked = pyqtSignal(IcpHistoryItem)
+    view_job_btn_clicked = pyqtSignal(IcpHistoryItem)
     printBtnClicked = pyqtSignal(str)
 
     nextPageClicked = pyqtSignal()
@@ -92,17 +93,21 @@ class IcpHistoryView(QObject):
         layout = QHBoxLayout()
         button_widget.setLayout(layout)
 
-        open_btn = QPushButton("View Sample")
+        view_sample_btn = QPushButton("View Sample")
+        view_job_btn = QPushButton("View Job")
         print_btn = QPushButton('Print Batch')
         spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        open_btn.setFixedSize(120,18)
+        view_sample_btn.setFixedSize(120,18)
+        view_job_btn.setFixedSize(120,18)
         print_btn.setFixedSize(120,18)
 
-        open_btn.clicked.connect(lambda: self.openBtnClicked.emit(current_item))
+        view_sample_btn.clicked.connect(lambda: self.view_sample_btn_clicked.emit(current_item))
+        view_job_btn.clicked.connect(lambda: self.view_job_btn_clicked.emit(current_item))
         print_btn.clicked.connect(lambda: self.printBtnClicked.emit(current_item.fileName))
 
-        layout.addWidget(open_btn)
+        layout.addWidget(view_sample_btn)
+        layout.addWidget(view_job_btn)
         layout.addWidget(print_btn)
         layout.addItem(spacer)
         layout.setContentsMargins(2, 0, 0, 0)  # Remove margins

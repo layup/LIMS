@@ -235,13 +235,13 @@ class ElementsManager:
             if(element_id in self.elements):
                 if param_id in self.elements[element_id].limits:
                     # already exists so just update
-                    query = 'UPDATE icp_limits SET unitType=?, lower_limit=?, upper_limit=?, side_comment=?, footer_comment=? WHERE param_id=? AND element_id=?'
+                    query = 'UPDATE icp_limits SET unit_name=?, lower_limit=?, upper_limit=?, side_comment=?, footer_comment=? WHERE param_id=? AND element_id=?'
                     self.db.execute(query, (unit_type, lower_limit, upper_limit, side_comment, footer,  param_id, element_id, ))
                     self.db.commit()
 
                 else:
                     # doesn't already exist so create the thing
-                    query = 'INSERT INTO icp_limits (param_id, element_id, unitType, lower_limit, upper_limit, side_comment, footer_comment) VALUES (?, ?, ?, ?, ?, ?)'
+                    query = 'INSERT INTO icp_limits (param_id, element_id, unit_name, lower_limit, upper_limit, side_comment, footer_comment) VALUES (?, ?, ?, ?, ?, ?)'
                     self.db.execute(query, (param_id, element_id, unit_type, lower_limit, upper_limit, side_comment, footer, ))
                     self.db.commit()
 

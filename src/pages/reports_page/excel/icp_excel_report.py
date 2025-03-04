@@ -7,12 +7,12 @@ from openpyxl.styles import Font, Alignment, borders, Border, Side
 from modules.utils.logic_utils import is_float
 from modules.utils.file_utils import get_path_from_json
 
-from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence_by_words
+from modules.models.excel_model import ExcelModel, split_sentence_by_words
 
 #TODO: set the upper limit comments
 #TODO: not scanning the entering in client info
 
-class IcpExcelReport(ExcelReports):
+class IcpExcelReport(ExcelModel):
 
     def __init__(self, param_num, client_info, jobNum, authors, comment, sample_names, sample_data, elements, symbols, limits, units, report_type=1):
         super().__init__(jobNum, report_type)
@@ -32,7 +32,6 @@ class IcpExcelReport(ExcelReports):
 
         for key, value in self.sample_data.items():
             print(key, len(value), value)
-
 
         print(self.__repr__)
 
@@ -119,7 +118,7 @@ class IcpExcelReport(ExcelReports):
         file_name = f'W{self.jobNum}_icp.xlsx'
         file_path = os.path.join(export_path, file_name)
 
-        self.save_excel(file_path)
+        file_path = self.save_excel(file_path)
 
         return file_path, file_name
 

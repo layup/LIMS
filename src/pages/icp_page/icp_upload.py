@@ -116,7 +116,7 @@ def process_machine_csv_file(db, file_path, base_name):
             package_data = json.dumps(value)
 
             if(key):
-                sql = 'INSERT OR REPLACE INTO icp_data values(?, ?, ?, ?, ?, 1)'
+                sql = 'INSERT OR REPLACE INTO icp_upload values(?, ?, ?, ?, ?, 1)'
                 db.execute(sql, (key, jobNum, base_name, package_data, today_date))
                 db.commit()
 
@@ -202,7 +202,7 @@ def process_edited_csv_file(db, file_path, base_name):
             package_data = json.dumps(value)
 
             if(key):
-                sql = 'INSERT OR REPLACE INTO icp_data values(?, ?, ?, ?, ?, 1)'
+                sql = 'INSERT OR REPLACE INTO icp_upload values(?, ?, ?, ?, ?, 1)'
                 db.execute(sql, (key, jobNum, base_name, package_data, today_date))
                 db.commit()
 
@@ -301,7 +301,7 @@ def process_txt_file(db, file_path):
             package_data = json.dumps(value)
 
             if(key):
-                sql = 'INSERT OR REPLACE INTO icp_data values(?, ?, ?, ?, ?, 1)'
+                sql = 'INSERT OR REPLACE INTO icp_upload values(?, ?, ?, ?, ?, 1)'
                 db.execute(sql, (key,jobNum, base_name, package_data, today_date))
                 db.commit()
 
@@ -349,9 +349,6 @@ def process_xlsx_file(db, filePath):
 
                 sampleName = formatJobSampleString(currentSampleName)
                 jobNum = sampleName[:6]
-                #print('---------------')
-                #print(sampleName, '|' , jobNum)
-
                 sampleData = {}
 
                 for i, element in enumerate(elementColumns):
@@ -367,7 +364,7 @@ def process_xlsx_file(db, filePath):
                 sampleInfo[sampleName] = sampleData
 
     for key, value in sampleInfo.items():
-        query  = 'INSERT OR REPLACE INTO icp_data values(?, ?, ?, ?, ?, 2)'
+        query  = 'INSERT OR REPLACE INTO icp_upload values(?, ?, ?, ?, ?, 2)'
         jobNum = key[:6]
         todayDate = date.today()
         tempData = json.dumps(value)
@@ -464,7 +461,6 @@ def viewIcpTable(filePath, data, reportType):
 #******************************************************************
 #    Classes
 #******************************************************************
-
 
 
 class icpTableView(QDialog):

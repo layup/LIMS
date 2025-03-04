@@ -8,38 +8,47 @@ from modules.utils.logic_utils import is_float
 
 class ChmReportController(QObject):
 
-    def __init__(self, model, view, sample_names):
+    def __init__(self, model, view):
         super().__init__()
 
         self.model = model
         self.view = view
-
-        self.sample_names = sample_names
         self.loaded = False
-        self.test_headers_size = 6
 
+        self.connect_signals()
+        self.init_setup()
+
+    def connect_signals(self):
         self.view.tableItemChangeEmit.connect(self.handle_table_change)
         self.view.reportsTabChangeEmit.connect(self.handle_report_tab_change)
         self.view.hideRowSignal.connect(self.handle_hide_row)
+        self.view.sampleRemovedEmit.connect(self.handle_remove_sample)
+        self.view.sampleNameChangeEmit.connect(self.handle_update_sample_name)
 
-        self.load_init_data()
+    def init_setup(self):
+        logger.info('Entering ChmReportController init_setup')
 
-    def load_init_data(self):
-        logger.info('Entering load_init_data')
+        # set up the samples layout
+        sample_names = self.model.init_sample_names()
+        self.view.update_samples_layout(sample_names)
 
-        # define all the samples i
+        #  setup table column
+        data_table_columns = self.model.get_column_headers(list(sample_names.keys()))
+        self.view.update_table_columns(data_table_columns)
+
+        # define all the samples
         self.model.init_samples()
 
         # retrieve the user tests lists from the txt file and user input from database
-        test_list, samples_data = self.model.get_lists()
+        test_list, sample_data_entries_list = self.model.get_sample_data_entires_lists()
 
         # load the defined user data and the default
         tests_info = self.model.load_tests(test_list)
-        samples_info = self.model.load_samples(samples_data)
+        samples_info = self.model.load_samples(sample_data_entries_list)
 
         logger.debug(f'total_tests: {len(test_list)}')
         logger.debug(f'test_list: {test_list}')
-        logger.debug(f'samples_data: {samples_data}')
+        logger.debug(f'sample_data_entries: {sample_data_entries_list}')
         logger.debug(f'tests_info: {tests_info}')
         logger.debug(f'samples_info: {samples_info}')
 
@@ -49,6 +58,7 @@ class ChmReportController(QObject):
         self.view.update_table_comments(tests_info)
         self.view.update_table_samples(samples_info)
         self.view.update_action_row()
+
         self.view.apply_dilution_factor(self.model.dilution)
 
         # load in the initial data allowing the signal to fire
@@ -100,15 +110,41 @@ class ChmReportController(QObject):
                 except Exception as e:
                     logger.error(f'Error with updating col: {col}, {e}')
 
+    def handle_remove_sample(self, sample_id):
+        logger.info(f'Entering handle_remove_sample with sample_num: {sample_id}')
+
+        # remove if from self.model
+        del self.model.samples[sample_id]
+
+        # remove if from the samples section
+        status = self.view.remove_sample_widget(sample_id)
+
+        if(status):
+            # remove it from the table section
+            remaining_sample_names = self.model.get_sample_names_list()
+            new_table_cols = self.model.get_column_headers(remaining_sample_names)
+            self.view.update_table_columns(new_table_cols)
+
+            # update the table data information as well
+            self.view.update_table_samples(self.model.samples)
+            self.view.update_action_row()
+
+
+
+    def handle_update_sample_name(self, sample_id, new_sample_name):
+        logger.info(f'Entering handle_update_sample_name with sample_id: {sample_id}, new_sample_name: {new_sample_name}')
+
+        #self.model.sample_names[sample_id] = new_sample_name
+
+        self.mode.samples[sample_id].update_sample_name(new_sample_name)
+
+
     def handle_report_tab_change(self, index):
 
         if(index == 3):
             logger.info('Entering Comments Table')
 
-            status_row = 4
-
             for row, test_info in self.model.tests.items():
-
                 upper_limit = test_info.upper_limit
                 lower_limit = test_info.lower_limit
 
@@ -141,7 +177,6 @@ class ChmReportController(QObject):
 
             if current_val is not None and is_float(current_val):  # Check for None and then float
                 try:
-
                     if float(current_val) <= float(lower_limit):
                         logger.info(f'row: {row}, current_val: {current_val}')
                         return True
@@ -150,7 +185,11 @@ class ChmReportController(QObject):
 
         return False  # Return False if no matching value or no value less than or equal to the lower_limit was found.
 
+    def save_data(self):
 
+        row_count = self.view.table.rowCount()
+
+        return self.model.export_save_data(row_count)
 
     def export_data(self):
         logger.info('Entering export_data')
@@ -159,7 +198,6 @@ class ChmReportController(QObject):
 
         sample_data = self.model.export_samples_data(row_count)
         display_names, recovery_vals, units, so_vals = self.model.export_tests_data()
-
 
         hidden_rows = self.model.hidden_rows
 
@@ -176,73 +214,7 @@ class ChmReportController(QObject):
 
         return self.model.export_comments_data()
 
-    def get_sample_data_from_table(self):
-        logger.info('Entering get_sample_data_from_table')
+    def export_sample_names(self):
+        logger.info('Entering export_sample_names')
 
-        total_rows = self.view.table.rowCount()
-        sample_data = {}
-
-        for col in range(self.test_headers_size, self.view.table.horizontalHeader().count()):
-            job_name = self.view.table.horizontalHeaderItem(col).text()
-
-            logger.debug(f"col: {col}, job_name: {job_name}")
-            job_values = []
-
-            for row in range(total_rows):
-                current_row_item = self.view.table.item(row, col)
-
-                if(current_row_item is None or (current_row_item.text().strip() == '')):
-                    job_values.append('ND')
-                else:
-                    job_values.append(current_row_item.text().strip())
-
-            sample_data[job_name] = job_values
-
-        return sample_data
-
-    def get_tests_data_from_table(self):
-        logger.info('Entering get_tests_data_from_table')
-
-        total_tests = self.view.table.rowCount()
-        text_names = self.model.get_tests_names()
-
-        display_names = []
-        recovery = []
-        unitType = []
-        so = []
-
-        for row in range(total_tests):
-
-            # get the test name values
-            test_item = self.view.table.item(row, 1)
-            if test_item is None or not test_item.text().strip():
-                display_names.append(text_names[row])
-            else:
-                testsName = test_item.text()
-                display_names.append(testsName)
-
-            # get the unit type values
-            unit_item = self.view.table.item(row, 4)
-            if unit_item is None or not unit_item.text().strip():
-                unit_item.append('')
-            else:
-                currentVal = unit_item.text()
-                unitType.append(currentVal)
-
-            # get the recovery value from the table
-            recovery_item = self.view.table.item(row, 5)
-            if recovery_item is None or not recovery_item.text().strip():
-                recovery.append('')
-            else:
-                recoveryVal = recovery_item.text()
-                recovery.append(float(recoveryVal) if is_float(recoveryVal) else recoveryVal)
-
-            # get the so value from table
-            so_item = self.view.table.item(row, 6)
-            if(so_item is None or not so_item.text().strip()):
-                so.append('')
-            else:
-                so_val = so_item.text()
-                so.append(float(so_val))
-
-        return display_names, recovery, unitType
+        return self.model.export_sample_names()

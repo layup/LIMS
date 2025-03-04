@@ -5,9 +5,9 @@ from base_logger import logger
 from pages.icp_page.history_tab.icp_history_item import IcpHistoryItem
 
 class IcpHistoryModel:
-    def __init__(self, db, icp_test_data_manager):
-        self.db = db
+    def __init__(self, icp_test_data_manager, elements_manager):
         self.icp_test_data_manager = icp_test_data_manager
+        self.elements_manager = elements_manager
 
         self.history_items = []
 

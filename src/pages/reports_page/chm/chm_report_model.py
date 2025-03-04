@@ -5,40 +5,64 @@ from modules.utils.logic_utils import removeIllegalCharacters, is_float, remove_
 from pages.reports_page.chm.chm_report_items import chmReportSampleItem, chmReportTestItem
 
 class ChmReportModel:
-    def __init__(self, tests_manager, chm_test_data_manager, jobNum, dilution, sample_tests):
+    def __init__(self, tests_manager, chm_test_data_manager, jobNum, dilution, sample_tests, sample_names):
         self.tests_manager = tests_manager
         self.chm_test_data_manager = chm_test_data_manager
         self.jobNum = jobNum
-        self.sample_tests = sample_tests
         self.dilution = dilution
 
+        self.sample_tests = sample_tests
+        self.sample_names = sample_names
 
         self.tests_ids = []
-
         self.test_row_info = {}
 
         self.samples = {}
         self.tests = {}
-
         self.hidden_rows = {}
 
     def init_samples(self):
-        ''' load in the sample tests '''
-
         logger.info('Entering init_samples')
 
-        # define all of the sample items
-        for sample_name, sample_tests in self.sample_tests.items():
-            job_num, sample_num = sample_name.split('-')
-            self.samples[sample_name] = chmReportSampleItem(job_num, sample_num, sample_name)
+        # define the sample information
+        for sample_id, sample_name in self.sample_names.items():
+            job_num, sample_num = sample_id.split('-')
+            self.samples[sample_id] = chmReportSampleItem(sample_id, job_num, sample_num, sample_name)
 
-    def get_lists(self):
+    def get_column_headers(self, samples_names:list):
+        report_column_names = ['Tests Name', 'Text Name', 'Display Name', 'Unit', '% Recovery', 'Distillation', 'So']
+        report_column_names.extend(samples_names)
+        report_column_names.append('Action')
+        return report_column_names
+
+    def get_sample_data_entires_lists(self):
         ''' return a list of all entered users tests data'''
-        #return get_tests_results(self.db, self.jobNum, self.sample_tests);
         return self.chm_test_data_manager.get_tests_results(self.jobNum, self.sample_tests)
 
     def get_samples_data(self):
-        return self.samples;
+        return self.samples
+
+    def get_sample_names_list(self):
+
+        if(self.samples):
+            return list(self.samples.keys())
+
+        return []
+
+    def init_sample_names(self):
+
+        if(self.sample_names):
+            # check database to see if user entered other data
+            sample_nums = self.chm_test_data_manager.get_sample_numbers(self.jobNum)
+
+            for sample_num in sample_nums:
+                sample_id = f'{self.jobNum}-{sample_num[0]}'
+
+                #TODO: replace with the duplicate name of something
+                if(sample_id not in self.sample_names):
+                    self.sample_names[sample_id] = ''
+
+        return self.sample_names
 
     def get_tests_data(self):
         return self.tests
@@ -47,8 +71,7 @@ class ChmReportModel:
         return list(self.tests.keys())
 
     def load_samples(self, samples_list):
-        ''' Check if there is existing data in the database associated with sample numbers'''
-        logger.info('Entering load_samples with samples_list: {samples_list}')
+        logger.info(f'Entering load_samples with samples_list: {samples_list}')
 
         for current_sample in samples_list:
             self.add_samples(current_sample)
@@ -56,7 +79,8 @@ class ChmReportModel:
         return self.samples
 
     def add_samples(self, item):
-        logger.info('Entering add_samples')
+        ''' add samples into self.samples for each sample_id'''
+        logger.info(f'Entering add_samples with item: {item}')
 
         sample_num = item[0]
         test_id = item[1]
@@ -64,25 +88,23 @@ class ChmReportModel:
         recovery = item[3]
         unit = item[4]
         job_num = item[5]
-        sample_name = f'{job_num}-{sample_num}'
+        sample_id = f'{job_num}-{sample_num}'
 
-        if(sample_name in self.samples):
-            logger.debug(f'Adding Current Sample: {sample_name}')
+        if(sample_id in self.sample_names):
+            logger.debug(f'Adding Current Sample: {sample_id}')
 
             row = self.test_row_info.get(test_id)
 
             if(row or row == 0):
-                logger.debug('big if buddy')
-                self.samples[sample_name].add_data(row, test_value, recovery, unit)
+                self.samples[sample_id].add_data(row, test_value, recovery, unit)
 
         if(test_id in self.tests_ids):
             row = self.test_row_info[test_id]
             self.tests[row].unitType = unit
             self.tests[row].recovery = recovery
 
-
-    def update_sample(self, sample_name, test_id, test_value):
-        self.samples[sample_name].update_data(test_id, test_value)
+    def update_sample(self, sample_id, test_id, test_value):
+        self.samples[sample_id].update_data(test_id, test_value)
 
     def load_tests(self, tests_list):
         logger.info(f'Entering load_samples with tests_list: {tests_list}')
@@ -115,7 +137,6 @@ class ChmReportModel:
             upper_limit = test_info.upper_limit
             lower_limit = test_info.lower_limit
 
-
             if(test_id not in self.tests_ids):
                 self.tests_ids.append(test_id)
                 self.test_row_info[test_id] = row
@@ -126,12 +147,43 @@ class ChmReportModel:
             logger.info(f'No test_data found for {text_name}')
             self.tests[row] = chmReportTestItem(textName=text_name)
 
+    def export_save_data(self, row_count):
+        logger.info(f'Entering export_save_data with row_count: {row_count}')
+
+        export_list = []
+        test_ids = []
+        unit_vals = []
+        recovery_vals = []
+
+        for _, tests_info in self.tests.items():
+            test_ids.append(tests_info.testNum or '')
+            recovery_vals.append(tests_info.recovery or '')
+            unit_vals.append(tests_info.unitType or '')
+
+        # export_list[sample_id] = {[sample_num, test_id, test_val, recovery, unit_val, job_nun]}
+        for sample_id, sample_info in self.samples.items():
+            job_num = int(sample_info.jobNum)
+            sample_num = int(sample_info.sample_num)
+
+            sample_data = sample_info.get_data()
+
+            for row in range(row_count):
+                if(row in sample_data):
+                    test_id = test_ids[row]
+                    test_val = sample_data[row]
+                    recovery_val = recovery_vals[row]
+                    unit_val = unit_vals[row]
+
+                    export_list.append([sample_num, test_id, test_val, recovery_val, unit_val, job_num])
+
+        return export_list
 
     def export_samples_data(self, row_count):
+        logger.info(f'Entering export_samples_data with row_count: {row_count}')
 
         export_list = {}
 
-        for sample_name, sample_info in self.samples.items():
+        for sample_id, sample_info in self.samples.items():
             sample_data = sample_info.get_data()
 
             export_sample_data = []
@@ -142,13 +194,22 @@ class ChmReportModel:
                     # when row item is blank
                     export_sample_data.append('---')
 
-            export_list[sample_name] = export_sample_data
+            export_list[sample_id] = export_sample_data
 
         return export_list
 
-    def export_tests_data(self):
-        logger.info('Entering export_tests_data')
+    def export_sample_names(self):
+        samples_names = {}
 
+        for sample_id, sample_item in self.samples.items():
+            sample_name = sample_item.sample_name
+
+            samples_names[sample_id] = sample_name
+
+        return samples_names
+
+
+    def export_tests_data(self):
         display_names = []
         recovery_values = []
         unit_values = []
@@ -163,8 +224,6 @@ class ChmReportModel:
         return display_names, recovery_values, unit_values, so_values
 
     def export_comments_data(self):
-        logger.info('Entering export_comments_data')
-
         upper_limits = []
         lower_limits = []
         side_comments = []

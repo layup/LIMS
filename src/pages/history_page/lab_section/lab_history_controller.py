@@ -31,10 +31,10 @@ class LabHistoryController(QObject):
 
     def load_initial_data(self):
         # load in the initial data
-        valid_rows = [25, 50, 100]
+        valid_rows = [50, 100, 150]
 
-        self.model.page_size = valid_rows[0]
-        self.model.page_sizes = valid_rows;
+        self.model.page_size = valid_rows[-1]
+        self.model.page_sizes = valid_rows
         self.view.footer.set_valid_rows(valid_rows)
 
         # load in the initial data
@@ -46,14 +46,12 @@ class LabHistoryController(QObject):
         self.view.update_footer(total_pages=total_pages)
 
         # set the default sort for the creation date column
-        self.view.search.filters.setCurrentIndex(4);
-
-
+        self.view.search.filters.setCurrentIndex(4)
 
     def handle_open_btn(self, current_item):
         logger.info(f'Entering handle_open_btn with updated_data: {current_item}')
 
-        print(current_item.__repr__())
+        print(current_item.__repr__)
 
         self.openReport.emit(current_item)
 
@@ -65,7 +63,7 @@ class LabHistoryController(QObject):
             # update the page size
             self.model.page_size = self.model.page_sizes[index]
             # reset the current_page and offset
-            self.model.current_page = 1;
+            self.model.current_page = 1
             self.model.off_set = (self.model.current_page - 1) * self.model.page_size
 
             self.update_view()
@@ -74,7 +72,7 @@ class LabHistoryController(QObject):
         logger.info(f'Entering handle_search with search_query: {search_query}')
 
         self.search_query = search_query
-        self.model.current_page = 1;
+        self.model.current_page = 1
         self.model.off_set = (self.model.current_page - 1) * self.model.page_size
 
         self.update_view()
@@ -83,7 +81,7 @@ class LabHistoryController(QObject):
         logger.info('Entering handle_next_page')
 
         if(self.model.current_page < self.model.total_pages):
-            self.model.current_page +=1;
+            self.model.current_page +=1
             self.model.off_set = (self.model.current_page - 1) * self.model.page_size
             self.update_view()
 
@@ -91,7 +89,7 @@ class LabHistoryController(QObject):
         logger.info('Entering handle_prev_page')
 
         if(self.model.current_page > 1):
-            self.model.current_page -=1;
+            self.model.current_page -=1
             self.model.off_set =  (self.model.current_page - 1) * self.model.page_size
             self.update_view()
 

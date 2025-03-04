@@ -79,7 +79,7 @@ class TestManager:
 
         return None
 
-    def get_chem_tests_info(self, test_id):
+    def get_chem_tests_info(self, test_id:int):
         if(test_id in self.tests):
             test_info = self.tests.get(test_id)
 
@@ -173,7 +173,6 @@ class TestManager:
             logger.error(f'Exception: {e}')
             return None
 
-
     def update_show_status(self, test_id: int, status: int):
         logger.info(f'Entering update_show_status with test_id: {test_id}, status: {status}')
 
@@ -236,14 +235,13 @@ class TestManager:
 
         # update the database
 
-        pass;
+        pass
 
     def new_test(self, test_id, test_item):
-        pass;
+        logger.info(f'Entering TestManager new_test with test_id: {test_id}, test_item: {test_item}')
 
     def add_test(self, test_id, test_name, text_name, ):
-        pass;
-
+        logger.info(f'Entering TestManager add_test')
 
     def add_new_chem_tests(self):
         pass;

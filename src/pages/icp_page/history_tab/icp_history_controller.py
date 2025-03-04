@@ -5,6 +5,8 @@ from base_logger import logger
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from modules.dialogs.text_dialog import TextFileDisplayDialog
+from modules.dialogs.icp_view_data_dialog import ViewIcpDataDialog
+from modules.dialogs.icp_view_job_dialog import ViewIcpJobDialog
 from modules.utils.file_utils import openFile
 
 from pages.icp_page.icp_upload import icp_upload
@@ -26,7 +28,8 @@ class IcpHistoryController(QObject):
 
         self.view.filterChanged.connect(self.handle_filter_change)
         self.view.searchTextEmit.connect(self.handle_search)
-        self.view.openBtnClicked.connect(self.handle_open_btn)
+        self.view.view_sample_btn_clicked.connect(self.handle_view_sample_btn)
+        self.view.view_job_btn_clicked.connect(self.handle_view_job_btn)
         self.view.printBtnClicked.connect(self.handle_print_btn)
 
         self.view.nextPageClicked.connect(self.handle_next_page)
@@ -40,7 +43,7 @@ class IcpHistoryController(QObject):
         # load in the initial data
         valid_rows = [25, 50, 100]
 
-        self.model.page_sizes = valid_rows;
+        self.model.page_sizes = valid_rows
 
         self.view.footer.set_valid_rows(valid_rows)
 
@@ -84,18 +87,30 @@ class IcpHistoryController(QObject):
         # update the table for the data
         self.update_view()
 
-    def handle_open_btn(self, current_item):
-        logger.info(f'Entering handle_open_btn with updated_data: {current_item}')
+    def handle_view_sample_btn(self, current_item):
+        logger.info(f'Entering handle_view_sample_btn with current_item: {current_item}')
 
-        print(current_item.__repr__)
+        dialog = ViewIcpDataDialog(self.model.icp_test_data_manager, current_item)
+        #dialog.delete_item.connect(lambda self=self:handle_delete_icp_item(self))
+        dialog.exec()
 
-        self.openReport.emit(current_item)
+        #TODO: manage when delete on other pages and etc
+        #TODO: fix the editing allowed feature
 
         self.update_view()
 
+    def handle_view_job_btn(self, current_item):
+        logger.info(f'Entering handle_view_job_btn with current_item: {current_item}')
+
+        view_job_dialog = ViewIcpJobDialog(self.model.icp_test_data_manager, self.model.elements_manager, current_item)
+        view_job_dialog.exec_()
+
+
+        #self.update_view()
+
+
     def handle_filter_change(self, index):
         logger.info(f'Entering handle_filter_change index: {index}')
-
         self.view.sort_table(index)
 
 
@@ -103,11 +118,10 @@ class IcpHistoryController(QObject):
         logger.info(f'Entering handle_search with search_query: {search_query}')
 
         self.search_query = search_query
-        self.model.current_page = 1;
+        self.model.current_page = 1
         self.model.off_set = (self.model.current_page - 1) * self.model.page_size
 
         self.update_view()
-
 
     def handle_combobox_change(self, index):
         logger.info(f'Entering handle_combobox_change with index: {index}')
@@ -117,8 +131,9 @@ class IcpHistoryController(QObject):
 
             # update the page size
             self.model.page_size = self.model.page_sizes[index]
+
             # reset the current_page and offset
-            self.model.current_page = 1;
+            self.model.current_page = 1
             self.model.off_set = (self.model.current_page - 1) * self.model.page_size
 
             self.update_view()
@@ -127,7 +142,7 @@ class IcpHistoryController(QObject):
         logger.info('Entering handle_next_page')
 
         if(self.model.current_page < self.model.total_pages):
-            self.model.current_page +=1;
+            self.model.current_page +=1
             self.model.off_set = (self.model.current_page - 1) * self.model.page_size
             self.update_view()
 
@@ -135,14 +150,14 @@ class IcpHistoryController(QObject):
         logger.info('Entering handle_prev_page')
 
         if(self.model.current_page > 1):
-            self.model.current_page -=1;
+            self.model.current_page -=1
             self.model.off_set =  (self.model.current_page - 1) * self.model.page_size
             self.update_view()
 
     def handle_spinbox_change(self, new_page):
         logger.info('Entering handle_spinbox_change')
 
-        self.model.current_page = new_page;
+        self.model.current_page = new_page
         self.model.off_set =  (self.model.current_page - 1) * self.model.page_size
         self.update_view()
 

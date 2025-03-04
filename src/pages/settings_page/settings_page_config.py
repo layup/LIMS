@@ -64,7 +64,7 @@ def loadSettings(self):
     self.ui.txtPath.setText(self.preferences.get('TXTDirLocation'))
     self.ui.convertPath.setText(self.preferences.get('ispDataUploadPath'))
     self.ui.dbPath.setText(self.preferences.get('databasePath'))
-    self.ui.frontPath.setText(self.preferences.get('officeDbPath'))
+    #self.ui.frontPath.setText(self.preferences.get('officeDbPath'))
     self.ui.prefrenceDbPath.setText(self.preferences.get('preferencesPath'))
 
 @pyqtSlot()

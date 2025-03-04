@@ -51,6 +51,7 @@ class NavigationManager(QObject):
         report_item.setData(0, Qt.UserRole, 0)
         icp_item.setData(0, Qt.UserRole, 2)
         chm_item.setData(0, Qt.UserRole, 3)
+        test_item.setData(0, Qt.UserRole, 1)
 
         report_child1.setData(0, Qt.UserRole, ['report', 0])
         report_child2.setData(0, Qt.UserRole, ['report', 1])
@@ -86,7 +87,7 @@ class NavigationManager(QObject):
         logger.info('Entering handle_item_clicked')
 
         secret_data = item.data(0, Qt.UserRole)
-        print(f"Clicked item: {item.text(0)} | secret_data: {secret_data}")
+        logger.info(f"Clicked item: {item.text(0)} | secret_data: {secret_data}")
 
         if(item.parent() is None):
             #TODO: make sure all of them emit something and double check since 0 is consider fasly

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2493</width>
+    <width>2471</width>
     <height>1667</height>
    </rect>
   </property>
@@ -20,7 +20,11 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QScrollBar:vertical {
+   <string notr="true">/******************************************************************
+/	global vertical and horizontal scrollbar  
+/******************************************************************/
+
+QScrollBar:vertical {
 	border: 1px solid #30333b;
 	background: #30333b; 
 	border-radius: 5px; 
@@ -40,15 +44,54 @@ QScrollBar::sub-line:vertical {
 	background:none;
 }
 
+QScrollBar:horizontal {
+	border: 1px solid #30333b;
+	background: #30333b; 
+	border-radius: 5px; 
+}
+QScrollBar::handle:horizontal {
+	background:  #323a47; 
+	border: 1px solid #30333b;
+	border-radius: 5px; 
+}
 
+QScrollBar::add-line:horizontal {
+	border:none; 
+	background:none;
+}
+QScrollBar::sub-line:horizontal {
+	border:none; 
+	background:none;
+}
 
 /******************************************************************
 /	toolBar 
 /******************************************************************/
+
+
+
 QToolBar {
 	background-color:#323a47; 
-	border-bottom:1px solid #30333b
+	border-bottom:1px solid #30333b;
+	color:white; 
 } 
+
+QToolBar QPushButton {  /* Target push buttons */
+    color: white;
+}
+
+QToolBar QPushButton::hover {  
+    background-color:red; 
+}
+
+
+QToolBar QLabel {      /* Target labels */
+    color: white;
+}
+
+QToolBar QToolButton { /* Target tool buttons (often used for actions) */
+    color: white;
+}
 
 #widget_47 {
 	background-color:#323a47; 
@@ -420,6 +463,59 @@ First Instacnce of QWidget within the stack
 	background-color:#363f4d;
 } 
 
+/******************************************************************
+/	Create Report Page  
+/******************************************************************/
+
+#createPage {
+	background-color:#788596;
+}
+
+#createReportHeader {
+	background-color:#363f4d;
+} 
+
+#createReportHeader QRadioButton {
+	color:white 
+} 
+
+
+#createReportHeader QLabel{
+	color:white;
+} 
+
+#createReportWidget {
+	border-radius: 10px;
+	background-color: #323a47;
+	color:white; 
+}
+#createReportWidget QLabel {
+	color:white; 
+}
+
+
+#createReportWidget QComboBox {
+	padding:2px;
+	padding-left: 5px; 
+	color:white; 
+	border: 1px solid gray; 
+	background-color: rgb(55, 65, 84);
+} 
+
+
+#createReportWidget QComboBox::item:selected {
+	background-color:rgb(66, 78, 101);
+	
+}
+
+#createReportWidget QListView {
+    background-color: rgb(55, 65, 84);
+}
+#textBrowser {
+	background-color:white; 
+	color:black; 
+}
+
 
 /******************************************************************
 /	Reports History Page 
@@ -500,88 +596,10 @@ First Instacnce of QWidget within the stack
  	color:white; 
 }
 
-
-
-
 #reportsFooterWidget QSpinBox {
 	color:white; 
 	background-color: #363f4d; 
 	border: 1px solid #30333b; 
-} 
-
-
-
-
-
-/******************************************************************
-/	Create Report Page  
-/******************************************************************/
-
-#createPage {
-	background-color:#788596;
-}
-
-#createReportHeader {
-	background-color:#363f4d;
-} 
-
-#createReportHeader QRadioButton {
-	color:white 
-} 
-
-
-#createReportHeader QLabel{
-	color:white;
-} 
-
-#createReportWidget {
-	border-radius: 10px;
-	background-color: #323a47;
-	color:white; 
-}
-#createReportWidget QLabel {
-	color:white; 
-}
-
-
-#createReportWidget QComboBox {
-	padding:2px;
-	padding-left: 5px; 
-	color:white; 
-	border: 1px solid gray; 
-	background-color: rgb(55, 65, 84);
-} 
-
-
-#createReportWidget QComboBox::item:selected {
-	background-color:rgb(66, 78, 101);
-	
-}
-
-#createReportWidget QListView {
-    background-color: rgb(55, 65, 84);
-}
-
-
-#createReportWidget QLineEdit {
-	padding: 2px; 
-	padding-left: 5px; 
-	border: 1px solid gray; 
-	color:white; 
-	background-color: rgb(55, 65, 84);
-	min-width: 190px; 
-}
-
-
-
-#reportsUserInfoWidget {
-	background-color: #323a47;
-	border-radius: 5px;
-} 
-
-#textBrowser {
-	background-color:white; 
-	color:black; 
 } 
 
 
@@ -1374,7 +1392,7 @@ margin: 0;
 }</string>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>5</number>
          </property>
          <widget class="QWidget" name="reportsPage">
           <property name="styleSheet">
@@ -1417,7 +1435,7 @@ margin: 0;
               <item>
                <widget class="QTabWidget" name="historyTabWidget">
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="chemistyTab">
                  <attribute name="title">
@@ -1712,375 +1730,67 @@ margin: 0;
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QWidget" name="createPageBody" native="true">
+            <widget class="QWidget" name="widget_2" native="true">
              <property name="styleSheet">
               <string notr="true"/>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <layout class="QVBoxLayout" name="verticalLayout_59">
               <item>
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QWidget" name="createReportWidget" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
+               <widget class="QWidget" name="widget_4" native="true">
                 <property name="maximumSize">
                  <size>
-                  <width>350</width>
-                  <height>200</height>
+                  <width>16777215</width>
+                  <height>30</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_42">
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <property name="topMargin">
-                  <number>12</number>
+                  <number>0</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>12</number>
+                  <number>0</number>
                  </property>
                  <item>
-                  <widget class="QWidget" name="widget_2" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
+                  <widget class="QPushButton" name="create_macro_btn">
+                   <property name="text">
+                    <string>Add Macro</string>
                    </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_41">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="jobNumLabel">
-                      <property name="minimumSize">
-                       <size>
-                        <width>100</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>100</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Job Number</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="jobNumInput"/>
-                    </item>
-                   </layout>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QWidget" name="widget_4" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
+                  <widget class="QPushButton" name="create_test_btn">
+                   <property name="text">
+                    <string>Add Test</string>
                    </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_42">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="reportTypeLabel">
-                      <property name="minimumSize">
-                       <size>
-                        <width>100</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>100</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Report Type</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="reportType">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>27</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>test</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>test2</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                   </layout>
                   </widget>
                  </item>
                  <item>
                   <widget class="QWidget" name="widget_6" native="true">
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
+                     <width>30</width>
                      <height>0</height>
                     </size>
                    </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_43">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="ParamLabel">
-                      <property name="minimumSize">
-                       <size>
-                        <width>100</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>100</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Parameter</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="paramType">
-                      <property name="minimumSize">
-                       <size>
-                        <width>25</width>
-                        <height>27</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QWidget" name="widget_7" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_44">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="label">
-                      <property name="minimumSize">
-                       <size>
-                        <width>100</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>100</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <weight>75</weight>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Dilution Factor</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="dilutionInput">
-                      <property name="minimumSize">
-                       <size>
-                        <width>192</width>
-                        <height>22</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="NextSection">
-                   <property name="minimumSize">
-                    <size>
-                     <width>102</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font/>
-                   </property>
-                   <property name="mouseTracking">
-                    <bool>false</bool>
-                   </property>
+                  <widget class="QPushButton" name="pushButton_5">
                    <property name="text">
-                    <string>Next Section</string>
+                    <string>Search</string>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit"/>
                  </item>
                 </layout>
                </widget>
               </item>
               <item>
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
+               <widget class="QWidget" name="macro_trees_container" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_41"/>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -2110,7 +1820,7 @@ margin: 0;
            <item>
             <widget class="QTabWidget" name="icpTabWidget">
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="icpHistory">
               <attribute name="title">
@@ -3253,7 +2963,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::North</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -5229,7 +4939,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QTabWidget" name="SettingsTab">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="generalTab">
                  <attribute name="title">
@@ -5249,36 +4959,13 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>2233</width>
-                       <height>1335</height>
+                       <width>53</width>
+                       <height>16</height>
                       </rect>
                      </property>
                      <attribute name="label">
                       <string>General</string>
                      </attribute>
-                     <widget class="QLabel" name="label_44">
-                      <property name="geometry">
-                       <rect>
-                        <x>20</x>
-                        <y>10</y>
-                        <width>91</width>
-                        <height>16</height>
-                       </rect>
-                      </property>
-                      <property name="text">
-                       <string>Set Font Size</string>
-                      </property>
-                     </widget>
-                     <widget class="QSpinBox" name="spinBox">
-                      <property name="geometry">
-                       <rect>
-                        <x>130</x>
-                        <y>10</y>
-                        <width>48</width>
-                        <height>24</height>
-                       </rect>
-                      </property>
-                     </widget>
                     </widget>
                     <widget class="QWidget" name="page_3">
                      <property name="geometry">
@@ -5592,8 +5279,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>2233</width>
-                       <height>1403</height>
+                       <width>924</width>
+                       <height>160</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -5905,8 +5592,8 @@ p, li { white-space: pre-wrap; }
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>2225</width>
-                       <height>1403</height>
+                       <width>45</width>
+                       <height>16</height>
                       </rect>
                      </property>
                      <attribute name="label">
@@ -6342,7 +6029,7 @@ p, li { white-space: pre-wrap; }
                  <enum>QTabWidget::Rounded</enum>
                 </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="elideMode">
                  <enum>Qt::ElideRight</enum>
@@ -6373,8 +6060,14 @@ p, li { white-space: pre-wrap; }
                      </size>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_35">
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
                      <property name="topMargin">
                       <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>6</number>
                      </property>
                      <property name="bottomMargin">
                       <number>0</number>
@@ -7347,7 +7040,7 @@ QPushButton::hover {
                      </spacer>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_3">
+                     <widget class="QPushButton" name="save_report_btn">
                       <property name="text">
                        <string>Save Report</string>
                       </property>
@@ -7402,7 +7095,7 @@ QPushButton::hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2493</width>
+     <width>2471</width>
      <height>22</height>
     </rect>
    </property>

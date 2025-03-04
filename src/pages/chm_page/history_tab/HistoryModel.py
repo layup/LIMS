@@ -6,8 +6,7 @@ from pages.chm_page.history_tab.HistoryItem import HistoryItem
 
 # managers the data and logic
 class HistoryModel:
-    def __init__(self, db, chm_test_data_manager):
-        self.db = db
+    def __init__(self, chm_test_data_manager):
         self.chm_test_data_manager = chm_test_data_manager
 
         self.history_items = []

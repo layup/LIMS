@@ -11,13 +11,12 @@ class TableFooterWidget(QWidget):
         self.total_pages = 1;
         self.limit = None;
 
-        self.valid_rows = [100, 200, 300]
+        self.valid_rows = [100, 150, 200]
 
         current_dir = os.getcwd()
         file_path = os.path.join(current_dir, "ui", 'tableFooterWidget.ui')
 
         self.ui = loadUi(file_path, self)  # Pass 'self' as parent
-
 
 
     def load_data(self, current_page, limit, total_pages):
@@ -44,6 +43,7 @@ class TableFooterWidget(QWidget):
     def set_current_page(self, current_page):
         self.current_page = current_page;
         self.QSpinBox.setValue(current_page)
+
 
     def set_limit_index(self, index):
         self.QComboBox.setCurrentIndex(index)

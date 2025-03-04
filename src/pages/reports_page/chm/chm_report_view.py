@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import  QHeaderView, QTableWidgetItem, QSpacerItem, QSizePo
 
 from pages.reports_page.chm.chm_report_items import chmReportSampleItem, chmReportTestItem
 
+from modules.widgets.SampleNameWidget import SampleNameWidget
+
 class ChmReportView(QObject):
 
     tableItemChangeEmit = pyqtSignal(QTableWidgetItem)
@@ -14,17 +16,23 @@ class ChmReportView(QObject):
 
     hideRowSignal = pyqtSignal(int)
 
-    def __init__(self,  table, comment_table, reports_tab, create_btn):
+    sampleNameChangeEmit = pyqtSignal(str, str)
+    sampleRemovedEmit = pyqtSignal(str)
+
+    def __init__(self,  table, comment_table, reports_tab, samples_layout, create_btn):
         super().__init__()
 
+        # define UI elements
         self.table = table
         self.comment_table = comment_table
         self.reports_tab = reports_tab
-
+        self.samples_layout = samples_layout
         self.create_btn = create_btn
 
         self.row_test_nums = []
+        self.sample_widgets = {}
 
+        # connect signals
         self.table.itemChanged.connect(self.item_changed_handler)
         self.reports_tab.currentChanged.connect(self.tab_changed_handler)
         #self.create_btn.clicked.connect(self.createExcelEmit.emit)
@@ -39,7 +47,7 @@ class ChmReportView(QObject):
         self.table.clearContents()
         self.table.setRowCount(0)
 
-    def set_row_count(self, row_count):
+    def set_row_count(self, row_count: int):
 
         # set the row count for both tables
         self.table.setRowCount(row_count)
@@ -63,7 +71,6 @@ class ChmReportView(QObject):
             item.setTextAlignment(Qt.AlignCenter)
 
         self.table.setItem(row, col, item)
-
 
     def add_comment_item(self, row, col, value):
 
@@ -129,6 +136,42 @@ class ChmReportView(QObject):
                             for row, value in sample_data.items():
                                 self.add_table_item(row, col_index, value)
 
+    def update_samples_layout(self, sample_names):
+        logger.info("Entering update_samples_layout")
+
+        # clear all of the existing samples
+        self.clear_samples_layout()
+
+        for i, (sample_id, sample_name ) in enumerate(sample_names.items()):
+            logger.debug(f'adding {sample_id}: {sample_name}')
+
+            sample_widget = SampleNameWidget(sample_id, sample_name)
+            sample_widget.remove_btn_clicked.connect(self.sampleRemovedEmit.emit)
+            sample_widget.line_edit_changed.connect(self.sampleNameChangeEmit.emit)
+
+            self.sample_widgets[sample_id] = sample_widget
+
+            self.samples_layout.addWidget(sample_widget)
+
+        # adding a spacer to move all samples up
+        self.samples_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+    def remove_sample_widget(self, sample_id):
+
+        if(sample_id in self.sample_widgets):
+            current_widget = self.sample_widgets[sample_id]
+            self.samples_layout.removeWidget(current_widget)
+            current_widget.deleteLater()
+
+            del current_widget
+            return True
+
+        return False
+
+    def clear_samples_layout(self):
+        for sample_id in self.sample_widgets.keys():
+            self.remove_sample_widget(sample_id)
+
     def update_action_row(self):
 
         action_col = self.table.columnCount() - 1
@@ -147,20 +190,23 @@ class ChmReportView(QObject):
 
             self.table.setCellWidget(row, action_col, remove_btn)
 
+    def update_table_columns(self, column_list):
+
+        self.table.horizontalHeader().setVisible(True)
+        self.table.verticalHeader().setVisible(True)
+
+        self.table.setColumnCount(len(column_list))
+
+        for i, name in enumerate(column_list):
+            self.table.setHorizontalHeaderItem(i, QTableWidgetItem(name))
+
+
     def update_comments_status(self, row, status):
-
         status_row = 4
-
         self.add_comment_item(row, status_row, status)
 
 
     def apply_dilution_factor(self, factor):
-
         for row in range(self.table.rowCount()):
             self.add_table_item(row, 5, factor)
 
-    def update_dilution_factors(self, factor):
-        pass
-
-    def update_standard(self, standards):
-        pass

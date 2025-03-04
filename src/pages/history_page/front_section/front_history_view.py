@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QColor, QBrush
 from PyQt5.QtWidgets import QHeaderView, QDialog, QPushButton, QAbstractItemView, QTableWidgetItem, QCompleter
 
-from pages.history_page.front_section.FrontHistoryItem import FrontHistoryItem
+from pages.history_page.front_section.front_history_item import FrontHistoryItem
 
 class FrontHistoryView(QObject):
     # Search Widget items
@@ -40,11 +40,8 @@ class FrontHistoryView(QObject):
 
 
     def search_activated(self):
-
         current_text = self.search.get_search_text()
-
         self.searchTextEmit.emit(current_text)
-
 
     def update_table(self, data):
         # refresh the table with the new data

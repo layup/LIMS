@@ -7,13 +7,6 @@ from modules.utils.logic_utils import is_float
 
 from pages.reports_page.icp.icp_report_items import IcpReportSampleItem, IcpReportElementsItem
 
-'''
-    weeekend goal
-    - complete icp
-    - streamline the report process
-    - double check the excel creation files
-
-'''
 
 class IcpReportModel(QObject):
 
@@ -120,7 +113,6 @@ class IcpReportModel(QObject):
 
         return export_list
 
-
     def init_samples(self):
         logger.info('Entering init_samples')
 
@@ -183,7 +175,7 @@ class IcpReportModel(QObject):
                 magnesium_value = sample_item.data[magnesium_row]
 
                 sample_item.hardness = calculate_hardness(calcium_value, magnesium_value)
-                print(sample_item.hardness)
+                print(f'sample_item.hardness: {sample_item.hardness}')
             else:
                 sample_item.hardness = 'Uncal'
                 logger.info(f"{sample_name} doesn't have the ca or mg element defined")
@@ -215,6 +207,7 @@ def calculate_hardness(calcium, magnesium):
         logger.info(f'total: {total}')
 
         return round(total, 1)
+
     except Exception as e:
 
         return 'Uncal'

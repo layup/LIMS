@@ -13,17 +13,3 @@ def history_page_setup(self):
     # set the default tab to the chem tab
     self.ui.historyTabWidget.setCurrentIndex(0)
 
-
-def set_total_outgoing_jobs(self):
-    query = '''
-        SELECT count(jobNumber)
-        FROM History
-        WHERE status = 0
-    '''
-    results = self.officeDB.query(query)
-
-    if(results):
-        total = results[0][0]
-
-        self.ui.headerDesc.setText(f'Total Outgoing Jobs: {total}')
-

@@ -2,7 +2,7 @@ import math
 
 from base_logger import logger
 
-from pages.history_page.front_section.FrontHistoryItem import FrontHistoryItem
+from pages.history_page.front_section.front_history_item import FrontHistoryItem
 
 
 class FrontHistoryModel:
@@ -29,6 +29,7 @@ class FrontHistoryModel:
     def total_items(self):
         return len(self.history_items)
 
+
     def get_all_item(self):
         return self.history_items
 
@@ -36,6 +37,7 @@ class FrontHistoryModel:
         self.history_items.clear()
 
     def load_items(self, limit, offset, search_query=''):
+        logger.info(f'Entering FrontHistoryModel.load_items with limit: {limit}, offset: {offset}, search_query: {search_query}')
 
         self.clear_items()
 
@@ -50,6 +52,12 @@ class FrontHistoryModel:
 
         return self.history_items
 
+    def set_page_size(self, index):
+
+        if(index in self.page_size):
+            self.page_size = self.page_size[index]
+
+
     def calculate_total_pages(self, search_query=""):
         #total pages
 
@@ -60,6 +68,8 @@ class FrontHistoryModel:
 
         # set total pages
         self.total_pages = math.ceil(total_items / self.page_size)
+
+        print(f'self.total_pages self.page_size: {self.page_size}')
 
         return self.total_pages
 

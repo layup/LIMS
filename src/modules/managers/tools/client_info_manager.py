@@ -50,6 +50,7 @@ class ClientInfoManager(QObject):
         # Dynamically find the widgets and store their references
         self.widgets = {}
 
+        # automatically update the client information
         for field, widget_name in self.client_info_mapping.items():
             widget = self.client_widget.findChild(QLineEdit, widget_name)
             if widget:
@@ -57,10 +58,17 @@ class ClientInfoManager(QObject):
                 # Connect the textChanged signal to update the dictionary
                 widget.textChanged.connect(lambda text, field=field: self.update_client_info(field, text))
 
-    def get_client_info(self):
+    def get_all_client_info(self):
         """Return the dictionary containing all the client information."""
         print(self.client_info_data)
         return self.client_info_data
+
+    def get_client_info(self, key_name):
+
+        if(key_name in self.client_info_data):
+            return self.client_info_data[key_name]
+
+        return None
 
     def print_child_widgets(self):
         print('print_child_widgets')
@@ -74,3 +82,14 @@ class ClientInfoManager(QObject):
         """Update the dictionary with the new value."""
         self.client_info_data[field_name] = text
         logger.info(f"Updated {field_name}: {text}")
+
+    def set_client_info(self, new_client_info):
+
+        for field, widget_name in self.client_info_mapping.items():
+
+            widget = self.client_widget.findChild(QLineEdit, widget_name)
+            if widget and field in new_client_info:
+                widget.setText(new_client_info[field])
+
+
+

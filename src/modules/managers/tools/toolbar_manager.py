@@ -26,6 +26,10 @@ class ToolbarManager(QObject):
         self.toolbar = toolbar
         self.actions = {}
 
+        self.toolbar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+
+
         self.init_toolbar_setup()
 
 
@@ -36,12 +40,20 @@ class ToolbarManager(QObject):
         self.toolbar.setIconSize(QSize(36, 36))
 
         # define the actions
-        create_action = QAction(QIcon('assets/icons/add_icon.png'), 'Create New Report', self.toolbar)
-        edit_action = QAction(QIcon('assets/icons/edit_icon.svg'), 'Modify Existing Report', self.toolbar)
-        search_action = QAction(QIcon('assets/icons/search_icon.png'), 'Search for Report', self.toolbar)
-        upload_action = QAction(QIcon('assets/icons/upload_icon.png'), 'upload ICP data', self.toolbar)
-        write_action = QAction(QIcon('assets/icons/write_icon.png'), 'write CHM data', self.toolbar)
+        create_action = QAction(QIcon('assets/icons/add_icon.png'), 'Create', self.toolbar)
+        edit_action = QAction(QIcon('assets/icons/edit_icon.svg'), 'Modify', self.toolbar)
+        search_action = QAction(QIcon('assets/icons/search_icon.png'), 'Search', self.toolbar)
+        upload_action = QAction(QIcon('assets/icons/upload_icon.png'), 'upload', self.toolbar)
+        write_action = QAction(QIcon('assets/icons/write_icon.png'), 'Write', self.toolbar)
         settings_action = QAction(QIcon('assets/icons/settings_icon.png'), 'Settings', self.toolbar)
+
+        # set the tool tips for each action
+        create_action.setToolTip('Create a new report')
+        edit_action.setToolTip('Edit an existing report')
+        search_action.setToolTip('Search for an existing report')
+        upload_action.setToolTip('Upload ICP file to database')
+        write_action.setToolTip('Write CHM test data to database')
+        settings_action.setToolTip('Open Settings')
 
         # save the actions
         self.actions['create'] = create_action

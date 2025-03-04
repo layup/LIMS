@@ -4,8 +4,8 @@ from base_logger import logger
 
 from modules.utils.logic_utils import remove_control_characters
 
-def processClientInfo(jobNum, fileLocation):
-    logger.info(f'Entering processClientInfo with jobNum: {jobNum}')
+def process_txt_client_info(jobNum, fileLocation):
+    logger.info(f'Entering process_txt_client_info with jobNum: {jobNum}')
 
     clientInfoDict = {
         'clientName': '',

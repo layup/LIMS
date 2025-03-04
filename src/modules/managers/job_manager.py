@@ -3,77 +3,49 @@ import sqlite3
 from datetime import date
 from base_logger import logger
 
-'''
 
-    jobs (front intake)
-    - job_num (pk)
-    - company_id
-    - company_info
-    - creation_date
-    - total_samples
-    - sample_names
-    - status
+class SamplesItem:
 
-    reports (general information )
-    - job_num (PK)
-    - report_id (PK)
-    - matrix_id
-    - dilution
-    - creation_date
-    - author_one_id
-    - author_two_id
+    def __init__(self, sample_num, sample_name, sample_time, sample_date, total_containers, container_type):
+        self.sample_num = sample_num
+        self.sample_name = sample_name
+        self.sample_time = sample_time
+        self.sample_date = sample_date
 
-    icp_upload
-    - job_num (PK)
-    - sample_num (PK)
-    - file_name
-    - upload_date
-    - machine_id
+        self.total_containers = total_containers
+        self.container_type = container_type
 
-    icp_data
-    - sample_num (PK)
-    - element_id (PK)
-    - element_val
-
-    chm_data
-    - job_num
-    - sample_num (PK)
-    - test_id (PK)
-    - test_val
-    - standard_val
-    - unit_val
-    -
-
-'''
+        self.macros_id = []
+        self.test_ids = []
 
 
-'''
 
-CREATE TABLE reports (
-    job_num INTEGER NOT NULL,       -- Primary Key (TEXT if it's not always a number)
-    report_id INTEGER NOT NULL,    -- Primary Key (INTEGER for auto-incrementing if needed)
-    matrix_id INTEGER,             -- Can be NULL if not applicable
-    dilution REAL,              -- Or appropriate data type (INTEGER, TEXT, etc.)
-    creation_date TEXT,          -- Or DATE, DATETIME, etc. - choose a consistent format
-    author_one_id INTEGER,       -- Or TEXT, depending on how you identify authors
-    author_two_id INTEGER,       -- Or TEXT, depending on how you identify authors
-    PRIMARY KEY (job_num, report_id) -- Composite primary key
-    FOREIGN KEY (report_id) REFERENCES report_type(report_id)
-);
+class JobItem:
 
-CREATE TABLE icp_upload (
-    job_num INTEGER,
-    report_id INTEGER,
-    matrix_id INTEGER,
-    dilution REAL,
-    creation_date TEXT,
-    author_one_id INTEGER,
-    author_two_id INTEGER,
-    PRIMARY KEY (job_num, report_id)
+    def __init__(self, job_num, company_name, total_samples, creation_date, status):
+        self.job_num = job_num
+        self.company_name = company_name
+        self.creation_date = creation_date
+        self.status = status
 
-);
+        self.total_samples = total_samples
 
-'''
+        self.company_id = None
+
+        keys = ["company_name", "attn", "addr_1", "addr_2", "city", "country", "prov", "postal", "phone", "ext", "fax", "email"]
+        self.company_info = {key: "" for key in keys}
+
+        self.samples = {}
+
+    def add_company(self, company_id):
+        self.company_id = company_id
+
+    def add_samples(self):
+        pass
+
+    def clear_info(self):
+        pass;
+
 
 
 class JobManager:
@@ -81,13 +53,17 @@ class JobManager:
     def __init__(self, db):
         self.db = db
 
-    def add_job(self, job_num, report_id, matrix_id, dilution, status ):
+        self.current_job = None
+
+    def add_jobs(self, job_num: int, company_name:str, total_samples:int) -> bool:
         logger.info('Entering JobManager add_job')
 
         try:
             current_date = date.today()
-            query = 'INSERT INTO jobs (jobNum, reportNum, parameterNum, status, creation_date, dilution) values (?,?,?, ?,?,?)'
-            self.db.execute(query, (job_num, report_id, matrix_id, status, current_date, dilution))
+            status = 0
+
+            query = 'INSERT INTO jobs (job_num, company_name, total_samples, status, creation_date values (?,?,?,?,?)'
+            self.db.execute(query, (job_num, company_name, total_samples, status, current_date))
             self.db.commit()
 
             logger.info(f"Job {job_num} added successfully.")  # More informative logging
@@ -95,56 +71,58 @@ class JobManager:
 
         except sqlite3.IntegrityError as e: # Handle IntegrityErrors (e.g., unique constraints)
             logger.warning(f"Integrity error adding job {job_num}: {e}")
-            self.db.rollback() # Rollback on error.
             return False
+
         except sqlite3.Error as e:  # Catch SQLite errors specifically
             logger.error(f"Database error adding job {job_num}: {e}") # Log as error
-            self.db.rollback()  # Rollback on error
             return False
+
         except Exception as e:  # Catch any other exceptions
             logger.error(f"An unexpected error occurred adding job {job_num}: {e}")
-            self.db.rollback()  # Rollback on error
             return False
 
-    def update_job(self, job_num, report_id, matrix_id, dilution, status):
-        logger.info('Entering JobManager update_job')
+    def update_jobs(self, job_num:int, company_name: str, total_samples: int, status:int, creation_date:int) -> bool:
 
         try:
-            current_date = date.today()
-            query = 'UPDATE jobs SET status = ?, creation_date = ?, dilution = ? WHERE jobNum = ? AND reportNum = ? AND parameter = ?'
-            self.db.execute(query, (status, current_date, dilution, job_num, report_id, matrix_id))
+            query = 'UPDATE jobs SET company_name = ?, total_samples = ?, status = ?, creation_date =?  WHERE job_num = ?'
+            self.db.execute(query, (company_name, total_samples, status, creation_date, job_num))
             self.db.commit()
 
-            if self.db.cursor.rowcount > 0:
-                logger.info(f"Successfully updated {self.db.cursor.rowcount} row(s).")
-
+            if(self.db.cursor.rowcount > 0):
+                logger.info(f"Successfully updated {self.db.cursor.rowcount} row(s) in jobs.")
                 return True
-            else:
-                logger.info("No rows were updated.")
 
-                return False
-
-        except sqlite3.IntegrityError as e: # Handle IntegrityErrors (e.g., unique constraints)
-            logger.warning(f"Integrity error adding job {job_num}: {e}")
-            self.db.rollback() # Rollback on error.
-            return False
-        except sqlite3.Error as e:  # Catch SQLite errors specifically
-            logger.error(f"Database error adding job {job_num}: {e}") # Log as error
-            self.db.rollback()  # Rollback on error
-            return False
-        except Exception as e:  # Catch any other exceptions
-            logger.error(f"An unexpected error occurred adding job {job_num}: {e}")
-            self.db.rollback()  # Rollback on error
+            logger.info("No rows were updated.")
             return False
 
-    def remove_job(self):
-        pass
+        except Exception as e:
+            logger.error(f'An unexpected error occurred when updating job {job_num}: {e}')
+            return False
 
+    def delete_job(self, job_num: int) -> int:
 
-    def update_status(self, job_num, report_id, new_status):
         try:
-            query = 'UPDATE jobs SET status = ? WHERE jobNum = ? AND reportNum = ?'
-            self.db.execute(query, (new_status, job_num, report_id))
+            query = 'DELETE FROM jobs WHERE job_num = ?'
+            self.db.execute(query, (job_num))
+            self.db.commit()
+
+            # Check how many rows were deleted
+            deleted_rows = self.db.cursor.rowcount  # Get the number of deleted rows
+            if deleted_rows > 0:
+                logger.info(f"Successfully deleted {deleted_rows} row(s) from jobs.")
+
+                return deleted_rows
+
+            return 0
+
+        except Exception as e:
+            logger.error(f'An unexpected error occurred when trying to delete job: {job_num}: {e}')
+            return 0
+
+    def update_status(self, job_num , new_status) -> bool:
+        try:
+            query = 'UPDATE jobs SET status = ? WHERE job_num = ?'
+            self.db.execute(query, (new_status, job_num))
             self.db.commit()
 
             if self.db.cursor.rowcount > 0:
@@ -156,54 +134,31 @@ class JobManager:
 
         except sqlite3.IntegrityError as e: # Handle IntegrityErrors (e.g., unique constraints)
             logger.warning(f"Integrity error updating status for job {job_num}: {e}")
-            self.db.rollback() # Rollback on error.
             return False
         except sqlite3.Error as e:  # Catch SQLite errors specifically
             logger.error(f"Database error updating status for job {job_num}: {e}") # Log as error
-            self.db.rollback()  # Rollback on error
             return False
         except Exception as e:  # Catch any other exceptions
             logger.error(f"An unexpected error occurred updating status for job {job_num}: {e}")
-            self.db.rollback()  # Rollback on error
             return False
 
-    def get_status(self, job_num, report_id):
-        logger.info(f'Entering JobManager get_status with job_num: {job_num}, report_id: {report_id}')
+    def get_status(self, job_num:int):
+        logger.info(f'Entering JobManager get_status with job_num: {job_num}')
 
         try:
-            query = 'SELECT status FROM jobs WHERE jobNum = ? and reportNum = ?'
-            result = self.db.query(query, (job_num, report_id))
+            query = 'SELECT status FROM jobs WHERE job_num = ?'
+            result = self.db.query(query, (job_num))
             return result[0][0]
 
         except Exception as e:
             logger.error(f'An error occurred: {e}')
             return None
 
-    def get_limited_jobs(self, limit, offset):
-        logger.info(f'Entering get_limited_jobs with limit: {limit}, offset: {offset}')
-
-        try:
-            query = '''
-                SELECT jobNum, reportNum, parameterNum, dilution, creation_date, status
-                FROM jobs
-                ORDER BY creation_date DESC
-                LIMIT ? OFFSET ?
-
-            '''
-            results = self.db.query(query, (limit, offset, ))
-
-            return results
-
-        except Exception as e:
-            logger.error(f'An error occurred: {e}')
-            return None
-
-
     def get_all_jobs(self):
         logger.info('Entering JobManager get_all_jobs')
 
         try:
-            query = 'SELECT DISTINCT jobNum FROM jobs'
+            query = 'SELECT job_num FROM jobs'
             self.db.execute(query)
 
             jobNumbers = self.db.fetchall()
@@ -217,7 +172,7 @@ class JobManager:
         logger.info('Entering JobManager get_total_jobs_count')
         try:
             query = '''
-                SELECT count(jobNum)
+                SELECT count(job_num)
                 FROM jobs
             '''
             results = self.db.query(query)
@@ -227,38 +182,14 @@ class JobManager:
             logger.error(f'An error occurred: {e}')
             return 0
 
-    def get_job_status(self, job_num, report_id):
-        logger.info(f'Entering JobManager get_job_status with job_num: {job_num}, report_id: {report_id}')
-
-        try:
-            query = 'SELECT status FROM jobs WHERE jobNum = ? and reportNum = ?'
-            result = self.db.query(query, (job_num, report_id))
-            return result[0][0]
-
-        except Exception as e:
-            logger.error(f'An error occurred: {e}')
-            return None
-
-    def check_job_exist(self, job_num, report_id):
-        logger.info(f'Entering check_job_exist with job_num: {job_num}, report_id: {report_id}')
-
-        try:
-            query = 'SELECT * FROM jobs WHERE jobNum = ? and reportNum = ?'
-            self.db.execute(query, (job_num, report_id))
-            result = self.db.fetchone()
-            return result
-
-        except Exception as e:
-            logger.error(f'An error occurred: {e}')
-            return None
-
     def search_job(self, search_value):
         logger.info(f'Entering search_job with search_value: {search_value}')
 
         try:
-            query = 'SELECT * FROM jobs WHERE jobNum LIKE ? ORDER BY creation_date DESC'
+            query = 'SELECT job_num, company_name, creation_date, total_samples, status FROM jobs WHERE job_num LIKE ? ORDER BY creation_date DESC'
             results = list(self.db.query(query, (search_value + '%',)))
             return results
+
         except Exception as e:
             logger.error(f"An error occurred during the database query: {e}")
             return None
@@ -268,9 +199,9 @@ class JobManager:
 
         try:
             query = """
-                SELECT jobNum, reportNum, parameterNum, dilution, creation_date, status
+                SELECT job_num, reportNum, parameterNum, dilution, creation_date, status
                 FROM jobs
-                WHERE jobNum LIKE ?
+                WHERE job_num LIKE ?
                 ORDER BY creation_date DESC
                 LIMIT ? OFFSET ?
             """
@@ -297,9 +228,9 @@ class JobManager:
 
         try:
             query = """
-                SELECT count(jobNum)
+                SELECT count(job_num)
                 FROM jobs
-                WHERE jobNum LIKE ?
+                WHERE job_num LIKE ?
             """
 
             # Add wildcards to the search term for partial matching

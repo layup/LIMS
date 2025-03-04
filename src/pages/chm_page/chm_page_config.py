@@ -4,7 +4,7 @@ from pages.chm_page.reports_tab.chm_reports_config import chm_reports_tab_setup
 from pages.chm_page.input_tab.chm_input_config import chm_input_tab_setup
 from pages.chm_page.tests_tab.chm_tests_config import chm_tests_tab_setup
 
-def chemistrySetup(self):
+def chm_section_setup(self):
     self.logger.info('Entering chemistrySetup')
 
     chm_tests_tab_setup(self)

@@ -35,24 +35,29 @@ class chmReportTestItem:
 #TODO: have a regular value and dilution value
 
 class chmReportSampleItem:
-    def __init__(self, jobNum, sampleNum, sampleName):
+    def __init__(self, sample_id, jobNum, sample_num, sample_name):
+        self.sample_id = sample_id
         self.jobNum = jobNum
-        self.sampleNum = sampleNum
-        self.sampleName = sampleName
+        self.sample_num = sample_num
+        self.sample_name = sample_name
 
         # Data consists of data[testNum] = [value, recovery, unitType]
         self.data = {}
 
     def __repr__(self):
         return (f"chemReportSampleItem(jobNum={self.jobNum!r}, "
-                f"sampleNum={self.sampleNum!r}, "
-                f"sampleName={self.sampleName!r}, "
+                f"sample_id={self.sample_id!r}, "
+                f"sample_num={self.sample_num!r}, "
+                f"sample_name={self.sample_name!r}, "
                 f"data={self.data!r})")
+
 
     def add_data(self, row, testVal, recovery=None, unit=None):
         logger.info(f'Entering add_data with row: {row}, testVal: {testVal}, recovery: {recovery}, unit: {unit}')
         self.data[row] = str(testVal)
 
+    def update_sample_name(self, new_sample_name):
+        self.sample_name = new_sample_name
 
     def update_data(self, test_id, testVal):
         self.data[test_id] = testVal

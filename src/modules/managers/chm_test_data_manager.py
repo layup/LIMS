@@ -46,7 +46,7 @@ class ChmTestManager:
         logger.info(f'Entering get_limited_tests with limit: {limit}, offset: {offset}')
 
         try:
-            query = "SELECT * FROM chm_data ORDER BY creation_date DESC LIMIT ? OFFSET ?"
+            query = "SELECT sample_num, test_id, test_val, recovery_val, unit_val, job_num, creation_date FROM chm_data ORDER BY creation_date DESC LIMIT ? OFFSET ?"
             results = self.db.query(query, (limit, offset))
 
             logger.info(f"Retrieved {len(results)} rows from chm_data (limit={limit}, offset={offset}).")
@@ -73,7 +73,7 @@ class ChmTestManager:
     def get_tests_results(self, job_num, sample_tests):
         logger.info('Entering get_tests_results')
 
-        testsQuery = 'SELECT * FROM chm_data WHERE job_num = ?'
+        testsQuery = 'SELECT sample_num, test_id, test_val, recovery_val, unit_val, job_num, creation_date FROM chm_data WHERE job_num = ?'
         test_results = self.db.query(testsQuery, (job_num,))
 
         logger.info(test_results)
@@ -100,14 +100,29 @@ class ChmTestManager:
         return chem_tests_list, test_results
 
     def get_test_text_name(self, test_id):
+        logger.info(f'Entering get_test_text_name with test_id: {test_id}')
 
         try:
-            query = 'SELECT bench_chem_name FROM Tests WHERE test_id = ?'
+            query = 'SELECT bench_chem_name FROM tests WHERE test_id = ?'
             result = self.db.query(query, (test_id, ))
             return result[0][0]
 
         except Exception as e:
             print(e)
+
+    def get_sample_numbers(self, job_num: int):
+        logger.info(f'Entering get_sample_names with job_num: {job_num}')
+
+        try:
+            query = 'SELECT DISTINCT sample_num FROM chm_data WHERE job_num = ?'
+            result = self.db.query(query, (job_num, ))
+
+            return result
+
+        except Exception as e:
+            logger.error(f'An unexpected error occurred when trying to get sample names: {e}')
+            return None
+
 
     #TODO: edit the thing
     def find_test_name(self, test_id):
@@ -115,11 +130,10 @@ class ChmTestManager:
         try:
 
             #self.db.query("SELECT testName FROM Tests WHERE test_id = ?", (test_id,))
-            self.db.query("SELECT testName FROM Tests WHERE test_id = ?", (test_id,))
-            result = self.db.fetchone()  # Use fetchone() and handle None
+            result = self.db.query("SELECT test_name FROM tests WHERE test_id = ?", (test_id,))
 
             if result:
-                return result[0]  # Return the testName
+                return result[0][0]  # Return the testName
             else:
                 return None  # Return None if no matching test is found
 
@@ -136,7 +150,7 @@ class ChmTestManager:
         """Searches jobs with pagination and returns a list of tuples or None on error."""
         try:
             query = """
-                SELECT *
+                SELECT sample_num, test_id, test_val, recovery_val, unit_val, job_num, creation_date
                 FROM chm_data
                 WHERE job_num LIKE ?
                 ORDER BY creation_date DESC
@@ -191,21 +205,20 @@ class ChmTestManager:
             self.db.execute(query, (sample_num, test_id, test_val, recovery, unit, job_num, current_date, ))
             self.db.commit()
 
+            logger.info(f'Successfully added {job_num}-{sample_num} with {test_val} to {test_id}')
+
             return True
 
         except sqlite3.IntegrityError as e:
             logger.error(f"Integrity Error: {e}")  # More descriptive message
-            self.db.rollback()  # Rollback on integrity error
             return False
 
         except sqlite3.Error as e:  # Catch other SQLite errors
             logger.error(f"SQLite Error: {e}")  # More descriptive message
-            self.db.rollback()
             return False
 
         except Exception as e: # Catch any other exceptions
             logger.error(f"An unexpected error occurred: {e}")
-            self.db.rollback()
 
             return False
 
@@ -235,7 +248,6 @@ class ChmTestManager:
 
         except sqlite3.Error as error:
             logger.error(f"Database error occurred: {error}")
-            self.db.rollback()  # Rollback on error
             return None
 
     def delete_test(self, job_num, sample_num, test_id):
@@ -256,16 +268,14 @@ class ChmTestManager:
 
         except sqlite3.Error as e:  # Catch SQLite errors specifically
             logger.error(f"Database error during delete: {e}")
-            self.db.rollback()
             return None
 
         except Exception as e: # Catch other exceptions
             logger.error(f"An unexpected error occurred during delete: {e}")
-            self.db.rollback()
             return None
 
     def check_test_exists(self, job_num, sample_num, test_id):
-        logger.info('Entering check_test_exists with job_num: {job_num}, sample_num: {sample_num}, test_id: {test_id}')
+        logger.info(f'Entering check_test_exists with job_num: {job_num}, sample_num: {sample_num}, test_id: {test_id}')
 
         try:
             query = f"SELECT EXISTS(SELECT 1 FROM chm_data WHERE job_num = ? AND sample_num = ? AND test_id = ?)"

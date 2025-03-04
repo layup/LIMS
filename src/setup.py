@@ -4,10 +4,10 @@ __license__ = "MIT"
 
 import sys
 
-from dotenv import find_dotenv, load_dotenv
-
 from app import MainWindow
 from base_logger import logger
+
+from dotenv import find_dotenv, load_dotenv
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
@@ -15,6 +15,10 @@ from PyQt5.QtWidgets import QApplication, QStyleFactory, QDialog
 
 from modules.widgets.SplashScreenWidget import SplashScreen
 from modules.dialogs.connect_server_dialog import ConnectServerDialog
+from modules.utils.server_utils import PostgresDatabaseManager
+
+from modules.managers.tools.file_paths_manager import FilePathsManager
+
 
 if hasattr(Qt, 'AA_EnableHighDpiScaling'):
     print(f'Qt hasattr AA_EnableHighDpiScaling')
@@ -51,19 +55,6 @@ def setup_env_files():
     # load the .env file into
     load_dotenv(dotenv_path)
 
-def connect_to_server():
-
-    server_dialog = ConnectServerDialog()
-    results = server_dialog.exec_()
-
-    if results ==  QDialog.Accepted:
-
-        return True
-
-    elif results == QDialog.Rejected:
-        #TODO: temp has this so server is doing the thing
-        return True
-
 def screen_resolution_adjust(app):
 
     # set the style for it
@@ -75,7 +66,9 @@ def screen_resolution_adjust(app):
     width, height = screen_size.width(), screen_size.height()
 
     # Set font size based on screen resolution
-    font_size = 10  # Default font size
+
+    font_size = 11  # Default font size
+
     if width <= 1280:
         font_size = 10  # Smaller font for lower resolution
     elif width >= 1920:
@@ -85,6 +78,8 @@ def screen_resolution_adjust(app):
     font = QFont("Arial", font_size)
 
     app.setFont(font)
+
+
 
 if __name__ == "__main__":
 
@@ -97,15 +92,25 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     screen_resolution_adjust(app)
 
-    connection_status = connect_to_server()
+    preferences = FilePathsManager()
 
-    if(connection_status):
+    #TODO: rename this
+    server_dialog = ConnectServerDialog(preferences)
+
+    # Connect to the login_accepted signal
+
+    if(server_dialog.exec_() == QDialog.Accepted):
+
+        db_manager = server_dialog.db_manager
+
         splash = SplashScreen()
         splash.show()
 
+        #TODO: pass the local db information or the server information
+
         def show_main_window():
             # Create and show the main window
-            window = MainWindow(logger)
+            window = MainWindow(logger, preferences, db_manager)
             window.show()
 
             # Finish the splash screen
@@ -113,8 +118,12 @@ if __name__ == "__main__":
 
         QTimer.singleShot(1000, lambda: show_main_window())
 
-
     else:
         sys.exit(1)
 
     sys.exit(app.exec_())
+
+
+
+
+

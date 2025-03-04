@@ -63,9 +63,8 @@ def get_path_from_json(filename, key):
     except json.JSONDecodeError:
         return None  # Handle invalid JSON data
 
-
-def scanForTXTFolders(jobNum):
-    logger.info(f'Entering scanForTXTFolders with parameter jobNum: {jobNum}')
+def scan_for_txt_folders(jobNum):
+    logger.info(f'Entering scan_for_txt_folders with parameter jobNum: {jobNum}')
 
     text_folders_path = get_path_from_json('default_paths.json','TXTDirLocation')
 
@@ -80,11 +79,11 @@ def scanForTXTFolders(jobNum):
 
     locationsObject.close()
 
-    return processTXTFolders(jobNum, text_folder_paths)
+    return process_txt_folders(jobNum, text_folder_paths)
 
 
-def processTXTFolders(jobNum, text_folder_paths):
-    logger.info(f'Entering processTXTFolders with parameter jobNum: {jobNum}, text_folder_paths: {text_folder_paths}')
+def process_txt_folders(jobNum, text_folder_paths):
+    logger.info(f'Entering process_txt_folders with parameter jobNum: {jobNum}, text_folder_paths: {text_folder_paths}')
 
     file_name = f"W{jobNum}.TXT"
 

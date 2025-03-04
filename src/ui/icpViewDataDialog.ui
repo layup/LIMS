@@ -75,13 +75,16 @@
         <item>
          <widget class="QLineEdit" name="jobNumberLabel">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="maximumSize">
            <size>
             <width>100</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="maxLength">
+           <number>6</number>
           </property>
          </widget>
         </item>

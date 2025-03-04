@@ -9,22 +9,26 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QTableWidget, QStyleFacto
 from modules.dialogs.basic_dialogs import yes_or_no_dialog
 from modules.utils.apply_drop_shadow_effect import apply_drop_shadow_effect
 from modules.dialogs.file_location_dialog import FileLocationDialog
-from modules.dialogs.connect_server_dialog import ConnectServerDialog
+from modules.utils.report_utils import deleteAllSampleWidgets
 
 # setup database managers
 from modules.managers.authors_manager import AuthorsManager
-from modules.managers.client_info_manager import ClientInfoManager
 from modules.managers.chm_test_data_manager import ChmTestManager
 from modules.managers.icp_test_data_manager import IcpTestManager
 from modules.managers.tests_manager import TestManager
 from modules.managers.job_manager import JobManager
+from modules.managers.reports_manager import ReportsManager
 from modules.managers.parameters_manager import ParametersManager
 from modules.managers.elements_manager import ElementsManager
 from modules.managers.units_manager import UnitManager
 from modules.managers.footers_manager import FootersManager
+from modules.managers.macros_manager import MacrosManger
+
+from modules.managers.server_manager import PostgresDatabaseManager
 
 # tools manager
-from modules.managers.tools.database_manager import DatabaseManager, PostgresDatabaseManager
+from modules.managers.tools.database_manager import DatabaseManager
+from modules.managers.tools.client_info_manager import ClientInfoManager
 from modules.managers.tools.toolbar_manager import ToolbarManager
 from modules.managers.tools.status_manager import StatusBarManager
 from modules.managers.tools.navigation_manager import NavigationManager
@@ -32,25 +36,30 @@ from modules.managers.tools.file_paths_manager import FilePathsManager
 
 # Page setup imports
 from pages.reports_page.reports_config import general_reports_setup
-from pages.reports_page.reports.report_utils import deleteAllSampleWidgets
 from pages.icp_page.icp_page_config import  icp_setup, on_icpTabWidget_currentChanged
-from pages.chm_page.chm_page_config import chemistrySetup, on_chmTabWidget_currentChanged
-from pages.history_page.history_page_config import history_page_setup, set_total_outgoing_jobs
+from pages.chm_page.chm_page_config import chm_section_setup, on_chmTabWidget_currentChanged
+from pages.macros_page.macros_page_config import macros_page_setup
+from pages.history_page.history_page_config import history_page_setup
 
 class MainWindow(QMainWindow):
 
-    def __init__(self,logger):
+    def __init__(self, logger, preferences, db_manager):
         super(MainWindow, self).__init__()
 
         self.ui = Ui_MainWindow()
+
         self.logger = logger
+        self.preferences = preferences
+        self.db_manager = db_manager
+
+        self.logger.debug(f'self.db_manager: {db_manager}')
+        self.logger.debug(f'self.preferences: {preferences}')
+        self.logger.debug(f'self.logger: {logger}')
 
         self.ui.setupUi(self)
 
         # load the setup
-        # self.connect_to_server()
-        self.load_local_database()
-        #self.test_connection(self.tempDB)
+        self.load_database()
         self.manager_setup()
         self.init_setup()
 
@@ -58,6 +67,9 @@ class MainWindow(QMainWindow):
         self.connect_client_info_signals()
 
     def closeEvent(self, event):
+
+        #TODO: be sure to kill the treads too when stopping the server
+
         """Override this method to handle the close event."""
         reply = QMessageBox.question(
             self,
@@ -69,9 +81,7 @@ class MainWindow(QMainWindow):
 
         if reply == QMessageBox.Yes:
             # Close the database connections
-            self.db.close()
-            self.tempDB.close()
-            self.officeDB.close()
+            self.local_db.close()
 
             event.accept()  # Allow the window to close
         else:
@@ -113,8 +123,10 @@ class MainWindow(QMainWindow):
         general_reports_setup(self)
         history_page_setup(self)
 
-        chemistrySetup(self)
+        chm_section_setup(self)
         icp_setup(self)
+
+        macros_page_setup(self)
 
     def manager_setup(self):
 
@@ -125,19 +137,21 @@ class MainWindow(QMainWindow):
         self.navigation_manager = NavigationManager(self.ui.navigationTree)
 
         # shared database tables managers
-        self.jobs_manager = JobManager(self.tempDB)
-        self.units_manager = UnitManager(self.tempDB)
-        self.tests_manager = TestManager(self.tempDB)
-        self.authors_manager = AuthorsManager(self.tempDB)
-        self.parameters_manager = ParametersManager(self.tempDB)
-        self.footers_manager = FootersManager(self.tempDB)
+        self.jobs_manager = JobManager(self.local_db)
+        self.units_manager = UnitManager(self.local_db)
+        self.tests_manager = TestManager(self.local_db)
+        self.authors_manager = AuthorsManager(self.local_db)
+        self.parameters_manager = ParametersManager(self.local_db)
+        self.footers_manager = FootersManager(self.local_db)
+        self.reports_manager = ReportsManager(self.local_db)
+        self.macros_manager = MacrosManger(self.local_db)
 
         # icp database table manager
-        self.elements_manager = ElementsManager(self.tempDB)
-        self.icp_test_data_manager = IcpTestManager(self.tempDB)
+        self.elements_manager = ElementsManager(self.local_db)
+        self.icp_test_data_manager = IcpTestManager(self.local_db)
 
         # chm database table manager
-        self.chm_test_data_manager = ChmTestManager(self.tempDB)
+        self.chm_test_data_manager = ChmTestManager(self.local_db)
 
         # manager signals
         self.toolbar_manager.action_name.connect(self.handle_toolbar_action)
@@ -169,55 +183,35 @@ class MainWindow(QMainWindow):
         if(action_name == 'settings'):
             pass
 
-    #******************************************************************
-    #    Database & Server
-    #******************************************************************
 
-    def connect_to_server(self):
-
-        # access values from .env file
-        HOST = os.getenv('HOST')
-        DATABASE = os.getenv('DATABASE')
-        PORT = os.getenv('PORT')
-        USERNAME = os.getenv('USERNAME')
-        PASSWORD = os.getenv('PASSWORD')
-
-        self.post_db = PostgresDatabaseManager(HOST, DATABASE, PORT, USERNAME, PASSWORD)
-
-       # print(f'connection_status: {connection_status}')
+    def load_database(self, max_attempts=3):
+        self.logger.info('Entering load_database')
 
 
-    def load_local_database(self, max_attempts=3, delay=2):
-        self.logger.info("Entering load_local_database")
+        #TODO: rename all of the .json files
+        self.local_db = self.db_manager
 
-        self.preferences = FilePathsManager()
+        # check where the output folder location is and if it exists
+        output_path = self.preferences.get_path('reportsPath')
 
+        print(f'output_path: {output_path}')
 
         for attempt in range(max_attempts):
             self.logger.debug(f'Attempt: {attempt}')
 
-            try:
-                # set the default databases
-                self.db = DatabaseManager(self.preferences.get_path('databasePath'))
-                self.tempDB = DatabaseManager(self.preferences.get_path('temp_backend_path')) # harry backend database
-                self.officeDB = DatabaseManager(self.preferences.get_path('officeDbPath'))  # front end database
-
-
+            # check where the output folder location is and if it exists
+            if(os.path.exists(output_path)):
                 return
 
-            except Exception as error:
-                self.logger.error(f"Error loading database: {error}")
+            else:
+                response = yes_or_no_dialog("Output Reports file path doesn't exist", ' would you like to set the file locations?')
 
-                if attempt == max_attempts-1:
-                    self.logger.warning("Max attempts reached. Unable to connect to databases.")
+                if(response):
+                    # Dialog popup to load the necessary database Information for the user
+                    dialog = FileLocationDialog(self.preferences)
+                    dialog.exec_()
+                else:
                     return
-
-                # Dialog popup to load the necessary database Information for the user
-                dialog = FileLocationDialog(self.preferences)
-                dialog.exec_()
-
-                time.sleep(delay)
-
 
     #******************************************************************
     #    Signal Connections
@@ -248,7 +242,8 @@ class MainWindow(QMainWindow):
             widget.textChanged.connect(lambda text, field=field: self.on_client_info_changed(field, text))
 
     def on_client_info_changed(self, field_name, text):
-        self.clientInfo[field_name] = text;
+        #self.clientInfo[field_name] = text;
+        self.client_manager.client_info_data[field_name] = text
 
     #TODO: deal with this
     def on_tab_pressed1(self):
@@ -274,13 +269,12 @@ class MainWindow(QMainWindow):
 
         if(index == 0): # History
             self.ui.headerTitle.setText('Reports History')
-            set_total_outgoing_jobs(self)
 
-        if(index == 1): # Create Report
-            self.ui.headerTitle.setText('Create Reports')
+
+        if(index == 1): # Micros/Tests
+            self.ui.headerTitle.setText('Micros/Tests')
             self.ui.headerDesc.setText('')
 
-            self.reset_create_report()
 
         if(index == 2): # ICP Page
             current_tab = self.ui.icpTabWidget.currentIndex()
@@ -300,29 +294,3 @@ class MainWindow(QMainWindow):
             self.ui.headerWidget.hide()
             deleteAllSampleWidgets(self)
 
-    def reset_create_report(self):
-        # Clearing the report page section
-        self.ui.jobNumInput.setText('')
-        self.ui.reportType.setCurrentIndex(0)
-        self.ui.paramType.setCurrentIndex(0)
-        self.ui.dilutionInput.setText('')
-
-
-
-def testing_post(db_manager):
-    print('testing_post')
-
-    try:
-        results = db_manager.query('SELECT * FROM my_test_table')
-        print(f'results: {results}')
-
-    except Exception as e:
-        print(f'failed: {e}')
-
-
-def test_connection(db):
-    try:
-        result = self.db.query('SELECT 1')
-        print(result)
-    except Exception as e:
-        print(e)

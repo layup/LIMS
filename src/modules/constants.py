@@ -1,4 +1,4 @@
-
+from PyQt5.QtGui import QIcon
 
 #******************************************************************
 #   Report Variables
@@ -37,6 +37,15 @@ REPORT_FILTER = ['Date Created', 'Status', 'Parameter', 'Job Number', 'Report Ty
 ICP_FILTER = ['Upload Date', 'Sample Number', 'Job Number']
 CHM_FILTER = ['Upload Date, ']
 
+
+#******************************************************************
+#    UI Variables
+#******************************************************************
+
+SMALL_BTN = 12
+MED_BTN = 13
+BIG_BTN = 14
+
 #******************************************************************
 #    Table Variables
 #******************************************************************
@@ -73,29 +82,16 @@ SHOW_ENTITIES = [
 ]
 
 
+#******************************************************************
+#    Global Icons
+#******************************************************************
 
-GSMS_values = {
-    "001": ["ALkalinity", "mg/L"],
-    "002": ["NH3-N", "ug/L "],
-    "003": ["Cl-", 'mg/L'],
-    "004": ['E.C', 'us/cm'],
-    "005": ['F-', 'mg/L'],
-    "006": ['TKN', 'mg/L'],
-    "007": ['Mn', 'mg/L'],
-    "008": ['NO3-N', 'ug/L'],
-    "009": ['NO2-N', 'ug/L'],
-    "010": ['ortho-PO43', 'ug/L'],
-    "011": ['pH', ' '],
-    "012": ['TPO43 --P', 'ug/L'],
-    "013": ['D.TO43 --P', 'ug/L'],
-    "014": ['SO42', 'mg/L'],
-    "015": ['T.O.C', 'mg/L'],
-    "016": ['T&L', 'mg/L'],
-    "017": ['TDS', 'mg/L'],
-    "018": ['TSS', 'mg/L'],
-    "019": ['Turbidity', 'NTU'],
-    "020": ['UVT', '%']
-}
+EDIT_ICON = QIcon('assets/icons/edit_icon.svg')
+DELETE_ICON = QIcon('assets/icons/delete_button.svg')
+#SAVE_ICON = QIcon('assets/icons/save.svg')
+
+
+
 
 periodic_table1 = {
     'Ag': 'Silver',

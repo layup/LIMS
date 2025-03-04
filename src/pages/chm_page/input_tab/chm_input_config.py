@@ -12,6 +12,7 @@ from modules.constants import CHM_REPORT, MED_COL, SMALL_COL
 from modules.dialogs.basic_dialogs import save_or_cancel_dialog
 from modules.utils.logic_utils import is_real_number
 from modules.dialogs.basic_dialogs import yes_or_no_dialog, error_dialog
+from modules.dialogs.duplicate_dialog import DuplicateDialog
 from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 
 #******************************************************************
@@ -20,8 +21,7 @@ from modules.widgets.SideEditWidget import SideEditWidget, hideSideEditWidget
 
 #TODO: takes in the values from the
 #TODO: duplication error
-#TODO: renamme those old variable names
-
+#TODO: rename those old variable names
 
 def chm_input_tab_setup(self):
     self.logger.info('Entering chm_input_tab_setup')
@@ -144,6 +144,7 @@ def on_chmProceedBtn_clicked(self):
 def handle_add_chm_sample_btn_clicked(self):
     self.logger.info('Entering handle_add_chm_sample_btn_clicked ')
 
+
     standards, units, testName = get_current_entry_values(self)
     jobNum, sampleNum, selected_unit, sampleVal = get_current_entered_values(self)
 
@@ -168,9 +169,13 @@ def handle_add_chm_sample_btn_clicked(self):
         existing_data_check = self.chm_test_data_manager.check_test_exists(jobNum, sampleNum, test_id)
 
         if(existing_data_check):
-            response = yes_or_no_dialog('Duplicate Sample', f"Would you like to overwrite existing sample {jobNum}-{sampleNum}")
+            #response = yes_or_no_dialog('Duplicate Sample', f"Would you like to overwrite existing sample {jobNum}-{sampleNum}")
 
-            if(response):
+            results = DuplicateDialog.show_dialog(f'{jobNum}-{sampleNum}')
+
+            print(f'results: {results}')
+
+            if(results == 'overwrite'):
                 #TODO: remove this so it updates instead of adding to ite
                 self.chm_test_data_manager.add_test(jobNum, sampleNum, test_id, sampleVal, standards, selected_unit)
                 #updated_rows = self.chm_test_data_manager.update_test(jobNum, sampleNum, test_id, sampleVal, standards, selected_unit)
@@ -185,6 +190,12 @@ def handle_add_chm_sample_btn_clicked(self):
                 else:
                     add_input_tree_item(self, sampleNum, testName, sampleVal, selected_unit, standards, jobNum)
 
+            if(results == 'duplicate'):
+                #self.chm_test_data_manager.duplicate_test()
+                return
+
+            if(results == 'cancel'):
+                return
 
             clear_samples_input(self)
 

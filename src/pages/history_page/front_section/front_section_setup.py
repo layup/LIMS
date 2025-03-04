@@ -8,9 +8,9 @@ from PyQt5.QtWidgets import QHeaderView, QDialog, QPushButton, QAbstractItemView
 from modules.widgets.TableFooterWidget import TableFooterWidget
 from modules.widgets.BasicSearchBar import BasicSearchBar
 
-from pages.history_page.front_section.FrontHistoryModel import FrontHistoryModel
-from pages.history_page.front_section.FrontHistoryView import FrontHistoryView
-from pages.history_page.front_section.FrontHistoryController import FrontHistoryController
+from pages.history_page.front_section.front_history_model import FrontHistoryModel
+from pages.history_page.front_section.front_history_view import FrontHistoryView
+from pages.history_page.front_section.front_history_controller import FrontHistoryController
 
 
 
@@ -21,9 +21,9 @@ def front_section_setup(self):
     front_footer_setup(self)
     front_table_setup(self.ui.frontHistoryTableWidget)
 
-    self.front_history_model = FrontHistoryModel(self.officeDB)
-    self.front_history_view = FrontHistoryView(self.ui.frontHistoryTableWidget, self.front_history_footer, self.front_history_search)
-    self.front_history_controller = FrontHistoryController(self.front_history_model, self.front_history_view)
+    #self.front_history_model = FrontHistoryModel(self.officeDB)
+    #self.front_history_view = FrontHistoryView(self.ui.frontHistoryTableWidget, self.front_history_footer, self.front_history_search)
+    #self.front_history_controller = FrontHistoryController(self.front_history_model, self.front_history_view)
 
 
 def front_table_setup(table):

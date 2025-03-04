@@ -25,7 +25,6 @@ class CreateReport(QDialog):
 
         self.proceedBtn.setDefault(True)
 
-
         self.setup()
 
     def setup(self):

@@ -22,9 +22,6 @@ class FileLocationDialog(QDialog):
         self.setupItems('TXTDirLocation', self.line1)
         self.setupItems('ispDataUploadPath', self.line2)
         self.setupItems('reportsPath', self.line3)
-        self.setupItems('databasePath', self.line4)
-        self.setupItems('officeDbPath', self.line5)
-        self.setupItems('temp_backend_path', self.line6)
 
         # Connect the Buttons
         self.closeBtn.clicked.connect(self.close)
@@ -34,13 +31,10 @@ class FileLocationDialog(QDialog):
         self.browse1.clicked.connect(lambda: self.browseForFolder('TXTDirLocation', self.line1))
         self.browse2.clicked.connect(lambda: self.browseForFolder('ispDataUploadPath', self.line2))
         self.browse3.clicked.connect(lambda: self.browseForFolder('reportsPath', self.line3))
-        self.browse4.clicked.connect(lambda: self.browseForFile('databasePath', self.line4))
-        self.browse5.clicked.connect(lambda: self.browseForFile('officeDbPath', self.line5))
-        self.browse6.clicked.connect(lambda: self.browseForFile('temp_backend_path', self.line6))
 
     def setupItems(self, pathName, lineItem):
         try:
-            filePath = self.preferences.get(pathName)
+            filePath = self.preferences.get_path(pathName)
             lineItem.setText(filePath)
         except Exception as error:
             print(error)

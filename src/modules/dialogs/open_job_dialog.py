@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import ( QDialog, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QDesktopWidget)
+from PyQt5.QtWidgets import (QDialog, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QDesktopWidget)
 
 class OpenJobDialog(QDialog):
     def __init__(self, jobNum, parent=None):

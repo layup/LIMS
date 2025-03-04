@@ -10,8 +10,7 @@ from openpyxl.utils import get_column_letter
 from modules.utils.file_utils import get_path_from_json
 from modules.utils.logic_utils import is_float
 
-from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence_by_words, significant_figures_convert
-
+from modules.models.excel_model import ExcelModel, split_sentence_by_words, significant_figures_convert
 '''
     Sₒ: standard deviation at zero analyze concentration; method detection limit is generally considered to be 3x So value
     Recovery: The percentage recovery of efficiency of isolating/purifying a substance.
@@ -20,8 +19,7 @@ from pages.reports_page.reports.ExcelReports import ExcelReports, split_sentence
 
 #FIXME: more data is showing up since can enter in information and it will add it to the tests
 
-
-class ChmExcelReport(ExcelReports):
+class ChmExcelReport(ExcelModel):
 
     def __init__(self, client_info, jobNum, authors, side_comments, extra_comments, comment, sample_names, sample_data, test_info, units, recovery, so, lower_limits, upper_limits, hidden_rows, report_type=2):
         super().__init__(jobNum, report_type)
@@ -73,12 +71,11 @@ class ChmExcelReport(ExcelReports):
 
         #set the total_cols
         self.total_cols = 10
-        self.page_size = 75
+        self.page_size = 78
 
         self.excel_page_setup()
         self.set_headers_and_footers()
         self.format_rows(self.total_samples)
-
 
         #note can insert
         self.insert_client_info(self.client_info, 'D')
@@ -107,15 +104,14 @@ class ChmExcelReport(ExcelReports):
         self.ws.page_setup.orientation = self.ws.ORIENTATION_PORTRAIT
 
         # set column dimensions
-        self.ws.column_dimensions['A'].width = 20 #120px
-        self.ws.column_dimensions['J'].width = 20 #1 width is equal to 6 pixels
+        self.ws.column_dimensions['A'].width = 21 #126 px
+        self.ws.column_dimensions['J'].width = 21 #1 width is equal to 6 pixels
         self.ws.print_title_rows = '1:8' # the first two row
 
         for col in range(1, self.total_cols -1):
             column_letter = get_column_letter(col + 1)
 
             self.ws.column_dimensions[column_letter].width = 9.2 # 57 px
-
 
     def create_report(self):
         logger.info('Entering create_report')
@@ -180,7 +176,7 @@ class ChmExcelReport(ExcelReports):
         file_name = f'W{self.jobNum}_chm.xlsx'
         file_path = os.path.join(export_path, file_name)
 
-        self.save_excel(file_path)
+        file_path = self.save_excel(file_path)
 
         return file_path, file_name
 

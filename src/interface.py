@@ -14,9 +14,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(2493, 1667)
+        MainWindow.resize(1510, 1112)
         MainWindow.setMinimumSize(QtCore.QSize(1200, 600))
-        MainWindow.setStyleSheet("QScrollBar:vertical {\n"
+        MainWindow.setStyleSheet("/******************************************************************\n"
+"/    global vertical and horizontal scrollbar  \n"
+"/******************************************************************/\n"
+"\n"
+"QScrollBar:vertical {\n"
 "    border: 1px solid #30333b;\n"
 "    background: #30333b; \n"
 "    border-radius: 5px; \n"
@@ -36,15 +40,54 @@ class Ui_MainWindow(object):
 "    background:none;\n"
 "}\n"
 "\n"
+"QScrollBar:horizontal {\n"
+"    border: 1px solid #30333b;\n"
+"    background: #30333b; \n"
+"    border-radius: 5px; \n"
+"}\n"
+"QScrollBar::handle:horizontal {\n"
+"    background:  #323a47; \n"
+"    border: 1px solid #30333b;\n"
+"    border-radius: 5px; \n"
+"}\n"
 "\n"
+"QScrollBar::add-line:horizontal {\n"
+"    border:none; \n"
+"    background:none;\n"
+"}\n"
+"QScrollBar::sub-line:horizontal {\n"
+"    border:none; \n"
+"    background:none;\n"
+"}\n"
 "\n"
 "/******************************************************************\n"
 "/    toolBar \n"
 "/******************************************************************/\n"
+"\n"
+"\n"
+"\n"
 "QToolBar {\n"
 "    background-color:#323a47; \n"
-"    border-bottom:1px solid #30333b\n"
+"    border-bottom:1px solid #30333b;\n"
+"    color:white; \n"
 "} \n"
+"\n"
+"QToolBar QPushButton {  /* Target push buttons */\n"
+"    color: white;\n"
+"}\n"
+"\n"
+"QToolBar QPushButton::hover {  \n"
+"    background-color:red; \n"
+"}\n"
+"\n"
+"\n"
+"QToolBar QLabel {      /* Target labels */\n"
+"    color: white;\n"
+"}\n"
+"\n"
+"QToolBar QToolButton { /* Target tool buttons (often used for actions) */\n"
+"    color: white;\n"
+"}\n"
 "\n"
 "#widget_47 {\n"
 "    background-color:#323a47; \n"
@@ -416,6 +459,59 @@ class Ui_MainWindow(object):
 "    background-color:#363f4d;\n"
 "} \n"
 "\n"
+"/******************************************************************\n"
+"/    Create Report Page  \n"
+"/******************************************************************/\n"
+"\n"
+"#createPage {\n"
+"    background-color:#788596;\n"
+"}\n"
+"\n"
+"#createReportHeader {\n"
+"    background-color:#363f4d;\n"
+"} \n"
+"\n"
+"#createReportHeader QRadioButton {\n"
+"    color:white \n"
+"} \n"
+"\n"
+"\n"
+"#createReportHeader QLabel{\n"
+"    color:white;\n"
+"} \n"
+"\n"
+"#createReportWidget {\n"
+"    border-radius: 10px;\n"
+"    background-color: #323a47;\n"
+"    color:white; \n"
+"}\n"
+"#createReportWidget QLabel {\n"
+"    color:white; \n"
+"}\n"
+"\n"
+"\n"
+"#createReportWidget QComboBox {\n"
+"    padding:2px;\n"
+"    padding-left: 5px; \n"
+"    color:white; \n"
+"    border: 1px solid gray; \n"
+"    background-color: rgb(55, 65, 84);\n"
+"} \n"
+"\n"
+"\n"
+"#createReportWidget QComboBox::item:selected {\n"
+"    background-color:rgb(66, 78, 101);\n"
+"    \n"
+"}\n"
+"\n"
+"#createReportWidget QListView {\n"
+"    background-color: rgb(55, 65, 84);\n"
+"}\n"
+"#textBrowser {\n"
+"    background-color:white; \n"
+"    color:black; \n"
+"}\n"
+"\n"
 "\n"
 "/******************************************************************\n"
 "/    Reports History Page \n"
@@ -496,88 +592,10 @@ class Ui_MainWindow(object):
 "     color:white; \n"
 "}\n"
 "\n"
-"\n"
-"\n"
-"\n"
 "#reportsFooterWidget QSpinBox {\n"
 "    color:white; \n"
 "    background-color: #363f4d; \n"
 "    border: 1px solid #30333b; \n"
-"} \n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"/******************************************************************\n"
-"/    Create Report Page  \n"
-"/******************************************************************/\n"
-"\n"
-"#createPage {\n"
-"    background-color:#788596;\n"
-"}\n"
-"\n"
-"#createReportHeader {\n"
-"    background-color:#363f4d;\n"
-"} \n"
-"\n"
-"#createReportHeader QRadioButton {\n"
-"    color:white \n"
-"} \n"
-"\n"
-"\n"
-"#createReportHeader QLabel{\n"
-"    color:white;\n"
-"} \n"
-"\n"
-"#createReportWidget {\n"
-"    border-radius: 10px;\n"
-"    background-color: #323a47;\n"
-"    color:white; \n"
-"}\n"
-"#createReportWidget QLabel {\n"
-"    color:white; \n"
-"}\n"
-"\n"
-"\n"
-"#createReportWidget QComboBox {\n"
-"    padding:2px;\n"
-"    padding-left: 5px; \n"
-"    color:white; \n"
-"    border: 1px solid gray; \n"
-"    background-color: rgb(55, 65, 84);\n"
-"} \n"
-"\n"
-"\n"
-"#createReportWidget QComboBox::item:selected {\n"
-"    background-color:rgb(66, 78, 101);\n"
-"    \n"
-"}\n"
-"\n"
-"#createReportWidget QListView {\n"
-"    background-color: rgb(55, 65, 84);\n"
-"}\n"
-"\n"
-"\n"
-"#createReportWidget QLineEdit {\n"
-"    padding: 2px; \n"
-"    padding-left: 5px; \n"
-"    border: 1px solid gray; \n"
-"    color:white; \n"
-"    background-color: rgb(55, 65, 84);\n"
-"    min-width: 190px; \n"
-"}\n"
-"\n"
-"\n"
-"\n"
-"#reportsUserInfoWidget {\n"
-"    background-color: #323a47;\n"
-"    border-radius: 5px;\n"
-"} \n"
-"\n"
-"#textBrowser {\n"
-"    background-color:white; \n"
-"    color:black; \n"
 "} \n"
 "\n"
 "\n"
@@ -1274,126 +1292,40 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setVerticalSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.createPageBody = QtWidgets.QWidget(self.createPage)
-        self.createPageBody.setStyleSheet("")
-        self.createPageBody.setObjectName("createPageBody")
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout(self.createPageBody)
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem1)
-        self.createReportWidget = QtWidgets.QWidget(self.createPageBody)
-        self.createReportWidget.setMinimumSize(QtCore.QSize(0, 0))
-        self.createReportWidget.setMaximumSize(QtCore.QSize(350, 200))
-        self.createReportWidget.setStyleSheet("")
-        self.createReportWidget.setObjectName("createReportWidget")
-        self.verticalLayout_42 = QtWidgets.QVBoxLayout(self.createReportWidget)
-        self.verticalLayout_42.setContentsMargins(-1, 12, -1, 12)
-        self.verticalLayout_42.setObjectName("verticalLayout_42")
-        self.widget_2 = QtWidgets.QWidget(self.createReportWidget)
-        self.widget_2.setMinimumSize(QtCore.QSize(0, 0))
-        self.widget_2.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.widget_2 = QtWidgets.QWidget(self.createPage)
+        self.widget_2.setStyleSheet("")
         self.widget_2.setObjectName("widget_2")
-        self.horizontalLayout_41 = QtWidgets.QHBoxLayout(self.widget_2)
-        self.horizontalLayout_41.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_41.setObjectName("horizontalLayout_41")
-        self.jobNumLabel = QtWidgets.QLabel(self.widget_2)
-        self.jobNumLabel.setMinimumSize(QtCore.QSize(100, 0))
-        self.jobNumLabel.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.jobNumLabel.setFont(font)
-        self.jobNumLabel.setObjectName("jobNumLabel")
-        self.horizontalLayout_41.addWidget(self.jobNumLabel)
-        self.jobNumInput = QtWidgets.QLineEdit(self.widget_2)
-        self.jobNumInput.setObjectName("jobNumInput")
-        self.horizontalLayout_41.addWidget(self.jobNumInput)
-        self.verticalLayout_42.addWidget(self.widget_2)
-        self.widget_4 = QtWidgets.QWidget(self.createReportWidget)
-        self.widget_4.setMinimumSize(QtCore.QSize(0, 0))
+        self.verticalLayout_59 = QtWidgets.QVBoxLayout(self.widget_2)
+        self.verticalLayout_59.setObjectName("verticalLayout_59")
+        self.widget_4 = QtWidgets.QWidget(self.widget_2)
         self.widget_4.setMaximumSize(QtCore.QSize(16777215, 30))
         self.widget_4.setObjectName("widget_4")
-        self.horizontalLayout_42 = QtWidgets.QHBoxLayout(self.widget_4)
-        self.horizontalLayout_42.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_42.setObjectName("horizontalLayout_42")
-        self.reportTypeLabel = QtWidgets.QLabel(self.widget_4)
-        self.reportTypeLabel.setMinimumSize(QtCore.QSize(100, 0))
-        self.reportTypeLabel.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.reportTypeLabel.setFont(font)
-        self.reportTypeLabel.setObjectName("reportTypeLabel")
-        self.horizontalLayout_42.addWidget(self.reportTypeLabel)
-        self.reportType = QtWidgets.QComboBox(self.widget_4)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.reportType.sizePolicy().hasHeightForWidth())
-        self.reportType.setSizePolicy(sizePolicy)
-        self.reportType.setMinimumSize(QtCore.QSize(0, 27))
-        self.reportType.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.reportType.setObjectName("reportType")
-        self.reportType.addItem("")
-        self.reportType.addItem("")
-        self.horizontalLayout_42.addWidget(self.reportType)
-        self.verticalLayout_42.addWidget(self.widget_4)
-        self.widget_6 = QtWidgets.QWidget(self.createReportWidget)
-        self.widget_6.setMinimumSize(QtCore.QSize(0, 0))
-        self.widget_6.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout(self.widget_4)
+        self.horizontalLayout_9.setContentsMargins(-1, 0, -1, 0)
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.create_macro_btn = QtWidgets.QPushButton(self.widget_4)
+        self.create_macro_btn.setObjectName("create_macro_btn")
+        self.horizontalLayout_9.addWidget(self.create_macro_btn)
+        self.create_test_btn = QtWidgets.QPushButton(self.widget_4)
+        self.create_test_btn.setObjectName("create_test_btn")
+        self.horizontalLayout_9.addWidget(self.create_test_btn)
+        self.widget_6 = QtWidgets.QWidget(self.widget_4)
+        self.widget_6.setMinimumSize(QtCore.QSize(30, 0))
         self.widget_6.setObjectName("widget_6")
-        self.horizontalLayout_43 = QtWidgets.QHBoxLayout(self.widget_6)
-        self.horizontalLayout_43.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_43.setObjectName("horizontalLayout_43")
-        self.ParamLabel = QtWidgets.QLabel(self.widget_6)
-        self.ParamLabel.setMinimumSize(QtCore.QSize(100, 0))
-        self.ParamLabel.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.ParamLabel.setFont(font)
-        self.ParamLabel.setObjectName("ParamLabel")
-        self.horizontalLayout_43.addWidget(self.ParamLabel)
-        self.paramType = QtWidgets.QComboBox(self.widget_6)
-        self.paramType.setMinimumSize(QtCore.QSize(25, 27))
-        self.paramType.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.paramType.setObjectName("paramType")
-        self.horizontalLayout_43.addWidget(self.paramType)
-        self.verticalLayout_42.addWidget(self.widget_6)
-        self.widget_7 = QtWidgets.QWidget(self.createReportWidget)
-        self.widget_7.setMinimumSize(QtCore.QSize(0, 0))
-        self.widget_7.setMaximumSize(QtCore.QSize(16777215, 30))
-        self.widget_7.setObjectName("widget_7")
-        self.horizontalLayout_44 = QtWidgets.QHBoxLayout(self.widget_7)
-        self.horizontalLayout_44.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_44.setObjectName("horizontalLayout_44")
-        self.label = QtWidgets.QLabel(self.widget_7)
-        self.label.setMinimumSize(QtCore.QSize(100, 0))
-        self.label.setMaximumSize(QtCore.QSize(100, 16777215))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
-        self.horizontalLayout_44.addWidget(self.label)
-        self.dilutionInput = QtWidgets.QLineEdit(self.widget_7)
-        self.dilutionInput.setMinimumSize(QtCore.QSize(192, 22))
-        self.dilutionInput.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        self.dilutionInput.setObjectName("dilutionInput")
-        self.horizontalLayout_44.addWidget(self.dilutionInput)
-        self.verticalLayout_42.addWidget(self.widget_7)
-        self.NextSection = QtWidgets.QPushButton(self.createReportWidget)
-        self.NextSection.setMinimumSize(QtCore.QSize(102, 22))
-        self.NextSection.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        self.NextSection.setFont(font)
-        self.NextSection.setMouseTracking(False)
-        self.NextSection.setObjectName("NextSection")
-        self.verticalLayout_42.addWidget(self.NextSection)
-        self.horizontalLayout_9.addWidget(self.createReportWidget)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem2)
-        self.gridLayout_2.addWidget(self.createPageBody, 0, 0, 1, 1)
+        self.horizontalLayout_9.addWidget(self.widget_6)
+        self.pushButton_5 = QtWidgets.QPushButton(self.widget_4)
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.horizontalLayout_9.addWidget(self.pushButton_5)
+        self.lineEdit = QtWidgets.QLineEdit(self.widget_4)
+        self.lineEdit.setObjectName("lineEdit")
+        self.horizontalLayout_9.addWidget(self.lineEdit)
+        self.verticalLayout_59.addWidget(self.widget_4)
+        self.macro_trees_container = QtWidgets.QWidget(self.widget_2)
+        self.macro_trees_container.setObjectName("macro_trees_container")
+        self.horizontalLayout_41 = QtWidgets.QHBoxLayout(self.macro_trees_container)
+        self.horizontalLayout_41.setObjectName("horizontalLayout_41")
+        self.verticalLayout_59.addWidget(self.macro_trees_container)
+        self.gridLayout_2.addWidget(self.widget_2, 0, 0, 1, 1)
         self.stackedWidget.addWidget(self.createPage)
         self.icpPage = QtWidgets.QWidget()
         self.icpPage.setStyleSheet("")
@@ -1506,8 +1438,8 @@ class Ui_MainWindow(object):
         self.icpSaveCompWidget.setObjectName("icpSaveCompWidget")
         self.gridLayout_8 = QtWidgets.QGridLayout(self.icpSaveCompWidget)
         self.gridLayout_8.setObjectName("gridLayout_8")
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_8.addItem(spacerItem3, 0, 1, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_8.addItem(spacerItem1, 0, 1, 1, 1)
         self.elements_name_header = QtWidgets.QLabel(self.icpSaveCompWidget)
         font = QtGui.QFont()
         font.setBold(True)
@@ -1693,8 +1625,8 @@ class Ui_MainWindow(object):
         self.deleteCompBtn.setCheckable(True)
         self.deleteCompBtn.setObjectName("deleteCompBtn")
         self.horizontalLayout_26.addWidget(self.deleteCompBtn)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_26.addItem(spacerItem4)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_26.addItem(spacerItem2)
         self.icpCancelBtn = QtWidgets.QPushButton(self.icpElementsFooter)
         self.icpCancelBtn.setObjectName("icpCancelBtn")
         self.horizontalLayout_26.addWidget(self.icpCancelBtn)
@@ -1749,8 +1681,8 @@ class Ui_MainWindow(object):
         self.icpReportNameLabel_2.setFont(font)
         self.icpReportNameLabel_2.setObjectName("icpReportNameLabel_2")
         self.horizontalLayout_4.addWidget(self.icpReportNameLabel_2)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem5)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem3)
         self.verticalLayout_53.addWidget(self.icpReportHeader)
         self.icpReportsOptions = QtWidgets.QWidget(self.widget_19)
         self.icpReportsOptions.setMaximumSize(QtCore.QSize(16777215, 16777215))
@@ -1781,8 +1713,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_35 = QtWidgets.QHBoxLayout(self.icpReportFooter)
         self.horizontalLayout_35.setContentsMargins(-1, 12, -1, 12)
         self.horizontalLayout_35.setObjectName("horizontalLayout_35")
-        spacerItem6 = QtWidgets.QSpacerItem(685, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_35.addItem(spacerItem6)
+        spacerItem4 = QtWidgets.QSpacerItem(685, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_35.addItem(spacerItem4)
         self.icpReportCancelBtn = QtWidgets.QPushButton(self.icpReportFooter)
         self.icpReportCancelBtn.setObjectName("icpReportCancelBtn")
         self.horizontalLayout_35.addWidget(self.icpReportCancelBtn)
@@ -1837,20 +1769,12 @@ class Ui_MainWindow(object):
         self.chmAddItemBtn = QtWidgets.QPushButton(self.widget_32)
         self.chmAddItemBtn.setObjectName("chmAddItemBtn")
         self.horizontalLayout_13.addWidget(self.chmAddItemBtn)
-        self.chmImportBtn = QtWidgets.QPushButton(self.widget_32)
-        self.chmImportBtn.setEnabled(False)
-        self.chmImportBtn.setObjectName("chmImportBtn")
-        self.horizontalLayout_13.addWidget(self.chmImportBtn)
-        self.chmExportBtn = QtWidgets.QPushButton(self.widget_32)
-        self.chmExportBtn.setEnabled(False)
-        self.chmExportBtn.setObjectName("chmExportBtn")
-        self.horizontalLayout_13.addWidget(self.chmExportBtn)
         self.horizontalLayout_56.addWidget(self.widget_32)
         self.chmSearchWidget = QtWidgets.QWidget(self.chmTopMenu1)
         self.chmSearchWidget.setMinimumSize(QtCore.QSize(0, 30))
         self.chmSearchWidget.setObjectName("chmSearchWidget")
         self.horizontalLayout_65 = QtWidgets.QHBoxLayout(self.chmSearchWidget)
-        self.horizontalLayout_65.setContentsMargins(20, 0, 20, 0)
+        self.horizontalLayout_65.setContentsMargins(26, 0, 26, 0)
         self.horizontalLayout_65.setSpacing(0)
         self.horizontalLayout_65.setObjectName("horizontalLayout_65")
         self.chmSearchBtn1 = QtWidgets.QPushButton(self.chmSearchWidget)
@@ -2155,8 +2079,8 @@ class Ui_MainWindow(object):
         self.chmAddTestsBtn.setObjectName("chmAddTestsBtn")
         self.verticalLayout_30.addWidget(self.chmAddTestsBtn)
         self.verticalLayout_27.addWidget(self.chmTestsValueWidget)
-        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_27.addItem(spacerItem7)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_27.addItem(spacerItem5)
         self.horizontalLayout_8.addWidget(self.chmInputActionsWidgets)
         self.chmRecentlyAdd = QtWidgets.QWidget(self.chmInputTab)
         self.chmRecentlyAdd.setEnabled(True)
@@ -2269,8 +2193,8 @@ class Ui_MainWindow(object):
         self.chm_upper = QtWidgets.QLineEdit(self.test_info_widget)
         self.chm_upper.setObjectName("chm_upper")
         self.gridLayout.addWidget(self.chm_upper, 4, 2, 1, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem8, 9, 2, 1, 1)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout.addItem(spacerItem6, 9, 2, 1, 1)
         self.chm_text_name = QtWidgets.QLineEdit(self.test_info_widget)
         self.chm_text_name.setObjectName("chm_text_name")
         self.gridLayout.addWidget(self.chm_text_name, 1, 2, 1, 1)
@@ -2341,8 +2265,8 @@ class Ui_MainWindow(object):
         self.label_60 = QtWidgets.QLabel(self.icpFooterCommentWidget_2)
         self.label_60.setObjectName("label_60")
         self.verticalLayout_52.addWidget(self.label_60)
-        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_52.addItem(spacerItem9)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_52.addItem(spacerItem7)
         self.gridLayout_3.addWidget(self.icpFooterCommentWidget_2, 2, 2, 1, 1)
         self.widget_41 = QtWidgets.QWidget(self.tests_container)
         self.widget_41.setObjectName("widget_41")
@@ -2364,8 +2288,8 @@ class Ui_MainWindow(object):
         self.pushButton_2 = QtWidgets.QPushButton(self.widget_39)
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_57.addWidget(self.pushButton_2)
-        spacerItem10 = QtWidgets.QSpacerItem(489, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_57.addItem(spacerItem10)
+        spacerItem8 = QtWidgets.QSpacerItem(489, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_57.addItem(spacerItem8)
         self.chm_test_btn = QtWidgets.QPushButton(self.widget_39)
         self.chm_test_btn.setObjectName("chm_test_btn")
         self.horizontalLayout_57.addWidget(self.chm_test_btn)
@@ -2428,8 +2352,8 @@ class Ui_MainWindow(object):
         self.chmReportNameLabel.setFont(font)
         self.chmReportNameLabel.setObjectName("chmReportNameLabel")
         self.horizontalLayout_22.addWidget(self.chmReportNameLabel)
-        spacerItem11 = QtWidgets.QSpacerItem(292, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_22.addItem(spacerItem11)
+        spacerItem9 = QtWidgets.QSpacerItem(292, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_22.addItem(spacerItem9)
         self.verticalLayout_34.addWidget(self.chmReportHeaderWidget)
         self.chmReportsInfo = QtWidgets.QWidget(self.chmReportsInfoWidget_2)
         self.chmReportsInfo.setMinimumSize(QtCore.QSize(0, 0))
@@ -2466,8 +2390,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_36 = QtWidgets.QHBoxLayout(self.chmReportFooter)
         self.horizontalLayout_36.setContentsMargins(-1, 12, -1, 12)
         self.horizontalLayout_36.setObjectName("horizontalLayout_36")
-        spacerItem12 = QtWidgets.QSpacerItem(686, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_36.addItem(spacerItem12)
+        spacerItem10 = QtWidgets.QSpacerItem(686, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_36.addItem(spacerItem10)
         self.chmReportCancelBtn = QtWidgets.QPushButton(self.chmReportFooter)
         self.chmReportCancelBtn.setMinimumSize(QtCore.QSize(122, 22))
         self.chmReportCancelBtn.setMaximumSize(QtCore.QSize(16777215, 16777215))
@@ -2506,14 +2430,8 @@ class Ui_MainWindow(object):
         self.generalToolBox = QtWidgets.QToolBox(self.generalTab)
         self.generalToolBox.setObjectName("generalToolBox")
         self.page_8 = QtWidgets.QWidget()
-        self.page_8.setGeometry(QtCore.QRect(0, 0, 2233, 1335))
+        self.page_8.setGeometry(QtCore.QRect(0, 0, 100, 30))
         self.page_8.setObjectName("page_8")
-        self.label_44 = QtWidgets.QLabel(self.page_8)
-        self.label_44.setGeometry(QtCore.QRect(20, 10, 91, 16))
-        self.label_44.setObjectName("label_44")
-        self.spinBox = QtWidgets.QSpinBox(self.page_8)
-        self.spinBox.setGeometry(QtCore.QRect(130, 10, 48, 24))
-        self.spinBox.setObjectName("spinBox")
         self.generalToolBox.addItem(self.page_8, "")
         self.page_3 = QtWidgets.QWidget()
         self.page_3.setGeometry(QtCore.QRect(0, 0, 678, 374))
@@ -2636,8 +2554,8 @@ class Ui_MainWindow(object):
         self.preferenceDbBtn.setObjectName("preferenceDbBtn")
         self.horizontalLayout_71.addWidget(self.preferenceDbBtn)
         self.verticalLayout_31.addWidget(self.widget_17)
-        spacerItem13 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_31.addItem(spacerItem13)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_31.addItem(spacerItem11)
         self.horizontalLayout_20.addWidget(self.fileLocationsWidget)
         self.generalToolBox.addItem(self.page_3, "")
         self.page_5 = QtWidgets.QWidget()
@@ -2658,7 +2576,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtWidgets.QToolBox(self.tab_6)
         self.toolBox.setObjectName("toolBox")
         self.page_2 = QtWidgets.QWidget()
-        self.page_2.setGeometry(QtCore.QRect(0, 0, 2233, 1403))
+        self.page_2.setGeometry(QtCore.QRect(0, 0, 924, 160))
         self.page_2.setObjectName("page_2")
         self.horizontalLayout_70 = QtWidgets.QHBoxLayout(self.page_2)
         self.horizontalLayout_70.setContentsMargins(12, -1, -1, -1)
@@ -2705,8 +2623,8 @@ class Ui_MainWindow(object):
         self.addParamBtn.setMinimumSize(QtCore.QSize(102, 22))
         self.addParamBtn.setObjectName("addParamBtn")
         self.horizontalLayout_62.addWidget(self.addParamBtn)
-        spacerItem14 = QtWidgets.QSpacerItem(899, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_62.addItem(spacerItem14)
+        spacerItem12 = QtWidgets.QSpacerItem(899, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_62.addItem(spacerItem12)
         self.verticalLayout_56.addWidget(self.widget_18)
         self.horizontalLayout_58.addWidget(self.widget_63)
         self.verticalLayout_10.addWidget(self.widget_11)
@@ -2742,8 +2660,8 @@ class Ui_MainWindow(object):
         self.addAuthorBtn.setMinimumSize(QtCore.QSize(102, 22))
         self.addAuthorBtn.setObjectName("addAuthorBtn")
         self.horizontalLayout_59.addWidget(self.addAuthorBtn)
-        spacerItem15 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_59.addItem(spacerItem15)
+        spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_59.addItem(spacerItem13)
         self.verticalLayout_49.addWidget(self.widget_61)
         self.horizontalLayout_67.addWidget(self.widget_58)
         self.toolBox.addItem(self.Authors, "")
@@ -2756,7 +2674,7 @@ class Ui_MainWindow(object):
         self.toolBox_3 = QtWidgets.QToolBox(self.testsTab)
         self.toolBox_3.setObjectName("toolBox_3")
         self.page = QtWidgets.QWidget()
-        self.page.setGeometry(QtCore.QRect(0, 0, 2225, 1403))
+        self.page.setGeometry(QtCore.QRect(0, 0, 100, 30))
         self.page.setObjectName("page")
         self.toolBox_3.addItem(self.page, "")
         self.page_6 = QtWidgets.QWidget()
@@ -2896,8 +2814,8 @@ class Ui_MainWindow(object):
         self.label_31.setObjectName("label_31")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_31)
         self.horizontalLayout_7.addWidget(self.widget_14)
-        spacerItem16 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem16)
+        spacerItem14 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem14)
         self.icpDataField = QtWidgets.QWidget(self.createReportHeader)
         self.icpDataField.setMaximumSize(QtCore.QSize(300, 16777215))
         self.icpDataField.setObjectName("icpDataField")
@@ -2912,8 +2830,8 @@ class Ui_MainWindow(object):
         self.radioButton_2.setCheckable(False)
         self.radioButton_2.setObjectName("radioButton_2")
         self.verticalLayout_25.addWidget(self.radioButton_2)
-        spacerItem17 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_25.addItem(spacerItem17)
+        spacerItem15 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_25.addItem(spacerItem15)
         self.horizontalLayout_7.addWidget(self.icpDataField)
         self.verticalLayout_14.addWidget(self.createReportHeader)
         self.Main = QtWidgets.QWidget(self.dataPage)
@@ -2938,7 +2856,7 @@ class Ui_MainWindow(object):
         self.widget_44.setMinimumSize(QtCore.QSize(0, 0))
         self.widget_44.setObjectName("widget_44")
         self.verticalLayout_35 = QtWidgets.QVBoxLayout(self.widget_44)
-        self.verticalLayout_35.setContentsMargins(-1, 0, -1, 0)
+        self.verticalLayout_35.setContentsMargins(0, 0, 6, 0)
         self.verticalLayout_35.setObjectName("verticalLayout_35")
         self.reportsUserInfoWidget = QtWidgets.QWidget(self.widget_44)
         self.reportsUserInfoWidget.setEnabled(True)
@@ -3214,8 +3132,8 @@ class Ui_MainWindow(object):
         self.samplesContainerLayout_2.setContentsMargins(0, 0, 0, 0)
         self.samplesContainerLayout_2.setObjectName("samplesContainerLayout_2")
         self.samplesContainerLayout.addLayout(self.samplesContainerLayout_2)
-        spacerItem18 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.samplesContainerLayout.addItem(spacerItem18)
+        spacerItem16 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.samplesContainerLayout.addItem(spacerItem16)
         self.verticalLayout_40.addWidget(self.samplesContainer)
         self.horizontalLayout_2.addWidget(self.widget_50)
         self.reportsTab.addTab(self.clientInfoTab, "")
@@ -3338,11 +3256,11 @@ class Ui_MainWindow(object):
         self.pushButton.setFont(font)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_60.addWidget(self.pushButton)
-        spacerItem19 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_60.addItem(spacerItem19)
-        self.pushButton_3 = QtWidgets.QPushButton(self.tabSectionWidget)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout_60.addWidget(self.pushButton_3)
+        spacerItem17 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_60.addItem(spacerItem17)
+        self.save_report_btn = QtWidgets.QPushButton(self.tabSectionWidget)
+        self.save_report_btn.setObjectName("save_report_btn")
+        self.horizontalLayout_60.addWidget(self.save_report_btn)
         self.createIcpReportBtn = QtWidgets.QPushButton(self.tabSectionWidget)
         self.createIcpReportBtn.setMinimumSize(QtCore.QSize(128, 23))
         self.createIcpReportBtn.setObjectName("createIcpReportBtn")
@@ -3359,7 +3277,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.MainBodyContainer)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 2493, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1510, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -3405,15 +3323,15 @@ class Ui_MainWindow(object):
         self.actionWrite.setObjectName("actionWrite")
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(3)
-        self.historyTabWidget.setCurrentIndex(0)
-        self.icpTabWidget.setCurrentIndex(1)
-        self.chmTabWidget.setCurrentIndex(2)
-        self.SettingsTab.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(5)
+        self.historyTabWidget.setCurrentIndex(1)
+        self.icpTabWidget.setCurrentIndex(0)
+        self.chmTabWidget.setCurrentIndex(0)
+        self.SettingsTab.setCurrentIndex(0)
         self.generalToolBox.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
         self.toolBox_3.setCurrentIndex(0)
-        self.reportsTab.setCurrentIndex(1)
+        self.reportsTab.setCurrentIndex(0)
         self.toggleMenuSmall.clicked['bool'].connect(self.LeftMenuContainerMini.setHidden) # type: ignore
         self.toggleMenuSmall.clicked['bool'].connect(self.LeftMenuContainer.setVisible) # type: ignore
         self.toggleMenuLarge.clicked['bool'].connect(self.LeftMenuContainerMini.setVisible) # type: ignore
@@ -3467,13 +3385,9 @@ class Ui_MainWindow(object):
         item = self.frontHistoryTableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "test"))
         self.historyTabWidget.setTabText(self.historyTabWidget.indexOf(self.FrontHistoryTab), _translate("MainWindow", "Front History"))
-        self.jobNumLabel.setText(_translate("MainWindow", "Job Number"))
-        self.reportTypeLabel.setText(_translate("MainWindow", "Report Type"))
-        self.reportType.setItemText(0, _translate("MainWindow", "test"))
-        self.reportType.setItemText(1, _translate("MainWindow", "test2"))
-        self.ParamLabel.setText(_translate("MainWindow", "Parameter"))
-        self.label.setText(_translate("MainWindow", "Dilution Factor"))
-        self.NextSection.setText(_translate("MainWindow", "Next Section"))
+        self.create_macro_btn.setText(_translate("MainWindow", "Add Macro"))
+        self.create_test_btn.setText(_translate("MainWindow", "Add Test"))
+        self.pushButton_5.setText(_translate("MainWindow", "Search"))
         self.icpUploadBtn.setText(_translate("MainWindow", "Upload"))
         item = self.icpTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Sample Name "))
@@ -3528,8 +3442,6 @@ class Ui_MainWindow(object):
         self.saveFooterBtn.setText(_translate("MainWindow", "Save Report"))
         self.icpTabWidget.setTabText(self.icpTabWidget.indexOf(self.icpReportsTab), _translate("MainWindow", "Reports"))
         self.chmAddItemBtn.setText(_translate("MainWindow", "Add Item"))
-        self.chmImportBtn.setText(_translate("MainWindow", "Import"))
-        self.chmExportBtn.setText(_translate("MainWindow", "Export"))
         self.chmSearchBtn1.setText(_translate("MainWindow", "Search "))
         self.chmSearchLine1.setPlaceholderText(_translate("MainWindow", "Search JobNum"))
         self.label_50.setText(_translate("MainWindow", "FILTER BY"))
@@ -3627,7 +3539,6 @@ class Ui_MainWindow(object):
         self.chmReportCancelBtn.setText(_translate("MainWindow", "Cancel"))
         self.chmReportSaveBtn.setText(_translate("MainWindow", "Save Changes"))
         self.chmTabWidget.setTabText(self.chmTabWidget.indexOf(self.chmReportInfoTab), _translate("MainWindow", "Reports"))
-        self.label_44.setText(_translate("MainWindow", "Set Font Size"))
         self.generalToolBox.setItemText(self.generalToolBox.indexOf(self.page_8), _translate("MainWindow", "General"))
         self.label_13.setText(_translate("MainWindow", "File Paths"))
         self.label_52.setText(_translate("MainWindow", "Set the defeault location that files will be accessed from"))
@@ -3715,7 +3626,7 @@ class Ui_MainWindow(object):
         self.reloadDataBtn.setText(_translate("MainWindow", "Reload Test Data"))
         self.calcHardnessBtn.setText(_translate("MainWindow", "Calculate Hardness"))
         self.pushButton.setText(_translate("MainWindow", "Reset Distillation"))
-        self.pushButton_3.setText(_translate("MainWindow", "Save Report"))
+        self.save_report_btn.setText(_translate("MainWindow", "Save Report"))
         self.createIcpReportBtn.setText(_translate("MainWindow", "Create ICP Report"))
         self.createChmReportBtn.setText(_translate("MainWindow", "Create CHM Report"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))

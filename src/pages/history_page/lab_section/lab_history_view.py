@@ -2,12 +2,9 @@ import math
 from base_logger import logger
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
-from PyQt5.QtWidgets import (
-    QCompleter, QAbstractItemView, QHeaderView,
-    QTableWidgetItem, QPushButton, QWidget, QHBoxLayout
-)
+from PyQt5.QtWidgets import QTableWidgetItem, QPushButton, QWidget, QHBoxLayout
 
-from pages.history_page.lab_section.lab_history_item import LabHistoryItem;
+from pages.history_page.lab_section.lab_history_item import LabHistoryItem
 
 class LabHistoryView(QObject):
     searchTextEmit = pyqtSignal(str)
@@ -42,7 +39,7 @@ class LabHistoryView(QObject):
         self.searchTextEmit.emit(current_text)
 
     def update_side_edit(self, history_item, row_item):
-        logger.info(f'Entering update_side_edit with {history_item.__repr__()}')
+        logger.info(f'Entering update_side_edit with {history_item.__repr__}')
 
         self.side_edit.load_job_info(history_item, row_item)
 
@@ -53,7 +50,7 @@ class LabHistoryView(QObject):
         # Bring the vertical scroll bar back to the top
         self.table.verticalScrollBar().setValue(0)
 
-        row_height = 24;
+        row_height = 24
         total_items = len(data)
         self.table.setRowCount(total_items)
 
@@ -93,6 +90,8 @@ class LabHistoryView(QObject):
                 if(col == 5):
                     status = current_item.status
 
+                    print(f'status: {status}, type: {type(status)}')
+
                     if(status == 0):
                         item.setText('Not Generated')
                     elif(status == 1):
@@ -110,7 +109,7 @@ class LabHistoryView(QObject):
     def create_open_btn(self, row, col, current_item):
 
         open_btn = QPushButton("Open")
-        open_btn.setFixedSize(120,18)
+        open_btn.setFixedSize(120, 18)
 
         open_btn.clicked.connect(lambda: self.openBtnClicked.emit(current_item))
 
@@ -118,11 +117,36 @@ class LabHistoryView(QObject):
 
     def sort_table(self, index):
 
-        if(index in [0,4]):
+        # sorting the creation_date column, if same date refer to the higher job_num to be
+        if index == 4:  # Date column
+            self.table.sortItems(index, Qt.DescendingOrder)  # Primary sort: Date (descending)
+
+            # Secondary sort: job_num (descending) for same dates
+            for i in range(self.table.rowCount() - 1):
+                for j in range(self.table.rowCount() - 1 - i):
+                    date1 = self.table.item(j, index).data(Qt.EditRole)  # Get date value
+                    date2 = self.table.item(j + 1, index).data(Qt.EditRole)
+
+                    if date1 == date2:  # Same date
+                        try:
+                            job_num1 = int(self.table.item(j, 0).text())  # Get job_num as integer
+                            job_num2 = int(self.table.item(j + 1, 0).text())
+
+                            if job_num1 < job_num2:  # Higher job_num should be earlier
+                                for k in range(self.table.columnCount()): # Swap entire rows
+                                    item1 = self.table.item(j, k)
+                                    item2 = self.table.item(j+1, k)
+                                    self.table.setItem(j,k, item2)
+                                    self.table.setItem(j+1, k, item1)
+
+                        except ValueError:  # Handle invalid job_num format
+                            print("Invalid job number format. Skipping secondary sort for these rows.")
+                            pass  # Or handle it differently (e.g., compare as strings)
+
+        elif index == 0: # Job number column
             self.table.sortItems(index, Qt.DescendingOrder)
         else:
-            self.table.sortItems(index)
-
+            self.table.sortItems(index)  # Default sorting for other columns
 
     def update_footer(self, current_page=None, total_pages=None, filter_size=None):
 
@@ -137,7 +161,12 @@ def get_param_name(param_id, param_names):
     #logger.info(f'Param ID: {param_id}, Type: {type(param_id)}')
     #logger.info(f'Param Names Keys: {list(param_names.keys())}, Key Types: {[type(key) for key in param_names.keys()]}')
 
-    if(param_id in param_names):
-        return param_names[param_id].param_name
+    logger.info(f'get_param_name param_id: {param_id}, param_names: {param_names}')
+
+    #TODO: fix this later so is more straight forward
+    for current_id, current_item in param_names:
+        if(param_id == current_id):
+            return current_item.param_name
+
 
     return param_id
